@@ -1,0 +1,15 @@
+function generateHealthBar() {
+
+}
+
+function updateHealthBar() {
+
+}
+
+function generatePlayerStats() {
+
+}
+
+function updatePlayerStats() {
+    
+}

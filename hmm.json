@@ -1,0 +1,82 @@
+{
+  "dependencies": [
+    {
+      "name": "flixel",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcubes-grave-of-shite/flixel"
+    },
+    {
+      "name": "flixel-addons",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcubes-grave-of-shite/flixel-addons"
+    },
+    {
+      "name": "flixel-controls",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/swordcubes-grave-of-shite/FlxControls"
+    },
+    {
+      "name": "flxanimate",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcube/flxanimate"
+    },
+    {
+      "name": "format",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "hmm",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "hxcpp",
+      "type": "git",
+      "dir": null,
+      "ref": "fa83d1964a4aac1e7a4bd68c75a962106324ddb6",
+      "url": "https://github.com/HaxeFoundation/hxcpp"
+    },
+    {
+      "name": "hxp",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "lime",
+      "type": "git",
+      "dir": null,
+      "ref": "develop",
+      "url": "https://github.com/swordcube/cubical-lime"
+    },
+    {
+      "name": "linc_luajit",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/superpowers04/linc_luajit"
+    },
+    {
+      "name": "lscript",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/swordcubes-grave-of-shite/lscript"
+    },
+    {
+      "name": "openfl",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcubes-grave-of-shite/openfl"
+    }
+  ]
+}

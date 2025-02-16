@@ -1,0 +1,44 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "bf",
+		"ratings": {}
+	},
+	"game": {
+		"stage": "limoRide",
+		"scrollSpeed": {
+			"easy": 1.9,
+			"normal": 2.2,
+			"hard": 2.6
+		},
+		"characters": {
+			"spectator": "gf-car",
+			"opponent": "mom-car",
+			"player": "bf-car"
+		},
+		"uiSkin": "default"
+	},
+	"song": {
+		"timingPoints": [
+			{
+				"b": 180,
+				"s": 0,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"artist": "Kawai Sprite",
+		"charter": "ninjamuffin99 + MtH + Spazkid",
+		"bpm": 180,
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [],
+		"title": "M.I.L.F"
+	}
+}

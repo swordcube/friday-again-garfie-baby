@@ -1,0 +1,28 @@
+{
+    "notes": {
+        "easy": [],
+        "normal": [],
+        "hard": [
+            {
+                "time": 0,
+                "direction": 2,
+                "length": 0,
+                "type": "Default"
+            }
+        ]
+    },
+    "events": {
+        "easy": [],
+        "normal": [],
+        "hard": [
+            {
+                "time": 0,
+                "params": {
+                    "game": 0.015,
+                    "hud": 0.15
+                },
+                "type": "Add Camera Zoom"
+            }
+        ]
+    }
+}

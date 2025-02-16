@@ -1,0 +1,28 @@
+{
+    "n": {
+        "easy": [],
+        "normal": [],
+        "hard": [
+            {
+                "t": 0,
+                "d": 2,
+                "l": 0,
+                "k": "Default"
+            }
+        ]
+    },
+    "e": {
+        "easy": [],
+        "normal": [],
+        "hard": [
+            {
+                "t": 0,
+                "p": {
+                    "game": 0.015,
+                    "hud": 0.15
+                },
+                "k": "Add Camera Zoom"
+            }
+        ]
+    }
+}

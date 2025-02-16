@@ -1,0 +1,341 @@
+{
+    "strum": {
+        "atlas": {
+            "type": "sparrow",
+            "path": "images/notes"
+        },
+        "scale": 0.7,
+        "animation": {
+            "static": {
+                "left": {
+                    "prefix": "left static",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "down static",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "up static",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "right static",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            },
+            "press": {
+                "left": {
+                    "prefix": "left press",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "down press",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "up press",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "right press",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            },
+            "confirm": {
+                "left": {
+                    "prefix": "left confirm",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "down confirm",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "up confirm",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "right confirm",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            }
+        }
+    },
+    "note": {
+        "atlas": {
+            "type": "sparrow",
+            "path": "images/notes"
+        },
+        "scale": 0.7,
+        "animation": {
+            "scroll": {
+                "left": {
+                    "prefix": "left scroll",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "down scroll",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "up scroll",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "right scroll",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            }
+        }
+    },
+    "hold": {
+        "atlas": {
+            "type": "sparrow",
+            "path": "images/notes"
+        },
+        "scale": 0.7,
+        "animation": {
+            "hold": {
+                "left": {
+                    "prefix": "left hold",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "down hold",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "up hold",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "right hold",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            },
+            "tail": {
+                "left": {
+                    "prefix": "left tail",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "down tail",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "up tail",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "right tail",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            }
+        }
+    },
+    "rating": {
+        "atlas": {
+            "type": "grid",
+            "path": "images/ratings",
+            "gridSize": {"x": 408, "y": 152}
+        },
+        "scale": 0.65,
+        "animation": {
+            "killer": {
+                "indices": [0],
+                "offset": {"x": 0, "y": 0}
+            },
+            "sick": {
+                "indices": [1],
+                "offset": {"x": 0, "y": 0}
+            },
+            "good": {
+                "indices": [2],
+                "offset": {"x": 0, "y": 0}
+            },
+            "bad": {
+                "indices": [3],
+                "offset": {"x": 0, "y": 0}
+            },
+            "shit": {
+                "indices": [4],
+                "offset": {"x": 0, "y": 0}
+            },
+            "miss": {
+                "indices": [5],
+                "offset": {"x": 0, "y": 0}
+            }
+        }
+    },
+    "combo": {
+        "atlas": {
+            "type": "grid",
+            "path": "images/combo",
+            "gridSize": {"x": 100, "y": 140}
+        },
+        "scale": 0.45,
+        "animation": {
+            "minus": {
+                "indices": [0],
+                "offset": {"x": 0, "y": 0}
+            },
+            "0": {
+                "indices": [1],
+                "offset": {"x": 0, "y": 0}
+            },
+            "1": {
+                "indices": [2],
+                "offset": {"x": 0, "y": 0}
+            },
+            "2": {
+                "indices": [3],
+                "offset": {"x": 0, "y": 0}
+            },
+            "3": {
+                "indices": [4],
+                "offset": {"x": 0, "y": 0}
+            },
+            "4": {
+                "indices": [5],
+                "offset": {"x": 0, "y": 0}
+            },
+            "5": {
+                "indices": [6],
+                "offset": {"x": 0, "y": 0}
+            },
+            "6": {
+                "indices": [7],
+                "offset": {"x": 0, "y": 0}
+            },
+            "7": {
+                "indices": [8],
+                "offset": {"x": 0, "y": 0}
+            },
+            "8": {
+                "indices": [9],
+                "offset": {"x": 0, "y": 0}
+            },
+            "9": {
+                "indices": [10],
+                "offset": {"x": 0, "y": 0}
+            }
+        }
+    },
+    "countdown": {
+        "atlas": {
+            "type": "grid",
+            "path": "images/countdown",
+            "gridSize": {"x": 770, "y": 380}
+        },
+        "steps": [
+            {
+                "name": "prepare",
+                "soundPath": "sfx/intro3"
+            },
+            {
+                "name": "ready",
+                "soundPath": "sfx/intro2"
+            },
+            {
+                "name": "set",
+                "soundPath": "sfx/intro1"
+            },
+            {
+                "name": "go",
+                "soundPath": "sfx/introGo"
+            }
+        ],
+        "scale": 0.8,
+        "animation": {
+            "prepare": {
+                "indices": [0],
+                "offset": {"x": 0, "y": 0}
+            },
+            "ready": {
+                "indices": [1],
+                "offset": {"x": 0, "y": 0}
+            },
+            "set": {
+                "indices": [2],
+                "offset": {"x": 0, "y": 0}
+            },
+            "go": {
+                "indices": [3],
+                "offset": {"x": 0, "y": 0}
+            }
+        }
+    }
+}
