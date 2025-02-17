@@ -1,5 +1,6 @@
 package funkin.assets.loaders;
 
+import sys.FileSystem;
 import haxe.ds.ReadOnlyArray;
 
 class AssetLoader {
@@ -22,5 +23,10 @@ class AssetLoader {
             return assetID;
 
         return '${root}/${assetID}';
+    }
+
+    public function readDirectory(path:String):Array<String> {
+        final path:String = getPath(path);
+        return (FileSystem.exists(path)) ? FileSystem.readDirectory(path) : [];
     }
 }

@@ -5,6 +5,6 @@ class ModAssetLoader extends AssetLoader {
 
     public function new(modID:String) {
         this.modID = modID;
-        super('mods/${modID}');
+        super('mods/${ModManager.modFolders.get(modID)}');
     }
 }

@@ -3,14 +3,11 @@ package funkin.backend.scripting;
 #if SCRIPTING_ALLOWED
 import llua.Lua;
 import haxe.io.Path;
+
 import lscript.LScript;
+import lscript.CustomConvert;
 
-class FunkinLua {
-    public var code(default, null):String = null;
-    public var filePath(default, null):String = null;
-    public var fileName(default, null):String = null;
-    public var unsafe(default, null):Bool = false;
-
+class FunkinLua extends FunkinScript {
     public function new(code:String, unsafe:Bool = false) {
         if(FlxG.assets.exists(code)) {
             filePath = code;
@@ -22,10 +19,19 @@ class FunkinLua {
             // returning the wrong colors
             // Everything else i tried didn't work :(
             "FlxColor:fromRGB(" => "FlxColor:new():setRGB(",
+            "FlxColor.fromRGB(" => "FlxColor:new():setRGB(",
+            
             "FlxColor:fromRGBFloat(" => "FlxColor:new():setRGBFloat(",
+            "FlxColor.fromRGBFloat(" => "FlxColor:new():setRGBFloat(",
+            
             "FlxColor:fromHSV(" => "FlxColor:new():setHSV(",
+            "FlxColor.fromHSV(" => "FlxColor:new():setHSV(",
+            
             "FlxColor:fromHSB(" => "FlxColor:new():setHSB(",
-            "FlxColor:fromCMYK(" => "FlxColor:new():setCMYK("
+            "FlxColor.fromHSB(" => "FlxColor:new():setHSB(",
+            
+            "FlxColor:fromCMYK(" => "FlxColor:new():setCMYK(",
+            "FlxColor.fromCMYK(" => "FlxColor:new():setCMYK("
         ];
         for(from => to in workaroundMap)
             code = code.replace(from, to);
@@ -46,83 +52,46 @@ class FunkinLua {
                 Logs.error('Failed to call function "$func": ${err}');
         };
         _lua.tracePrefix = (filePath != null) ? fileName : 'FunkinLua';
-        _lua.scriptTrace = (s:Dynamic) -> {
-            Logs.trace('${_lua.tracePrefix}: ${s}');
+        _lua.print = (line:Int, s:String) -> {
+            Logs.trace('${_lua.tracePrefix}:${line}: ${s}');
         };
-        preset();
+        super(code, unsafe);
     }
 
-    public function preset():Void {
-        set("Json", {
-            parse: Json.parse,
-            stringify: Json.stringify
-        });
-        setClass(FlxG);
-
-        setClass(FlxBasic);
-        setClass(FlxObject);
-
-        setClass(FlxSprite);
-        setClass(FlxCamera);
-
-        setClass(FlxState);
-        setClass(FlxSubState);
-
-        setClass(FlxTypedGroup);
-        set("FlxGroup", FlxTypedGroup);
-        setClass(FlxTypedSpriteGroup);
-        set("FlxSpriteGroup", FlxTypedSpriteGroup);
-
-        setClass(FlxMath);
-        setClass(FlxEase);
-        setClass(FlxTween);
-
-        setClass(Paths);
-        setClass(Cache);
-        setClass(Logs);
-        setClass(Options);
-        setClass(Controls);
-        setClass(Conductor);
-        setClass(ModManager);
-        setClass(Constants);
-
-        set("BlendMode", funkin.backend.scripting.helpers.BlendModeHelper);
-        set("FlxAxes", funkin.backend.scripting.helpers.FlxAxesHelper);
-        set("FlxCameraFollowStyle", funkin.backend.scripting.helpers.FlxCameraFollowStyleHelper);
-        set("FlxColor", funkin.backend.scripting.helpers.FlxColorHelper);
-        set("FlxKey", funkin.backend.scripting.helpers.FlxKeyHelper);
-        set("FlxTextAlign", funkin.backend.scripting.helpers.FlxTextAlignHelper);
-        set("FlxTextBorderStyle", funkin.backend.scripting.helpers.FlxTextBorderStyleHelper);
-        set("FlxTweenType", funkin.backend.scripting.helpers.FlxTweenTypeHelper);
-    }
-
-    public function execute():Void {
+    override function execute():Void {
+        if(closed) return;
         _lua.execute();
     }
 
-    public function get(name:String):Dynamic {
+    override function get(name:String):Dynamic {
+        if(closed) return null;
         return _lua.getVar(name);
     }
 
-    public function set(name:String, value:Dynamic):Void {
+    override function set(name:String, value:Dynamic):Void {
+        if(closed) return;
         return _lua.setVar(name, value);
     }
 
-    public function setClass(value:Class<Dynamic>):Void {
+    override function setClass(value:Class<Dynamic>):Void {
+        if(closed) return;
         final cl:Array<String> = Type.getClassName(value).split('.');
         _lua.setVar(cl[cl.length - 1], value);
     }
 
-    public function call(method:String, ?args:Array<Dynamic>):Dynamic {
-        return _lua.callFunc(method, args);
+    override function call(method:String, ?args:Array<Dynamic>):Dynamic {
+        if(closed) return null; // if script is closed BEFORE calling the func, do nothing
+        var ret:Dynamic = _lua.callFunc(method, args);
+
+        if(closed) // if the script was closed DURING a func call, wait till after the call to close it
+            Lua.close(_lua.luaState); // the one thing lscript doesn't have...
+
+        return ret;
     }
 
-    public function setParent(parent:Dynamic):Void {
+    override function setParent(parent:Dynamic):Void {
+        if(closed) return;
         _lua.parent = parent;
-    }
-
-    public function close():Void {
-        Lua.close(_lua.luaState); // the one thing lscript doesn't have...
     }
 
     //----------- [ Private API ] -----------//

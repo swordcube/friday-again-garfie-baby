@@ -1,6 +1,7 @@
 package funkin.backend;
 
 import flixel.input.keyboard.FlxKey;
+
 import funkin.backend.native.NativeAPI;
 import funkin.utilities.AudioSwitchFix;
 
@@ -24,10 +25,6 @@ class InitState extends FlxState {
         Paths.initAssetSystem();
 
         Controls.init();
-        Controls.instance.bind(NOTE_LEFT, 0, FlxKey.S);
-        Controls.instance.bind(NOTE_DOWN, 0, FlxKey.D);
-        Controls.instance.bind(NOTE_UP, 0, FlxKey.K);
-        Controls.instance.bind(NOTE_RIGHT, 0, FlxKey.L);
 
         ModManager.scanMods();
         ModManager.registerMods();
