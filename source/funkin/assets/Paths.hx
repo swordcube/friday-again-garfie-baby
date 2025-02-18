@@ -29,7 +29,7 @@ class Paths {
         IMAGE => [".png", ".jpg", ".jpeg", ".bmp"],
         SOUND => [".ogg", ".wav", ".mp3"],
         FONT => [".ttf", ".otf"],
-        SCRIPT => [".lua"]
+        SCRIPT => [".hx", ".hxs", ".hsc", ".hscript", ".lua"]
     ];
     public static var forceMod:String = null;
 

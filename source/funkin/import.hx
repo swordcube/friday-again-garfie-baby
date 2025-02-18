@@ -2,6 +2,9 @@
 import haxe.Json;
 import openfl.utils.Assets as OpenFLAssets;
 
+import json2object.JsonParser;
+import json2object.JsonWriter;
+
 import flixel.FlxG;
 
 import flixel.FlxBasic;
@@ -17,6 +20,8 @@ import flixel.group.FlxGroup;
 import flixel.group.FlxSpriteGroup;
 
 import flixel.math.FlxMath;
+import flixel.util.FlxColor;
+import flixel.sound.FlxSound;
 
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;

@@ -3,6 +3,9 @@ package funkin.backend;
 import flixel.input.keyboard.FlxKey;
 
 import funkin.backend.native.NativeAPI;
+import funkin.graphics.RatioScaleModeEx;
+
+import funkin.utilities.FlxUtil;
 import funkin.utilities.AudioSwitchFix;
 
 import funkin.states.PlayState;
@@ -28,6 +31,9 @@ class InitState extends FlxState {
 
         ModManager.scanMods();
         ModManager.registerMods();
+
+        FlxUtil.init();
+        FlxG.scaleMode = new RatioScaleModeEx();
 
         FlxG.signals.preStateCreate.add((newState:FlxState) -> {
             if(Type.getClass(newState) != _lastState) {

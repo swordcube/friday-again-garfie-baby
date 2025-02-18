@@ -4,7 +4,7 @@ import flixel.util.FlxDestroyUtil;
 import flixel.sound.FlxSound;
 
 class VocalGroup extends FlxBasic {
-    public var resyncRange:Float = 30;
+    public var resyncRange:Float = 20;
 
     public var spectator(default, null):FlxSound;
     public var opponent(default, null):FlxSound;
@@ -96,14 +96,14 @@ class VocalGroup extends FlxBasic {
 
     override function update(elapsed:Float) {
         if(!isSingleTrack) {
-            if(spectator != null && spectator.playing && Math.abs(attachedConductor.rawTime - spectator.time) >= resyncRange)
-                spectator.time = attachedConductor.rawTime;
+            if(spectator != null && spectator.playing && Math.abs(attachedConductor.music.time - spectator.time) >= resyncRange)
+                spectator.time = attachedConductor.music.time;
             
-            if(opponent != null && opponent.playing && Math.abs(attachedConductor.rawTime - opponent.time) >= resyncRange)
-                opponent.time = attachedConductor.rawTime;
+            if(opponent != null && opponent.playing && Math.abs(attachedConductor.music.time - opponent.time) >= resyncRange)
+                opponent.time = attachedConductor.music.time;
         }
-        if(player != null && player.playing && Math.abs(attachedConductor.rawTime - player.time) >= resyncRange)
-            player.time = attachedConductor.rawTime;
+        if(player != null && player.playing && Math.abs(attachedConductor.music.time - player.time) >= resyncRange)
+            player.time = attachedConductor.music.time;
     }
 
     public function seek(time:Float):Void {

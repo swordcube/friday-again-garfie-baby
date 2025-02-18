@@ -1,11 +1,9 @@
 package funkin.gameplay;
 
 import flixel.util.FlxSort;
-import flixel.addons.input.FlxControlInputType;
-import flixel.input.keyboard.FlxKey;
-import openfl.ui.Keyboard;
-import lime.ui.KeyModifier;
-import lime.ui.KeyCode;
+
+import funkin.gameplay.hud.BaseHUD;
+
 import funkin.gameplay.notes.Strum;
 import funkin.gameplay.notes.Note;
 import funkin.gameplay.notes.StrumLine;
@@ -17,6 +15,8 @@ import funkin.gameplay.song.Chart.ChartData;
 class PlayField extends FlxGroup {
     public var opponentStrumLine:StrumLine;
     public var playerStrumLine:StrumLine;
+
+    public var hud:BaseHUD;
 
     public var currentChart:ChartData;
     public var currentDifficulty:String;
@@ -63,7 +63,7 @@ class PlayField extends FlxGroup {
             }
         }
         noteSpawner = new NoteSpawner(this);
-        noteSpawner.pendingNotes = currentChart.notes;
+        noteSpawner.pendingNotes = currentChart.notes.get(currentDifficulty);
         add(noteSpawner);
     }
 

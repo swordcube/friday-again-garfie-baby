@@ -1,6 +1,9 @@
 package funkin.backend.scripting;
 
 #if SCRIPTING_ALLOWED
+import funkin.backend.scripting.events.ScriptEvent;
+
+@:access(funkin.backend.scripting.events.ScriptEvent)
 class FunkinScriptGroup {
     public var parent:Dynamic;
     public var members(default, null):Array<FunkinScript>;
@@ -53,6 +56,16 @@ class FunkinScriptGroup {
         return defaultValue;
     }
 
+    public function event<T:ScriptEvent>(method:String, event:T):T {
+        for(i in 0...members.length) {
+            if(!event._canPropagate)
+                break;
+
+            members[i].call(method, [event]);
+        }
+        return event;
+    }
+
     public function setParent(parent:Dynamic):Void {
         this.parent = parent;
         for(i in 0...members.length)
@@ -60,10 +73,11 @@ class FunkinScriptGroup {
     }
 
     public function close():Void {
+        final members:Array<FunkinScript> = members.copy();
         for(i in 0...members.length)
             members[i].close();
 
-        members.clear();
+        this.members.clear();
     }
 
     public function preAdd(script:FunkinScript):Void {

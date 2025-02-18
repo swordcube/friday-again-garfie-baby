@@ -1,14 +1,16 @@
 package funkin.states;
 
-import flixel.sound.FlxSound;
-
 import funkin.gameplay.song.VocalGroup;
 import funkin.backend.interfaces.IBeatReceiver;
 
 import funkin.gameplay.PlayField;
 import funkin.gameplay.song.Chart;
 
+import funkin.gameplay.hud.*;
+import funkin.gameplay.hud.BaseHUD;
+
 #if SCRIPTING_ALLOWED
+import funkin.backend.scripting.events.*;
 import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
 #end
@@ -68,8 +70,16 @@ class PlayState extends FunkinState implements IBeatReceiver {
 			if(instPath.startsWith('${ModManager.MOD_DIRECTORY}/'))
 				Paths.forceMod = instPath.split("/")[1];
 		}
-		currentChart = Chart.load(currentSong, currentDifficulty, currentMix, Paths.forceMod);
+		currentChart = Chart.load(currentSong, currentMix, Paths.forceMod);
 		FlxG.sound.playMusic(instPath, 1, false);
+
+		Conductor.instance.music = null;
+		Conductor.instance.offset = Options.songOffset;
+
+		Conductor.instance.reset(currentChart.meta.song.bpm);
+		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
+
+		Conductor.instance.time = -((Conductor.instance.beatLength * 4) + Options.songOffset);
 
 		#if SCRIPTING_ALLOWED
 		scripts = new FunkinScriptGroup();
@@ -105,6 +115,31 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		}
 		#end
 
+		playField = new PlayField(currentChart, currentDifficulty);
+		add(playField);
+		
+		var event:HUDGenerationEvent = Events.get(HUD_GENERATION);
+		event = scripts.event("onHUDGeneration", event.recycle(Options.hudType));
+
+		switch(event.hudType) {
+			case "Classic":
+				playField.hud = new ClassicHUD(playField);
+
+			default:
+				playField.hud = new ScriptedHUD(playField, event.hudType);
+		}
+		add(playField.hud);
+
+		#if SCRIPTING_ALLOWED
+		if(playField.hud is ScriptedHUD) {
+			final hud:ScriptedHUD = cast playField.hud;
+			scripts.add(hud.script);
+
+			hud.script.setParent(hud);
+			hud.script.call("onCreate");
+		}
+		#end
+
 		inst = FlxG.sound.music;
 		FlxG.sound.music.pause();
 
@@ -122,17 +157,6 @@ class PlayState extends FunkinState implements IBeatReceiver {
 			});
 		}
 		add(vocals);
-
-		Conductor.instance.music = null;
-		Conductor.instance.offset = Options.songOffset;
-
-		Conductor.instance.reset(currentChart.meta.song.bpm);
-		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
-
-		Conductor.instance.time = -((Conductor.instance.beatLength * 4) + Options.songOffset);
-
-		playField = new PlayField(currentChart, currentDifficulty);
-		add(playField);
 
 		#if SCRIPTING_ALLOWED
 		scripts.call("onCreatePost");

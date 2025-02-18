@@ -193,15 +193,15 @@ class FlxColorHelper {
 	}
 
 	public static function fromCMYK(Cyan:Float, Magenta:Float, Yellow:Float, Black:Float, Alpha:Float) {
-		return fc = new FlxColor(FlxColor.fromCMYK(Cyan, Magenta, Yellow, Black, Alpha));
+		return new FlxColorHelper(FlxColor.WHITE).setCMYK(Cyan, Magenta, Yellow, Black, Alpha);
 	}
 
 	public static function fromHSB(Hue:Float, Saturation:Float, Brightness:Float, Alpha:Float = 1) {
-		return fc = new FlxColor(FlxColor.fromHSB(Hue, Saturation, Brightness, Alpha));
+		return new FlxColorHelper(FlxColor.WHITE).setHSB(Hue, Saturation, Brightness, Alpha);
 	}
 
 	public static function fromHSL(Hue:Float, Saturation:Float, Lightness:Float, Alpha:Float = 1) {
-		return fc = new FlxColor(FlxColor.fromHSL(Hue, Saturation, Lightness, Alpha));
+		return new FlxColorHelper(FlxColor.WHITE).setHSL(Hue, Saturation, Lightness, Alpha);
 	}
 
 	public static function fromInt(Value:Int) {
@@ -209,11 +209,11 @@ class FlxColorHelper {
 	}
 
 	public static function fromRGB(Red:Int, Green:Int, Blue:Int, Alpha:Int = 255) {
-		return fc = new FlxColor(FlxColor.fromRGB(Red, Blue, Green, Alpha));
+		return new FlxColorHelper(FlxColor.WHITE).setRGB(Red, Green, Blue, Alpha);
 	}
 
 	public static function fromRGBFloat(Red:Float, Green:Float, Blue:Float, Alpha:Float = 1) {
-		return fc = new FlxColor(FlxColor.fromRGBFloat(Red, Blue, Green, Alpha));
+		return new FlxColorHelper(FlxColor.WHITE).setRGBFloat(Red, Green, Blue, Alpha);
 	}
 
 	public static function fromString(str:String) {

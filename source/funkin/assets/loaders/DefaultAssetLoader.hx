@@ -2,6 +2,7 @@ package funkin.assets.loaders;
 
 class DefaultAssetLoader extends AssetLoader {
     public function new() {
-        super('assets');
+        final root:String = Sys.args().contains("-livereload") ? "../../../../" : "";
+        super('${root}assets');
     }
 }

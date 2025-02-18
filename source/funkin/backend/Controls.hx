@@ -20,6 +20,10 @@ enum Control {
     NOTE_DOWN;
     NOTE_UP;
     NOTE_RIGHT;
+
+    FULLSCREEN;
+    DEBUG;
+    DEBUG_RELOAD;
 }
 
 class Controls extends FlxControls<Control> {
@@ -70,7 +74,11 @@ class Controls extends FlxControls<Control> {
             NOTE_LEFT => [FlxKey.A, FlxKey.LEFT],
             NOTE_DOWN => [FlxKey.S, FlxKey.DOWN],
             NOTE_UP => [FlxKey.W, FlxKey.UP],
-            NOTE_RIGHT => [FlxKey.D, FlxKey.RIGHT]
+            NOTE_RIGHT => [FlxKey.D, FlxKey.RIGHT],
+
+            FULLSCREEN => [FlxKey.F11],
+            DEBUG => [FlxKey.SEVEN],
+            DEBUG_RELOAD => [FlxKey.F5]
         ];
     }
 

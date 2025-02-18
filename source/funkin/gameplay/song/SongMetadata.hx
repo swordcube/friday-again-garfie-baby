@@ -1,37 +1,50 @@
 package funkin.gameplay.song;
 
-import haxe.DynamicAccess;
+@:structInit
+class SongData {
+	public var title:String;
 
-typedef SongData = {
-    var title:String;
+	public var mixes:Array<String>;
+	public var difficulties:Array<String>;
 
-    var mixes:Array<String>;
-    var difficulties:Array<String>;
+	public var bpm:Float;
+	public var timingPoints:Array<TimingPoint>;
 
-    var bpm:Float;
-    var timingPoints:Array<CompressedTimingPoint>;
-
-    var artist:String;
-    var charter:String;
+	public var artist:String;
+	public var charter:String;
 }
 
-typedef FreeplayData = {
-    var ratings:DynamicAccess<Int>;
+@:structInit
+class FreeplayData {
+	public var ratings:Map<String, Int>;//DynamicAccess<Int>;
 
-    var icon:String;
-    var album:String;
+	public var icon:String;
+	public var album:String;
+
+    public function getRating(difficulty:String):Int {
+        return ratings.get(difficulty);
+    }
 }
 
-typedef GameplayData = {
-    var characters:DynamicAccess<String>;
-    var scrollSpeed:DynamicAccess<Float>;
+@:structInit
+class GameplayData {
+	public var characters:Map<String, String>;//DynamicAccess<String>;
+	public var scrollSpeed:Map<String, Float>;//DynamicAccess<Float>;
 
-    var stage:String;
-    var uiSkin:String;
+	public var stage:String;
+	public var uiSkin:String;
+
+    public function getCharacter(type:String):String {
+        return characters.get(type);
+    }
+
+    public function getScrollSpeed(difficulty:String):Float {
+        return scrollSpeed.get(difficulty);
+    }
 }
 
-typedef SongMetadata = {
-    var song:SongData;
-    var freeplay:FreeplayData;
-    var game:GameplayData;
+class SongMetadata {
+	public var song:SongData;
+	public var freeplay:FreeplayData;
+	public var game:GameplayData;
 }

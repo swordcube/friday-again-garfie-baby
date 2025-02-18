@@ -93,5 +93,9 @@
 		"xtr1common": "cpp",
 		"xtree": "cpp",
 		"xutility": "cpp"
-	}
+	},
+	"Lua.diagnostics.disable": [
+		"lowercase-global",
+		"undefined-global"
+	]
 }

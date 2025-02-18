@@ -59,8 +59,16 @@
 
 	<!-- Useful Libraries -->
 	<haxelib name="flxanimate" />
-	<haxelib name="linc_luajit" if="SCRIPTING_ALLOWED" />
-	<haxelib name="lscript" if="SCRIPTING_ALLOWED" /> <!-- Library for easier OOP interfacing with Lua/Haxe -->
+
+	<haxelib name="thx.core" />
+	<haxelib name="thx.semver" />
+	<haxelib name="json2object" />
+
+	<section if="SCRIPTING_ALLOWED">
+		<haxelib name="linc_luajit" />
+		<haxelib name="lscript" /> <!-- Library for easier OOP interfacing with Lua/Haxe -->
+		<haxelib name="hscript-improved" />
+	</section>
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
 
@@ -104,6 +112,8 @@
 	<!-- Haxe 4.3.0+: Enable pretty syntax errors and stuff. -->
 	<!-- pretty (haxeflixel default), indent, classic (haxe compiler default) -->
 	<haxedef name="message.reporting" value="pretty" />
+
+	<haxedef name="hscriptPos" if="SCRIPTING_ALLOWED" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 

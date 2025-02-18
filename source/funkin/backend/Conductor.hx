@@ -31,32 +31,34 @@ enum abstract TimeSignature(Array<Int>) from Array<Int> to Array<Int> {
 }
 
 /**
- * Compressed timing point data for storing in JSON files.
- */
-typedef CompressedTimingPoint = {
-    var t:Float; // time
-    var s:Float; // step
-
-    var b:Float; // bpm
-    var ts:TimeSignature; // time sig
-}
-
-/**
  * Data for determining BPM/time sig changes, as a class.
  */
 @:structInit
 class TimingPoint {
+    @:alias("t")
     public var time:Float;
 
+    @:alias("s")
     public var step:Float;
+
+    @:jignored
     public var beat:Float;
+
+    @:jignored
     public var measure:Float;
 
+    @:alias("b")
     public var bpm:Float;
-    public var timeSignature:TimeSignature;
+
+    @:alias("ts")
+    public var timeSignature:Array<Int>;
+
+    public inline function getTimeSignature():TimeSignature {
+        return cast timeSignature;
+    }
 
     public inline function getStepLength():Float {
-        return getBeatLength() / timeSignature.getDenominator();
+        return getBeatLength() / timeSignature[1];
     }
 
     public inline function getBeatLength():Float {
@@ -64,7 +66,7 @@ class TimingPoint {
     }
 
     public inline function getMeasureLength():Float {
-        return getBeatLength() * timeSignature.getNumerator();
+        return getBeatLength() * timeSignature[0];
     }
 }
 
@@ -134,7 +136,7 @@ class Conductor extends FlxBasic {
         _lastMusicTime = -999999;
     }
 
-    public function setupTimingPoints(timingPoints:Array<CompressedTimingPoint>) {
+    public function setupTimingPoints(timingPoints:Array<TimingPoint>) {
         var timeOffset:Float = 0;
         var beatOffset:Float = 0;
         var measureOffset:Float = 0;
@@ -143,34 +145,34 @@ class Conductor extends FlxBasic {
         var lastTopNumber:Float = 0;
         var lastBPM:Float = 0;
 
-        timingPoints.sort((a, b) -> Std.int(a.t - b.t));
+        timingPoints.sort((a, b) -> Std.int(a.time - b.time));
 
         for(point in timingPoints) {
-            if (point.t == 0) {
+            if (point.time == 0) {
                 // avoids few divisions by 0 that led to issues, assuming the first timing point is always at the start of a song
-                lastTopNumber = point.ts.getNumerator();
-                lastBPM = point.b;
+                lastTopNumber = point.getTimeSignature().getNumerator();
+                lastBPM = point.bpm;
                 continue;
             }
-            final beatDifference:Float = (point.t - timeOffset) / ((60 * lastBPM) * 1000);
+            final beatDifference:Float = (point.time - timeOffset) / ((60 * lastBPM) * 1000);
             measureOffset += beatDifference / lastTopNumber;
             beatOffset += beatDifference;
             
             final newPoint:TimingPoint = {
-                time: point.t,
+                time: point.time,
 
-                step: point.s,
+                step: point.step,
                 beat: beatOffset,
                 measure: measureOffset,
 
-                bpm: point.b,
-                timeSignature: point.ts
+                bpm: point.bpm,
+                timeSignature: point.timeSignature
             };
             this.timingPoints.push(newPoint);
 
-            timeOffset = point.t;
-            lastTopNumber = point.ts.getNumerator();
-            lastBPM = point.b;
+            timeOffset = point.time;
+            lastTopNumber = point.getTimeSignature().getNumerator();
+            lastBPM = point.bpm;
         }
         _latestTimingPoint = this.timingPoints[0];
     }
@@ -291,7 +293,7 @@ class Conductor extends FlxBasic {
         if(curBeat > lastBeat) {
             if(hasMetronome) {
                 final sound:FlxSound = FlxG.sound.play(Paths.sound('menus/sfx/charter/metronome'));
-                sound.pitch = (curBeat % curTimingPoint.timeSignature.getNumerator() == 0) ? 1.5 : 1.12;
+                sound.pitch = (curBeat % curTimingPoint.getTimeSignature().getNumerator() == 0) ? 1.5 : 1.12;
             }
             for(i in FlxMath.maxInt(lastBeat, -1)...curBeat) {
                 if(Conductor.instance == this) {
@@ -348,7 +350,7 @@ class Conductor extends FlxBasic {
 
     @:noCompletion
     private inline function get_timeSignature():TimeSignature {
-        return _latestTimingPoint.timeSignature;
+        return _latestTimingPoint.getTimeSignature();
     }
 
     @:noCompletion

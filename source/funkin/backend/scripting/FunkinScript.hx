@@ -21,6 +21,9 @@ class FunkinScript {
 
     public static function fromFile(filePath:String, unsafe:Bool = false):FunkinScript {
         switch(Path.extension(filePath).toLowerCase()) {
+            case "hx", "hxs", "hsc", "hscript":
+                return new FunkinHScript(filePath, unsafe);
+
             case "lua":
                 return new FunkinLua(filePath, unsafe);
         }
@@ -52,6 +55,7 @@ class FunkinScript {
         setClass(FlxEase);
         setClass(FlxTween);
 
+        setClass(flixel.ui.FlxBar);
         setClass(flixel.addons.display.FlxBackdrop);
         setClass(flixel.addons.display.FlxTiledSprite);
 
@@ -63,7 +67,9 @@ class FunkinScript {
         setClass(Conductor);
         setClass(ModManager);
         setClass(Constants);
+
         setClass(FunkinLua);
+        setClass(FunkinHScript);
 
         setClass(funkin.graphics.SkinnableSprite);
         setClass(funkin.graphics.TiledSprite);
@@ -82,6 +88,8 @@ class FunkinScript {
         setClass(funkin.gameplay.song.Chart);
         setClass(funkin.gameplay.song.VocalGroup);
 
+        setClass(funkin.gameplay.Character);
+        setClass(funkin.gameplay.HealthIcon);
         setClass(funkin.gameplay.HoldTiledSprite);
         setClass(funkin.gameplay.PlayField);
         setClass(funkin.gameplay.UISkin);
@@ -94,6 +102,7 @@ class FunkinScript {
         set("FlxTextAlign", funkin.backend.scripting.helpers.FlxTextAlignHelper);
         set("FlxTextBorderStyle", funkin.backend.scripting.helpers.FlxTextBorderStyleHelper);
         set("FlxTweenType", funkin.backend.scripting.helpers.FlxTweenTypeHelper);
+        set("FlxBarFillDirection", flixel.ui.FlxBar.FlxBarFillDirection); // using a helper doesn't work, but using the enum directly does
 
         set("platform", Constants.CURRENT_OS);
         set("osName", Constants.CURRENT_OS);

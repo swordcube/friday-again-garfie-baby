@@ -2,32 +2,43 @@ package funkin.gameplay;
 
 import funkin.graphics.SkinnableSprite;
 
-typedef CountdownStepData = {
-    var name:String;
-    var soundPath:String;
+@:structInit
+class CountdownStepData {
+	public var name:String;
+	public var soundPath:String;
 }
 
-typedef CountdownData = {
-    > SkinnableSpriteData,
+@:structInit
+class CountdownData {
+	public var atlas:AtlasData;
+	public var scale:Float;
 
-    var steps:Array<CountdownStepData>;
+	@:optional
+	public var antialiasing:Bool;
+
+	public var animation:Map<String, Map<String, AnimationData>>;//DynamicAccess<DynamicAccess<AnimationData>>;
+
+	public var steps:Array<CountdownStepData>;
 }
 
-typedef UISkinData = {
-    var strum:SkinnableSpriteData;
-    var note:SkinnableSpriteData;
-    var hold:SkinnableSpriteData;
+@:structInit
+class UISkinData {
+	public var strum:SkinnableSpriteData;
+	public var note:SkinnableSpriteData;
+	public var hold:SkinnableSpriteData;
 
-    var rating:SkinnableSpriteData;
-    var combo:SkinnableSpriteData;
+	public var rating:SkinnableSpriteData;
+	public var combo:SkinnableSpriteData;
 
-    var countdown:SkinnableSpriteData;
+	public var countdown:CountdownData;
 }
 
 class UISkin {
     public static function get(name:String):UISkinData {
         if(Cache.uiSkinCache.get(name) == null) {
-            Cache.uiSkinCache.set(name, Json.parse(FlxG.assets.getText(Paths.json('gameplay/uiskins/${name}/conf'))));
+			final parser:JsonParser<UISkinData> = new JsonParser<UISkinData>();
+			parser.ignoreUnknownVariables = true;
+			Cache.uiSkinCache.set(name, parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/uiskins/${name}/conf'))));
         }
         return Cache.uiSkinCache.get(name);
     }

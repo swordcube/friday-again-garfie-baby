@@ -5,6 +5,8 @@ class ModAssetLoader extends AssetLoader {
 
     public function new(modID:String) {
         this.modID = modID;
-        super('mods/${ModManager.modFolders.get(modID)}');
+
+        final root:String = Sys.args().contains("-livereload") ? "../../../../" : "";
+        super('${root}mods/${ModManager.modFolders.get(modID)}');
     }
 }

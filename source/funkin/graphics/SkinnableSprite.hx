@@ -2,27 +2,43 @@ package funkin.graphics;
 
 import haxe.DynamicAccess;
 
-typedef AtlasData = {
-    var type:AtlasType;
-    var path:String;
-    var ?gridSize:PointData<Int>;
+@:structInit
+class AtlasData {
+	public var type:AtlasType;
+	public var path:String;
+
+	@:optional
+	public var gridSize:PointData<Int>;
 }
 
 typedef AnimationData = {
-    var ?prefix:String;
-    var ?indices:Array<Int>;
+	@:optional
+	var prefix:String;
 
-    var fps:Float;
-    var ?looped:Bool;
+	@:optional
+	var indices:Array<Int>;
 
-    var ?offset:PointData<Float>;
+	var fps:Float;
+
+	@:optional
+	@:default(false)
+	var looped:Bool;
+
+	@:optional
+	@:default({x: 0, y: 0})
+	var offset:PointData<Float>;
 }
 
-typedef SkinnableSpriteData = {
-    var atlas:AtlasData;
-    var scale:Float;
-    var ?antialiasing:Bool;
-    var animation:DynamicAccess<DynamicAccess<AnimationData>>;
+@:structInit
+class SkinnableSpriteData {
+	public var atlas:AtlasData;
+	public var scale:Float;
+
+	@:optional
+    @:default(null)
+	public var antialiasing:Null<Bool>;
+
+	public var animation:Map<String, Map<String, AnimationData>>;//DynamicAccess<DynamicAccess<AnimationData>>;
 }
 
 class SkinnableSprite extends FlxSprite {

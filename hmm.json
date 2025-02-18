@@ -1,34 +1,6 @@
 {
   "dependencies": [
     {
-      "name": "flixel",
-      "type": "git",
-      "dir": null,
-      "ref": "dev",
-      "url": "https://github.com/swordcubes-grave-of-shite/flixel"
-    },
-    {
-      "name": "flixel-addons",
-      "type": "git",
-      "dir": null,
-      "ref": "dev",
-      "url": "https://github.com/swordcubes-grave-of-shite/flixel-addons"
-    },
-    {
-      "name": "flixel-controls",
-      "type": "git",
-      "dir": null,
-      "ref": "master",
-      "url": "https://github.com/swordcubes-grave-of-shite/FlxControls"
-    },
-    {
-      "name": "flxanimate",
-      "type": "git",
-      "dir": null,
-      "ref": "dev",
-      "url": "https://github.com/swordcube/flxanimate"
-    },
-    {
       "name": "format",
       "type": "haxelib",
       "version": null
@@ -58,6 +30,48 @@
       "url": "https://github.com/swordcube/cubical-lime"
     },
     {
+      "name": "openfl",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcubes-grave-of-shite/openfl"
+    },
+    {
+      "name": "flixel",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcubes-grave-of-shite/flixel"
+    },
+    {
+      "name": "flixel-addons",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcubes-grave-of-shite/flixel-addons"
+    },
+    {
+      "name": "thx.core",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/fponticelli/thx.core"
+    },
+    {
+      "name": "thx.semver",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/fponticelli/thx.semver"
+    },
+    {
+      "name": "json2object",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/FunkinCrew/json2object"
+    },
+    {
       "name": "linc_luajit",
       "type": "git",
       "dir": null,
@@ -72,11 +86,25 @@
       "url": "https://github.com/swordcubes-grave-of-shite/lscript"
     },
     {
-      "name": "openfl",
+      "name": "flixel-controls",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/swordcubes-grave-of-shite/FlxControls"
+    },
+    {
+      "name": "flxanimate",
       "type": "git",
       "dir": null,
       "ref": "dev",
-      "url": "https://github.com/swordcubes-grave-of-shite/openfl"
+      "url": "https://github.com/swordcube/flxanimate"
+    },
+    {
+      "name": "hscript-improved",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/Sword352/hscript-improved"
     }
   ]
 }

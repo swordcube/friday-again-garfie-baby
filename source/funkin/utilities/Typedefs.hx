@@ -1,6 +1,7 @@
 package funkin.utilities;
 
-typedef PointData<T> = {
-    var x:T;
-    var y:T;
+@:structInit
+class PointData<T> {
+    public var x:T;
+    public var y:T;
 }
