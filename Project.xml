@@ -78,36 +78,32 @@
 	<!--Allow for easier support of custom asset loading-->
 	<haxedef name="FLX_CUSTOM_ASSETS_DIRECTORY" value="assets" />
 	<haxedef name="FLX_CUSTOM_RUNTIME_ASSETS_DIRECTORY" />
-	
-	<!--Enable the Flixel core recording system-->
-	<!--<haxedef name="FLX_RECORD" />-->
-
-	<!--Disable the right and middle mouse buttons-->
-	<!--<haxedef name="FLX_NO_MOUSE_ADVANCED" />-->
-
-	<!--Disable the native cursor API on Flash-->
-	<!--<haxedef name="FLX_NO_NATIVE_CURSOR" />-->
 
 	<!--Optimise inputs, be careful you will get null errors if you don't use conditionals in your game-->
 	<haxedef name="FLX_NO_MOUSE" if="mobile" />
 	<haxedef name="FLX_NO_KEYBOARD" if="mobile" />
 	<haxedef name="FLX_NO_TOUCH" if="desktop" />
-	<!--<haxedef name="FLX_NO_GAMEPAD" />-->
-
-	<!--Disable the Flixel core sound tray-->
-	<!--<haxedef name="FLX_NO_SOUND_TRAY" />-->
-
-	<!--Disable the Flixel sound management code-->
-	<!--<haxedef name="FLX_NO_SOUND_SYSTEM" />-->
 
 	<!--Disable the Flixel core focus lost screen-->
 	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
 
-	<!--Disable the Flixel core debugger. Automatically gets set whenever you compile in release mode!-->
-	<haxedef name="FLX_NO_DEBUG" unless="debug" />
+	<!-- Release-build specific defines -->
+    <section unless="debug">
+        <!--Disable the Flixel core debugger. Automatically gets set whenever you compile in release mode!-->
+        <haxedef name="FLX_NO_DEBUG" />
+        
+        <!--Enable this for Nape release builds for a serious peformance improvement-->
+        <haxedef name="NAPE_RELEASE_BUILD" />
 
-	<!--Enable this for Nape release builds for a serious peformance improvement-->
-	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
+        <!-- Crash tracing on release builds -->
+        <haxedef name="HXCPP_CHECK_POINTER" />
+        <haxedef name="HXCPP_STACK_LINE" />
+        <haxedef name="HXCPP_STACK_TRACE" />
+		<haxedef name="openfl-enable-handle-error" />
+    </section>
+
+    <!-- Self explanatory i'd say -->
+    <haxedef name="no-deprecation-warnings" />
 
 	<!-- Haxe 4.3.0+: Enable pretty syntax errors and stuff. -->
 	<!-- pretty (haxeflixel default), indent, classic (haxe compiler default) -->
