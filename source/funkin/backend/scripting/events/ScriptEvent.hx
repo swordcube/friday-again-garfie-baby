@@ -1,10 +1,12 @@
 package funkin.backend.scripting.events;
 
-#if SCRIPTING_ALLOWED
 import flixel.util.FlxDestroyUtil.IFlxDestroyable;
 
 enum abstract ScriptEventType(String) from String to String {
+	final UNKNOWN = "UNKNOWN";
     final HUD_GENERATION = "HUD_GENERATION";
+	final NOTE_HIT = "NOTE_HIT";
+	final NOTE_MISS = "NOTE_MISS";
 }
 
 @:autoBuild(funkin.backend.macros.EventMacro.build())
@@ -79,10 +81,11 @@ class ScriptEvent implements IFlxDestroyable {
 		flagAsPre();
 	}
 
-	public function new() {}
+	public function new(type:ScriptEventType) {
+		this.type = type;
+	}
 
 	public function destroy():Void {
 		data = null;
 	}
 }
-#end

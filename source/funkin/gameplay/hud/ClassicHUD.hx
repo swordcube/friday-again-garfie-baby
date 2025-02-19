@@ -1,6 +1,8 @@
 package funkin.gameplay.hud;
 
+import flixel.util.FlxStringUtil;
 import flixel.ui.FlxBar;
+import flixel.text.FlxText;
 import funkin.states.PlayState;
 
 class ClassicHUD extends BaseHUD {
@@ -10,6 +12,8 @@ class ClassicHUD extends BaseHUD {
 
     public var healthBarBG:FlxSprite;
     public var healthBar:FlxBar;
+
+    public var scoreText:FlxText;
 
     override function generateHealthBar():Void {
         final game:PlayState = PlayState.instance;
@@ -23,10 +27,11 @@ class ClassicHUD extends BaseHUD {
         healthBar = new FlxBar(
             healthBarBG.x + 4, healthBarBG.y + 4,
             FlxBarFillDirection.RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8),
-            null, null, 0, 2
+            null, null, playField.stats.minHealth, playField.stats.maxHealth
         );
         healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33); // using direct 0xFF codes doesn't work in lua, must use FlxColor.fromString there instead
-        healthBar.value = 1;
+        healthBar.value = playField.stats.health;
+        healthBar.numDivisions = Std.int(healthBar.width * 2);
         add(healthBar);
 
         var opponentIcon = "face";
@@ -43,22 +48,36 @@ class ClassicHUD extends BaseHUD {
         iconP1 = new HealthIcon(playerIcon, 1);
         iconP1.flipX = true;
         add(iconP1);
+
+        scoreText = new FlxText(healthBarBG.x + (healthBarBG.width - 190), healthBarBG.y + 30, 0, "Score: N/A");
+        scoreText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
+        add(scoreText);
     }
 
     override function updateHealthBar() {
+        final percent:Float = healthBar.value / healthBar.max;
+        iconP2.health = percent;
+        iconP1.health = percent;
         positionIcons();
+    }
+
+    override function updatePlayerStats():Void {
+        scoreText.text = "Score: " + FlxStringUtil.formatMoney(playField.stats.score, false, true);
     }
     
     override function positionIcons():Void {
-        var percent = healthBar.value / healthBar.max;
+        final percent:Float = healthBar.value / healthBar.max;
         iconP1.x = healthBar.x + (healthBar.width * (1 - percent)) - 26;
         iconP1.y = healthBar.y + (healthBar.height * 0.5) - (iconP1.height * 0.5);
     
-        iconP2.x = healthBar.x + (healthBar.width * percent) - (iconP2.width - 26);
+        iconP2.x = healthBar.x + (healthBar.width * (1 - percent)) - (iconP2.width - 26);
         iconP2.y = healthBar.y + (healthBar.height * 0.5) - (iconP2.height * 0.5);
     }
     
     override function update(elapsed:Float):Void {
+        healthBar.setRange(playField.stats.minHealth, playField.stats.maxHealth);
+        healthBar.value = FlxMath.lerp(healthBar.value, playField.stats.health, FlxMath.getElapsedLerp(0.25, elapsed));
+
         positionIcons();
         super.update(elapsed);
     }

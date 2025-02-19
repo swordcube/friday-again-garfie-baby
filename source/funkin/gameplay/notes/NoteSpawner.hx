@@ -27,6 +27,7 @@ class NoteSpawner extends FlxBasic {
                 break;
             
             final note:Note = strumLine.notes.recycle(_noteFactory);
+            note.stepLength = 100;//playField.attachedConductor.stepLength;
             note.setup(strumLine, noteData.time, noteData.direction, noteData.length - playField.attachedConductor.stepLength, noteData.type, strumLine.strums.members[noteData.direction % Constants.KEY_COUNT].skin);
             
             if(!strumLine.holdTrails.members.contains(note.holdTrail))

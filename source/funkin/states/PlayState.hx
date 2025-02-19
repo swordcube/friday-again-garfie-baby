@@ -11,6 +11,9 @@ import funkin.gameplay.hud.BaseHUD;
 
 #if SCRIPTING_ALLOWED
 import funkin.backend.scripting.events.*;
+import funkin.backend.scripting.events.notes.*;
+import funkin.backend.scripting.events.gameplay.*;
+
 import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
 #end
@@ -116,11 +119,21 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		#end
 
 		playField = new PlayField(currentChart, currentDifficulty);
+
+		playField.onNoteHit.add(onNoteHit);
+		playField.onNoteHitPost.add(onNoteHitPost);
+
+		playField.onNoteMiss.add(onNoteMiss);
+		playField.onNoteMissPost.add(onNoteMissPost);
+
 		add(playField);
 		
 		var event:HUDGenerationEvent = Events.get(HUD_GENERATION);
+		#if SCRIPTING_ALLOWED
 		event = scripts.event("onHUDGeneration", event.recycle(Options.hudType));
-
+		#else
+		event = event.recycle(Options.hudType);
+		#end
 		switch(event.hudType) {
 			case "Classic":
 				playField.hud = new ClassicHUD(playField);
@@ -157,7 +170,7 @@ class PlayState extends FunkinState implements IBeatReceiver {
 			});
 		}
 		add(vocals);
-
+		
 		#if SCRIPTING_ALLOWED
 		scripts.call("onCreatePost");
 		#end
@@ -184,6 +197,10 @@ class PlayState extends FunkinState implements IBeatReceiver {
 
 		startingSong = false;
 
+		#if SCRIPTING_ALLOWED
+		scripts.call("onStartSong");
+		#end
+
 		FlxG.sound.music.time = 0;
 		FlxG.sound.music.resume();
 
@@ -194,7 +211,31 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		Conductor.instance.music = FlxG.sound.music;
 
 		#if SCRIPTING_ALLOWED
-		scripts.call("onStartSong");
+		scripts.call("onStartSongPost");
+		#end
+	}
+
+	private function onNoteHit(event:NoteHitEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.event("onNoteHit", event);
+		#end
+	}
+
+	private function onNoteHitPost(event:NoteHitEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.event("onNoteHitPost", event);
+		#end
+	}
+
+	private function onNoteMiss(event:NoteMissEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.event("onNoteMiss", event);
+		#end
+	}
+
+	private function onNoteMissPost(event:NoteMissEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.event("onNoteMissPost", event);
 		#end
 	}
 
@@ -205,7 +246,7 @@ class PlayState extends FunkinState implements IBeatReceiver {
 	}
 
 	override function beatHit(beat:Int):Void {
-		if(beat % Conductor.instance.timeSignature.getNumerator() == 0)
+		if(beat > 0 && beat % Conductor.instance.timeSignature.getNumerator() == 0)
 			FlxG.camera.zoom += 0.03;
 
 		#if SCRIPTING_ALLOWED

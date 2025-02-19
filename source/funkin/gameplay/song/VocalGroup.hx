@@ -27,16 +27,16 @@ class VocalGroup extends FlxBasic {
         if(params.isSingleTrack)
             isSingleTrack = true;
         else {
-            if(FlxG.assets.exists(params.spectator)) {
+            if(params.spectator != null && FlxG.assets.exists(params.spectator)) {
                 spectator = FlxG.sound.play(params.spectator, 0).pause();
                 spectator.volume = 1;
             }
-            if(FlxG.assets.exists(params.opponent)) {
+            if(params.opponent != null && FlxG.assets.exists(params.opponent)) {
                 opponent = FlxG.sound.play(params.opponent, 0).pause();
                 opponent.volume = 1;
             }
         }
-        if(FlxG.assets.exists(params.player)) {
+        if(params.player != null && FlxG.assets.exists(params.player)) {
             player = FlxG.sound.play(params.player, 0).pause();
             player.volume = 1;
         }

@@ -5,6 +5,21 @@ import flixel.util.FlxColor;
 import funkin.gameplay.UISkin;
 import funkin.graphics.SkinnableSprite;
 
+import funkin.backend.scripting.events.notes.*;
+
+/**
+ * A class representing a step at which you
+ * should be given score.
+ * 
+ * This is primarily used for scoring systems which
+ * allow hold notes to give you score, such as PBOT.
+ */
+@:structInit
+class ScoreStep {
+    public var time:Float;
+    public var score:Int;
+}
+
 class Note extends SkinnableSprite {
     public var strumLine:StrumLine;
 
@@ -20,6 +35,16 @@ class Note extends SkinnableSprite {
     public var wasMissed:Bool = false;
 
     public var holdTrail:HoldTrail;
+    public var stepLength:Float;
+
+    public var curScoreStep:Int = 0;
+    public var scoreSteps:Array<ScoreStep> = [];
+
+    @:noCompletion
+    public var hitEvent:NoteHitEvent; // meant for internal use, don't care enough to make it private :/
+
+    @:noCompletion
+    public var missEvent:NoteMissEvent; // meant for internal use, don't care enough to make it private :/
 
     public function new(x:Float = 0, y:Float = 0) {
         super(x, y);
@@ -36,6 +61,12 @@ class Note extends SkinnableSprite {
         this.length = Math.max(length, 0.0);
         this.type = type;
 
+        curScoreStep = 0;
+        scoreSteps.resize(0);
+
+        for(i in 0...Std.int(this.length / stepLength))
+            scoreSteps.push({time: time + ((i + 1) * stepLength), score: 4});
+        
         holdTrail.setup(this, skin);
 
         // reset a bunch of properties the programmer

@@ -41,38 +41,6 @@ class StrumLine extends FlxSpriteGroup {
         }
     }
 
-    public function hitNote(note:Note):Void {
-        note.wasHit = true;
-
-        if(note.length <= 0)
-            killNote(note);
-        else {
-            note.colorTransform.redOffset = note.colorTransform.greenOffset = note.colorTransform.blueOffset = 40;
-        }
-        final strum:Strum = strums.members[note.direction];
-        strum.holdTime = Math.max(note.length, (botplay) ? (playField?.attachedConductor.stepLength ?? Conductor.instance.stepLength) : 250);
-        strum.animation.play('${Constants.NOTE_DIRECTIONS[note.direction]} confirm', true);
-    }
-
-    public function killNote(note:Note):Void {
-        note.kill();
-        note.holdTrail.kill();
-    }
-
-    public function missNote(note:Note):Void {
-        note.wasHit = false;
-        note.wasMissed = true;
-
-        // the note is now cum colored
-        note.colorTransform.redOffset = note.colorTransform.greenOffset = note.colorTransform.blueOffset = 200;
-
-        note.holdTrail.strip.colorTransform.redOffset = note.holdTrail.strip.colorTransform.greenOffset = note.holdTrail.strip.colorTransform.blueOffset = 200;
-        note.holdTrail.tail.colorTransform.redOffset = note.holdTrail.tail.colorTransform.greenOffset = note.holdTrail.tail.colorTransform.blueOffset = 200;
-        
-        note.alpha = 0.3;
-        note.holdTrail.alpha = 0.3;
-    }
-
     public function processNote(note:Note):Void {
         final strum:Strum = strums.members[note.direction];
         final attachedConductor:Conductor = playField?.attachedConductor ?? Conductor.instance;
@@ -97,6 +65,22 @@ class StrumLine extends FlxSpriteGroup {
             
             note.holdTrail.y = strum.y + note.holdTrail.offsetY + (strum.height * 0.5);
             note.holdTrail.height = calcHeight;
+
+            if(playField != null && playField.playerStrumLine == this && note.scoreSteps.length != 0) {
+                while(note.curScoreStep < note.scoreSteps.length && attachedConductor.time >= note.scoreSteps[note.curScoreStep].time) {
+                    if(note.hitEvent.gainHealthFromHolds)
+                        playField.stats.health += note.hitEvent.healthGain;
+
+                    if(note.hitEvent.gainScoreFromHolds)
+                        playField.stats.score += note.scoreSteps[note.curScoreStep++].score;
+
+                    if(playField.hud != null) {
+                        playField.hud.updateHealthBar();
+                        playField.hud.updatePlayerStats();
+                    }
+                }
+            }
+
         } else {
             note.y = strum.y + note.offsetY + (Constants.PIXELS_PER_MS * (note.time - attachedConductor.time) * absSpeed * scrollMult);
             
@@ -107,31 +91,31 @@ class StrumLine extends FlxSpriteGroup {
         }
         if(botplay) {
             if(!note.wasHit && !note.wasMissed && note.time <= attachedConductor.time)
-                hitNote(note);
+                playField.hitNote(note);
             
             if(note.wasHit && note.length > 0 && note.time <= attachedConductor.time - note.length) {
                 // kill the note if it is a hold note and it was
                 // held the entire way through
-                killNote(note);
+                playField.killNote(note);
             }
             if(note.time <= attachedConductor.time - ((350 / scrollSpeed) + note.length)) {
                 // kill the note if it goes off-screen, regardless of if it was missed or not
                 // nobody will know trust 🤫
-                killNote(note);
+                playField.killNote(note);
             }
         } else {
             if(!note.wasHit && !note.wasMissed && note.time <= attachedConductor.time - Options.hitWindow) {
                 // miss the note if it's out of range to be hit
-                missNote(note);
+                playField.missNote(note);
             }
             if(note.wasHit && note.length > 0 && note.time <= attachedConductor.time - note.length) {
                 // kill the note if it is a hold note and it was
                 // held the entire way through
-                killNote(note);
+                playField.killNote(note);
             }
             if(note.wasMissed && note.time <= attachedConductor.time - ((350 / scrollSpeed) + note.length)) {
                 // kill the note if it goes off-screen (only if it was missed)
-                killNote(note);
+                playField.killNote(note);
             }
         }
     }

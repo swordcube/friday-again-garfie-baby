@@ -1,0 +1,97 @@
+package funkin.backend.scripting.events.notes;
+
+import funkin.gameplay.notes.Note;
+
+class NoteHitEvent extends ScriptEvent {
+    /**
+     * The note that was hit.
+     */
+    public var note:Note;
+
+    /**
+     * The time at which the note was hit (in milliseconds).
+     */
+    public var time:Float;
+
+    /**
+     * The direction of the note that was hit.
+     */
+    public var direction:Int;
+
+    /**
+     * The length of the note that was hit (in milliseconds).
+     */
+    public var length:Float;
+
+    /**
+     * The type of the note that was hit.
+     */
+    public var noteType:String;
+    
+    /**
+     * Whether or not the note that was hit
+     * should increase the player's combo.
+     */
+    public var increaseCombo:Bool;
+
+    /**
+     * Whether or not the note that was hit
+     * should cause a miss to occur.
+     */
+    public var hitCausesMiss:Bool;
+
+    /**
+     * The rating of the note that was hit.
+     */
+    public var rating:String;
+
+    /**
+     * Whether or not to show the rating of
+     * the note that was hit.
+     */
+    public var showRating:Bool;
+
+    /**
+     * Whether or not to show the combo of
+     * the note that was hit.
+     */
+    public var showCombo:Bool;
+
+    /**
+     * The amount of score gained from the note.
+     */
+    public var score:Int;
+
+    /**
+     * The accuracy multiplier of the note that was hit.
+     */
+    public var accuracyScore:Float;
+
+    /**
+     * The amount of health gained from the note.
+     */
+    public var healthGain:Float;
+
+    /**
+     * Whether or not to gain health from hold notes.
+     */
+    public var gainHealthFromHolds:Bool;
+
+    /**
+     * Whether or not to gain score from hold notes.
+     */
+    public var gainScoreFromHolds:Bool;
+
+    /**
+     * Whether or not to play the strum's confirm animation.
+     */
+    public var playConfirmAnim:Bool;
+
+    /**
+     * This is the constructor for this event, mainly
+     * used just to specify it's type.
+     */
+    public function new() {
+        super(NOTE_HIT);
+    }
+}
