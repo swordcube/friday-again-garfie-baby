@@ -56,7 +56,7 @@ class ClassicHUD extends BaseHUD {
 
     override function updateHealthBar() {
         final percent:Float = healthBar.value / healthBar.max;
-        iconP2.health = percent;
+        iconP2.health = 1 - percent;
         iconP1.health = percent;
         positionIcons();
     }

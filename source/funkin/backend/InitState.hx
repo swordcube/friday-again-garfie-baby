@@ -45,9 +45,18 @@ class InitState extends FlxState {
         FlxG.plugins.addPlugin(Conductor.instance);
 
         FlxSprite.defaultAntialiasing = true;
-        FlxG.switchState(PlayState.new.bind({
-            song: "milf",
-            difficulty: "hard"
-        }));
+
+        final args = Sys.args();
+        if(args.contains("--song")) {
+            FlxG.switchState(PlayState.new.bind({
+                song: args[args.indexOf("--song") + 1],
+                difficulty: args[args.indexOf("--diff") + 1]
+            }));    
+        } else {
+            FlxG.switchState(PlayState.new.bind({
+                song: "milf",
+                difficulty: "hard"
+            }));
+        }
     }
 }

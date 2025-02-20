@@ -74,7 +74,7 @@ class PlayState extends FunkinState implements IBeatReceiver {
 				Paths.forceMod = instPath.split("/")[1];
 		}
 		currentChart = Chart.load(currentSong, currentMix, Paths.forceMod);
-		FlxG.sound.playMusic(instPath, 1, false);
+		FlxG.sound.playMusic(instPath, 0, false);
 
 		Conductor.instance.music = null;
 		Conductor.instance.offset = Options.songOffset;
@@ -154,7 +154,8 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		#end
 
 		inst = FlxG.sound.music;
-		FlxG.sound.music.pause();
+		inst.pause();
+		inst.volume = 1;
 
 		final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
 		if(FlxG.assets.exists(playerVocals)) {
