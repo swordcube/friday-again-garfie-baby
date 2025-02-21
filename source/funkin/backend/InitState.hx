@@ -8,6 +8,7 @@ import funkin.graphics.RatioScaleModeEx;
 import funkin.utilities.FlxUtil;
 import funkin.utilities.AudioSwitchFix;
 
+import funkin.states.FreeplayState;
 import funkin.states.PlayState;
 
 class InitState extends FlxState {
@@ -53,10 +54,7 @@ class InitState extends FlxState {
                 difficulty: args[args.indexOf("--diff") + 1]
             }));    
         } else {
-            FlxG.switchState(PlayState.new.bind({
-                song: "milf",
-                difficulty: "hard"
-            }));
+            FlxG.switchState(FreeplayState.new);
         }
     }
 }

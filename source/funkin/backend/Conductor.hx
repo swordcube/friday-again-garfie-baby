@@ -254,7 +254,7 @@ class Conductor extends FlxBasic {
     }
 
     override function update(elapsed:Float) {
-        if(music != null) {
+        if(music != null && music.playing) {
             final musicTime:Float = music.time;
             if(musicTime != _lastMusicTime) {
                 @:bypassAccessor rawTime = musicTime;

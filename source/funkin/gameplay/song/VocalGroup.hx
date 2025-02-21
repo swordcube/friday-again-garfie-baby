@@ -95,6 +95,9 @@ class VocalGroup extends FlxBasic {
     }
 
     override function update(elapsed:Float) {
+        if(attachedConductor.music == null || !attachedConductor.music.playing)
+            return;
+        
         if(!isSingleTrack) {
             if(spectator != null && spectator.playing && Math.abs(attachedConductor.music.time - spectator.time) >= resyncRange)
                 spectator.time = attachedConductor.music.time;

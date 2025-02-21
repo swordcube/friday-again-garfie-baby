@@ -1,5 +1,8 @@
 {
-	"atlasPath": "bf/normal",
+	"atlas": {
+		"type": "sparrow",
+		"path": "sprite"
+	},
 	"position": {
 		"x": 0,
 		"y": 0
@@ -15,7 +18,6 @@
 		"x": 0,
 		"y": 0
 	},
-	"atlasType": "sparrow",
 	"healthIcon": {
 		"isPixel": true,
 		"scale": 1,

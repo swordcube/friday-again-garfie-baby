@@ -1,0 +1,85 @@
+{
+    "atlas": {
+		"type": "sparrow",
+		"path": "sprite"
+	},
+    "offset": {"x": 0, "y": -38},
+
+    "scale": 1,
+    "lineHeight": 60,
+    
+    "noLowerCase": true,
+    "glyphs": {
+        "'": {
+            "offset": {"x": 0, "y": -30}
+        },
+        "-": {
+            "offset": {"x": 0, "y": -20}
+        },
+        "=": {
+            "offset": {"x": 0, "y": -15}
+        },
+        "+": {
+            "offset": {"x": 0, "y": -15}
+        },
+        "^": {
+            "offset": {"x": 0, "y": -25}
+        },
+        "&": {
+            "prefix": "and"
+        },
+        ",": {
+            "prefix": "comma",
+            "offset": {"x": 0, "y": 8}
+        },
+        "~": {
+            "offset": {"x": 0, "y": -20}
+        },
+        "“": {
+            "prefix": "start parentheses",
+            "offset": {"x": 0, "y": -30}
+        },
+        "”": {
+            "prefix": "end parentheses",
+            "offset": {"x": 0, "y": -30}
+        },
+        "\"": {
+            "prefix": "end parentheses",
+            "offset": {"x": 0, "y": -30}
+        },
+        "!": {
+            "prefix": "exclamation mark"
+        },
+        "#": {
+            "prefix": "hashtag"
+        },
+        "$": {
+            "prefix": "dollar"
+        },
+        "%": {
+            "prefix": "percent"
+        },
+        ":": {
+            "prefix": "colon"
+        },
+        ";": {
+            "prefix": "semicolon"
+        },
+        "\\": {
+            "prefix": "backslash"
+        },
+        "/": {
+            "prefix": "forward slash"
+        },
+        " ": {
+            "width": 34,
+            "height": 34,
+            "visible": false
+        },
+        "\t": {
+            "width": 74,
+            "height": 34,
+            "visible": false
+        }
+    }
+}

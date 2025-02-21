@@ -42,6 +42,7 @@ class FunkinScript {
 
         setClass(FlxSprite);
         setClass(FlxCamera);
+        setClass(flixel.text.FlxText);
 
         setClass(FlxState);
         setClass(FlxSubState);
@@ -54,6 +55,7 @@ class FunkinScript {
         setClass(FlxMath);
         setClass(FlxEase);
         setClass(FlxTween);
+        setClass(flixel.util.FlxTimer);
 
         setClass(flixel.ui.FlxBar);
         setClass(flixel.addons.display.FlxBackdrop);

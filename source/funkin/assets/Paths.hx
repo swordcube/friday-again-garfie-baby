@@ -23,6 +23,7 @@ enum AssetType {
     SCRIPT;
 }
 
+@:allow(funkin.backend.WeekData)
 @:allow(funkin.backend.ModManager)
 class Paths {
     public static final ASSET_EXTENSIONS:Map<AssetType, Array<String>> = [

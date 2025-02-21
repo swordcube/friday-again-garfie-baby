@@ -111,6 +111,7 @@
 	<haxedef name="message.reporting" value="pretty" />
 
 	<haxedef name="hscriptPos" if="SCRIPTING_ALLOWED" />
+	<haxedef name="NO_PRECOMPILED_HEADERS" /> <!-- Fixes linux compilation?? -->
 
 	<!-- _________________________________ Custom _______________________________ -->
 

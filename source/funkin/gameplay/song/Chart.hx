@@ -74,7 +74,12 @@ class Chart {
 
 		final parser:JsonParser<SongMetadata> = new JsonParser<SongMetadata>();
 		parser.ignoreUnknownVariables = true;
-		return parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/songs/${song}/${mix}/meta', loaderID)));
+
+		final meta:SongMetadata = parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/songs/${song}/${mix}/meta', loaderID)));
+		if(mix == "default")
+			meta.song.mixes.insert(0, "default");
+
+		return meta;
     }
 
 	public static function load(song:String, ?mix:String = "default", ?loaderID:String):ChartData {

@@ -1,5 +1,7 @@
 package funkin.states;
 
+import flixel.util.FlxTimer;
+
 import funkin.gameplay.song.VocalGroup;
 import funkin.backend.interfaces.IBeatReceiver;
 
@@ -73,7 +75,12 @@ class PlayState extends FunkinState implements IBeatReceiver {
 			if(instPath.startsWith('${ModManager.MOD_DIRECTORY}/'))
 				Paths.forceMod = instPath.split("/")[1];
 		}
-		currentChart = Chart.load(currentSong, currentMix, Paths.forceMod);
+		if(lastParams._chart != null) {
+			currentChart = lastParams._chart;
+			lastParams._chart = null; // this is only useful for changing difficulties mid song, so we don't need to keep this value
+		} else
+			currentChart = Chart.load(currentSong, currentMix, Paths.forceMod);
+		
 		FlxG.sound.playMusic(instPath, 0, false);
 
 		Conductor.instance.music = null;
@@ -155,7 +162,9 @@ class PlayState extends FunkinState implements IBeatReceiver {
 
 		inst = FlxG.sound.music;
 		inst.pause();
+
 		inst.volume = 1;
+		inst.onComplete = finishSong;
 
 		final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
 		if(FlxG.assets.exists(playerVocals)) {
@@ -184,6 +193,9 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		if(startingSong && Conductor.instance.time >= -Options.songOffset)
 			startSong();
 
+		if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.END)
+			endSong(); // end the song immediately when SHIFT + END is pressed, as emergency
+
 		FlxG.camera.zoom = FlxMath.lerp(FlxG.camera.zoom, 1.0, FlxMath.getElapsedLerp(0.05, elapsed));
 		super.update(elapsed);
 
@@ -200,6 +212,7 @@ class PlayState extends FunkinState implements IBeatReceiver {
 
 		#if SCRIPTING_ALLOWED
 		scripts.call("onStartSong");
+		scripts.call("onSongStart");
 		#end
 
 		FlxG.sound.music.time = 0;
@@ -213,7 +226,50 @@ class PlayState extends FunkinState implements IBeatReceiver {
 
 		#if SCRIPTING_ALLOWED
 		scripts.call("onStartSongPost");
+		scripts.call("onSongStartPost");
 		#end
+	}
+
+	public function endSong():Void {
+		if(endingSong)
+			return;
+
+		endingSong = true;
+
+		#if SCRIPTING_ALLOWED
+		scripts.call("onEndSong");
+		scripts.call("onSongEnd");
+		#end
+
+		FlxG.sound.music.pause();
+		vocals.pause();
+
+		FlxG.sound.music.looped = true;
+		FlxG.sound.music.time = FlxG.random.float(0, FlxG.sound.music.length / 2);
+		FlxG.sound.music.volume = 0;
+
+		// TODO: story mode
+		FlxG.signals.postStateSwitch.addOnce(() -> {
+			FlxTimer.wait(0.001, () -> FlxG.sound.music.fadeIn(4, 0, 1));
+		});
+		FlxG.switchState(FreeplayState.new);
+
+		#if SCRIPTING_ALLOWED
+		scripts.call("onEndSongPost");
+		scripts.call("onSongEndPost");
+		#end
+	}
+
+	//----------- [ Private API ] -----------//
+
+	private function finishSong():Void {
+		if(Conductor.instance.offset > 0) {
+			// end the song after waiting for the amount
+			// of time your song offset takes (in seconds),
+			// to avoid the song ending too early
+			FlxTimer.wait(Conductor.instance.offset / 1000, endSong);
+		} else
+			endSong();
 	}
 
 	private function onNoteHit(event:NoteHitEvent):Void {
@@ -262,13 +318,13 @@ class PlayState extends FunkinState implements IBeatReceiver {
 	}
 
 	override function destroy() {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onDestroy");
+		scripts.close();
+		#end
 		PlayState.instance = null;
 		Paths.forceMod = null;
 		Conductor.instance.offset = 0;
-
-		#if SCRIPTING_ALLOWED
-		scripts.close();
-		#end
 		super.destroy();
 	}
 }
@@ -283,4 +339,7 @@ typedef PlayStateParams = {
 	var ?mix:String;
 
 	var ?mod:String;
+
+	@:noCompletion
+	var ?_chart:ChartData;
 }
