@@ -8,6 +8,9 @@ import funkin.backend.interfaces.IBeatReceiver;
 import funkin.gameplay.PlayField;
 import funkin.gameplay.song.Chart;
 
+import funkin.gameplay.character.Character;
+import funkin.gameplay.stage.Stage;
+
 import funkin.gameplay.hud.*;
 import funkin.gameplay.hud.BaseHUD;
 
@@ -31,6 +34,12 @@ class PlayState extends FunkinState implements IBeatReceiver {
 	public var currentSong:String;
 	public var currentDifficulty:String;
 	public var currentMix:String;
+
+	public var spectator:Character;
+	public var opponent:Character;
+	public var player:Character;
+
+	public var stage:Stage;
 	
 	public var inst:FlxSound;
 	public var vocals:VocalGroup;
@@ -124,6 +133,13 @@ class PlayState extends FunkinState implements IBeatReceiver {
 			leScripts[i].call("onCreate");
 		}
 		#end
+
+		stage = new Stage(currentChart.meta.game.stage, {
+			spectator: new Character(currentChart.meta.game.getCharacter("spectator"), false),
+			opponent: new Character(currentChart.meta.game.getCharacter("opponent"), false),
+			player: new Character(currentChart.meta.game.getCharacter("player"), true)
+		});
+		add(stage);
 
 		playField = new PlayField(currentChart, currentDifficulty);
 
@@ -244,13 +260,13 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		FlxG.sound.music.pause();
 		vocals.pause();
 
-		FlxG.sound.music.looped = true;
-		FlxG.sound.music.time = FlxG.random.float(0, FlxG.sound.music.length / 2);
+		FlxG.sound.music.time = 0;
 		FlxG.sound.music.volume = 0;
+		FlxG.sound.music.looped = true;
 
 		// TODO: story mode
 		FlxG.signals.postStateSwitch.addOnce(() -> {
-			FlxTimer.wait(0.001, () -> FlxG.sound.music.fadeIn(4, 0, 1));
+			FlxTimer.wait(0.001, () -> FlxG.sound.music.fadeIn(2, 0, 1));
 		});
 		FlxG.switchState(FreeplayState.new);
 

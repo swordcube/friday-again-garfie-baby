@@ -3,7 +3,9 @@ package funkin.gameplay;
 import flixel.math.FlxPoint;
 import flixel.util.FlxDestroyUtil;
 
-import funkin.gameplay.Character;
+import funkin.gameplay.character.Character;
+import funkin.gameplay.character.CharacterData;
+
 import funkin.graphics.TrackingSprite;
 
 /**
@@ -268,7 +270,7 @@ class HealthIcon extends TrackingSprite {
 
     private function _loadCharacter(charID:Null<String>):Void {
         charID = _correctCharacterID(charID);
-        final charData:CharacterData = Character.loadData(charID);
+        final charData:CharacterData = CharacterData.load(charID);
 
         isPixel = charData?.healthIcon?.isPixel ?? false;
         isLegacyStyle = !_isNewSpritesheet(charID);

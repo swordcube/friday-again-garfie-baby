@@ -5,7 +5,7 @@
 		"ratings": {}
 	},
 	"game": {
-		"stage": "erect/stage",
+		"stage": "stage",
 		"scrollSpeed": {
 			"nightmare": 2.2,
 			"erect": 2.2

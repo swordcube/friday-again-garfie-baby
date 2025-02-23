@@ -90,7 +90,7 @@ class FunkinScript {
         setClass(funkin.gameplay.song.Chart);
         setClass(funkin.gameplay.song.VocalGroup);
 
-        setClass(funkin.gameplay.Character);
+        setClass(funkin.gameplay.character.Character);
         setClass(funkin.gameplay.HealthIcon);
         setClass(funkin.gameplay.HoldTiledSprite);
         setClass(funkin.gameplay.PlayField);
