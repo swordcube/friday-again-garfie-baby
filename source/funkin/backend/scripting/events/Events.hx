@@ -10,6 +10,9 @@ class Events {
     public static function get<T:ScriptEvent>(type:ScriptEventType):T {
         if(_events.get(type) == null) {
             switch(type) {
+                case UNKNOWN:
+                    _events.set(type, new ScriptEvent(UNKNOWN));
+
                 case HUD_GENERATION:
                     _events.set(type, new HUDGenerationEvent());
 
@@ -18,6 +21,9 @@ class Events {
 
                 case NOTE_MISS:
                     _events.set(type, new NoteMissEvent());
+
+                case CAMERA_MOVE:
+                    _events.set(type, new CameraMoveEvent());
 
                 default:
                     _events.set(type, new ScriptEvent(UNKNOWN));

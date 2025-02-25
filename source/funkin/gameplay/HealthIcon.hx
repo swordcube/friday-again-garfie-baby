@@ -162,6 +162,8 @@ class HealthIcon extends TrackingSprite {
 
     public var health:Float = 0.5;
 
+    public var bopTween:FlxTween;
+
     /**
      * Makes a new `HealthIcon` instance.
      */
@@ -185,15 +187,15 @@ class HealthIcon extends TrackingSprite {
     }
 
     public function bop():Void {
-        if(_bopTween != null)
-            _bopTween.cancel();
+        if(bopTween != null)
+            bopTween.cancel();
 
         if(width > height)
             setGraphicSize(HEALTH_ICON_SIZE * size.x * (1 + BOP_AMOUNT), 0);
         else
             setGraphicSize(0, HEALTH_ICON_SIZE * size.y * (1 + BOP_AMOUNT));
         
-        _bopTween = FlxTween.tween(this.scale, {x: (HEALTH_ICON_SIZE * size.x) / frameWidth, y: (HEALTH_ICON_SIZE * size.y) / frameHeight}, 0.15, {
+        bopTween = FlxTween.tween(this.scale, {x: (HEALTH_ICON_SIZE * size.x) / frameWidth, y: (HEALTH_ICON_SIZE * size.y) / frameHeight}, 0.15, {
             ease: FlxEase.sineOut,
             onUpdate: (_) -> {
                 updateHitbox();
@@ -222,7 +224,6 @@ class HealthIcon extends TrackingSprite {
     // [ Private API ] //
     // --------------- //
 
-    private var _bopTween:FlxTween;
     private var _lastHealth:Float = Math.NEGATIVE_INFINITY;
 
     private function _isNewSpritesheet(charID:String):Bool {

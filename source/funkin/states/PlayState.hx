@@ -1,15 +1,18 @@
 package funkin.states;
 
+import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
 
-import funkin.gameplay.song.VocalGroup;
 import funkin.backend.interfaces.IBeatReceiver;
 
 import funkin.gameplay.PlayField;
-import funkin.gameplay.song.Chart;
+import funkin.gameplay.FunkinCamera;
 
-import funkin.gameplay.character.Character;
+import funkin.gameplay.song.Chart;
+import funkin.gameplay.song.VocalGroup;
+
 import funkin.gameplay.stage.Stage;
+import funkin.gameplay.character.Character;
 
 import funkin.gameplay.hud.*;
 import funkin.gameplay.hud.BaseHUD;
@@ -23,6 +26,12 @@ import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
 #end
 import funkin.assets.loaders.AssetLoader;
+
+enum abstract CameraTarget(Int) from Int to Int {
+	final OPPONENT = 0;
+	final PLAYER = 1;
+	final SPECTATOR = 2;
+}
 
 class PlayState extends FunkinState implements IBeatReceiver {
 	public static var lastParams:PlayStateParams = {
@@ -40,6 +49,11 @@ class PlayState extends FunkinState implements IBeatReceiver {
 	public var player:Character;
 
 	public var stage:Stage;
+	public var camFollow:FlxObject;
+	public var curCameraTarget:CameraTarget = OPPONENT;
+
+	public var camGame:FunkinCamera;
+	public var camHUD:FunkinCamera;
 	
 	public var inst:FlxSound;
 	public var vocals:VocalGroup;
@@ -92,6 +106,14 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		
 		FlxG.sound.playMusic(instPath, 0, false);
 
+		camGame = new FunkinCamera();
+		camGame.bgColor = 0;
+		FlxG.cameras.reset(camGame);
+
+		camHUD = new FunkinCamera();
+		camHUD.bgColor = 0;
+		FlxG.cameras.add(camHUD, false);
+
 		Conductor.instance.music = null;
 		Conductor.instance.offset = Options.songOffset;
 
@@ -139,7 +161,18 @@ class PlayState extends FunkinState implements IBeatReceiver {
 			opponent: new Character(currentChart.meta.game.getCharacter("opponent"), false),
 			player: new Character(currentChart.meta.game.getCharacter("player"), true)
 		});
+		camGame.zoom = stage.data.zoom;
 		add(stage);
+
+		spectator = stage.characters.spectator;
+		opponent = stage.characters.opponent;
+		player = stage.characters.player;
+
+		camFollow = new FlxObject(0, 0, 1, 1);
+		add(camFollow);
+
+		camGame.follow(camFollow, LOCKON, 0.05);
+		camGame.snapToTarget();
 
 		playField = new PlayField(currentChart, currentDifficulty);
 
@@ -149,6 +182,7 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		playField.onNoteMiss.add(onNoteMiss);
 		playField.onNoteMissPost.add(onNoteMissPost);
 
+		playField.cameras = [camHUD];
 		add(playField);
 		
 		var event:HUDGenerationEvent = Events.get(HUD_GENERATION);
@@ -164,6 +198,7 @@ class PlayState extends FunkinState implements IBeatReceiver {
 			default:
 				playField.hud = new ScriptedHUD(playField, event.hudType);
 		}
+		playField.hud.cameras = [camHUD];
 		add(playField.hud);
 
 		#if SCRIPTING_ALLOWED
@@ -212,7 +247,31 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.END)
 			endSong(); // end the song immediately when SHIFT + END is pressed, as emergency
 
-		FlxG.camera.zoom = FlxMath.lerp(FlxG.camera.zoom, 1.0, FlxMath.getElapsedLerp(0.05, elapsed));
+		camGame.extraZoom = FlxMath.lerp(camGame.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
+		camHUD.extraZoom = FlxMath.lerp(camHUD.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
+
+		if(player._holdingPose && player.holdTimer <= 0 && !playField.strumsPressed.contains(true))
+			player._holdingPose = false;
+		
+		final cameraPos:FlxPoint = FlxPoint.get();
+		switch(curCameraTarget) {
+			case OPPONENT:
+				opponent.getCameraPosition(cameraPos);
+
+			case PLAYER:
+				player.getCameraPosition(cameraPos);
+
+			case SPECTATOR:
+				spectator.getCameraPosition(cameraPos);
+		}
+		#if SCRIPTING_ALLOWED
+		var event:CameraMoveEvent = Events.get(CAMERA_MOVE);
+		event = scripts.event("onCameraMove", event.recycle(cameraPos));
+		#end
+		if(!event.cancelled)
+			camFollow.setPosition(event.position.x, event.position.y);
+		
+		cameraPos.put();
 		super.update(elapsed);
 
 		#if SCRIPTING_ALLOWED
@@ -289,26 +348,64 @@ class PlayState extends FunkinState implements IBeatReceiver {
 	}
 
 	private function onNoteHit(event:NoteHitEvent):Void {
+		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
+		if(isPlayer)
+			event.character = player;
+		else
+			event.character = opponent;
+		
 		#if SCRIPTING_ALLOWED
 		scripts.event("onNoteHit", event);
+		scripts.event((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", event);
+		scripts.event((isPlayer) ? "onPlayerHit" : "onOpponentHit", event);
+		scripts.event((isPlayer) ? "goodNoteHit" : "dadNoteHit", event);
 		#end
+		if(event.cancelled)
+			return;
+		
+		if(event.playSingAnim) {
+			event.character._holdingPose = isPlayer;
+			event.character.holdTimer += event.length;
+			event.character.playSingAnim(event.direction, true);
+		}
 	}
 
 	private function onNoteHitPost(event:NoteHitEvent):Void {
+		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
 		#if SCRIPTING_ALLOWED
 		scripts.event("onNoteHitPost", event);
+		scripts.event((isPlayer) ? "onPlayerNoteHitPost" : "onOpponentNoteHitPost", event);
+		scripts.event((isPlayer) ? "onPlayerHitPost" : "onOpponentHitPost", event);
+		scripts.event((isPlayer) ? "goodNoteHitPost" : "dadNoteHitPost", event);
 		#end
 	}
-
+	
 	private function onNoteMiss(event:NoteMissEvent):Void {
+		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
+		if(isPlayer)
+			event.character = player;
+		else
+			event.character = opponent;
+
 		#if SCRIPTING_ALLOWED
 		scripts.event("onNoteMiss", event);
 		#end
+		if(event.cancelled)
+			return;
+		
+		if(event.playMissAnim) {
+			event.character._holdingPose = isPlayer;
+			event.character.playMissAnim(event.direction, true);
+		}
 	}
 
 	private function onNoteMissPost(event:NoteMissEvent):Void {
+		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
 		#if SCRIPTING_ALLOWED
 		scripts.event("onNoteMissPost", event);
+		scripts.event((isPlayer) ? "onPlayerNoteMissPost" : "onOpponentNoteMissPost", event);
+		scripts.event((isPlayer) ? "onPlayerMissPost" : "onOpponentMissPost", event);
+		scripts.event((isPlayer) ? "goodNoteMissPost" : "dadNoteMissPost", event);
 		#end
 	}
 
@@ -319,9 +416,10 @@ class PlayState extends FunkinState implements IBeatReceiver {
 	}
 
 	override function beatHit(beat:Int):Void {
-		if(beat > 0 && beat % Conductor.instance.timeSignature.getNumerator() == 0)
-			FlxG.camera.zoom += 0.03;
-
+		if(beat > 0 && beat % Conductor.instance.timeSignature.getNumerator() == 0) {
+			camGame.extraZoom += 0.015;
+			camHUD.extraZoom += 0.03;
+		}
 		#if SCRIPTING_ALLOWED
 		scripts.call("onBeatHit", [beat]);
 		#end

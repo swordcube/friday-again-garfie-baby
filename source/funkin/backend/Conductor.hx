@@ -128,9 +128,9 @@ class Conductor extends FlxBasic {
         ];
         _latestTimingPoint = timingPoints[0];
 
-        curStep = -999999;
-        curBeat = -999999;
-        curMeasure = -999999;
+        curStep = -1;
+        curBeat = -1;
+        curMeasure = -1;
 
         rawTime = 0;
         _lastMusicTime = -999999;
@@ -276,7 +276,7 @@ class Conductor extends FlxBasic {
         curStep = Math.floor(curDecStep);
 
         if(curStep > lastStep) {
-            for(i in FlxMath.maxInt(lastStep, -1)...curStep) {
+            for(i in lastStep...curStep) {
                 if(Conductor.instance == this) {
                     var state:FlxState = FlxG.state;
                     while(state != null) {
@@ -295,7 +295,7 @@ class Conductor extends FlxBasic {
                 final sound:FlxSound = FlxG.sound.play(Paths.sound('menus/sfx/charter/metronome'));
                 sound.pitch = (curBeat % curTimingPoint.getTimeSignature().getNumerator() == 0) ? 1.5 : 1.12;
             }
-            for(i in FlxMath.maxInt(lastBeat, -1)...curBeat) {
+            for(i in lastBeat...curBeat) {
                 if(Conductor.instance == this) {
                     var state:FlxState = FlxG.state;
                     while(state != null) {
@@ -310,7 +310,7 @@ class Conductor extends FlxBasic {
         curMeasure = Math.floor(curDecMeasure);
 
         if(curMeasure > lastMeasure) {
-            for(i in FlxMath.maxInt(lastMeasure, -1)...curMeasure) {
+            for(i in lastMeasure...curMeasure) {
                 if(Conductor.instance == this) {
                     var state:FlxState = FlxG.state;
                     while(state != null) {
@@ -372,21 +372,19 @@ class Conductor extends FlxBasic {
 
     @:noCompletion
     private function recursiveStep(state:FlxGroup, step:Int):Void {
-        if(!(state is IBeatReceiver))
-            return;
-
-        final beatReceiver:IBeatReceiver = cast state;
-        beatReceiver.stepHit(step);
-
+        if(state is IBeatReceiver) {
+            final beatReceiver:IBeatReceiver = cast state;
+            beatReceiver.stepHit(step);
+        }
         @:privateAccess
         for(i in 0...state.length) {
             final member:FlxBasic = state.members[i];
             if(member != null && member.exists && member.alive && member.active) {
-                if(member.flixelType == SPRITEGROUP && member is IBeatReceiver) {
+                if(member.flixelType == SPRITEGROUP) {
                     final sprGroup:FlxSpriteGroup = cast member;
                     recursiveStep(cast sprGroup.group, step);
                 }
-                else if(member.flixelType == GROUP && member is IBeatReceiver)
+                else if(member.flixelType == GROUP)
                     recursiveStep(cast member, step);
 
                 else if(member is IBeatReceiver) {
@@ -399,21 +397,19 @@ class Conductor extends FlxBasic {
 
     @:noCompletion
     private function recursiveBeat(state:FlxGroup, beat:Int):Void {
-        if(!(state is IBeatReceiver))
-            return;
-        
-        final beatReceiver:IBeatReceiver = cast state;
-        beatReceiver.beatHit(beat);
-
+        if(state is IBeatReceiver) {
+            final beatReceiver:IBeatReceiver = cast state;
+            beatReceiver.beatHit(beat);
+        }
         @:privateAccess
         for(i in 0...state.length) {
             final member:FlxBasic = state.members[i];
             if(member != null && member.exists && member.alive && member.active) {
-                if(member.flixelType == SPRITEGROUP && member is IBeatReceiver) {
+                if(member.flixelType == SPRITEGROUP) {
                     final sprGroup:FlxSpriteGroup = cast member;
                     recursiveBeat(cast sprGroup.group, beat);
                 }
-                else if(member.flixelType == GROUP && member is IBeatReceiver)
+                else if(member.flixelType == GROUP)
                     recursiveBeat(cast member, beat);
 
                 else if(member is IBeatReceiver) {
@@ -426,21 +422,19 @@ class Conductor extends FlxBasic {
 
     @:noCompletion
     private function recursiveMeasure(state:FlxGroup, measure:Int):Void {
-        if(!(state is IBeatReceiver))
-            return;
-
-        final beatReceiver:IBeatReceiver = cast state;
-        beatReceiver.measureHit(measure);
-
+        if(state is IBeatReceiver) {
+            final beatReceiver:IBeatReceiver = cast state;
+            beatReceiver.measureHit(measure);
+        }
         @:privateAccess
         for(i in 0...state.length) {
             final member:FlxBasic = state.members[i];
             if(member != null && member.exists && member.alive && member.active) {
-                if(member.flixelType == SPRITEGROUP && member is IBeatReceiver) {
+                if(member.flixelType == SPRITEGROUP) {
                     final sprGroup:FlxSpriteGroup = cast member;
                     recursiveMeasure(cast sprGroup.group, measure);
                 }
-                else if(member.flixelType == GROUP && member is IBeatReceiver)
+                else if(member.flixelType == GROUP)
                     recursiveMeasure(cast member, measure);
 
                 else if(member is IBeatReceiver) {

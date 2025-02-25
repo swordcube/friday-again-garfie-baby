@@ -37,6 +37,7 @@ class PlayField extends FlxGroup {
     public var onNoteMiss:FlxTypedSignal<NoteMissEvent->Void> = new FlxTypedSignal<NoteMissEvent->Void>();
     public var onNoteMissPost:FlxTypedSignal<NoteMissEvent->Void> = new FlxTypedSignal<NoteMissEvent->Void>();
 
+    public var strumsPressed:Array<Bool> = [false, false, false, false];
     public var controls:Array<Control> = [NOTE_LEFT, NOTE_DOWN, NOTE_UP, NOTE_RIGHT];
 
     public function new(chart:ChartData, difficulty:String) {
@@ -93,7 +94,7 @@ class PlayField extends FlxGroup {
             note, note.time, note.direction, note.length, note.type,
             true, false, judgement, isPlayer, !isPlayer,
             Scoring.scoreNote(note, timestamp), Scoring.getAccuracyScore(judgement), 0.0115,
-            Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true
+            Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true, true, null
         ));
         if(event.cancelled)
             return;
@@ -151,7 +152,7 @@ class PlayField extends FlxGroup {
         onNoteMiss.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
             true, true, note.strumLine == playerStrumLine, note.strumLine == playerStrumLine,
-            10, 0.02375
+            10, 0.02375 + (Math.min(note.length * 0.001, 0.25) * 0.5), true, null
         ));
         if(event.cancelled)
             return;
@@ -204,6 +205,8 @@ class PlayField extends FlxGroup {
                 
                 if(controls.justReleased.check(control))
                     onNoteRelease(i);
+
+                strumsPressed[i] = controls.pressed.check(control);
             }
         }
         super.update(elapsed);

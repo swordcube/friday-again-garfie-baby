@@ -1,6 +1,7 @@
 package funkin.backend.scripting.events.notes;
 
 import funkin.gameplay.notes.Note;
+import funkin.gameplay.character.Character;
 
 class NoteHitEvent extends ScriptEvent {
     /**
@@ -86,6 +87,16 @@ class NoteHitEvent extends ScriptEvent {
      * Whether or not to play the strum's confirm animation.
      */
     public var playConfirmAnim:Bool;
+
+    /**
+     * Whether or not to play the characters's sing animation.
+     */
+    public var playSingAnim:Bool;
+
+    /**
+     * The character that will sing the note.
+     */
+    public var character:Character;
 
     /**
      * This is the constructor for this event, mainly

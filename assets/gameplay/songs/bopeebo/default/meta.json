@@ -5,7 +5,7 @@
 		"ratings": {}
 	},
 	"game": {
-		"stage": "mainStage",
+		"stage": "stage",
 		"scrollSpeed": {
 			"default": 1,
 			"hard": 1.3

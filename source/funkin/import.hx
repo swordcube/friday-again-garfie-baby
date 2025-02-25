@@ -17,7 +17,10 @@ import flixel.FlxState;
 import flixel.FlxSubState;
 
 import flixel.group.FlxGroup;
+import flixel.group.FlxContainer;
+
 import flixel.group.FlxSpriteGroup;
+import flixel.group.FlxSpriteContainer;
 
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;

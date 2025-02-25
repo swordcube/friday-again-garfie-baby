@@ -45,6 +45,7 @@ class InitState extends FlxState {
         Conductor.instance = new Conductor();
         FlxG.plugins.addPlugin(Conductor.instance);
 
+        FlxG.mouse.visible = false;
         FlxSprite.defaultAntialiasing = true;
 
         final args = Sys.args();

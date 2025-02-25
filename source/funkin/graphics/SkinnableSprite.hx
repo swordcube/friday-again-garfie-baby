@@ -18,7 +18,9 @@ typedef AnimationData = {
 	@:optional
 	var indices:Array<Int>;
 
-	var fps:Float;
+    @:optional
+	@:default(24)
+    var fps:Float;
 
 	@:optional
 	@:default(false)

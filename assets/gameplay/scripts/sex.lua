@@ -31,6 +31,12 @@ function onCreatePost()
     setRate(1)
 end
 
+-- function onPlayerHit(e)
+--     if sex then
+--         setRate(1)
+--     end
+-- end
+
 function onUpdate(dt)
     if FlxG.keys.justPressed.GRAVEACCENT then
         sex = not sex
@@ -44,8 +50,14 @@ function onUpdate(dt)
     if FlxG.keys.justPressed.PAGEDOWN then
         setRate(rate - (FlxG.keys.pressed.SHIFT and 0.25 or 0.01))
     end
+    -- if sex then
+    --     setRate(rate - (dt * 0.25))
+    -- end
+end
+
+function onStepHit()
     if sex then
-        setRate(rate - (dt * 0.5))
+        setRate(FlxG.random.float(0.5, 2.0)) 
     end
 end
 

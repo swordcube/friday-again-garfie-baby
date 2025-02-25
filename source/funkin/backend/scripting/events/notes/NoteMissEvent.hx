@@ -1,6 +1,7 @@
 package funkin.backend.scripting.events.notes;
 
 import funkin.gameplay.notes.Note;
+import funkin.gameplay.character.Character;
 
 class NoteMissEvent extends ScriptEvent {
     /**
@@ -61,6 +62,16 @@ class NoteMissEvent extends ScriptEvent {
      * The amount of health lost from the note.
      */
     public var healthLoss:Float;
+
+    /**
+     * Whether or not to play the characters's miss animation.
+     */
+    public var playMissAnim:Bool;
+
+    /**
+     * The character that will miss the note.
+     */
+    public var character:Character;
 
     /**
      * This is the constructor for this event, mainly
