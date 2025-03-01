@@ -47,4 +47,18 @@ class SongMetadata {
 	public var song:SongData;
 	public var freeplay:FreeplayData;
 	public var game:GameplayData;
+
+	public static function load(song:String, ?mix:String, ?loaderID:String):SongMetadata {
+        if(mix == null || mix.length == 0)
+            mix = "default";
+
+		final parser:JsonParser<SongMetadata> = new JsonParser<SongMetadata>();
+		parser.ignoreUnknownVariables = true;
+
+		final meta:SongMetadata = parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/songs/${song}/${mix}/meta', loaderID)));
+		if(mix == "default")
+			meta.song.mixes.insert(0, "default");
+
+		return meta;
+    }
 }

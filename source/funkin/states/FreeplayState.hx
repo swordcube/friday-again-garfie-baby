@@ -5,7 +5,7 @@ import flixel.text.FlxText;
 import funkin.ui.AtlasText;
 import funkin.backend.WeekData;
 
-import funkin.gameplay.song.Chart;
+import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.SongMetadata;
 
 @:structInit
@@ -32,7 +32,7 @@ class FreeplayState extends FunkinState {
     override function create() {
         super.create();
 
-        bg = new FlxSprite().loadGraphic(Paths.image("menus/bg-blue"));
+        bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_blue"));
         bg.screenCenter();
         add(bg);
 
@@ -49,11 +49,11 @@ class FreeplayState extends FunkinState {
                     if(!FlxG.assets.exists(Paths.json('gameplay/songs/${songData.id}/default/meta', weekList.loaderID)))
                         continue;
 
-                    final meta:SongMetadata = Chart.loadMeta(songData.id, null, weekList.loaderID);
+                    final meta:SongMetadata = SongMetadata.load(songData.id, null, weekList.loaderID);
                     final metaMap:Map<String, SongMetadata> = ["default" => meta];
                     
                     for(mix in meta.song.mixes)
-                        metaMap.set(mix, Chart.loadMeta(songData.id, mix, weekList.loaderID));
+                        metaMap.set(mix, SongMetadata.load(songData.id, mix, weekList.loaderID));
                     
                     songs.push({
                         meta: metaMap,
@@ -116,7 +116,7 @@ class FreeplayState extends FunkinState {
             song.alpha = (i == curSelected) ? 1.0 : 0.6;
         }
         changeDifficulty(0, true);
-        FlxG.sound.play(Paths.sound("menus/sfx/generic/scroll"));
+        FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
     }
 
     public function changeDifficulty(by:Int = 0, ?force:Bool):Void {

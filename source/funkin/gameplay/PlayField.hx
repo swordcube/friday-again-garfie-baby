@@ -10,8 +10,8 @@ import funkin.gameplay.notes.Note;
 import funkin.gameplay.notes.StrumLine;
 import funkin.gameplay.notes.NoteSpawner;
 
-import funkin.gameplay.song.Chart.NoteData;
-import funkin.gameplay.song.Chart.ChartData;
+import funkin.gameplay.song.ChartData.NoteData;
+import funkin.gameplay.song.ChartData.ChartData;
 
 import funkin.backend.scripting.events.*;
 import funkin.backend.scripting.events.notes.*;

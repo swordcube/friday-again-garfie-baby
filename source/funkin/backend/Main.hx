@@ -9,12 +9,15 @@ import funkin.backend.StatsDisplay;
 class Main extends Sprite {
 	public static var changeID:Int = 0;
     public static var audioDisconnected:Bool = false;
-
 	public static var allowTerminalColor:Bool = true;
+
+	public static var statsDisplay:StatsDisplay;
 
 	public function new() {
 		super();
 		addChild(new FlxGame(0, 0, InitState.new, 0, 0, true));
-		addChild(new StatsDisplay(10, 3));
+		
+		statsDisplay = new StatsDisplay(10, 3);
+		addChild(statsDisplay);
 	}
 }

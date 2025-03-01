@@ -8,7 +8,7 @@ import funkin.backend.interfaces.IBeatReceiver;
 import funkin.gameplay.PlayField;
 import funkin.gameplay.FunkinCamera;
 
-import funkin.gameplay.song.Chart;
+import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.VocalGroup;
 
 import funkin.gameplay.stage.Stage;
@@ -26,6 +26,7 @@ import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
 #end
 import funkin.assets.loaders.AssetLoader;
+import funkin.states.editors.ChartEditor;
 
 enum abstract CameraTarget(Int) from Int to Int {
 	final OPPONENT = 0;
@@ -102,7 +103,7 @@ class PlayState extends FunkinState implements IBeatReceiver {
 			currentChart = lastParams._chart;
 			lastParams._chart = null; // this is only useful for changing difficulties mid song, so we don't need to keep this value
 		} else
-			currentChart = Chart.load(currentSong, currentMix, Paths.forceMod);
+			currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
 		
 		FlxG.sound.playMusic(instPath, 0, false);
 
@@ -116,6 +117,7 @@ class PlayState extends FunkinState implements IBeatReceiver {
 
 		Conductor.instance.music = null;
 		Conductor.instance.offset = Options.songOffset;
+		Conductor.instance.autoIncrement = true;
 
 		Conductor.instance.reset(currentChart.meta.song.bpm);
 		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
@@ -247,6 +249,15 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.END)
 			endSong(); // end the song immediately when SHIFT + END is pressed, as emergency
 
+		if(controls.justPressed.DEBUG) {
+			FlxG.switchState(ChartEditor.new.bind({
+				song: currentSong,
+				difficulty: currentDifficulty,
+				mix: currentMix,
+				mod: lastParams.mod,
+				_chart: currentChart
+			}));
+		}
 		camGame.extraZoom = FlxMath.lerp(camGame.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
 		camHUD.extraZoom = FlxMath.lerp(camHUD.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
 
@@ -438,6 +449,7 @@ class PlayState extends FunkinState implements IBeatReceiver {
 		#end
 		PlayState.instance = null;
 		Paths.forceMod = null;
+		Conductor.instance.music = null;
 		Conductor.instance.offset = 0;
 		super.destroy();
 	}

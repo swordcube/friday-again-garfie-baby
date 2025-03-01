@@ -28,16 +28,16 @@ class VocalGroup extends FlxBasic {
             isSingleTrack = true;
         else {
             if(params.spectator != null && FlxG.assets.exists(params.spectator)) {
-                spectator = FlxG.sound.play(params.spectator, 0).pause();
+                spectator = FlxG.sound.play(params.spectator, 0, false, null, false).pause();
                 spectator.volume = 1;
             }
             if(params.opponent != null && FlxG.assets.exists(params.opponent)) {
-                opponent = FlxG.sound.play(params.opponent, 0).pause();
+                opponent = FlxG.sound.play(params.opponent, 0, false, null, false).pause();
                 opponent.volume = 1;
             }
         }
         if(params.player != null && FlxG.assets.exists(params.player)) {
-            player = FlxG.sound.play(params.player, 0).pause();
+            player = FlxG.sound.play(params.player, 0, false, null, false).pause();
             player.volume = 1;
         }
         if(params.attachedConductor != null)
@@ -119,6 +119,30 @@ class VocalGroup extends FlxBasic {
         }
         if(player != null)
             player.time = time;
+    }
+
+    public function setVolume(volume:Float):Void {
+        if(!isSingleTrack) {
+            if(spectator != null)
+                spectator.volume = volume;
+            
+            if(opponent != null)
+                opponent.volume = volume;
+        }
+        if(player != null)
+            player.volume = volume;
+    }
+
+    public function setMuted(muted:Bool):Void {
+        if(!isSingleTrack) {
+            if(spectator != null)
+                spectator.muted = muted;
+            
+            if(opponent != null)
+                opponent.muted = muted;
+        }
+        if(player != null)
+            player.muted = muted;
     }
 
     override function destroy() {

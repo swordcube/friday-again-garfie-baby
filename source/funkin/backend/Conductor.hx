@@ -292,7 +292,7 @@ class Conductor extends FlxBasic {
 
         if(curBeat > lastBeat) {
             if(hasMetronome) {
-                final sound:FlxSound = FlxG.sound.play(Paths.sound('menus/sfx/charter/metronome'));
+                final sound:FlxSound = FlxG.sound.play(Paths.sound('editors/charter/sfx/metronome'));
                 sound.pitch = (curBeat % curTimingPoint.getTimeSignature().getNumerator() == 0) ? 1.5 : 1.12;
             }
             for(i in lastBeat...curBeat) {

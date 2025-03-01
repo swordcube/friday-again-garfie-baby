@@ -87,7 +87,7 @@ class FunkinScript {
         setClass(funkin.gameplay.notes.HoldTail);
         setClass(funkin.gameplay.notes.HoldTrail);
 
-        setClass(funkin.gameplay.song.Chart);
+        setClass(funkin.gameplay.song.ChartData);
         setClass(funkin.gameplay.song.VocalGroup);
 
         setClass(funkin.gameplay.character.Character);
