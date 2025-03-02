@@ -109,8 +109,11 @@ class HoldTrail extends FlxSpriteGroup {
             }
             final strum:Strum = note.strumLine.strums.members[note.direction];
             final strumCenter:Float = (strum != null) ? strum.y + (strum.height * 0.5) : y;
+
+            if(tail.clipRect == null)
+                tail.clipRect = FlxRect.get();
             
-            final clipRect:FlxRect = (tail.clipRect ?? FlxRect.get()).set(0, 0, tail.frameWidth, tail.frameHeight);
+            final clipRect:FlxRect = tail.clipRect.set(0, 0, tail.frameWidth, tail.frameHeight);
             if(note == null || (note.wasHit && !note.wasMissed)) {
                 if(tail.flipY) {
                     clipRect.height = (strumCenter - tail.y) / tail.scale.y;
@@ -120,7 +123,6 @@ class HoldTrail extends FlxSpriteGroup {
                     clipRect.height -= clipRect.y;
                 }
             }
-            tail.clipRect = clipRect;
         }
         return Value;
     }

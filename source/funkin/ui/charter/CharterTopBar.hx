@@ -68,7 +68,7 @@ class CharterTopBar extends TopBar {
                 Button("Delete", [DELETE], () -> charter.deleteObjects(charter.selectedObjects))
             ]),
             DropDown("Chart", [
-                Button("Playtest", [ENTER], () -> {trace("playtest NOT IMPLEMENTED!!");}),
+                Button("Playtest", [ENTER], () -> charter.playTest()),
                 Button("Playtest here", [SHIFT, ENTER], () -> {trace("playtest here NOT IMPLEMENTED!!");}),
 
                 Separator,
@@ -76,9 +76,9 @@ class CharterTopBar extends TopBar {
                 Button("Edit chart metadata", null, () -> {trace("edit chart metadata NOT IMPLEMENTED!!");})
             ]),
             DropDown("View", [
-                Button("Zoom In", [CONTROL, NUMPADPLUS], () -> {trace("zoom in NOT IMPLEMENTED!!");}),
-                Button("Zoom Out", [CONTROL, NUMPADMINUS], () -> {trace("zoom out NOT IMPLEMENTED!!");}),
-                Button("Reset Zoom", [CONTROL, NUMPADZERO], () -> {trace("reset zoom NOT IMPLEMENTED!!");})
+                Button("Zoom In", [CONTROL, NUMPADPLUS], () -> charter.zoomIn()),
+                Button("Zoom Out", [CONTROL, NUMPADMINUS], () -> charter.zoomOut()),
+                Button("Reset Zoom", [CONTROL, NUMPADZERO], () -> charter.resetZoom())
             ]),
             DropDown("Song", [
                 Button("Go back to the start", [HOME], () -> charter.goBackToStart()),

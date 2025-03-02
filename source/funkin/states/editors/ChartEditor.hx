@@ -1,5 +1,9 @@
 package funkin.states.editors;
 
+import flixel.math.FlxPoint;
+import flixel.util.FlxTimer;
+import flixel.util.FlxDestroyUtil;
+
 import openfl.geom.Rectangle;
 import openfl.display.BitmapData;
 
@@ -9,6 +13,7 @@ import flixel.addons.display.FlxGridOverlay;
 import funkin.backend.Main;
 
 import funkin.ui.*;
+import funkin.ui.panel.*;
 import funkin.ui.topbar.*;
 import funkin.ui.charter.*;
 
@@ -24,10 +29,15 @@ import funkin.gameplay.song.VocalGroup;
 
 // TODO: waveforms or whatever the fuck you're supposed to call them
 
+@:allow(funkin.ui.charter.CharterNoteRenderer)
 class ChartEditor extends FunkinState {
     public static final CELL_SIZE:Int = 40;
     public static final ALL_GRID_SNAPS:Array<Int> = [4, 8, 12, 16, 20, 24, 32, 48, 64, 192];
 
+    public static var lastParams:ChartEditorParams = {
+        song: "bopeebo",
+        difficulty: "hard"
+    };
     public static var editorSettings:ChartEditorSettings = {};
 
     public var currentSong:String;
@@ -35,6 +45,7 @@ class ChartEditor extends FunkinState {
 	public var currentMix:String;
 
     public var currentChart:ChartData;
+    public var rawNotes:Array<NoteData>;
 
     public var inst:FlxSound;
     public var vocals:VocalGroup;
@@ -53,11 +64,13 @@ class ChartEditor extends FunkinState {
     public var measureSeparators:FlxSpriteContainer;
 
     public var noteRenderer:CharterNoteRenderer;
+    public var selectionBox:SelectionPanel;
 
     public var opponentStrumLine:CharterStrumLine;
     public var playerStrumLine:CharterStrumLine;
 
     public var strumLine:FlxSprite; // this will actually be a line 💥
+    public var noteCam:FlxCamera;
 
     // ui layer
 
@@ -71,12 +84,17 @@ class ChartEditor extends FunkinState {
 
     public function new(params:ChartEditorParams) {
         super();
+        if(params == null)
+			params = lastParams;
 
         currentSong = params.song;
         currentDifficulty = params.difficulty;
+        
         currentMix = params.mix;
+		if(currentMix == null || currentMix.length == 0)
+			currentMix = "default";
 
-        _params = params;
+        lastParams = params;
     }
 
     override function create() {
@@ -84,18 +102,17 @@ class ChartEditor extends FunkinState {
             FlxG.sound.music.stop();
 
         final instPath:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/inst');
-		if(_params.mod != null && _params.mod.length > 0)
-			Paths.forceMod = _params.mod;
+		if(lastParams.mod != null && lastParams.mod.length > 0)
+			Paths.forceMod = lastParams.mod;
 		else {
             if(instPath.startsWith('${ModManager.MOD_DIRECTORY}/'))
 				Paths.forceMod = instPath.split("/")[1];
             else
-                Paths.forceMod = _params.mod;
+                Paths.forceMod = lastParams.mod;
 		}
-		if(_params._chart != null) {
-			currentChart = _params._chart;
-			_params._chart = null; // this is only useful for reloading charts, so we don't need to keep this value
-		} else
+		if(lastParams._chart != null)
+			currentChart = lastParams._chart;
+		else
             currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
 		
         Conductor.instance.time = 0;
@@ -147,6 +164,10 @@ class ChartEditor extends FunkinState {
 
         // note layer
 
+        noteCam = new FlxCamera();
+        noteCam.bgColor = 0;
+        FlxG.cameras.add(noteCam, false);
+
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_desat"));
         bg.scale.set(1.1, 1.1);
         bg.updateHitbox();
@@ -159,12 +180,15 @@ class ChartEditor extends FunkinState {
         grid = new FlxBackdrop(gridBitmap, Y);
         grid.screenCenter(X);
         grid.scrollFactor.x = 0;
+        grid.cameras = [noteCam];
         add(grid);
 
         beatSeparators = new FlxSpriteContainer();
+        beatSeparators.cameras = [noteCam];
         add(beatSeparators);
 
         measureSeparators = new FlxSpriteContainer();
+        measureSeparators.cameras = [noteCam];
         add(measureSeparators);
 
         var curBeat:Int = -16;
@@ -187,6 +211,7 @@ class ChartEditor extends FunkinState {
         topCover.y -= topCover.height;
         topCover.scrollFactor.x = 0;
         topCover.alpha = 0.5;
+        topCover.cameras = [noteCam];
         add(topCover);
         
         final endStep:Float = Conductor.instance.getStepAtTime(inst.length);
@@ -194,21 +219,26 @@ class ChartEditor extends FunkinState {
         bottomCover.y = CELL_SIZE * endStep;
         bottomCover.scrollFactor.x = 0;
         bottomCover.alpha = 0.5;
+        bottomCover.cameras = [noteCam];
         add(bottomCover);
 
         opponentStrumLine = new CharterStrumLine(0, 75);
         opponentStrumLine.screenCenter();
         opponentStrumLine.x -= ((CELL_SIZE * opponentStrumLine.keyCount) / 2) + 1;
         opponentStrumLine.y += CELL_SIZE * 0.5;
+        opponentStrumLine.cameras = [noteCam];
         add(opponentStrumLine);
         
         playerStrumLine = new CharterStrumLine(0, 75);
         playerStrumLine.screenCenter();
         playerStrumLine.x += ((CELL_SIZE * opponentStrumLine.keyCount) / 2) + 1;
         playerStrumLine.y += CELL_SIZE * 0.5;
+        playerStrumLine.cameras = [noteCam];
         add(playerStrumLine);
         
-        final rawNotes:Array<NoteData> = currentChart.notes.get(currentDifficulty);
+        rawNotes = currentChart.notes.get(currentDifficulty);
+        rawNotes.sort((a, b) -> Std.int(a.time - b.time));
+
         noteRenderer = new CharterNoteRenderer(grid.x, grid.y);
 
         noteRenderer.onEmptyCellClick.add(addNoteOnCursor);
@@ -230,12 +260,7 @@ class ChartEditor extends FunkinState {
                     FlxG.sound.play(Paths.sound('editors/charter/sfx/hitsound'));
             }
         });
-        add(noteRenderer);
-
-        final opponentNotes:Array<NoteData> = rawNotes.filter((n) -> return n.direction < Constants.KEY_COUNT);
-        opponentNotes.sort((a, b) -> Std.int(a.time - b.time));
-
-        noteRenderer.opponentNotes = [for(n in opponentNotes) {
+        noteRenderer.notes = [for(n in rawNotes) {
             final t = Conductor.instance.getTimingPointAtTime(n.time);
             final step = Conductor.instance.getStepAtTime(n.time, t);
             {
@@ -244,22 +269,19 @@ class ChartEditor extends FunkinState {
                 stepLength: Conductor.instance.getStepAtTime(n.time + n.length, t) - step
             };
         }];
-        final playerNotes:Array<NoteData> = rawNotes.filter((n) -> return n.direction > (Constants.KEY_COUNT - 1));
-        playerNotes.sort((a, b) -> Std.int(a.time - b.time));
+        noteRenderer.cameras = [noteCam];
+        add(noteRenderer);
         
-        noteRenderer.playerNotes = [for(n in playerNotes) {
-            final t = Conductor.instance.getTimingPointAtTime(n.time);
-            final step = Conductor.instance.getStepAtTime(n.time, t);
-            {
-                data: n,
-                step: step,
-                stepLength: Conductor.instance.getStepAtTime(n.time + n.length, t) - step
-            };
-        }];
         strumLine = new FlxSprite().makeSolid(gridBitmap.width, 4, FlxColor.WHITE);
         strumLine.screenCenter();
         strumLine.scrollFactor.set();
+        strumLine.cameras = [noteCam];
         add(strumLine);
+
+        selectionBox = new SelectionPanel(0, 0, 16, 16);
+        selectionBox.kill();
+        selectionBox.cameras = [noteCam];
+        add(selectionBox);
 
         // ui layer
 
@@ -279,18 +301,27 @@ class ChartEditor extends FunkinState {
 
         // adjust a few lil things
 
+        FlxG.mouse.visible = true;
         Main.statsDisplay.visible = false; // it gets in the way
         
-        FlxG.mouse.visible = true;
-        FlxG.camera.scroll.y -= FlxG.height * 0.5;
+        noteCam.zoom = editorSettings.gridZoom;
+        noteCam.scroll.y -= FlxG.height * 0.5;
         
         super.create();
     }
 
     override function update(elapsed:Float) {
+        super.update(elapsed);
+
+        FlxG.mouse.getWorldPosition(noteCam, _mousePos);
+        noteCam.zoom = FlxMath.lerp(noteCam.zoom, editorSettings.gridZoom, FlxMath.getElapsedLerp(0.32, elapsed));
+
+        if(Conductor.instance.time >= inst.length)
+            Conductor.instance.time = inst.length;
+
         final targetScrollY:Float = (CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.time)) - (FlxG.height * 0.5);
         if(inst.playing)
-            FlxG.camera.scroll.y = targetScrollY;
+            noteCam.scroll.y = targetScrollY;
         else {
             if(FlxG.mouse.wheel != 0) {
                 final wheel:Float = -FlxG.mouse.wheel;
@@ -299,15 +330,60 @@ class ChartEditor extends FunkinState {
                 else
                     goForwardABeat();
             }
-            if(FlxG.keys.justPressed.SHIFT && Math.abs(FlxG.camera.scroll.y - targetScrollY) < 20)
-                FlxG.camera.scroll.y = targetScrollY;
+            if(FlxG.keys.justPressed.SHIFT && Math.abs(noteCam.scroll.y - targetScrollY) < 20)
+                noteCam.scroll.y = targetScrollY;
             else
-                FlxG.camera.scroll.y = FlxMath.lerp(FlxG.camera.scroll.y, targetScrollY, FlxMath.getElapsedLerp(0.32, elapsed));
+                noteCam.scroll.y = FlxMath.lerp(noteCam.scroll.y, targetScrollY, FlxMath.getElapsedLerp(0.32, elapsed));
         }
-        super.update(elapsed);
+        if(!noteRenderer._movingObjects) {
+            if(FlxG.mouse.pressed) {
+                if(FlxG.mouse.justMoved && !selectionBox.exists) {
+                    FlxG.mouse.getWorldPosition(noteCam, _lastMousePos);
+                    selectionBox.revive();
+                }
+                if(selectionBox.exists) {
+                    final newWidth:Float = (_mousePos.x - _lastMousePos.x);
+                    final newHeight:Float = (_mousePos.y - _lastMousePos.y);
+                    
+                    final newWidthAbs:Float = Math.abs(newWidth);
+                    final newHeightAbs:Float = Math.abs(newHeight);
+                    
+                    if(newWidthAbs > 5 && newHeightAbs > 5) {
+                        if(newWidthAbs != selectionBox.width)
+                            selectionBox.width = newWidthAbs;
+            
+                        if(newHeightAbs != selectionBox.height)
+                            selectionBox.height = newHeightAbs;
+                        
+                        selectionBox.setPosition(_lastMousePos.x, _lastMousePos.y);
+                        if(newWidth < 0)
+                            selectionBox.x -= newWidthAbs;
+            
+                        if(newHeight < 0)
+                            selectionBox.y -= newHeightAbs;
+                    }
+                    selectionBox.visible = (newWidthAbs > 5 && newHeightAbs > 5);
+                }
+            }
+            else if(FlxG.mouse.justReleased) {
+                if(selectionBox.exists) {
+                    var selected:Array<ChartEditorObject> = noteRenderer.checkSelection();
+                    selectObjects(selected);
+        
+                    FlxTimer.wait(0.001, () -> selectionBox.kill());
+                } else {
+                    final direction:Int = Math.floor((_mousePos.x - noteRenderer.x) / CELL_SIZE);
+                    if(direction < 0 || direction >= (Constants.KEY_COUNT * 2))
+                        selectObjects([]);
+                }
+            }
+        }
     }
     
     override function destroy():Void {
+        _mousePos = FlxDestroyUtil.put(_mousePos);
+        _lastMousePos = FlxDestroyUtil.put(_lastMousePos);
+
         Main.statsDisplay.visible = true;
         FlxG.mouse.visible = false;
 
@@ -329,13 +405,13 @@ class ChartEditor extends FunkinState {
             Conductor.instance.music = null;
         }
         else {
-            if(noteRenderer.opponentNotes.length != 0) {
-                if(Conductor.instance.time <= 0)
-                    noteRenderer.opponentNotes[0].wasHit = false;
-            }
-            if(noteRenderer.playerNotes.length != 0) {
-                if(Conductor.instance.time <= 0)
-                    noteRenderer.playerNotes[0].wasHit = false;
+            if(Conductor.instance.time <= 0) {
+                for(i in 0...noteRenderer.notes.length) {
+                    if(noteRenderer.notes[i].data.time > 0)
+                        break;
+
+                    noteRenderer.notes[i].wasHit = false;
+                }
             }
             Conductor.instance.music = inst;
             inst.time = FlxMath.bound(Conductor.instance.time, 0, inst.length);
@@ -391,6 +467,29 @@ class ChartEditor extends FunkinState {
 
         seekToTime(inst.length);
     }
+
+    public function playTest():Void {
+        lastParams = null;
+        FlxG.switchState(PlayState.new.bind({
+            song: currentSong,
+            difficulty: currentDifficulty,
+            mix: currentMix,
+            mod: Paths.forceMod,
+            _chart: currentChart
+        }));
+    }
+
+    public function zoomIn():Void {
+        editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom + 0.2, 2), 0.5, 2.0);
+    }
+
+    public function zoomOut():Void {
+        editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom - 0.2, 2), 0.5, 2.0);
+    }
+
+    public function resetZoom():Void {
+        editorSettings.gridZoom = 1.0;
+    }
     
     public inline function seekToTime(newTime:Float):Void {
         inst.time = newTime;
@@ -402,12 +501,9 @@ class ChartEditor extends FunkinState {
         for(object in objects) {
             switch(object) {
                 case CNote(note):
-                    final rawNotes:Array<NoteData> = currentChart.notes.get(currentDifficulty);
                     rawNotes.push(note.data);
-    
-                    final notes:Array<ChartEditorNote> = (note.data.direction < Constants.KEY_COUNT) ? noteRenderer.opponentNotes : noteRenderer.playerNotes;
-                    notes.push(note);
-                    notes.sort((a, b) -> Std.int(a.data.time - b.data.time));
+                    noteRenderer.notes.push(note);
+                    noteRenderer.notes.sort((a, b) -> Std.int(a.data.time - b.data.time));
     
                 case CEvent(event):
                     // TODO:
@@ -417,15 +513,15 @@ class ChartEditor extends FunkinState {
     }
 
     public function addNoteOnCursor():Void {
-        final snapMult:Float = ChartEditor.CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
-        final newStep:Float = ((FlxG.keys.pressed.SHIFT) ? FlxG.mouse.y : Math.floor(FlxG.mouse.y / snapMult) * snapMult) / CELL_SIZE;
+        final snapMult:Float = CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
+        final newStep:Float = ((FlxG.keys.pressed.SHIFT) ? _mousePos.y : Math.floor(_mousePos.y / snapMult) * snapMult) / CELL_SIZE;
         if(newStep < 0)
             return;
 
         addObjects([CNote({
             data: {
                 time: Conductor.instance.getTimeAtStep(newStep),
-                direction: Math.floor((FlxG.mouse.x - grid.x) / ChartEditor.CELL_SIZE),
+                direction: Math.floor((_mousePos.x - grid.x) / CELL_SIZE),
                 length: 0,
                 type: noteTypes[curNoteType]
             },
@@ -454,11 +550,8 @@ class ChartEditor extends FunkinState {
         for(object in objects) {
             switch(object) {
                 case CNote(note):
-                    final rawNotes:Array<NoteData> = currentChart.notes.get(currentDifficulty);
                     rawNotes.remove(note.data);
-            
-                    final notes:Array<ChartEditorNote> = (note.data.direction < Constants.KEY_COUNT) ? noteRenderer.opponentNotes : noteRenderer.playerNotes;
-                    notes.remove(note);
+                    noteRenderer.notes.remove(note);
 
                 case CEvent(event):
                     // TODO
@@ -552,7 +645,8 @@ class ChartEditor extends FunkinState {
 
     //----------- [ Private API ] -----------//
 
-    private var _params:ChartEditorParams;
+    private var _mousePos:FlxPoint = FlxPoint.get();
+    private var _lastMousePos:FlxPoint = FlxPoint.get();
 
     private function _createGridBitmap():BitmapData {
         final gridBitmap:BitmapData = FlxGridOverlay.createGrid(
@@ -600,6 +694,8 @@ class ChartEditorSettings {
     public var muteSpectatorVocals:Bool = false;
     public var muteOpponentVocals:Bool = false;
     public var mutePlayerVocals:Bool = false;
+
+    public var gridZoom:Float = 1;
 }
 
 @:structInit
@@ -607,15 +703,23 @@ class ChartEditorNote {
     public var data:NoteData;
 
     public var step:Float;
+    public var lastStep:Float = 0; // used for moving the notes
     public var stepLength:Float;
     
     public var wasHit:Bool = false;
     public var selected:Bool = false;
+
+    public var lastDirection:Int = 0;
 }
 
 @:structInit
 class ChartEditorEvent {
+    public var step:Float;
+    public var lastStep:Float = 0;
+    
     public var data:EventData;
+
+    public var wasHit:Bool = false;
     public var selected:Bool = false;
 }
 
