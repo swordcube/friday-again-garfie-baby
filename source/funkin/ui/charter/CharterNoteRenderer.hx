@@ -83,11 +83,12 @@ class CharterNoteRenderer extends FlxObject {
             var isEmptyCell:Bool = true;
             for(i in begin...end) {
                 note = notes[i];
-                
                 sprite = _getSprite(note.data.type, note.data.direction % Constants.KEY_COUNT);
-                sprite.setPosition(x + (ChartEditor.CELL_SIZE * direction), y + (ChartEditor.CELL_SIZE * note.step));
-            
-                if(FlxG.mouse.overlaps(sprite)) {
+                
+                final offsetX:Float = (note.data.direction < Constants.KEY_COUNT) ? -1 : 1;
+                sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + offsetX, y + (ChartEditor.CELL_SIZE * note.step));
+
+                if(FlxG.mouse.overlaps(sprite, charter.noteCam)) {
                     isHoveringNote = true;
                     if(FlxG.mouse.pressed && FlxG.mouse.justMoved && note.selected && !charter.selectionBox.exists) {
                         for(object in charter.selectedObjects) {
@@ -106,7 +107,7 @@ class CharterNoteRenderer extends FlxObject {
                         _movingObjects = true;
                         return;
                     }
-                    else if(FlxG.mouse.justReleased)
+                    if(FlxG.mouse.justReleased)
                         onNoteClick.dispatch(note);
 
                     else if(FlxG.mouse.justReleasedRight)
@@ -180,18 +181,15 @@ class CharterNoteRenderer extends FlxObject {
 
         final sprite:FlxSprite = _getSprite(noteType, direction % Constants.KEY_COUNT);
         sprite.alpha = 0.3;
-        sprite.setPosition(snapX, snapY);
+
+        final offsetX:Float = (direction < Constants.KEY_COUNT) ? -1 : 1;
+        sprite.setPosition(snapX + offsetX, snapY);
         sprite.draw();
     }
 
     public function checkSelection():Array<ChartEditorObject> {
-        var sprite:FlxSprite = null;
         var selectedObjs:Array<ChartEditorObject> = [];
-
         for(note in notes) {
-            sprite = _getSprite(note.data.type, note.data.direction % Constants.KEY_COUNT);
-            sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction), y + (ChartEditor.CELL_SIZE * note.step));
-
             final minX:Int = Std.int((charter.selectionBox.x - x) / ChartEditor.CELL_SIZE);
             final minY:Float = ((charter.selectionBox.y - y) / ChartEditor.CELL_SIZE) - 1;
 

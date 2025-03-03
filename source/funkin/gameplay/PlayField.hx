@@ -106,9 +106,9 @@ class PlayField extends FlxGroup {
         final isPlayer:Bool = event.note.strumLine == playerStrumLine;
         if(event.note.length <= 0)
             killNote(event.note);
-        else {
+        else
             event.note.colorTransform.redOffset = event.note.colorTransform.greenOffset = event.note.colorTransform.blueOffset = 45;
-        }
+        
         if(isPlayer) {
             stats.score += event.score;
             stats.health += event.healthGain;

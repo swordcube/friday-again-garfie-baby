@@ -75,16 +75,6 @@ class CharterSustain extends FlxSpriteGroup {
                 strip.y = y;
                 tail.y = y + calcHeight;
             }
-            final strumCenter:Float = y;
-            final clipRect:FlxRect = (tail.clipRect ?? FlxRect.get()).set(0, 0, tail.frameWidth, tail.frameHeight);
-            if(tail.flipY) {
-                clipRect.height = (strumCenter - tail.y) / tail.scale.y;
-                clipRect.y = tail.frameHeight - clipRect.height;
-            } else {
-                clipRect.y = (strumCenter - tail.y) / tail.scale.y;
-                clipRect.height -= clipRect.y;
-            }
-            tail.clipRect = clipRect;
         }
         return Value;
     }

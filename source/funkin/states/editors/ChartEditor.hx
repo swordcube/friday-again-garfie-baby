@@ -81,6 +81,7 @@ class ChartEditor extends FunkinState {
     public var uiLayer:FlxContainer;
 
     public var topBar:CharterTopBar;
+    public var playBar:CharterPlayBar;
 
     public function new(params:ChartEditorParams) {
         super();
@@ -299,6 +300,10 @@ class ChartEditor extends FunkinState {
         topBar.updateLeftSideItems();
         topBar.updateRightSideItems();
 
+        playBar = new CharterPlayBar();
+        playBar.y = FlxG.height - playBar.bg.height;
+        uiLayer.add(playBar);
+
         // adjust a few lil things
 
         FlxG.mouse.visible = true;
@@ -311,9 +316,9 @@ class ChartEditor extends FunkinState {
     }
 
     override function update(elapsed:Float) {
+        FlxG.mouse.getWorldPosition(noteCam, _mousePos);
         super.update(elapsed);
 
-        FlxG.mouse.getWorldPosition(noteCam, _mousePos);
         noteCam.zoom = FlxMath.lerp(noteCam.zoom, editorSettings.gridZoom, FlxMath.getElapsedLerp(0.32, elapsed));
 
         if(Conductor.instance.time >= inst.length)
@@ -370,7 +375,10 @@ class ChartEditor extends FunkinState {
                     var selected:Array<ChartEditorObject> = noteRenderer.checkSelection();
                     selectObjects(selected);
         
-                    FlxTimer.wait(0.001, () -> selectionBox.kill());
+                    FlxTimer.wait(0.001, () -> {
+                        selectionBox.setPosition(-99999, -99999);
+                        selectionBox.kill();
+                    });
                 } else {
                     final direction:Int = Math.floor((_mousePos.x - noteRenderer.x) / CELL_SIZE);
                     if(direction < 0 || direction >= (Constants.KEY_COUNT * 2))
@@ -426,7 +434,7 @@ class ChartEditor extends FunkinState {
         if(inst.playing)
             return;
 
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.floor(Conductor.instance.getBeatAtTime(Conductor.instance.time)) - 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.ceil(Conductor.instance.getBeatAtTime(Conductor.instance.time)) - 1), 0, inst.length);
         seekToTime(newTime);
     }
 
@@ -434,7 +442,7 @@ class ChartEditor extends FunkinState {
         if(inst.playing)
             return;
         
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.floor(Conductor.instance.getMeasureAtTime(Conductor.instance.time)) - 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.ceil(Conductor.instance.getMeasureAtTime(Conductor.instance.time)) - 1), 0, inst.length);
         seekToTime(newTime);
     }
     
@@ -442,7 +450,7 @@ class ChartEditor extends FunkinState {
         if(inst.playing)
             return;
         
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.floor(Conductor.instance.getBeatAtTime(Conductor.instance.time)) + 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.ceil(Conductor.instance.getBeatAtTime(Conductor.instance.time)) + 1), 0, inst.length);
         seekToTime(newTime);
     }
 
@@ -450,7 +458,7 @@ class ChartEditor extends FunkinState {
         if(inst.playing)
             return;
         
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.floor(Conductor.instance.getMeasureAtTime(Conductor.instance.time)) + 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.ceil(Conductor.instance.getMeasureAtTime(Conductor.instance.time)) + 1), 0, inst.length);
         seekToTime(newTime);
     }
 
