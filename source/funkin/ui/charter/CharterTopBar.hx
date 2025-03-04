@@ -141,7 +141,8 @@ class CharterTopBar extends TopBar {
 
                 Checkbox("Metronome", (value:Bool) -> charter.toggleMetronome(!ChartEditor.editorSettings.metronome), () -> return ChartEditor.editorSettings.metronome),
                 Checkbox("Visual metronome", (value:Bool) -> {trace("visual metronome NOT IMPLEMENTED!!");})
-            ])
+            ]),
+            Slider(0.25, 3, 0.01, 1, 130, (value:Float) -> {trace("playback slider NOT IMPLEMENTED!!");})
         ];
     }
 }

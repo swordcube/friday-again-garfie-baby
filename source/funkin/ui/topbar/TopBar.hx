@@ -3,9 +3,10 @@ package funkin.ui.topbar;
 import funkin.ui.dropdown.*;
 import funkin.ui.dropdown.DropDown;
 
+import flixel.util.FlxDestroyUtil;
 import flixel.input.keyboard.FlxKey;
 
-class TopBar extends FlxSpriteContainer {
+class TopBar extends UIComponent {
     public var bg:FlxSprite;
     public var dropdown:DropDown;
 
@@ -36,7 +37,6 @@ class TopBar extends FlxSpriteContainer {
         return switch(item) {
             case Button(name, _): name;
             case DropDown(name, _): name;
-            case Slider(name, _, _, _): name;
             default: null;
         }
     }
@@ -102,6 +102,9 @@ class TopBar extends FlxSpriteContainer {
                     final item:TopBarDropDownButton = new TopBarDropDownButton(totalWidth, 0, name, null);
                     item.topBar = this;
                     item.callback = () -> {
+                        if(dropdown != null)
+                            dropdown = FlxDestroyUtil.destroy(dropdown);
+
                         dropdown = new DropDown(item.x, item.y + bg.height, items);
                         dropdown.topBar = this;
                         dropdown.setPosition(
@@ -123,8 +126,10 @@ class TopBar extends FlxSpriteContainer {
                         }
                     }
 
-                case Slider(name, min, max, step):
-                    // TODO
+                case Slider(min, max, step, value, width, callback):
+                    final item:TopBarSlider = new TopBarSlider(totalWidth, 0, min, max, step, value, width, callback);
+                    totalWidth += item.width;
+                    _leftItemContainer.add(item);
 
                 case Text(contents):
                     final item:TopBarText = new TopBarText(totalWidth, 0, contents);
@@ -160,6 +165,9 @@ class TopBar extends FlxSpriteContainer {
                     final item:TopBarDropDownButton = new TopBarDropDownButton(0, 0, name, null);
                     item.topBar = this;
                     item.callback = () -> {
+                        if(dropdown != null)
+                            dropdown = FlxDestroyUtil.destroy(dropdown);
+
                         dropdown = new DropDown(item.x, item.y + bg.height, items);
                         dropdown.topBar = this;
                         dropdown.setPosition(
@@ -184,8 +192,14 @@ class TopBar extends FlxSpriteContainer {
                         }
                     }
 
-                case Slider(name, min, max, step):
-                    // TODO
+                case Slider(min, max, step, value, width, callback):
+                    final item:TopBarSlider = new TopBarSlider(0, 0, min, max, step, value, width, callback);
+
+                    for(leItem in _rightItemContainer)
+                        leItem.x -= item.width;
+                    
+                    item.x = FlxG.width - item.width;
+                    _rightItemContainer.add(item);
 
                 case Text(contents):
                     final item:TopBarText = new TopBarText(0, 0, contents);

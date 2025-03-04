@@ -7,7 +7,7 @@ import funkin.ui.topbar.TopBar;
 
 import funkin.utilities.InputFormatter;
 
-class DropDown extends FlxSpriteContainer {
+class DropDown extends UIComponent {
     public var bg:Panel;
     public var topBar:TopBar;
 

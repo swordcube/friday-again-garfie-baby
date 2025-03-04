@@ -5,6 +5,6 @@ import funkin.ui.dropdown.*;
 enum TopBarItemType {
     Button(name:String, callback:Void->Void);
     DropDown(name:String, items:Array<DropDownItemType>);
-    Slider(name:String, min:Float, max:Float, step:Float);
+    Slider(min:Float, max:Float, step:Float, value:Float, width:Float, ?callback:Float->Void);
     Text(contents:String);
 }

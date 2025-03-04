@@ -30,7 +30,51 @@ class HorizontalSlider extends Slider {
         this.width = width;
     }
 
+    override function update(elapsed:Float) {
+        final thumbHovered:Bool = FlxG.mouse.overlaps(thumb);
+        thumb.frame = thumb.frames.frames[(thumbHovered || dragging) ? 1 : 0];
+
+        if(FlxG.mouse.overlaps(this) && FlxG.mouse.pressed && !dragging) {
+            dragging = true;
+
+            final thumbPosCap = width - (thumb.width - 1);
+            _lastThumbPos.x = FlxMath.bound(((thumbHovered) ? thumb.x : FlxG.mouse.x) - x, 0, thumbPosCap);
+            FlxG.mouse.getWorldPosition(getDefaultCamera(), _lastMousePos);
+        }
+        else if(dragging && FlxG.mouse.justReleased)
+            dragging = false;
+
+        if(dragging) {
+            FlxG.mouse.getWorldPosition(getDefaultCamera(), _mousePos);
+            final thumbPosCap = width - (thumb.width - 1);
+        
+            _lastThumbPos.x = FlxMath.bound(_lastThumbPos.x + (_mousePos.x - _lastMousePos.x), 0, thumbPosCap);
+        
+            final oldValue:Float = value;
+            final newValue:Float = FlxMath.remapToRange(FlxMath.bound(_lastThumbPos.x / thumbPosCap, 0, 1), 0, 1, min, max);
+        
+            @:bypassAccessor value = (step > 0) ? Math.floor(newValue / step) * step : newValue;
+            if(value != oldValue && callback != null)
+                callback(value);
+
+            final percent = FlxMath.remapToRange(value, min, max, 0, 1);
+            thumb.x = x + FlxMath.lerp(0, thumbPosCap, percent) - 1;
+        
+            _lastMousePos.copyFrom(_mousePos);
+        }
+        super.update(elapsed);
+    }
+
+    override function _updateThumbPos(value:Float):Void {
+        final thumbPosCap = width - (thumb.width - 1);
+        final percent = FlxMath.remapToRange(value, min, max, 0, 1);
+        thumb.x = x + FlxMath.lerp(0, thumbPosCap, percent) - 1;
+    }
+
     override function set_width(newWidth:Float):Float {
+        if(newWidth < 20)
+            newWidth = 20; // you can't make the slider smaller than the thumb
+
         if(leftSide != null) {
             middle.x = leftSide.x + leftSide.width;
     

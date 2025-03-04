@@ -130,6 +130,7 @@ class ChartEditor extends FunkinState {
         inst = FlxG.sound.music;
         inst.onComplete = () -> {
             inst.time = inst.length;
+            vocals.pause();
             Conductor.instance.music = null;
             Conductor.instance.time = inst.length;
         }
@@ -319,6 +320,7 @@ class ChartEditor extends FunkinState {
         FlxG.mouse.getWorldPosition(noteCam, _mousePos);
         super.update(elapsed);
 
+        final hoveringOnUI:Bool = UIComponent.isHoveringAny();
         noteCam.zoom = FlxMath.lerp(noteCam.zoom, editorSettings.gridZoom, FlxMath.getElapsedLerp(0.32, elapsed));
 
         if(Conductor.instance.time >= inst.length)
@@ -341,7 +343,10 @@ class ChartEditor extends FunkinState {
                 noteCam.scroll.y = FlxMath.lerp(noteCam.scroll.y, targetScrollY, FlxMath.getElapsedLerp(0.32, elapsed));
         }
         if(!noteRenderer._movingObjects) {
-            if(FlxG.mouse.pressed) {
+            if(FlxG.mouse.justPressed && !hoveringOnUI)
+                _selectingObjects = true;
+
+            if(_selectingObjects) {
                 if(FlxG.mouse.justMoved && !selectionBox.exists) {
                     FlxG.mouse.getWorldPosition(noteCam, _lastMousePos);
                     selectionBox.revive();
@@ -370,7 +375,8 @@ class ChartEditor extends FunkinState {
                     selectionBox.visible = (newWidthAbs > 5 && newHeightAbs > 5);
                 }
             }
-            else if(FlxG.mouse.justReleased) {
+            if(FlxG.mouse.justReleased && !hoveringOnUI) {
+                _selectingObjects = false;
                 if(selectionBox.exists) {
                     var selected:Array<ChartEditorObject> = noteRenderer.checkSelection();
                     selectObjects(selected);
@@ -411,6 +417,7 @@ class ChartEditor extends FunkinState {
             inst.pause();
 
             Conductor.instance.music = null;
+            playBar.playPauseButton.text = ">";
         }
         else {
             if(Conductor.instance.time <= 0) {
@@ -427,6 +434,8 @@ class ChartEditor extends FunkinState {
             
             vocals.play();
             inst.play();
+
+            playBar.playPauseButton.text = "||";
         }
     }
 
@@ -434,7 +443,7 @@ class ChartEditor extends FunkinState {
         if(inst.playing)
             return;
 
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.ceil(Conductor.instance.getBeatAtTime(Conductor.instance.time)) - 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Conductor.instance.getBeatAtTime(Conductor.instance.time) - 1), 0, inst.length);
         seekToTime(newTime);
     }
 
@@ -442,7 +451,7 @@ class ChartEditor extends FunkinState {
         if(inst.playing)
             return;
         
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.ceil(Conductor.instance.getMeasureAtTime(Conductor.instance.time)) - 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Conductor.instance.getMeasureAtTime(Conductor.instance.time) - 1), 0, inst.length);
         seekToTime(newTime);
     }
     
@@ -450,7 +459,7 @@ class ChartEditor extends FunkinState {
         if(inst.playing)
             return;
         
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.ceil(Conductor.instance.getBeatAtTime(Conductor.instance.time)) + 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Conductor.instance.getBeatAtTime(Conductor.instance.time) + 1), 0, inst.length);
         seekToTime(newTime);
     }
 
@@ -458,7 +467,7 @@ class ChartEditor extends FunkinState {
         if(inst.playing)
             return;
         
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.ceil(Conductor.instance.getMeasureAtTime(Conductor.instance.time)) + 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Conductor.instance.getMeasureAtTime(Conductor.instance.time) + 1), 0, inst.length);
         seekToTime(newTime);
     }
 
@@ -521,6 +530,9 @@ class ChartEditor extends FunkinState {
     }
 
     public function addNoteOnCursor():Void {
+        if(UIComponent.isHoveringAny())
+            return;
+
         final snapMult:Float = CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
         final newStep:Float = ((FlxG.keys.pressed.SHIFT) ? _mousePos.y : Math.floor(_mousePos.y / snapMult) * snapMult) / CELL_SIZE;
         if(newStep < 0)
@@ -652,6 +664,8 @@ class ChartEditor extends FunkinState {
     }
 
     //----------- [ Private API ] -----------//
+
+    private var _selectingObjects:Bool = false;
 
     private var _mousePos:FlxPoint = FlxPoint.get();
     private var _lastMousePos:FlxPoint = FlxPoint.get();
