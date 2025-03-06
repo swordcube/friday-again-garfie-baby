@@ -25,6 +25,8 @@ class TopBarSlider extends FlxSpriteContainer {
 
         bg.setGraphicSize(slider.width + 16, bg.frameHeight);
         bg.updateHitbox();
+
+        this.valueFactory = valueFactory;
     }
 
     override function update(elapsed:Float):Void {

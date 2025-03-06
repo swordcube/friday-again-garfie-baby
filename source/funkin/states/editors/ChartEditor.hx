@@ -253,7 +253,7 @@ class ChartEditor extends UIState {
         noteRenderer.onNoteRightClick.add((n) -> deleteObjects([CNote(n)]));
 
         noteRenderer.onNoteHit.add((note:ChartEditorNote) -> {
-            if(!inst.playing)
+            if(!inst.playing || playBar.songSlider.dragging)
                 return;
 
             if(note.data.direction < Constants.KEY_COUNT) {
