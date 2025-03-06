@@ -8,6 +8,8 @@ import funkin.backend.WeekData;
 import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.SongMetadata;
 
+import funkin.states.editors.ChartEditor;
+
 @:structInit
 class FreeplaySongData {
     public var meta:Map<String, SongMetadata>;
@@ -97,9 +99,12 @@ class FreeplayState extends FunkinState {
         if(controls.justPressed.UI_RIGHT)
             changeDifficulty(1);
 
-        if(controls.justPressed.ACCEPT)
-            loadIntoSong();
-        
+        if(controls.justPressed.ACCEPT) {
+            if(FlxG.keys.pressed.SHIFT)
+                loadIntoCharter();
+            else
+                loadIntoSong();
+        }
         super.update(elapsed);
     }
 
@@ -168,6 +173,15 @@ class FreeplayState extends FunkinState {
 		diffText.x = Std.int(scoreBG.x + scoreBG.width / 2);
 		diffText.x -= (diffText.width / 2);
 	}
+
+    public function loadIntoCharter():Void {
+        final songData:FreeplaySongData = songs[curSelected];
+        FlxG.switchState(ChartEditor.new.bind({
+            song: songData.data.id,
+            difficulty: curDifficulty,
+            mix: curMix
+        }));
+    }
 
     public function loadIntoSong():Void {
         final songData:FreeplaySongData = songs[curSelected];
