@@ -5,7 +5,7 @@ import flixel.util.FlxTimer;
 
 import funkin.ui.panel.CustomPanel;
 
-class DropDownItem extends FlxSpriteContainer {
+class DropDownItem extends UIComponent {
     public var bg:CustomPanel;
     public var icon:FlxSprite;
 
@@ -16,6 +16,7 @@ class DropDownItem extends FlxSpriteContainer {
 
     public function new(x:Float = 0, y:Float = 0, text:String, shortcutText:String, callback:Void->Void) {
         super(x, y);
+        cursorType = POINTER;
 
         bg = new CustomPanel(0, 0, Paths.image("ui/images/panel_hover"), 32, 22);
         bg.alpha = 0.001;

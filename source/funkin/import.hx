@@ -40,6 +40,8 @@ import funkin.backend.Controls;
 import funkin.backend.Conductor;
 import funkin.backend.ModManager;
 
+import funkin.ui.Cursor;
+
 import funkin.utilities.Typedefs;
 import funkin.utilities.Constants;
 

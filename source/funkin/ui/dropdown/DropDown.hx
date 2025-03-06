@@ -13,6 +13,7 @@ class DropDown extends UIComponent {
 
     public function new(x:Float = 0, y:Float = 0, items:Array<DropDownItemType>) {
         super(x, y);
+        UIUtil.focusedComponents.push(this);
 
         bg = new Panel(0, 0, 32, 32);
         add(bg);

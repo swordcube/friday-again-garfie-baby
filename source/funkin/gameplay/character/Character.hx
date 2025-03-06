@@ -3,7 +3,7 @@ package funkin.gameplay.character;
 import flixel.math.FlxPoint;
 import flixel.util.FlxDestroyUtil;
 
-import funkin.backend.interfaces.IBeatReceiver;
+import funkin.backend.Conductor.IBeatReceiver;
 
 import funkin.graphics.AtlasType;
 import funkin.graphics.SkinnableSprite;

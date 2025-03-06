@@ -3,8 +3,6 @@ package funkin.backend;
 import flixel.sound.FlxSound;
 import flixel.util.FlxSignal.FlxTypedSignal;
 
-import funkin.backend.interfaces.IBeatReceiver;
-
 enum abstract TimeSignature(Array<Int>) from Array<Int> to Array<Int> {
     @:from
     public static function fromString(str:String):TimeSignature {
@@ -68,6 +66,12 @@ class TimingPoint {
     public inline function getMeasureLength():Float {
         return getBeatLength() * timeSignature[0];
     }
+}
+
+interface IBeatReceiver {
+    public function stepHit(step:Int):Void;
+    public function beatHit(beat:Int):Void;
+    public function measureHit(measure:Int):Void;
 }
 
 class Conductor extends FlxBasic {

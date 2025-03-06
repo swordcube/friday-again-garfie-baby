@@ -6,8 +6,9 @@ import funkin.ui.slider.HorizontalSlider;
 class TopBarSlider extends FlxSpriteContainer {
     public var bg:FlxSprite;
     public var slider:HorizontalSlider;
+    public var valueFactory:Void->Float;
 
-    public function new(x:Float = 0, y:Float = 0, min:Float, max:Float, step:Float, value:Float, width:Float, ?callback:Float->Void) {
+    public function new(x:Float = 0, y:Float = 0, min:Float, max:Float, step:Float, value:Float, width:Float, ?callback:Float->Void, ?valueFactory:Void->Float) {
         super(x, y);
 
         bg = new FlxSprite().loadGraphic(Paths.image("ui/images/top_bar"));
@@ -24,5 +25,12 @@ class TopBarSlider extends FlxSpriteContainer {
 
         bg.setGraphicSize(slider.width + 16, bg.frameHeight);
         bg.updateHitbox();
+    }
+
+    override function update(elapsed:Float):Void {
+        if(valueFactory != null)
+            slider.value = valueFactory();
+
+        super.update(elapsed);
     }
 }

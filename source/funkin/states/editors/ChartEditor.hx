@@ -1,6 +1,8 @@
 package funkin.states.editors;
 
+import flixel.text.FlxText;
 import flixel.math.FlxPoint;
+
 import flixel.util.FlxTimer;
 import flixel.util.FlxDestroyUtil;
 
@@ -30,7 +32,7 @@ import funkin.gameplay.song.VocalGroup;
 // TODO: waveforms for inst and each vocal track
 
 @:allow(funkin.ui.charter.CharterNoteRenderer)
-class ChartEditor extends FunkinState {
+class ChartEditor extends UIState {
     public static final CELL_SIZE:Int = 40;
     public static final ALL_GRID_SNAPS:Array<Int> = [4, 8, 12, 16, 20, 24, 32, 48, 64, 192];
 
@@ -55,7 +57,7 @@ class ChartEditor extends FunkinState {
     // note layer
 
     public var bg:FlxSprite;
-    public var grid:FlxBackdrop;
+    public var grid:CharterGrid;
 
     public var topCover:FlxSprite;
     public var bottomCover:FlxSprite;
@@ -82,6 +84,8 @@ class ChartEditor extends FunkinState {
 
     public var topBar:CharterTopBar;
     public var playBar:CharterPlayBar;
+
+    public var conductorInfoText:FlxText;
 
     public function new(params:ChartEditorParams) {
         super();
@@ -180,7 +184,7 @@ class ChartEditor extends FunkinState {
         add(bg);
 
         final gridBitmap:BitmapData = _createGridBitmap();
-        grid = new FlxBackdrop(gridBitmap, Y);
+        grid = new CharterGrid(gridBitmap, Y);
         grid.screenCenter(X);
         grid.scrollFactor.x = 0;
         grid.cameras = [noteCam];
@@ -306,6 +310,11 @@ class ChartEditor extends FunkinState {
         playBar.y = FlxG.height - playBar.bg.height;
         uiLayer.add(playBar);
 
+        conductorInfoText = new FlxText(12, 0, 0, "Step: 0\nBeat: 0\nMeasure: 0");
+        conductorInfoText.setFormat(Paths.font("fonts/montserrat/semibold"), 14, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
+        conductorInfoText.y = FlxG.height - (conductorInfoText.height + playBar.bg.height + 16);
+        uiLayer.add(conductorInfoText);
+
         // adjust a few lil things
 
         FlxG.mouse.visible = true;
@@ -313,24 +322,27 @@ class ChartEditor extends FunkinState {
         
         noteCam.zoom = editorSettings.gridZoom;
         noteCam.scroll.y -= FlxG.height * 0.5;
+        setPlaybackRate(editorSettings.playbackRate);
         
         super.create();
     }
 
     override function update(elapsed:Float) {
-        FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY);
+        FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY) && !UIUtil.isAnyComponentFocused();
         FlxG.mouse.getWorldPosition(noteCam, _mousePos);
 
         super.update(elapsed);
 
-        final hoveringOnUI:Bool = UIComponent.isHoveringAny();
+        final isUIActive:Bool = UIUtil.isHoveringAnyComponent() || UIUtil.isAnyComponentFocused();
         noteCam.zoom = FlxMath.lerp(noteCam.zoom, editorSettings.gridZoom, FlxMath.getElapsedLerp(0.32, elapsed));
 
         if(Conductor.instance.time >= inst.length)
             Conductor.instance.time = inst.length;
+        
+        conductorInfoText.text = 'Step: ${Conductor.instance.curStep}\nBeat: ${Conductor.instance.curBeat}\nMeasure: ${Conductor.instance.curMeasure}';
 
         final targetScrollY:Float = (CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.time)) - (FlxG.height * 0.5);
-        if(inst.playing)
+        if(inst.playing || UIUtil.isAnyComponentFocused())
             noteCam.scroll.y = targetScrollY;
         else {
             if(FlxG.mouse.wheel != 0) {
@@ -356,7 +368,7 @@ class ChartEditor extends FunkinState {
             }
         }
         if(!noteRenderer._movingObjects) {
-            if(FlxG.mouse.justPressed && !hoveringOnUI)
+            if(FlxG.mouse.justPressed && !isUIActive)
                 _selectingObjects = true;
 
             if(_selectingObjects) {
@@ -388,7 +400,7 @@ class ChartEditor extends FunkinState {
                     selectionBox.visible = (newWidthAbs > 5 && newHeightAbs > 5);
                 }
             }
-            if(FlxG.mouse.justReleased && !hoveringOnUI) {
+            if(FlxG.mouse.justReleased && !isUIActive) {
                 _selectingObjects = false;
                 if(selectionBox.exists) {
                     var selected:Array<ChartEditorObject> = noteRenderer.checkSelection();
@@ -424,6 +436,9 @@ class ChartEditor extends FunkinState {
     }
 
     public function playPause():Void {
+        if(UIUtil.isAnyComponentFocused())
+            return;
+
         if(inst.playing) {
             opponentStrumLine.resetAllStrums();
             playerStrumLine.resetAllStrums();
@@ -455,7 +470,7 @@ class ChartEditor extends FunkinState {
     }
 
     public function goBackABeat():Void {
-        if(inst.playing)
+        if(inst.playing || UIUtil.isAnyComponentFocused())
             return;
 
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Conductor.instance.getBeatAtTime(Conductor.instance.time) - 1), 0, inst.length);
@@ -463,7 +478,7 @@ class ChartEditor extends FunkinState {
     }
 
     public function goBackAMeasure():Void {
-        if(inst.playing)
+        if(inst.playing || UIUtil.isAnyComponentFocused())
             return;
         
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Conductor.instance.getMeasureAtTime(Conductor.instance.time) - 1), 0, inst.length);
@@ -471,7 +486,7 @@ class ChartEditor extends FunkinState {
     }
     
     public function goForwardABeat():Void {
-        if(inst.playing)
+        if(inst.playing || UIUtil.isAnyComponentFocused())
             return;
         
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Conductor.instance.getBeatAtTime(Conductor.instance.time) + 1), 0, inst.length);
@@ -479,7 +494,7 @@ class ChartEditor extends FunkinState {
     }
 
     public function goForwardAMeasure():Void {
-        if(inst.playing)
+        if(inst.playing || UIUtil.isAnyComponentFocused())
             return;
         
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Conductor.instance.getMeasureAtTime(Conductor.instance.time) + 1), 0, inst.length);
@@ -487,20 +502,23 @@ class ChartEditor extends FunkinState {
     }
 
     public function goBackToStart():Void {
-        if(inst.playing)
+        if(inst.playing || UIUtil.isAnyComponentFocused())
             return;
 
         seekToTime(0);
     }
 
     public function goToEnd():Void {
-        if(inst.playing)
+        if(inst.playing || UIUtil.isAnyComponentFocused())
             return;
 
         seekToTime(inst.length);
     }
 
     public function playTest():Void {
+        if(UIUtil.isAnyComponentFocused())
+            return;
+
         lastParams = null;
         FlxG.switchState(PlayState.new.bind({
             song: currentSong,
@@ -512,22 +530,35 @@ class ChartEditor extends FunkinState {
     }
 
     public function zoomIn():Void {
+        if(UIUtil.isAnyComponentFocused())
+            return;
+
         editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom + 0.2, 2), 0.5, 2.0);
     }
 
     public function zoomOut():Void {
+        if(UIUtil.isAnyComponentFocused())
+            return;
+
         editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom - 0.2, 2), 0.5, 2.0);
     }
 
     public function resetZoom():Void {
+        if(UIUtil.isAnyComponentFocused())
+            return;
+        
         editorSettings.gridZoom = 1.0;
     }
 
     public function setPlaybackRate(rate:Float):Void {
+        if(Math.isNaN(rate))
+            rate = 1;
+        
+        rate = FlxMath.roundDecimal(FlxMath.bound(rate, 0.25, 3), 2);
         editorSettings.playbackRate = rate;
-        Conductor.instance.rate = editorSettings.playbackRate;
 
         inst.pitch = editorSettings.playbackRate;
+        Conductor.instance.rate = editorSettings.playbackRate;
 
         if(vocals.spectator != null)
             vocals.spectator.pitch = editorSettings.playbackRate;
@@ -562,7 +593,7 @@ class ChartEditor extends FunkinState {
     }
 
     public function addNoteOnCursor():Void {
-        if(UIComponent.isHoveringAny())
+        if(UIUtil.isHoveringAnyComponent() || UIUtil.isAnyComponentFocused())
             return;
 
         final snapMult:Float = CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);

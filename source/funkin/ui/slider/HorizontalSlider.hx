@@ -22,12 +22,19 @@ class HorizontalSlider extends Slider {
         rightSide.frame = rightSide.frames.frames[2];
         add(rightSide);
 
-        thumb = new FlxSprite(-1).loadGraphic(Paths.image("ui/images/slider_thumb"), true, 18, 18);
+        thumb = new UISprite(-1).loadGraphic(Paths.image("ui/images/slider_thumb"), true, 18, 18);
         thumb.frame = thumb.frames.frames[0];
         thumb.y = leftSide.y - (leftSide.height * 0.5);
         add(thumb);
 
         this.width = width;
+    }
+
+    override function checkMouseOverlap():Bool {
+        // force dragging to be allowed to keep the cursor
+        // on the POINTER type the whole way thru
+        // should be fine???
+        return dragging || super.checkMouseOverlap();
     }
 
     override function update(elapsed:Float) {

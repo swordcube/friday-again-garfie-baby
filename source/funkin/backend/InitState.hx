@@ -42,6 +42,8 @@ class InitState extends FlxState {
             }
             _lastState = Type.getClass(newState);
         });
+        Cursor.init();
+        
         Conductor.instance = new Conductor();
         FlxG.plugins.addPlugin(Conductor.instance);
 

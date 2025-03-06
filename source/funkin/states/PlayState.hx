@@ -3,7 +3,7 @@ package funkin.states;
 import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
 
-import funkin.backend.interfaces.IBeatReceiver;
+import funkin.backend.Conductor.IBeatReceiver;
 
 import funkin.gameplay.PlayField;
 import funkin.gameplay.FunkinCamera;
@@ -34,7 +34,7 @@ enum abstract CameraTarget(Int) from Int to Int {
 	final SPECTATOR = 2;
 }
 
-class PlayState extends FunkinState implements IBeatReceiver {
+class PlayState extends FunkinState {
 	public static var lastParams:PlayStateParams = {
 		song: "bopeebo",
 		difficulty: "hard"

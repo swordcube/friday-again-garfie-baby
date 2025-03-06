@@ -1,25 +1,23 @@
 package funkin.ui;
 
-class UIComponent extends FlxSpriteContainer {
-    public static final allComponents:Array<UIComponent> = [];
+class UIComponent extends FlxSpriteContainer implements IUIComponent {
+    public var cursorType:CursorType = DEFAULT;
 
     public function new(x:Float = 0, y:Float = 0) {
         super(x, y);
-        allComponents.push(this);
+        UIUtil.allComponents.push(this);
     }
 
-    public static function isHoveringAny():Bool {
-        var c:UIComponent = null;
-        for(i in 0...allComponents.length) {
-            c = allComponents[i];
-            if(FlxG.mouse.overlaps(c, c.getDefaultCamera()))
-                return true;
-        }
-        return false;
+    public function checkMouseOverlap():Bool {
+        return FlxG.mouse.overlaps(this, getDefaultCamera());
     }
 
     override function destroy():Void {
-        allComponents.remove(this);
+        UIUtil.allComponents.remove(this);
+
+        if(UIUtil.focusedComponents.contains(this))
+            UIUtil.focusedComponents.remove(this);
+
         super.destroy();
     }
 }

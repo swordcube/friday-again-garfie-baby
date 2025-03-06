@@ -8,7 +8,7 @@ import flixel.graphics.tile.FlxDrawQuadsItem;
 
 import flixel.system.FlxAssets.FlxGraphicAsset;
 
-class SliceSprite extends FlxSprite {
+class SliceSprite extends UISprite {
 	public var leftBorder:Float = 5;
 	public var rightBorder:Float = 5;
 	public var topBorder:Float = 5;

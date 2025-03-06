@@ -1,7 +1,7 @@
 package funkin.states;
 
 import funkin.backend.Controls;
-import funkin.backend.interfaces.IBeatReceiver;
+import funkin.backend.Conductor.IBeatReceiver;
 
 class FunkinState extends FlxState implements IBeatReceiver {
     public var controls(get, never):Controls;

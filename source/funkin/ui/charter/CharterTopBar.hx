@@ -16,7 +16,7 @@ class CharterTopBar extends TopBar {
     public function updateLeftSideItems():Void {
         final noteTypeItems:Array<DropDownItemType> = [];
         for(i in 0...charter.noteTypes.length)
-            noteTypeItems.push(Button('(${i}) ${charter.noteTypes[i]}', null, () -> {trace('${charter.noteTypes[i]} NOT IMPLEMENTED!!');}));
+            noteTypeItems.push(Checkbox('(${i}) ${charter.noteTypes[i]}', (value:Bool) -> {trace('${charter.noteTypes[i]} NOT IMPLEMENTED!!');}, () -> return charter.curNoteType == i));
         
         final vocalItems:Array<DropDownItemType> = [];
         if(charter.vocals.spectator != null)
@@ -147,7 +147,8 @@ class CharterTopBar extends TopBar {
                 Checkbox("Metronome", (value:Bool) -> charter.toggleMetronome(!ChartEditor.editorSettings.metronome), () -> return ChartEditor.editorSettings.metronome),
                 Checkbox("Visual metronome", (value:Bool) -> {trace("visual metronome NOT IMPLEMENTED!!");})
             ]),
-            Slider(0.25, 3, 0.01, ChartEditor.editorSettings.playbackRate, 130, (value:Float) -> charter.setPlaybackRate(value))
+            Textbox(Std.string(ChartEditor.editorSettings.playbackRate), (value:String) -> charter.setPlaybackRate(Std.parseFloat(value)), true, null, () -> return Std.string(ChartEditor.editorSettings.playbackRate)),
+            Slider(0.25, 3, 0.01, ChartEditor.editorSettings.playbackRate, 130, (value:Float) -> charter.setPlaybackRate(value), () -> return ChartEditor.editorSettings.playbackRate),
         ];
     }
 }

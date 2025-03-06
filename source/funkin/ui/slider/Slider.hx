@@ -12,6 +12,11 @@ class Slider extends UIComponent {
     public var callback:Float->Void;
     public var dragging:Bool = false;
 
+    public function new(x:Float = 0, y:Float = 0) {
+        super(x, y);
+        cursorType = POINTER;
+    }
+
     //----------- [ Private API ] -----------//
 
     private var _lastThumbPos:FlxPoint = FlxPoint.get();

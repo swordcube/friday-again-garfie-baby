@@ -18,6 +18,7 @@ class Button extends UIComponent {
 
     public function new(x:Float = 0, y:Float = 0, text:String, ?width:Float = 0, ?height:Float = 0, ?callback:Void->Void) {
         super(x, y);
+        cursorType = POINTER;
 
         bg = new SliceSprite(0, 0);
         bg.loadGraphic(Paths.image("ui/images/button"), true, 48, 48);

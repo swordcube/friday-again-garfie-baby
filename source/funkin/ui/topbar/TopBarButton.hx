@@ -2,13 +2,14 @@ package funkin.ui.topbar;
 
 import flixel.text.FlxText;
 
-class TopBarButton extends FlxSpriteContainer {
+class TopBarButton extends UIComponent {
     public var bg:FlxSprite;
     public var label:FlxText;
     public var callback:Void->Void;
 
     public function new(x:Float = 0, y:Float = 0, text:String, callback:Void->Void) {
         super(x, y);
+        cursorType = POINTER;
 
         bg = new FlxSprite().loadGraphic(Paths.image("ui/images/top_bar"));
         add(bg);

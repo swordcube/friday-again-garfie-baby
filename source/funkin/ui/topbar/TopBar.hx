@@ -138,13 +138,21 @@ class TopBar extends UIComponent {
                         }
                     }
 
-                case Slider(min, max, step, value, width, callback):
-                    final item:TopBarSlider = new TopBarSlider(totalWidth, 0, min, max, step, value, width, callback);
+                case Slider(min, max, step, value, width, callback, valueFactory):
+                    final item:TopBarSlider = new TopBarSlider(totalWidth, 0, min, max, step, value, width, callback, valueFactory);
                     totalWidth += item.width;
                     _leftItemContainer.add(item);
 
                 case Text(contents):
                     final item:TopBarText = new TopBarText(totalWidth, 0, contents);
+                    totalWidth += item.width;
+                    _leftItemContainer.add(item);
+
+                case Textbox(contents, callback, autoSize, width, valueFactory):
+                    autoSize ??= false;
+                    width ??= 100;
+
+                    final item:TopBarTextbox = new TopBarTextbox(totalWidth, 0, contents, autoSize, width, callback, valueFactory);
                     totalWidth += item.width;
                     _leftItemContainer.add(item);
             }
@@ -204,8 +212,8 @@ class TopBar extends UIComponent {
                         }
                     }
 
-                case Slider(min, max, step, value, width, callback):
-                    final item:TopBarSlider = new TopBarSlider(0, 0, min, max, step, value, width, callback);
+                case Slider(min, max, step, value, width, callback, valueFactory):
+                    final item:TopBarSlider = new TopBarSlider(0, 0, min, max, step, value, width, callback, valueFactory);
 
                     for(leItem in _rightItemContainer)
                         leItem.x -= item.width;
@@ -215,6 +223,18 @@ class TopBar extends UIComponent {
 
                 case Text(contents):
                     final item:TopBarText = new TopBarText(0, 0, contents);
+                    
+                    for(leItem in _rightItemContainer)
+                        leItem.x -= item.width;
+                    
+                    item.x = FlxG.width - item.width;
+                    _rightItemContainer.add(item);
+
+                case Textbox(contents, callback, autoSize, width, valueFactory):
+                    autoSize ??= false;
+                    width ??= 100;
+
+                    final item:TopBarTextbox = new TopBarTextbox(0, 0, contents, autoSize, width, callback, valueFactory);
                     
                     for(leItem in _rightItemContainer)
                         leItem.x -= item.width;

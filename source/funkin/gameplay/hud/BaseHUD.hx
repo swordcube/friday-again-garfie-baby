@@ -1,6 +1,6 @@
 package funkin.gameplay.hud;
 
-import funkin.backend.interfaces.IBeatReceiver;
+import funkin.backend.Conductor.IBeatReceiver;
 
 class BaseHUD extends FlxGroup implements IBeatReceiver {
     public var playField:PlayField;
