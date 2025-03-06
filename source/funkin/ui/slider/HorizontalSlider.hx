@@ -38,29 +38,24 @@ class HorizontalSlider extends Slider {
             dragging = true;
 
             final thumbPosCap = width - (thumb.width - 1);
-            _lastThumbPos.x = FlxMath.bound(((thumbHovered) ? thumb.x : FlxG.mouse.x) - x, 0, thumbPosCap);
+            _lastThumbPos.x = FlxMath.bound(((thumbHovered) ? thumb.x : (FlxG.mouse.x - ((thumb.width + 1) * 0.5))) - x, 0, thumbPosCap) + 1;
             FlxG.mouse.getWorldPosition(getDefaultCamera(), _lastMousePos);
         }
         else if(dragging && FlxG.mouse.justReleased)
             dragging = false;
 
         if(dragging) {
+            final thumbPosCap:Float = width - (thumb.width - 1);
             FlxG.mouse.getWorldPosition(getDefaultCamera(), _mousePos);
-            final thumbPosCap = width - (thumb.width - 1);
-        
-            _lastThumbPos.x = FlxMath.bound(_lastThumbPos.x + (_mousePos.x - _lastMousePos.x), 0, thumbPosCap);
         
             final oldValue:Float = value;
-            final newValue:Float = FlxMath.remapToRange(FlxMath.bound(_lastThumbPos.x / thumbPosCap, 0, 1), 0, 1, min, max);
+            final newValue:Float = FlxMath.remapToRange(FlxMath.bound((_lastThumbPos.x + (FlxG.mouse.x - _lastMousePos.x)) / thumbPosCap, 0, 1), 0, 1, min, max);
         
             @:bypassAccessor value = (step > 0) ? Math.floor(newValue / step) * step : newValue;
             if(value != oldValue && callback != null)
                 callback(value);
 
-            final percent = FlxMath.remapToRange(value, min, max, 0, 1);
-            thumb.x = x + FlxMath.lerp(0, thumbPosCap, percent) - 1;
-        
-            _lastMousePos.copyFrom(_mousePos);
+            _updateThumbPos(value);
         }
         super.update(elapsed);
     }

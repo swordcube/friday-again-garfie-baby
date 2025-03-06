@@ -27,7 +27,7 @@ import funkin.gameplay.song.VocalGroup;
 // TODO: have some way to place events
 // TODO: have some way to place timing points
 
-// TODO: waveforms or whatever the fuck you're supposed to call them
+// TODO: waveforms for inst and each vocal track
 
 @:allow(funkin.ui.charter.CharterNoteRenderer)
 class ChartEditor extends FunkinState {
@@ -117,6 +117,7 @@ class ChartEditor extends FunkinState {
             currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
 		
         Conductor.instance.time = 0;
+        Conductor.instance.rate = 1;
         Conductor.instance.offset = 0;
         
         Conductor.instance.autoIncrement = false;
@@ -317,7 +318,9 @@ class ChartEditor extends FunkinState {
     }
 
     override function update(elapsed:Float) {
+        FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY);
         FlxG.mouse.getWorldPosition(noteCam, _mousePos);
+
         super.update(elapsed);
 
         final hoveringOnUI:Bool = UIComponent.isHoveringAny();
@@ -341,6 +344,16 @@ class ChartEditor extends FunkinState {
                 noteCam.scroll.y = targetScrollY;
             else
                 noteCam.scroll.y = FlxMath.lerp(noteCam.scroll.y, targetScrollY, FlxMath.getElapsedLerp(0.32, elapsed));
+
+            if(FlxG.mouse.pressedMiddle && FlxG.mouse.justMoved && !_middleScrolling) {
+                _middleScrolling = true;
+                _lastMousePos.y = FlxG.mouse.y;
+            }
+            if(_middleScrolling) {
+                seekToTime(FlxMath.bound(Conductor.instance.time + ((FlxG.mouse.y - _lastMousePos.y) * elapsed * 6), 0, inst.length));
+                if(FlxG.mouse.justReleasedMiddle)
+                    _middleScrolling = false;
+            }
         }
         if(!noteRenderer._movingObjects) {
             if(FlxG.mouse.justPressed && !hoveringOnUI)
@@ -348,7 +361,7 @@ class ChartEditor extends FunkinState {
 
             if(_selectingObjects) {
                 if(FlxG.mouse.justMoved && !selectionBox.exists) {
-                    FlxG.mouse.getWorldPosition(noteCam, _lastMousePos);
+                    _lastMousePos.copyFrom(_mousePos);
                     selectionBox.revive();
                 }
                 if(selectionBox.exists) {
@@ -401,9 +414,11 @@ class ChartEditor extends FunkinState {
         Main.statsDisplay.visible = true;
         FlxG.mouse.visible = false;
 
+        Conductor.instance.rate = 1;
         Conductor.instance.music = null;
         Conductor.instance.hasMetronome = false;
         
+        FlxG.sound.acceptInputs = true;
         Paths.forceMod = null;
         super.destroy();
     }
@@ -417,7 +432,7 @@ class ChartEditor extends FunkinState {
             inst.pause();
 
             Conductor.instance.music = null;
-            playBar.playPauseButton.text = ">";
+            playBar.playPauseButton.icon = Paths.image("editors/charter/images/playbar/play");
         }
         else {
             if(Conductor.instance.time <= 0) {
@@ -435,7 +450,7 @@ class ChartEditor extends FunkinState {
             vocals.play();
             inst.play();
 
-            playBar.playPauseButton.text = "||";
+            playBar.playPauseButton.icon = Paths.image("editors/charter/images/playbar/pause");
         }
     }
 
@@ -507,10 +522,27 @@ class ChartEditor extends FunkinState {
     public function resetZoom():Void {
         editorSettings.gridZoom = 1.0;
     }
+
+    public function setPlaybackRate(rate:Float):Void {
+        editorSettings.playbackRate = rate;
+        Conductor.instance.rate = editorSettings.playbackRate;
+
+        inst.pitch = editorSettings.playbackRate;
+
+        if(vocals.spectator != null)
+            vocals.spectator.pitch = editorSettings.playbackRate;
+        
+        if(vocals.opponent != null)
+            vocals.opponent.pitch = editorSettings.playbackRate;
+        
+        if(vocals.player != null)
+            vocals.player.pitch = editorSettings.playbackRate;
+    }
     
     public inline function seekToTime(newTime:Float):Void {
         inst.time = newTime;
         vocals.seek(newTime);
+
         Conductor.instance.time = newTime;
     }
 
@@ -665,6 +697,7 @@ class ChartEditor extends FunkinState {
 
     //----------- [ Private API ] -----------//
 
+    private var _middleScrolling:Bool = false;
     private var _selectingObjects:Bool = false;
 
     private var _mousePos:FlxPoint = FlxPoint.get();
@@ -718,6 +751,7 @@ class ChartEditorSettings {
     public var mutePlayerVocals:Bool = false;
 
     public var gridZoom:Float = 1;
+    public var playbackRate:Float = 1;
 }
 
 @:structInit

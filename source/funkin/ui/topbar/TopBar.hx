@@ -47,7 +47,19 @@ class TopBar extends UIComponent {
 
         for(keys => callback in rightShortcutMap)
             _handleShortcut(keys, callback);
-        
+
+        var seX:Float = x;
+        for(i in 0..._leftItemContainer.length) {
+            var item:FlxSprite = _leftItemContainer.members.unsafeGet(i);
+            item.x = seX;
+            seX += item.width;
+        }
+        var seX:Float = FlxG.width;
+        for(i in 0..._rightItemContainer.length) {
+            var item:FlxSprite = _rightItemContainer.members.unsafeGet(_rightItemContainer.length - i - 1);
+            seX -= item.width;
+            item.x = seX;
+        }
         super.update(elapsed);
     }
 

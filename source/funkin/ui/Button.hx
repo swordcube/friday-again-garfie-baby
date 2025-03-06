@@ -1,17 +1,17 @@
 package funkin.ui;
 
 import flixel.text.FlxText;
-import flixel.graphics.FlxGraphic;
 
-import flixel.graphics.frames.FlxFrame;
-import flixel.graphics.frames.FlxImageFrame;
-
-@:access(flixel.graphics.frames.FlxFrame)
 class Button extends UIComponent {
     public var bg:SliceSprite;
+    
     public var label:FlxText;
-
     public var text(get, set):String;
+
+    public var icon(default, set):String;
+    public var iconSpr:FlxSprite;
+
+    public var contentContainer:FlxSpriteContainer;
 
     public var pressed:Bool = false;
     public var callback:Void->Void;
@@ -23,10 +23,16 @@ class Button extends UIComponent {
         bg.loadGraphic(Paths.image("ui/images/button"), true, 48, 48);
         add(bg);
 
-        label = new FlxText(8, 0, 0, text);
+        contentContainer = new FlxSpriteContainer(0, 0);
+        add(contentContainer);
+
+        iconSpr = new FlxSprite(0, 0);
+        iconSpr.visible = false;
+        contentContainer.add(iconSpr);
+        
+        label = new FlxText(0, 0, 0, text ?? "");
         label.setFormat(Paths.font("fonts/montserrat/semibold"), 14, FlxColor.WHITE, CENTER, OUTLINE, FlxColor.BLACK);
-        label.y = bg.y + ((bg.height - label.height) * 0.5);
-        add(label);
+        contentContainer.add(label);
 
         this.width = width;
         this.height = height;
@@ -58,11 +64,11 @@ class Button extends UIComponent {
     override function set_width(Value:Float):Float {
         if(bg != null) {
             if(Value <= 0)
-                bg.width = label.width + 16;
+                bg.width = contentContainer.width + 16;
             else
                 bg.width = Value;
 
-            label.setPosition(bg.x + ((bg.width - label.width) * 0.5), bg.y + ((bg.height - label.height) * 0.5));
+            contentContainer.setPosition(bg.x + ((bg.width - contentContainer.width) * 0.5), bg.y + ((bg.height - contentContainer.height) * 0.5));
         }
         return width = Value;
     }
@@ -70,11 +76,11 @@ class Button extends UIComponent {
     override function set_height(Value:Float):Float {
         if(bg != null) {
             if(Value <= 0)
-                bg.height = label.height + 8;
+                bg.height = contentContainer.height + 8;
             else
                 bg.height = Value;
 
-            label.setPosition(bg.x + ((bg.width - label.width) * 0.5), bg.y + ((bg.height - label.height) * 0.5));
+            contentContainer.setPosition(bg.x + ((bg.width - contentContainer.width) * 0.5), bg.y + ((bg.height - contentContainer.height) * 0.5));
         }
         return height = Value;
     }
@@ -86,8 +92,35 @@ class Button extends UIComponent {
 
     @:noCompletion
     private inline function set_text(Value:String):String {
+        Value ??= "";
+
         label.text = Value;
-        label.setPosition(bg.x + ((bg.width - label.width) * 0.5), bg.y + ((bg.height - label.height) * 0.5));
+        label.visible = (Value != null && Value.length != 0);
+        
+        contentContainer.setPosition(bg.x + ((bg.width - contentContainer.width) * 0.5), bg.y + ((bg.height - contentContainer.height) * 0.5));
         return Value;
+    }
+    
+    @:noCompletion
+    private inline function set_icon(newIcon:String):String {
+        if(newIcon != null && newIcon.length != 0) {
+            iconSpr.visible = true;
+            iconSpr.loadGraphic(newIcon);
+            iconSpr.updateHitbox();
+            
+            if(label.text.length != 0)
+                label.x = iconSpr.x + iconSpr.width + 4;
+            else
+                label.x = iconSpr.x;
+        }
+        else {
+            iconSpr.visible = false;
+        }
+        contentContainer.setPosition(bg.x + ((bg.width - contentContainer.width) * 0.5), bg.y + ((bg.height - contentContainer.height) * 0.5));
+        
+        iconSpr.y = bg.y + ((bg.height - iconSpr.height) * 0.5);
+        label.y = bg.y + ((bg.height - label.height) * 0.5);
+
+        return icon = newIcon;
     }
 }

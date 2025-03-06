@@ -129,6 +129,11 @@ class CharterTopBar extends TopBar {
                 
                 Separator,
 
+                Button("Go back a beat", [UP], charter.goBackABeat),
+                Button("Go forward a beat", [DOWN], charter.goForwardABeat),
+                
+                Separator,
+
                 Button("Go back a measure", [A], charter.goBackAMeasure),
                 Button("Go forward a measure", [D], charter.goForwardAMeasure),
                 
@@ -142,7 +147,7 @@ class CharterTopBar extends TopBar {
                 Checkbox("Metronome", (value:Bool) -> charter.toggleMetronome(!ChartEditor.editorSettings.metronome), () -> return ChartEditor.editorSettings.metronome),
                 Checkbox("Visual metronome", (value:Bool) -> {trace("visual metronome NOT IMPLEMENTED!!");})
             ]),
-            Slider(0.25, 3, 0.01, 1, 130, (value:Float) -> {trace("playback slider NOT IMPLEMENTED!!");})
+            Slider(0.25, 3, 0.01, ChartEditor.editorSettings.playbackRate, 130, (value:Float) -> charter.setPlaybackRate(value))
         ];
     }
 }

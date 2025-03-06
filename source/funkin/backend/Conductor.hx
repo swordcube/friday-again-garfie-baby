@@ -81,6 +81,7 @@ class Conductor extends FlxBasic {
     public var measureLength(get, never):Float;
 
     public var offset:Float = 0;
+    public var rate:Float = 1;
 
     public var music:FlxSound;
 
@@ -260,10 +261,10 @@ class Conductor extends FlxBasic {
                 @:bypassAccessor rawTime = musicTime;
                 _lastMusicTime = musicTime;
             } else
-                @:bypassAccessor rawTime += elapsed * 1000;
+                @:bypassAccessor rawTime += elapsed * 1000 * rate;
         }
         else if(autoIncrement)
-            @:bypassAccessor rawTime += elapsed * 1000;
+            @:bypassAccessor rawTime += elapsed * 1000 * rate;
         
         var curTimingPoint:TimingPoint = getTimingPointAtTime(time);
         _latestTimingPoint = curTimingPoint;
