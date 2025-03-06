@@ -19,15 +19,14 @@ import funkin.ui.panel.*;
 import funkin.ui.topbar.*;
 import funkin.ui.charter.*;
 
+import funkin.gameplay.HealthIcon;
 import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.VocalGroup;
 
-// TODO: play bar
 // TODO: undos & redos
-// TODO: click and drag selection box thingie
 
-// TODO: have some way to place events
-// TODO: have some way to place timing points
+// TODO: have some way to place & select events
+// TODO: have some way to place & select timing points
 
 // TODO: waveforms for inst and each vocal track
 
@@ -58,6 +57,9 @@ class ChartEditor extends UIState {
 
     public var bg:FlxSprite;
     public var grid:CharterGrid;
+
+    public var iconP2:HealthIcon;
+    public var iconP1:HealthIcon;
 
     public var topCover:FlxSprite;
     public var bottomCover:FlxSprite;
@@ -189,6 +191,24 @@ class ChartEditor extends UIState {
         grid.scrollFactor.x = 0;
         grid.cameras = [noteCam];
         add(grid);
+
+        iconP2 = new HealthIcon(currentChart.meta.game.getCharacter("opponent"), OPPONENT);
+        add(iconP2);
+        
+        iconP1 = new HealthIcon(currentChart.meta.game.getCharacter("player"), PLAYER);
+        iconP1.flipX = true;
+        add(iconP1);
+        
+        for(icon in [iconP1, iconP2]) {
+            icon.size.scale(0.5);
+            icon.scale.scale(0.5);
+            icon.updateHitbox();
+            icon.centered = true;
+            icon.cameras = [noteCam];
+            icon.scrollFactor.set();
+        }
+        iconP2.setPosition(grid.x - (iconP2.width + 12), 38);
+        iconP1.setPosition(grid.x + (grid.width + 12), 38);
 
         beatSeparators = new FlxSpriteContainer();
         beatSeparators.cameras = [noteCam];
@@ -417,6 +437,12 @@ class ChartEditor extends UIState {
                 }
             }
         }
+    }
+
+    override function beatHit(beat:Int):Void {
+        iconP2.bop();
+        iconP1.bop();
+        super.beatHit(beat);
     }
     
     override function destroy():Void {

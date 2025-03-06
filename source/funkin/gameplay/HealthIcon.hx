@@ -160,6 +160,12 @@ class HealthIcon extends TrackingSprite {
      */
     public var size:FlxPoint = FlxPoint.get(1, 1);
 
+    /**
+     * Whether or not the icon should scale from it's center
+     * instead of the top left corner.
+     */
+    public var centered:Bool = false;
+
     public var health:Float = 0.5;
 
     public var bopTween:FlxTween;
@@ -184,6 +190,12 @@ class HealthIcon extends TrackingSprite {
             updateHitbox();
         }
         _updateHealthIcon(health);
+    }
+
+    override function updateHitbox():Void {
+        super.updateHitbox();
+        if(centered)
+            offset.set(-0.5 * ((frameWidth * size.x) - frameWidth), -0.5 * ((frameHeight * size.y) - frameHeight));
     }
 
     public function bop():Void {
@@ -289,7 +301,11 @@ class HealthIcon extends TrackingSprite {
         final leScale:Float = charData?.healthIcon?.scale ?? 1.0;
         size.set(leScale, leScale);
         
-        setGraphicSize(HEALTH_ICON_SIZE * size.x, HEALTH_ICON_SIZE * size.y);
+        if(width > height)
+            setGraphicSize(HEALTH_ICON_SIZE * size.x, 0);
+        else
+            setGraphicSize(0, HEALTH_ICON_SIZE * size.y);
+        
         updateHitbox();
 
         flipX = charData?.healthIcon?.flip?.x ?? false;
