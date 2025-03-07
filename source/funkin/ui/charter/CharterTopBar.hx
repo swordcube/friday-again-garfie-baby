@@ -38,7 +38,7 @@ class CharterTopBar extends TopBar {
                 Separator,
 
                 Button("Open", [[CONTROL, O]], () -> {trace("open NOT IMPLEMENTED!!");}),
-                Button("Save", [[CONTROL, S]], () -> {trace("save NOT IMPLEMENTED!!");}),
+                Button("Save", [[CONTROL, S]], charter.save),
                 
                 Separator,
                 
@@ -145,7 +145,7 @@ class CharterTopBar extends TopBar {
                 Separator,
 
                 Checkbox("Metronome", (value:Bool) -> charter.toggleMetronome(!ChartEditor.editorSettings.metronome), () -> return ChartEditor.editorSettings.metronome),
-                Checkbox("Visual metronome", (value:Bool) -> {trace("visual metronome NOT IMPLEMENTED!!");})
+                Checkbox("Visual metronome", (value:Bool) -> charter.toggleVisualMetronome(!ChartEditor.editorSettings.visualMetronome), () -> return ChartEditor.editorSettings.visualMetronome),
             ]),
             Textbox(Std.string(ChartEditor.editorSettings.playbackRate), (value:String) -> charter.setPlaybackRate(Std.parseFloat(value)), 4, true, null, () -> return Std.string(ChartEditor.editorSettings.playbackRate)),
             Slider(0.25, 3, 0.01, ChartEditor.editorSettings.playbackRate, 130, (value:Float) -> charter.setPlaybackRate(value), () -> return ChartEditor.editorSettings.playbackRate),

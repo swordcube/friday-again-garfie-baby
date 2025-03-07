@@ -90,6 +90,8 @@ class ChartEditor extends UIState {
     public var uiCam:FlxCamera;
     public var uiLayer:FlxContainer;
 
+    public var visualMetronome:CharterVisualMetronome;
+
     public var topBar:CharterTopBar;
     public var playBar:CharterPlayBar;
 
@@ -326,6 +328,15 @@ class ChartEditor extends UIState {
         uiLayer.cameras = [uiCam];
         add(uiLayer);
 
+        visualMetronome = new CharterVisualMetronome(0, 24);
+        visualMetronome.cameras = [uiCam];
+        visualMetronome.screenCenter(X);
+
+        if(!editorSettings.visualMetronome)
+            visualMetronome.visible = false;
+
+        uiLayer.add(visualMetronome);
+
         topBar = new CharterTopBar();
         topBar.zIndex = 1;
         uiLayer.add(topBar);
@@ -369,6 +380,7 @@ class ChartEditor extends UIState {
         if(Conductor.instance.time >= inst.length)
             Conductor.instance.time = inst.length;
         
+        Conductor.instance.hasMetronome = editorSettings.metronome && inst.playing;
         conductorInfoText.text = 'Step: ${Conductor.instance.curStep}\nBeat: ${Conductor.instance.curBeat}\nMeasure: ${Conductor.instance.curMeasure}';
 
         final targetScrollY:Float = (CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.time)) - (FlxG.height * 0.5);
@@ -452,6 +464,7 @@ class ChartEditor extends UIState {
     override function beatHit(beat:Int):Void {
         iconP2.bop();
         iconP1.bop();
+        visualMetronome.tick(beat);
         super.beatHit(beat);
     }
     
@@ -483,6 +496,7 @@ class ChartEditor extends UIState {
             inst.pause();
 
             Conductor.instance.music = null;
+            visualMetronome.bigBars.visible = false;
             playBar.playPauseButton.icon = Paths.image("editors/charter/images/playbar/play");
         }
         else {
@@ -501,6 +515,9 @@ class ChartEditor extends UIState {
             vocals.play();
             inst.play();
 
+            visualMetronome.bigBars.visible = true;
+            visualMetronome.tick(Conductor.instance.curBeat);
+
             playBar.playPauseButton.icon = Paths.image("editors/charter/images/playbar/pause");
         }
     }
@@ -509,7 +526,7 @@ class ChartEditor extends UIState {
         if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
 
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Conductor.instance.getBeatAtTime(Conductor.instance.time) - 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.floor(Conductor.instance.getBeatAtTime(Conductor.instance.time + (FlxMath.EPSILON * 1000))) - 1), 0, inst.length);
         seekToTime(newTime);
     }
 
@@ -517,7 +534,7 @@ class ChartEditor extends UIState {
         if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
         
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Conductor.instance.getMeasureAtTime(Conductor.instance.time) - 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.floor(Conductor.instance.getMeasureAtTime(Conductor.instance.time + (FlxMath.EPSILON * 1000))) - 1), 0, inst.length);
         seekToTime(newTime);
     }
     
@@ -525,7 +542,7 @@ class ChartEditor extends UIState {
         if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
         
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Conductor.instance.getBeatAtTime(Conductor.instance.time) + 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.floor(Conductor.instance.getBeatAtTime(Conductor.instance.time + (FlxMath.EPSILON * 1000))) + 1), 0, inst.length);
         seekToTime(newTime);
     }
 
@@ -533,7 +550,7 @@ class ChartEditor extends UIState {
         if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
         
-        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Conductor.instance.getMeasureAtTime(Conductor.instance.time) + 1), 0, inst.length);
+        final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.floor(Conductor.instance.getMeasureAtTime(Conductor.instance.time + (FlxMath.EPSILON * 1000))) + 1), 0, inst.length);
         seekToTime(newTime);
     }
 
@@ -724,7 +741,16 @@ class ChartEditor extends UIState {
 
     public function toggleMetronome(value:Bool):Void {
         editorSettings.metronome = value;
-        Conductor.instance.hasMetronome = editorSettings.metronome;
+        Conductor.instance.hasMetronome = editorSettings.metronome && inst.playing;
+    }
+
+    public function toggleVisualMetronome(value:Bool):Void {
+        editorSettings.visualMetronome = value;
+
+        visualMetronome.visible = editorSettings.visualMetronome;
+        visualMetronome.bigBars.visible = inst.playing;
+        
+        visualMetronome.tick(Conductor.instance.curBeat, true);
     }
 
     public function toggleInstrumental(value:Bool):Void {
@@ -835,6 +861,7 @@ class ChartEditorSettings {
 
     public var gridSnap:Int = 16;
     public var metronome:Bool = false;
+    public var visualMetronome:Bool = false;
 
     public var muteInstrumental:Bool = false;
     public var muteAllVocals:Bool = false;
