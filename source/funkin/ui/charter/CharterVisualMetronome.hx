@@ -48,36 +48,37 @@ class CharterVisualMetronome extends FlxSpriteContainer {
 
     @:noCompletion
     private function set_beatsPerMeasure(newValue:Int):Int {
-        for(bars in [smallBars, bigBars]) {
-            bars.forEach((b) -> b.destroy());
-            bars.clear();
+        if(beatsPerMeasure != newValue) {
+            for(bars in [smallBars, bigBars]) {
+                bars.forEach((b) -> b.destroy());
+                bars.clear();
+            }
+            barTimers.resize(newValue);
+    
+            smallBars.x = bg.x;
+            bigBars.x = bg.x;
+    
+            final barScale:Float = 0.15 * (4 / newValue);
+            for(i in 0...newValue) {
+                final bigBar:FlxSprite = new FlxSprite().loadGraphic(Paths.image("editors/charter/images/metronome/big_bar"));
+                bigBar.scale.set(barScale, barScale);
+                bigBar.updateHitbox();
+                bigBar.visible = false;
+                bigBar.x = i * bigBar.width;
+                
+                final smallBar:FlxSprite = new FlxSprite().loadGraphic(Paths.image("editors/charter/images/metronome/small_bar"));
+                smallBar.scale.set(barScale, barScale);
+                smallBar.updateHitbox();
+                smallBar.alpha = 0.45;
+                smallBar.x = (i * bigBar.width) + ((bigBar.width - smallBar.width) * 0.5);
+                smallBar.y = bigBar.y + (bigBar.height - smallBar.height) * 0.5;
+    
+                bigBars.add(bigBar);
+                smallBars.add(smallBar);
+            }
+            smallBars.x += (bg.width - bigBars.width) * 0.5;
+            bigBars.x += (bg.width - bigBars.width) * 0.5;
         }
-        barTimers.resize(newValue);
-
-        smallBars.x = bg.x;
-        bigBars.x = bg.x;
-
-        final barScale:Float = 0.15 * (4 / newValue);
-        for(i in 0...newValue) {
-            final bigBar:FlxSprite = new FlxSprite().loadGraphic(Paths.image("editors/charter/images/metronome/big_bar"));
-            bigBar.scale.set(barScale, barScale);
-            bigBar.updateHitbox();
-            bigBar.visible = false;
-            bigBar.x = i * bigBar.width;
-            
-            final smallBar:FlxSprite = new FlxSprite().loadGraphic(Paths.image("editors/charter/images/metronome/small_bar"));
-            smallBar.scale.set(barScale, barScale);
-            smallBar.updateHitbox();
-            smallBar.alpha = 0.45;
-            smallBar.x = (i * bigBar.width) + ((bigBar.width - smallBar.width) * 0.5);
-            smallBar.y = bigBar.y + (bigBar.height - smallBar.height) * 0.5;
-
-            bigBars.add(bigBar);
-            smallBars.add(smallBar);
-        }
-        smallBars.x += (bg.width - bigBars.width) * 0.5;
-        bigBars.x += (bg.width - bigBars.width) * 0.5;
-
         return beatsPerMeasure = newValue;
     }
 }

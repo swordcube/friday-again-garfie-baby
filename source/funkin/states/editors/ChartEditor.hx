@@ -335,6 +335,7 @@ class ChartEditor extends UIState {
         if(!editorSettings.visualMetronome)
             visualMetronome.visible = false;
 
+        visualMetronome.bigBars.visible = false;
         uiLayer.add(visualMetronome);
 
         topBar = new CharterTopBar();
@@ -380,6 +381,9 @@ class ChartEditor extends UIState {
         if(Conductor.instance.time >= inst.length)
             Conductor.instance.time = inst.length;
         
+        @:privateAccess
+        visualMetronome.beatsPerMeasure = Conductor.instance._latestTimingPoint.getTimeSignature().getNumerator();
+
         Conductor.instance.hasMetronome = editorSettings.metronome && inst.playing;
         conductorInfoText.text = 'Step: ${Conductor.instance.curStep}\nBeat: ${Conductor.instance.curBeat}\nMeasure: ${Conductor.instance.curMeasure}';
 
