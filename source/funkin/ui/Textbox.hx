@@ -26,6 +26,7 @@ class Textbox extends UIComponent {
     public var callback:String->Void;
 
     public var position:Int = 0;
+    public var maxCharacters:Int = 0;
 
     public function new(x:Float = 0, y:Float = 0, text:String, ?autoSize:Bool = false, ?width:Float = 100, ?height:Float = 26, ?callback:String->Void = null) {
         super(x, y);
@@ -169,11 +170,17 @@ class Textbox extends UIComponent {
     }
 
     private function _onTextInput(text:String):Void {
+        if(maxCharacters > 0 && this.text.length >= maxCharacters)
+            return;
+
         this.text = this.text.substr(0, position) + text + this.text.substr(position);
 		position += text.length;
     }
 
     private function _onTextEdit(text:String, start:Int, end:Int):Void {
+        if(maxCharacters > 0 && this.text.length >= maxCharacters)
+            return;
+        
         this.text = this.text.substr(0, position) + text + this.text.substr(position);
 		position += text.length;
     }

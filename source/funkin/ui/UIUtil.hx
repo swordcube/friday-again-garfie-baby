@@ -11,10 +11,14 @@ class UIUtil {
     public static var allComponents:Array<IUIComponent> = [];
     public static var focusedComponents:Array<IUIComponent> = [];
 
-    public static function isHoveringAnyComponent():Bool {
+    public static function isHoveringAnyComponent(?ignoreList:Array<IUIComponent>):Bool {
         var c:IUIComponent = null;
-        for(i in 0...UIUtil.allComponents.length) {
-            c = UIUtil.allComponents[i];
+        var hasIgnores:Bool = ignoreList != null && ignoreList.length != 0;
+
+        for(i in 0...allComponents.length) {
+            c = allComponents[i];
+            if(hasIgnores && ignoreList.contains(c))
+                continue;
 
             if(c.checkMouseOverlap())
                 return true;
@@ -22,7 +26,19 @@ class UIUtil {
         return false;
     }
 
-    public static function isAnyComponentFocused():Bool {
+    public static function isAnyComponentFocused(?ignoreList:Array<IUIComponent>):Bool {
+        var hasIgnores:Bool = ignoreList != null && ignoreList.length != 0;
+        if(hasIgnores) {
+            var c:IUIComponent = null;
+            for(i in 0...focusedComponents.length) {
+                c = focusedComponents[i];
+                if(ignoreList.contains(c))
+                    continue;
+                
+                return true;
+            }
+            return false;
+        }
         return focusedComponents.length != 0;
     }
 

@@ -1,2 +1,0 @@
-package funkin.backend.interfaces;
-

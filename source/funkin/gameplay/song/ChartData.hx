@@ -68,4 +68,9 @@ class ChartData {
 		result.meta = SongMetadata.load(song, mix, loaderID);
 		return result;
 	}
+
+	public static function stringify(chart:ChartData):String {
+		final writer:JsonWriter<ChartData> = new JsonWriter<ChartData>();
+		return writer.write(chart);
+	}
 }

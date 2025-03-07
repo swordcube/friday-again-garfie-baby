@@ -5,7 +5,7 @@ class TopBarTextbox extends UIComponent {
     public var textbox:Textbox;
     public var valueFactory:Void->String;
 
-    public function new(x:Float = 0, y:Float = 0, text:String, ?autoSize:Bool = false, ?width:Float = 100, ?callback:String->Void, ?valueFactory:Void->String) {
+    public function new(x:Float = 0, y:Float = 0, text:String, ?maxCharacters:Int = 0, ?autoSize:Bool = false, ?width:Float = 100, ?callback:String->Void, ?valueFactory:Void->String) {
         super(x, y);
         this.valueFactory = valueFactory;
 
@@ -13,6 +13,7 @@ class TopBarTextbox extends UIComponent {
         add(bg);
 
         textbox = new Textbox(4, 2, text, autoSize, width, 22, callback);
+        textbox.maxCharacters = maxCharacters;
         add(textbox);
 
         bg.setGraphicSize(textbox.width + 12, bg.frameHeight);

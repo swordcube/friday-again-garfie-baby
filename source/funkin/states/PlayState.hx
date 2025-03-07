@@ -106,6 +106,22 @@ class PlayState extends FunkinState {
 			currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
 		
 		FlxG.sound.playMusic(instPath, 0, false);
+		inst = FlxG.sound.music;
+
+		final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
+		if(FlxG.assets.exists(playerVocals)) {
+			vocals = new VocalGroup({
+				spectator: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'),
+				opponent: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'),
+				player: playerVocals
+			});
+		} else {
+			vocals = new VocalGroup({
+				player: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals'),
+				isSingleTrack: true
+			});
+		}
+		add(vocals);
 
 		camGame = new FunkinCamera();
 		camGame.bgColor = 0;
@@ -116,13 +132,17 @@ class PlayState extends FunkinState {
 		FlxG.cameras.add(camHUD, false);
 
 		Conductor.instance.music = null;
-		Conductor.instance.offset = Options.songOffset;
+		Conductor.instance.offset = Options.songOffset + inst.latency;
 		Conductor.instance.autoIncrement = true;
-
+		
 		Conductor.instance.reset(currentChart.meta.song.bpm);
 		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
+		
+		Conductor.instance.time = -((Conductor.instance.beatLength * 4) + Conductor.instance.offset);
 
-		Conductor.instance.time = -((Conductor.instance.beatLength * 4) + Options.songOffset);
+		inst.pause();
+		inst.volume = 1;
+		inst.onComplete = finishSong;
 
 		#if SCRIPTING_ALLOWED
 		scripts = new FunkinScriptGroup();
@@ -212,27 +232,6 @@ class PlayState extends FunkinState {
 			hud.script.call("onCreate");
 		}
 		#end
-
-		inst = FlxG.sound.music;
-		inst.pause();
-
-		inst.volume = 1;
-		inst.onComplete = finishSong;
-
-		final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
-		if(FlxG.assets.exists(playerVocals)) {
-			vocals = new VocalGroup({
-				spectator: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'),
-				opponent: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'),
-				player: playerVocals
-			});
-		} else {
-			vocals = new VocalGroup({
-				player: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals'),
-				isSingleTrack: true
-			});
-		}
-		add(vocals);
 		
 		#if SCRIPTING_ALLOWED
 		scripts.call("onCreatePost");
@@ -243,7 +242,7 @@ class PlayState extends FunkinState {
 		#if SCRIPTING_ALLOWED
 		scripts.call("onUpdate", [elapsed]);
 		#end
-		if(startingSong && Conductor.instance.time >= -Options.songOffset)
+		if(startingSong && Conductor.instance.time >= -Conductor.instance.offset)
 			startSong();
 
 		if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.END)
@@ -307,7 +306,7 @@ class PlayState extends FunkinState {
 		vocals.seek(0);
 		vocals.play();
 
-		Conductor.instance.time = -Options.songOffset;
+		Conductor.instance.time = -Conductor.instance.offset;
 		Conductor.instance.music = FlxG.sound.music;
 
 		#if SCRIPTING_ALLOWED
@@ -375,9 +374,9 @@ class PlayState extends FunkinState {
 			return;
 		
 		if(event.playSingAnim) {
-			event.character._holdingPose = isPlayer;
-			event.character.holdTimer += event.length;
 			event.character.playSingAnim(event.direction, true);
+			event.character.holdTimer += event.length;
+			event.character._holdingPose = isPlayer;
 		}
 	}
 

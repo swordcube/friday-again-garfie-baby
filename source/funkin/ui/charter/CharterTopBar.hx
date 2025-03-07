@@ -33,56 +33,56 @@ class CharterTopBar extends TopBar {
 
         leftItems = [
             DropDown("File", [
-                Button("New", [CONTROL, N], () -> {trace("new NOT IMPLEMENTED!!");}),
+                Button("New", [[CONTROL, N]], () -> {trace("new NOT IMPLEMENTED!!");}),
                 
                 Separator,
 
-                Button("Open", [CONTROL, O], () -> {trace("open NOT IMPLEMENTED!!");}),
-                Button("Save", [CONTROL, S], () -> {trace("save NOT IMPLEMENTED!!");}),
+                Button("Open", [[CONTROL, O]], () -> {trace("open NOT IMPLEMENTED!!");}),
+                Button("Save", [[CONTROL, S]], () -> {trace("save NOT IMPLEMENTED!!");}),
                 
                 Separator,
                 
-                Button("Save Chart As", [CONTROL, SHIFT, S], () -> {trace("save chart as NOT IMPLEMENTED!!");}),
-                Button("Save Meta As", [CONTROL, ALT, SHIFT, S], () -> {trace("save meta as NOT IMPLEMENTED!!");}),
+                Button("Save Chart As", [[CONTROL, SHIFT, S]], charter.saveChartAs),
+                Button("Save Meta As", [[CONTROL, ALT, SHIFT, S]], charter.saveMetaAs),
                 
                 Separator,
 
-                Button("Convert Chart", [CONTROL, SHIFT, C], () -> {trace("convert chart NOT IMPLEMENTED!!");}),
+                Button("Convert Chart", [[CONTROL, SHIFT, C]], () -> {trace("convert chart NOT IMPLEMENTED!!");}),
 
                 Separator,
 
                 Button("Exit", null, () -> {trace("exit NOT IMPLEMENTED!!");})
             ]),
             DropDown("Edit", [
-                Button("Undo", [CONTROL, Z], () -> {trace("undo NOT IMPLEMENTED!!");}),
-                Button("Redo", [CONTROL, Y], () -> {trace("redo NOT IMPLEMENTED!!");}),
+                Button("Undo", [[CONTROL, Z]], () -> {trace("undo NOT IMPLEMENTED!!");}),
+                Button("Redo", [[CONTROL, Y], [CONTROL, SHIFT, Z]], () -> {trace("redo NOT IMPLEMENTED!!");}),
                 
                 Separator,
                 
-                Button("Copy", [CONTROL, C], () -> {trace("copy NOT IMPLEMENTED!!");}),
-                Button("Paste", [CONTROL, V], () -> {trace("paste NOT IMPLEMENTED!!");}),
+                Button("Copy", [[CONTROL, C]], () -> {trace("copy NOT IMPLEMENTED!!");}),
+                Button("Paste", [[CONTROL, V]], () -> {trace("paste NOT IMPLEMENTED!!");}),
                 
                 Separator,
                 
-                Button("Cut", [CONTROL, X], () -> {trace("cut NOT IMPLEMENTED!!");}),
-                Button("Delete", [DELETE], () -> charter.deleteObjects(charter.selectedObjects))
+                Button("Cut", [[CONTROL, X]], () -> {trace("cut NOT IMPLEMENTED!!");}),
+                Button("Delete", [[DELETE]], () -> charter.deleteObjects(charter.selectedObjects))
             ]),
             DropDown("Chart", [
-                Button("Playtest", [ENTER], () -> charter.playTest()),
-                Button("Playtest here", [SHIFT, ENTER], () -> {trace("playtest here NOT IMPLEMENTED!!");}),
+                Button("Playtest", [[ENTER]], charter.playTest),
+                Button("Playtest here", [[SHIFT, ENTER]], () -> {trace("playtest here NOT IMPLEMENTED!!");}),
 
                 Separator,
 
-                Button("Edit chart metadata", null, () -> {trace("edit chart metadata NOT IMPLEMENTED!!");})
+                Button("Edit chart metadata", null, charter.openMetadataWindow)
             ]),
             DropDown("View", [
-                Button("Zoom In", [CONTROL, NUMPADPLUS], () -> charter.zoomIn()),
-                Button("Zoom Out", [CONTROL, NUMPADMINUS], () -> charter.zoomOut()),
-                Button("Reset Zoom", [CONTROL, NUMPADZERO], () -> charter.resetZoom())
+                Button("Zoom In", [[CONTROL, NUMPADPLUS]], charter.zoomIn),
+                Button("Zoom Out", [[CONTROL, NUMPADMINUS]], charter.zoomOut),
+                Button("Reset Zoom", [[CONTROL, NUMPADZERO]], charter.resetZoom)
             ]),
             DropDown("Song", [
-                Button("Go back to the start", [HOME], () -> charter.goBackToStart()),
-                Button("Go to the end", [END], () -> charter.goToEnd()),
+                Button("Go back to the start", [[HOME]], charter.goBackToStart),
+                Button("Go to the end", [[END]], charter.goToEnd),
 
                 Separator,
                 
@@ -90,13 +90,13 @@ class CharterTopBar extends TopBar {
                 Checkbox("Mute all vocals", (value:Bool) -> charter.toggleAllVocals(value), () -> return ChartEditor.editorSettings.muteAllVocals),
             ].concat(vocalItems)),
             DropDown("Note", [
-                Button("Add sustain length", [E], () -> charter.addSustainLength(charter.selectedObjects)),
-                Button("Subtract sustain length", [Q], () -> charter.subtractSustainLength(charter.selectedObjects)),
+                Button("Add sustain length", [[E]], () -> charter.addSustainLength(charter.selectedObjects)),
+                Button("Subtract sustain length", [[Q]], () -> charter.subtractSustainLength(charter.selectedObjects)),
                 
                 Separator,
                 
-                Button("Select all", [CONTROL, A], () -> {trace("select all NOT IMPLEMENTED!!");}),
-                Button("Select measure", [CONTROL, SHIFT, A], () -> {trace("select measure NOT IMPLEMENTED!!");}),
+                Button("Select all", [[CONTROL, A]], () -> {trace("select all NOT IMPLEMENTED!!");}),
+                Button("Select measure", [[CONTROL, SHIFT, A]], () -> {trace("select measure NOT IMPLEMENTED!!");}),
                 
                 Separator,
             ].concat(noteTypeItems))
@@ -106,9 +106,9 @@ class CharterTopBar extends TopBar {
     public function updateRightSideItems():Void {
         rightItems = [
             DropDown("Snap >", [
-                Button("+ Grid Snap", [X], () -> charter.increaseGridSnap()),
+                Button("+ Grid Snap", [[X]], charter.increaseGridSnap),
                 Button("Reset Grid Snap", null, () -> charter.setGridSnap(16)),
-                Button("- Grid Snap", [Z], () -> charter.decreaseGridSnap()),
+                Button("- Grid Snap", [[Z]], charter.decreaseGridSnap),
 
                 Separator,
 
@@ -125,17 +125,17 @@ class CharterTopBar extends TopBar {
             ]),
             Text('${ChartEditor.editorSettings.gridSnap}x'),
             DropDown("Playback >", [
-                Button("Play/Pause", [SPACE], charter.playPause),
+                Button("Play/Pause", [[SPACE]], charter.playPause),
                 
                 Separator,
 
-                Button("Go back a beat", [UP], charter.goBackABeat),
-                Button("Go forward a beat", [DOWN], charter.goForwardABeat),
+                Button("Go back a beat", [[UP]], charter.goBackABeat),
+                Button("Go forward a beat", [[DOWN]], charter.goForwardABeat),
                 
                 Separator,
 
-                Button("Go back a measure", [A], charter.goBackAMeasure),
-                Button("Go forward a measure", [D], charter.goForwardAMeasure),
+                Button("Go back a measure", [[A]], charter.goBackAMeasure),
+                Button("Go forward a measure", [[D]], charter.goForwardAMeasure),
                 
                 Separator,
 
@@ -147,7 +147,7 @@ class CharterTopBar extends TopBar {
                 Checkbox("Metronome", (value:Bool) -> charter.toggleMetronome(!ChartEditor.editorSettings.metronome), () -> return ChartEditor.editorSettings.metronome),
                 Checkbox("Visual metronome", (value:Bool) -> {trace("visual metronome NOT IMPLEMENTED!!");})
             ]),
-            Textbox(Std.string(ChartEditor.editorSettings.playbackRate), (value:String) -> charter.setPlaybackRate(Std.parseFloat(value)), true, null, () -> return Std.string(ChartEditor.editorSettings.playbackRate)),
+            Textbox(Std.string(ChartEditor.editorSettings.playbackRate), (value:String) -> charter.setPlaybackRate(Std.parseFloat(value)), 4, true, null, () -> return Std.string(ChartEditor.editorSettings.playbackRate)),
             Slider(0.25, 3, 0.01, ChartEditor.editorSettings.playbackRate, 130, (value:Float) -> charter.setPlaybackRate(value), () -> return ChartEditor.editorSettings.playbackRate),
         ];
     }

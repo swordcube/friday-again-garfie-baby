@@ -1,5 +1,8 @@
 package funkin.states.editors;
 
+import sys.io.File;
+import openfl.net.FileReference;
+
 import flixel.text.FlxText;
 import flixel.math.FlxPoint;
 
@@ -20,7 +23,10 @@ import funkin.ui.topbar.*;
 import funkin.ui.charter.*;
 
 import funkin.gameplay.HealthIcon;
+
 import funkin.gameplay.song.ChartData;
+import funkin.gameplay.song.SongMetadata;
+
 import funkin.gameplay.song.VocalGroup;
 
 // TODO: undos & redos
@@ -321,12 +327,14 @@ class ChartEditor extends UIState {
         add(uiLayer);
 
         topBar = new CharterTopBar();
+        topBar.zIndex = 1;
         uiLayer.add(topBar);
         
         topBar.updateLeftSideItems();
         topBar.updateRightSideItems();
 
         playBar = new CharterPlayBar();
+        playBar.zIndex = 1;
         playBar.y = FlxG.height - playBar.bg.height;
         uiLayer.add(playBar);
 
@@ -348,12 +356,14 @@ class ChartEditor extends UIState {
     }
 
     override function update(elapsed:Float) {
-        FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY) && !UIUtil.isAnyComponentFocused();
+        final isUIFocused:Bool = UIUtil.isAnyComponentFocused([grid]);
+
+        FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY) && !isUIFocused;
         FlxG.mouse.getWorldPosition(noteCam, _mousePos);
 
         super.update(elapsed);
 
-        final isUIActive:Bool = UIUtil.isHoveringAnyComponent() || UIUtil.isAnyComponentFocused();
+        final isUIActive:Bool = UIUtil.isHoveringAnyComponent([grid]) || isUIFocused;
         noteCam.zoom = FlxMath.lerp(noteCam.zoom, editorSettings.gridZoom, FlxMath.getElapsedLerp(0.32, elapsed));
 
         if(Conductor.instance.time >= inst.length)
@@ -362,7 +372,7 @@ class ChartEditor extends UIState {
         conductorInfoText.text = 'Step: ${Conductor.instance.curStep}\nBeat: ${Conductor.instance.curBeat}\nMeasure: ${Conductor.instance.curMeasure}';
 
         final targetScrollY:Float = (CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.time)) - (FlxG.height * 0.5);
-        if(inst.playing || UIUtil.isAnyComponentFocused())
+        if(inst.playing || isUIFocused)
             noteCam.scroll.y = targetScrollY;
         else {
             if(FlxG.mouse.wheel != 0) {
@@ -382,8 +392,8 @@ class ChartEditor extends UIState {
                 _lastMousePos.y = FlxG.mouse.y;
             }
             if(_middleScrolling) {
-                seekToTime(FlxMath.bound(Conductor.instance.time + ((FlxG.mouse.y - _lastMousePos.y) * elapsed * 6), 0, inst.length));
-                if(FlxG.mouse.justReleasedMiddle)
+                seekToTime(FlxMath.bound(Conductor.instance.time + ((FlxG.mouse.y - _lastMousePos.y) * elapsed * 10), 0, inst.length));
+                if(FlxG.mouse.releasedMiddle)
                     _middleScrolling = false;
             }
         }
@@ -462,7 +472,7 @@ class ChartEditor extends UIState {
     }
 
     public function playPause():Void {
-        if(UIUtil.isAnyComponentFocused())
+        if(UIUtil.isAnyComponentFocused([grid]))
             return;
 
         if(inst.playing) {
@@ -496,7 +506,7 @@ class ChartEditor extends UIState {
     }
 
     public function goBackABeat():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused())
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
 
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Conductor.instance.getBeatAtTime(Conductor.instance.time) - 1), 0, inst.length);
@@ -504,7 +514,7 @@ class ChartEditor extends UIState {
     }
 
     public function goBackAMeasure():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused())
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
         
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Conductor.instance.getMeasureAtTime(Conductor.instance.time) - 1), 0, inst.length);
@@ -512,7 +522,7 @@ class ChartEditor extends UIState {
     }
     
     public function goForwardABeat():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused())
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
         
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Conductor.instance.getBeatAtTime(Conductor.instance.time) + 1), 0, inst.length);
@@ -520,7 +530,7 @@ class ChartEditor extends UIState {
     }
 
     public function goForwardAMeasure():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused())
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
         
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Conductor.instance.getMeasureAtTime(Conductor.instance.time) + 1), 0, inst.length);
@@ -528,21 +538,21 @@ class ChartEditor extends UIState {
     }
 
     public function goBackToStart():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused())
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
 
         seekToTime(0);
     }
 
     public function goToEnd():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused())
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
             return;
 
         seekToTime(inst.length);
     }
 
     public function playTest():Void {
-        if(UIUtil.isAnyComponentFocused())
+        if(UIUtil.isAnyComponentFocused([grid]))
             return;
 
         lastParams = null;
@@ -556,21 +566,21 @@ class ChartEditor extends UIState {
     }
 
     public function zoomIn():Void {
-        if(UIUtil.isAnyComponentFocused())
+        if(UIUtil.isAnyComponentFocused([grid]))
             return;
 
         editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom + 0.2, 2), 0.5, 2.0);
     }
 
     public function zoomOut():Void {
-        if(UIUtil.isAnyComponentFocused())
+        if(UIUtil.isAnyComponentFocused([grid]))
             return;
 
         editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom - 0.2, 2), 0.5, 2.0);
     }
 
     public function resetZoom():Void {
-        if(UIUtil.isAnyComponentFocused())
+        if(UIUtil.isAnyComponentFocused([grid]))
             return;
         
         editorSettings.gridZoom = 1.0;
@@ -619,7 +629,7 @@ class ChartEditor extends UIState {
     }
 
     public function addNoteOnCursor():Void {
-        if(UIUtil.isHoveringAnyComponent() || UIUtil.isAnyComponentFocused())
+        if(UIUtil.isHoveringAnyComponent([grid]) || UIUtil.isAnyComponentFocused([grid]))
             return;
 
         final snapMult:Float = CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
@@ -687,7 +697,7 @@ class ChartEditor extends UIState {
             switch(object) {
                 case CNote(note):
                     final t = Conductor.instance.getTimingPointAtTime(note.data.time);
-                    note.data.length = Math.max(note.data.length - (t.getStepLength() * 1000), 0);
+                    note.data.length = Math.max(note.data.length - t.getStepLength(), 0);
                     note.stepLength = Math.max(note.stepLength - 1, 0);
 
                 default:
@@ -750,6 +760,32 @@ class ChartEditor extends UIState {
         editorSettings.mutePlayerVocals = value;
         if(vocals.player != null)
             vocals.player.muted = editorSettings.muteAllVocals || editorSettings.mutePlayerVocals;
+    }
+
+    public function openMetadataWindow():Void {
+        final window = new CharterMetadataWindow(topBar.x + 12, topBar.y + topBar.bg.height + 12);
+        window.cameras = [uiCam];
+        uiLayer.add(window);
+    }
+
+    public function save():Void {
+        if(currentSong == null || currentMix == null) {
+            saveChartAs();
+            FlxTimer.wait(0.1, () -> saveMetaAs());
+            return;
+        }
+        File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/chart', lastParams.mod), ChartData.stringify(currentChart));
+        File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/meta', lastParams.mod), SongMetadata.stringify(currentChart.meta));
+    }
+
+    public function saveChartAs():Void {
+        final fileRef:FileReference = new FileReference();
+        fileRef.save(ChartData.stringify(currentChart), 'chart.json');
+    }
+
+    public function saveMetaAs():Void {
+        final fileRef:FileReference = new FileReference();
+        fileRef.save(SongMetadata.stringify(currentChart.meta), 'meta.json');
     }
 
     //----------- [ Private API ] -----------//

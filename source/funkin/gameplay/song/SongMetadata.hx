@@ -61,4 +61,9 @@ class SongMetadata {
 
 		return meta;
     }
+
+	public static function stringify(chart:SongMetadata):String {
+		final writer:JsonWriter<SongMetadata> = new JsonWriter<SongMetadata>();
+		return writer.write(chart);
+	}
 }

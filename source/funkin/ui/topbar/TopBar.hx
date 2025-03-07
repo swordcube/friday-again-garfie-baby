@@ -1,5 +1,6 @@
 package funkin.ui.topbar;
 
+import flixel.util.FlxSort;
 import funkin.ui.dropdown.*;
 import funkin.ui.dropdown.DropDown;
 
@@ -13,8 +14,9 @@ class TopBar extends UIComponent {
     public var leftItems(default, set):Array<TopBarItemType> = [];
     public var rightItems(default, set):Array<TopBarItemType> = [];
 
-    public var leftShortcutMap(default, null):Map<Array<FlxKey>, Void->Void> = [];
-    public var rightShortcutMap(default, null):Map<Array<FlxKey>, Void->Void> = [];
+    public var leftShortcuts(default, null):Array<TopBarShortcut> = [];
+    public var rightShortcuts(default, null):Array<TopBarShortcut> = [];
+    public var allShortcuts(default, null):Array<TopBarShortcut> = [];
 
     public function new(x:Float = 0, y:Float = 0) {
         super(x, y);
@@ -42,11 +44,7 @@ class TopBar extends UIComponent {
     }
 
     override function update(elapsed:Float) {
-        for(keys => callback in leftShortcutMap)
-            _handleShortcut(keys, callback);
-
-        for(keys => callback in rightShortcutMap)
-            _handleShortcut(keys, callback);
+        _handleShortcuts(allShortcuts);
 
         var seX:Float = x;
         for(i in 0..._leftItemContainer.length) {
@@ -68,27 +66,35 @@ class TopBar extends UIComponent {
     private var _leftItemContainer:FlxSpriteContainer;
     private var _rightItemContainer:FlxSpriteContainer;
 
-    private function _handleShortcut(keys:Array<FlxKey>, callback:Void->Void):Void {
-        if(keys.length > 1) {
-            final needsShift:Bool = keys.contains(SHIFT);
-            if(!needsShift && FlxG.keys.pressed.SHIFT)
-                return;
+    private function _handleShortcuts(shortcuts:Array<TopBarShortcut>):Void {
+        var pick:Array<TopBarShortcut> = [];
+        for(shortcut in shortcuts) {
+            if(shortcut.keybinds == null || shortcut.keybinds.length == 0)
+                continue;
 
-            var pressed:Int = 0;
-            for(i in 0...keys.length - 1) {
-                if(FlxG.keys.anyPressed([keys[i]]))
-                    pressed++;
+            for(i => keybind in shortcut.keybinds) {
+                if(keybind == null || keybind.length == 0)
+                    continue;
+
+                var curPressed:Int = 0;
+                for(key in keybind) {
+                    if(FlxG.keys.checkStatus(key, PRESSED))
+                        curPressed++;
+                }
+                if(curPressed >= keybind.length && FlxG.keys.anyJustPressed(keybind)) {
+                    shortcut.keybindSetPressed = i;
+                    pick.push(shortcut);
+                }
             }
-            final lastKeyPressed:Bool = FlxG.keys.anyJustPressed([keys.unsafeLast()]);
-            if(lastKeyPressed)
-                pressed++;
-
-            if(lastKeyPressed && pressed == keys.length && callback != null)
-                callback();
-        } else {
-            if(FlxG.keys.anyJustPressed(keys) && callback != null)
-                callback();
         }
+        if(pick.length == 0)
+            return;
+
+        pick.sort((s1, s2) -> FlxSort.byValues(FlxSort.ASCENDING, s1.keybinds[s1.keybindSetPressed].length, s2.keybinds[s2.keybindSetPressed].length));
+
+        final lastPick:TopBarShortcut = pick.last();
+        if(lastPick.callback != null)
+            lastPick.callback();
     }
 
     @:noCompletion
@@ -100,7 +106,7 @@ class TopBar extends UIComponent {
         _leftItemContainer.clear();
 
         var totalWidth:Float = 0;
-        leftShortcutMap.clear();
+        leftShortcuts.clear();
 
         for(i in 0...newItems.length) {
             final rawItem:TopBarItemType = newItems[i];
@@ -131,8 +137,12 @@ class TopBar extends UIComponent {
                     for(item in items) {
                         switch(item) {
                             case Button(_, shortcut, callback):
-                                if(shortcut != null)
-                                    leftShortcutMap.set(shortcut, callback);
+                                if(shortcut != null) {
+                                    leftShortcuts.push({
+                                        keybinds: shortcut,
+                                        callback: callback
+                                    });
+                                }
 
                             default:
                         }
@@ -148,15 +158,17 @@ class TopBar extends UIComponent {
                     totalWidth += item.width;
                     _leftItemContainer.add(item);
 
-                case Textbox(contents, callback, autoSize, width, valueFactory):
+                case Textbox(contents, callback, maxCharacters, autoSize, width, valueFactory):
                     autoSize ??= false;
                     width ??= 100;
+                    maxCharacters ??= 0;
 
-                    final item:TopBarTextbox = new TopBarTextbox(totalWidth, 0, contents, autoSize, width, callback, valueFactory);
+                    final item:TopBarTextbox = new TopBarTextbox(totalWidth, 0, contents, maxCharacters, autoSize, width, callback, valueFactory);
                     totalWidth += item.width;
                     _leftItemContainer.add(item);
             }
         }
+        allShortcuts = leftShortcuts.concat(rightShortcuts);
         return leftItems = newItems;
     }
 
@@ -167,7 +179,7 @@ class TopBar extends UIComponent {
                 item.destroy();
         }
         _rightItemContainer.clear();
-        rightShortcutMap.clear();
+        rightShortcuts.clear();
 
         for(i in 0...newItems.length) {
             final rawItem:TopBarItemType = newItems[i];
@@ -205,8 +217,12 @@ class TopBar extends UIComponent {
                     for(item in items) {
                         switch(item) {
                             case Button(_, shortcut, callback):
-                                if(shortcut != null)
-                                    rightShortcutMap.set(shortcut, callback);
+                                if(shortcut != null) {
+                                    rightShortcuts.push({
+                                        keybinds: shortcut,
+                                        callback: callback
+                                    });
+                                }
 
                             default:
                         }
@@ -230,11 +246,12 @@ class TopBar extends UIComponent {
                     item.x = FlxG.width - item.width;
                     _rightItemContainer.add(item);
 
-                case Textbox(contents, callback, autoSize, width, valueFactory):
+                case Textbox(contents, callback, maxCharacters, autoSize, width, valueFactory):
                     autoSize ??= false;
                     width ??= 100;
+                    maxCharacters ??= 0;
 
-                    final item:TopBarTextbox = new TopBarTextbox(0, 0, contents, autoSize, width, callback, valueFactory);
+                    final item:TopBarTextbox = new TopBarTextbox(0, 0, contents, maxCharacters, autoSize, width, callback, valueFactory);
                     
                     for(leItem in _rightItemContainer)
                         leItem.x -= item.width;
@@ -243,6 +260,16 @@ class TopBar extends UIComponent {
                     _rightItemContainer.add(item);
             }
         }
+        allShortcuts = leftShortcuts.concat(rightShortcuts);
         return rightItems = newItems;
     }
+}
+
+@:structInit
+class TopBarShortcut {
+    public var keybinds:Array<Array<FlxKey>>;
+    public var callback:Void->Void;
+
+    @:optional
+    public var keybindSetPressed:Int = -1;
 }

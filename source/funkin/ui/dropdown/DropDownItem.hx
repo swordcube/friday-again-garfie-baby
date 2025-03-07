@@ -38,18 +38,15 @@ class DropDownItem extends UIComponent {
     }
 
     override function update(elapsed:Float) {
-        bg.alpha = FlxMath.lerp(bg.alpha, (isHovered()) ? 1 : 0, FlxMath.getElapsedLerp(0.32, elapsed));
+        final isHovered:Bool = checkMouseOverlap();
+        bg.alpha = FlxMath.lerp(bg.alpha, (isHovered) ? 1 : 0, FlxMath.getElapsedLerp(0.32, elapsed));
         if(Math.abs(bg.alpha) < 0.001)
             bg.alpha = 0;
 
-        if(FlxG.mouse.justPressed && callback != null && isHovered())
+        if(FlxG.mouse.justPressed && callback != null && isHovered)
             callback();
 
         super.update(elapsed);
-    }
-
-    public function isHovered():Bool {
-        return FlxG.mouse.overlaps(bg, getDefaultCamera());
     }
 
     //----------- [ Private API ] -----------//

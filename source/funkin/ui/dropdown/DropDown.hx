@@ -13,7 +13,6 @@ class DropDown extends UIComponent {
 
     public function new(x:Float = 0, y:Float = 0, items:Array<DropDownItemType>) {
         super(x, y);
-        UIUtil.focusedComponents.push(this);
 
         bg = new Panel(0, 0, 32, 32);
         add(bg);
@@ -30,7 +29,7 @@ class DropDown extends UIComponent {
                 case Button(name, shortcut, callback):
                     var shortcutText:String = null;
                     if(shortcut != null && shortcut.length != 0)
-                        shortcutText = [for(i in shortcut) InputFormatter.formatFlixel(i)].join("+");
+                        shortcutText = [for(i in shortcut[0]) InputFormatter.formatFlixel(i)].join("+");
                     
                     final item:DropDownItem = new DropDownItem(2, 2 + totalHeight, name, shortcutText, callback);
                     totalHeight += item.height;
