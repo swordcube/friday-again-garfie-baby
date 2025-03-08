@@ -1,15 +1,12 @@
 package funkin.ui.charter;
 
-import flixel.math.FlxRect;
 import flixel.math.FlxPoint;
-
-import flixel.util.FlxSignal;
+import flixel.math.FlxRect;
 import flixel.util.FlxDestroyUtil;
-
-import funkin.utilities.SortedArrayUtil;
-
+import flixel.util.FlxSignal;
 import funkin.gameplay.song.ChartData;
 import funkin.states.editors.ChartEditor;
+import funkin.utilities.SortedArrayUtil;
 
 /**
  * A class specifically designed to render notes
@@ -24,21 +21,23 @@ import funkin.states.editors.ChartEditor;
  */
 // TODO: sustain support :p
 @:allow(funkin.states.editors.ChartEditor)
-class CharterNoteRenderer extends FlxObject {
+class CharterObjectRenderer extends FlxObject {
     public var charter(default, null):ChartEditor;
 
     public var onNoteHit(default, null):FlxTypedSignal<ChartEditorNote->Void> = new FlxTypedSignal<ChartEditorNote->Void>(); 
     public var onEmptyCellClick(default, null):FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>(); 
+
     public var onNoteClick(default, null):FlxTypedSignal<ChartEditorNote->Void> = new FlxTypedSignal<ChartEditorNote->Void>(); 
     public var onNoteRightClick(default, null):FlxTypedSignal<ChartEditorNote->Void> = new FlxTypedSignal<ChartEditorNote->Void>(); 
+
+	public var onEventClick(default, null):FlxTypedSignal<ChartEditorEvent->Void> = new FlxTypedSignal<ChartEditorEvent->Void>();
+	public var onEventRightClick(default, null):FlxTypedSignal<ChartEditorEvent->Void> = new FlxTypedSignal<ChartEditorEvent->Void>(); 
 
     /**
      * The notes from the chart that will directly
      * be rendered onto this object.
      */
     public var notes:Array<ChartEditorNote> = [];
-
-    public var isHoveringNote:Bool = false;
 
     public function new(x:Float = 0, y:Float = 0) {
         super(x, y, 1, 1);
@@ -71,57 +70,56 @@ class CharterNoteRenderer extends FlxObject {
             }
             return;
         }
-        if(direction >= 0 && direction < (Constants.KEY_COUNT * 2) && ((FlxG.mouse.pressed && FlxG.mouse.justMoved) || FlxG.mouse.justReleased || FlxG.mouse.justReleasedRight)) {
+		if(direction >= -1 && direction < (Constants.KEY_COUNT * 2) && ((FlxG.mouse.pressed && FlxG.mouse.justMoved) || FlxG.mouse.justReleased || FlxG.mouse.justReleasedRight)) {
             final max:Float = FlxG.height / 70 / getDefaultCamera().zoom;
     
-            final begin:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep - max, _getVarForEachAdd);
-            final end:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep + max, _getVarForEachRemove);
-    
-            var note:ChartEditorNote = null;
             var sprite:FlxSprite = null;
-    
             var isEmptyCell:Bool = true;
-            for(i in begin...end) {
-                note = notes[i];
-                sprite = _getSprite(note.data.type, note.data.direction % Constants.KEY_COUNT);
-                
-                final offsetX:Float = (note.data.direction < Constants.KEY_COUNT) ? -1 : 1;
-                sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + offsetX, y + (ChartEditor.CELL_SIZE * note.step));
 
-                if(FlxG.mouse.overlaps(sprite, charter.noteCam)) {
-                    isHoveringNote = true;
-                    if(FlxG.mouse.pressed && FlxG.mouse.justMoved && note.selected && !charter.selectionBox.exists) {
-                        for(object in charter.selectedObjects) {
-                            switch(object) {
-                                case CNote(note):
-                                    note.lastStep = note.step * ChartEditor.CELL_SIZE;
-                                    note.lastDirection = note.data.direction;
-            
-                                default:
-                                    continue;
-                            }
-                        }
-                        _lastDirection = Math.floor((charter._mousePos.x - x) / ChartEditor.CELL_SIZE);
-                        _lastMouseY = sprite.y;
-
-                        _movingObjects = true;
-                        return;
-                    }
-                    if(FlxG.mouse.justReleased)
-                        onNoteClick.dispatch(note);
-
-                    else if(FlxG.mouse.justReleasedRight)
-                        onNoteRightClick.dispatch(note);
+            if(direction > -1) {
+                final begin:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep - max, _getVarForEachAdd);
+                final end:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep + max, _getVarForEachRemove);
+        
+                var note:ChartEditorNote = null;
+                for(i in begin...end) {
+                    note = notes[i];
+                    sprite = _getNoteSprite(note.data.type, note.data.direction % Constants.KEY_COUNT);
                     
-                    isEmptyCell = false;
-                    break;
+                    final offsetX:Float = (note.data.direction < Constants.KEY_COUNT) ? -1 : 1;
+                    sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + offsetX, y + (ChartEditor.CELL_SIZE * note.step));
+    
+                    if (FlxG.mouse.overlaps(sprite, charter.noteCam)) {
+                        if(FlxG.mouse.pressed && FlxG.mouse.justMoved && note.selected && !charter.selectionBox.exists) {
+                            for(object in charter.selectedObjects) {
+                                switch(object) {
+                                    case CNote(note):
+                                        note.lastStep = note.step * ChartEditor.CELL_SIZE;
+                                        note.lastDirection = note.data.direction;
+                
+                                    default:
+                                        continue;
+                                }
+                            }
+                            _lastDirection = Math.floor((charter._mousePos.x - x) / ChartEditor.CELL_SIZE);
+                            _lastMouseY = sprite.y;
+    
+                            _movingObjects = true;
+                            return;
+                        }
+                        if(FlxG.mouse.justReleased)
+                            onNoteClick.dispatch(note);
+    
+                        else if(FlxG.mouse.justReleasedRight)
+                            onNoteRightClick.dispatch(note);
+                        
+                        isEmptyCell = false;
+                        break;
+                    }
                 }
             }
             if(isEmptyCell && FlxG.mouse.justReleased && !charter.selectionBox.exists)
                 onEmptyCellClick.dispatch();
-        }
-        else
-            isHoveringNote = false;
+		}
     }
 
     override function draw():Void {
@@ -138,7 +136,7 @@ class CharterNoteRenderer extends FlxObject {
         for(i in begin...end) {
             note = notes[i];
 
-            sprite = _getSprite(note.data.type, note.data.direction % Constants.KEY_COUNT);
+			sprite = _getNoteSprite(note.data.type, note.data.direction % Constants.KEY_COUNT);
             sustain = _getSustain(note.data.type, note.data.direction % Constants.KEY_COUNT);
             
             if(note.data.time <= Conductor.instance.time) {
@@ -179,7 +177,7 @@ class CharterNoteRenderer extends FlxObject {
         final snapMult:Float = ChartEditor.CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
         final snapY:Float = (FlxG.keys.pressed.SHIFT) ? charter._mousePos.y : Math.floor(charter._mousePos.y / snapMult) * snapMult;
 
-        final sprite:FlxSprite = _getSprite(noteType, direction % Constants.KEY_COUNT);
+		final sprite:FlxSprite = _getNoteSprite(noteType, direction % Constants.KEY_COUNT);
         sprite.alpha = 0.3;
 
         final offsetX:Float = (direction < Constants.KEY_COUNT) ? -1 : 1;
@@ -203,13 +201,13 @@ class CharterNoteRenderer extends FlxObject {
     }
 
     override function destroy():Void {
-        for(spr in _spriteMap)
+		for (spr in _noteSpriteMap)
             spr.destroy();
 
         for(spr in _sustainMap)
             spr.destroy();
 
-        _spriteMap = null;
+		_noteSpriteMap = null;
         _sustainMap = null;
 
         super.destroy();
@@ -234,7 +232,7 @@ class CharterNoteRenderer extends FlxObject {
      * Contains a bunch of helper sprites used to render
      * the notes, the keys are the names of note types
      */
-    private var _spriteMap:Map<String, FlxSprite> = [];
+	private var _noteSpriteMap:Map<String, FlxSprite> = [];
 
     /**
      * Contains a bunch of helper sprites used to render
@@ -242,8 +240,8 @@ class CharterNoteRenderer extends FlxObject {
      */
     private var _sustainMap:Map<String, CharterSustain> = [];
 
-    private function _getSprite(noteType:String, direction:Int):FlxSprite {
-        if(!_spriteMap.exists(noteType)) {
+	private function _getNoteSprite(noteType:String, direction:Int):FlxSprite {
+		if (!_noteSpriteMap.exists(noteType)) {
             final sprite:FlxSprite = new FlxSprite();
             sprite.frames = Paths.getSparrowAtlas('editors/charter/images/notes');
             
@@ -254,9 +252,9 @@ class CharterNoteRenderer extends FlxObject {
             sprite.setGraphicSize(ChartEditor.CELL_SIZE);
             sprite.updateHitbox();
 
-            _spriteMap.set(noteType, sprite);
+			_noteSpriteMap.set(noteType, sprite);
         }
-        final sprite:FlxSprite = _spriteMap.get(noteType);
+		final sprite:FlxSprite = _noteSpriteMap.get(noteType);
         sprite.cameras = getCameras();
         sprite.animation.play(Constants.NOTE_DIRECTIONS[direction], true);
         return sprite;
@@ -269,7 +267,7 @@ class CharterNoteRenderer extends FlxObject {
         }
         final sprite:CharterSustain = _sustainMap.get(noteType);
         sprite.cameras = getCameras();
-        sprite.updateSustain(direction, _getSprite(noteType, direction).scale.x);
+		sprite.updateSustain(direction, _getNoteSprite(noteType, direction).scale.x);
         return sprite;
     }
 }

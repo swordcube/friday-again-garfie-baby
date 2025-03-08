@@ -26,6 +26,8 @@ import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
 #end
 import funkin.assets.loaders.AssetLoader;
+
+import funkin.states.menus.FreeplayState;
 import funkin.states.editors.ChartEditor;
 
 enum abstract CameraTarget(Int) from Int to Int {

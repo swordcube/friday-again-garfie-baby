@@ -36,7 +36,7 @@ import funkin.gameplay.song.VocalGroup;
 
 // TODO: waveforms for inst and each vocal track
 
-@:allow(funkin.ui.charter.CharterNoteRenderer)
+@:allow(funkin.ui.charter.CharterObjectRenderer)
 class ChartEditor extends UIState {
     public static final CELL_SIZE:Int = 40;
     public static final ALL_GRID_SNAPS:Array<Int> = [4, 8, 12, 16, 20, 24, 32, 48, 64, 192];
@@ -62,7 +62,9 @@ class ChartEditor extends UIState {
     // note layer
 
     public var bg:FlxSprite;
+
     public var grid:CharterGrid;
+	public var eventGrid:FlxBackdrop;
 
     public var iconP2:HealthIcon;
     public var iconP1:HealthIcon;
@@ -73,7 +75,7 @@ class ChartEditor extends UIState {
     public var beatSeparators:FlxSpriteContainer;
     public var measureSeparators:FlxSpriteContainer;
 
-    public var noteRenderer:CharterNoteRenderer;
+	public var objectRenderer:CharterObjectRenderer;
     public var selectionBox:SelectionPanel;
 
     public var opponentStrumLine:CharterStrumLine;
@@ -200,6 +202,13 @@ class ChartEditor extends UIState {
         grid.cameras = [noteCam];
         add(grid);
 
+		eventGrid = new FlxBackdrop(Paths.image("editors/charter/images/event_grid"), Y);
+		eventGrid.x = grid.x - eventGrid.width;
+		eventGrid.scrollFactor.x = 0;
+		eventGrid.cameras = [noteCam];
+		eventGrid.alpha = 0.45;
+		add(eventGrid);
+
         iconP2 = new HealthIcon(currentChart.meta.game.getCharacter("opponent"), OPPONENT);
         add(iconP2);
         
@@ -274,13 +283,13 @@ class ChartEditor extends UIState {
         rawNotes = currentChart.notes.get(currentDifficulty);
         rawNotes.sort((a, b) -> Std.int(a.time - b.time));
 
-        noteRenderer = new CharterNoteRenderer(grid.x, grid.y);
+		objectRenderer = new CharterObjectRenderer(grid.x, grid.y);
 
-        noteRenderer.onEmptyCellClick.add(addNoteOnCursor);
-        noteRenderer.onNoteClick.add((n) -> selectObjects([CNote(n)]));
-        noteRenderer.onNoteRightClick.add((n) -> deleteObjects([CNote(n)]));
+		objectRenderer.onEmptyCellClick.add(addObjectOnCursor);
+		objectRenderer.onNoteClick.add((n) -> selectObjects([CNote(n)]));
+		objectRenderer.onNoteRightClick.add((n) -> deleteObjects([CNote(n)]));
 
-        noteRenderer.onNoteHit.add((note:ChartEditorNote) -> {
+		objectRenderer.onNoteHit.add((note:ChartEditorNote) -> {
             if(!inst.playing || playBar.songSlider.dragging)
                 return;
 
@@ -295,7 +304,8 @@ class ChartEditor extends UIState {
                     FlxG.sound.play(Paths.sound('editors/charter/sfx/hitsound'));
             }
         });
-        noteRenderer.notes = [for(n in rawNotes) {
+		objectRenderer.notes = [
+			for (n in rawNotes) {
             final t = Conductor.instance.getTimingPointAtTime(n.time);
             final step = Conductor.instance.getStepAtTime(n.time, t);
             {
@@ -304,8 +314,8 @@ class ChartEditor extends UIState {
                 stepLength: Conductor.instance.getStepAtTime(n.time + n.length, t) - step
             };
         }];
-        noteRenderer.cameras = [noteCam];
-        add(noteRenderer);
+		objectRenderer.cameras = [noteCam];
+		add(objectRenderer);
         
         strumLine = new FlxSprite().makeSolid(gridBitmap.width, 4, FlxColor.WHITE);
         strumLine.screenCenter();
@@ -413,7 +423,7 @@ class ChartEditor extends UIState {
                     _middleScrolling = false;
             }
         }
-        if(!noteRenderer._movingObjects) {
+		if (!objectRenderer._movingObjects) {
             if(FlxG.mouse.justPressed && !isUIActive)
                 _selectingObjects = true;
 
@@ -449,7 +459,7 @@ class ChartEditor extends UIState {
             if(FlxG.mouse.justReleased && !isUIActive) {
                 _selectingObjects = false;
                 if(selectionBox.exists) {
-                    var selected:Array<ChartEditorObject> = noteRenderer.checkSelection();
+					var selected:Array<ChartEditorObject> = objectRenderer.checkSelection();
                     selectObjects(selected);
         
                     FlxTimer.wait(0.001, () -> {
@@ -457,7 +467,7 @@ class ChartEditor extends UIState {
                         selectionBox.kill();
                     });
                 } else {
-                    final direction:Int = Math.floor((_mousePos.x - noteRenderer.x) / CELL_SIZE);
+					final direction:Int = Math.floor((_mousePos.x - objectRenderer.x) / CELL_SIZE);
                     if(direction < 0 || direction >= (Constants.KEY_COUNT * 2))
                         selectObjects([]);
                 }
@@ -505,11 +515,11 @@ class ChartEditor extends UIState {
         }
         else {
             if(Conductor.instance.time <= 0) {
-                for(i in 0...noteRenderer.notes.length) {
-                    if(noteRenderer.notes[i].data.time > 0)
+				for (i in 0...objectRenderer.notes.length) {
+					if (objectRenderer.notes[i].data.time > 0)
                         break;
 
-                    noteRenderer.notes[i].wasHit = false;
+					objectRenderer.notes[i].wasHit = false;
                 }
             }
             Conductor.instance.music = inst;
@@ -639,8 +649,8 @@ class ChartEditor extends UIState {
             switch(object) {
                 case CNote(note):
                     rawNotes.push(note.data);
-                    noteRenderer.notes.push(note);
-                    noteRenderer.notes.sort((a, b) -> Std.int(a.data.time - b.data.time));
+					objectRenderer.notes.push(note);
+					objectRenderer.notes.sort((a, b) -> Std.int(a.data.time - b.data.time));
     
                 case CEvent(event):
                     // TODO:
@@ -649,7 +659,7 @@ class ChartEditor extends UIState {
         selectObjects(objects);
     }
 
-    public function addNoteOnCursor():Void {
+    public function addObjectOnCursor():Void {
         if(UIUtil.isHoveringAnyComponent([grid]) || UIUtil.isAnyComponentFocused([grid]))
             return;
 
@@ -658,16 +668,19 @@ class ChartEditor extends UIState {
         if(newStep < 0)
             return;
 
-        addObjects([CNote({
-            data: {
-                time: Conductor.instance.getTimeAtStep(newStep),
-                direction: Math.floor((_mousePos.x - grid.x) / CELL_SIZE),
-                length: 0,
-                type: noteTypes[curNoteType]
-            },
-            step: newStep,
-            stepLength: 0
-        })]);
+        final direction:Int = Math.floor((_mousePos.x - grid.x) / CELL_SIZE);
+        if(direction > -1) {
+            addObjects([CNote({
+                data: {
+                    time: Conductor.instance.getTimeAtStep(newStep),
+                    direction: direction,
+                    length: 0,
+                    type: noteTypes[curNoteType]
+                },
+                step: newStep,
+                stepLength: 0
+            })]);
+        }
     }
 
     public function selectObjects(objects:Array<ChartEditorObject>):Void {
@@ -691,7 +704,7 @@ class ChartEditor extends UIState {
             switch(object) {
                 case CNote(note):
                     rawNotes.remove(note.data);
-                    noteRenderer.notes.remove(note);
+					objectRenderer.notes.remove(note);
 
                 case CEvent(event):
                     // TODO

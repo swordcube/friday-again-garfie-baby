@@ -8,8 +8,8 @@ import funkin.graphics.RatioScaleModeEx;
 import funkin.utilities.FlxUtil;
 import funkin.utilities.AudioSwitchFix;
 
-import funkin.states.FreeplayState;
 import funkin.states.PlayState;
+import funkin.states.menus.FreeplayState;
 
 class InitState extends FlxState {
     private static var _lastState:Class<FlxState>;
@@ -20,11 +20,16 @@ class InitState extends FlxState {
         AudioSwitchFix.init();
         FlxG.fixedTimestep = false;
 
+        #if windows
         NativeAPI.setDarkMode(FlxG.stage.window.title, true);
 
+        // Hacky fix for Windows 10 not applying dark mode correctly
+        // Doesn't happen on Windows 11, would be ideal to check for Windows 11
+        // but i don't know how to do that
         FlxG.stage.window.borderless = !FlxG.stage.window.borderless;
         FlxG.stage.window.borderless = !FlxG.stage.window.borderless;
-        
+        #end
+
         Logs.init();
         Paths.initAssetSystem();
 
