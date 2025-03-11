@@ -91,6 +91,7 @@ class InputFormatter {
             case CONTROL: "Ctrl";
             case SHIFT: "Shift";
             case ALT: "Alt";
+            case WINDOWS: #if (mac || macos) "Cmd" #else "Win" #end;
             case ESCAPE: "ESC";
             case BACKSPACE: "BckSpc";
             case DELETE: "Delete";

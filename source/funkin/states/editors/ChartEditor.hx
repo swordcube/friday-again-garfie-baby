@@ -53,6 +53,7 @@ class ChartEditor extends UIState {
 
     public var currentChart:ChartData;
     public var rawNotes:Array<NoteData>;
+    public var rawEvents:Array<EventData>;
 
     public var inst:FlxSound;
     public var vocals:VocalGroup;
@@ -209,24 +210,6 @@ class ChartEditor extends UIState {
 		eventGrid.alpha = 0.45;
 		add(eventGrid);
 
-        iconP2 = new HealthIcon(currentChart.meta.game.getCharacter("opponent"), OPPONENT);
-        add(iconP2);
-        
-        iconP1 = new HealthIcon(currentChart.meta.game.getCharacter("player"), PLAYER);
-        iconP1.flipX = true;
-        add(iconP1);
-        
-        for(icon in [iconP1, iconP2]) {
-            icon.size.scale(0.5);
-            icon.scale.scale(0.5);
-            icon.updateHitbox();
-            icon.centered = true;
-            icon.cameras = [noteCam];
-            icon.scrollFactor.set();
-        }
-        iconP2.setPosition(grid.x - (iconP2.width + 12), 38);
-        iconP1.setPosition(grid.x + (grid.width + 12), 38);
-
         beatSeparators = new FlxSpriteContainer();
         beatSeparators.cameras = [noteCam];
         add(beatSeparators);
@@ -283,11 +266,18 @@ class ChartEditor extends UIState {
         rawNotes = currentChart.notes.get(currentDifficulty);
         rawNotes.sort((a, b) -> Std.int(a.time - b.time));
 
+        rawEvents = currentChart.events;
+        rawEvents.sort((a, b) -> Std.int(a.time - b.time));
+
 		objectRenderer = new CharterObjectRenderer(grid.x, grid.y);
 
 		objectRenderer.onEmptyCellClick.add(addObjectOnCursor);
+
 		objectRenderer.onNoteClick.add((n) -> selectObjects([CNote(n)]));
-		objectRenderer.onNoteRightClick.add((n) -> deleteObjects([CNote(n)]));
+		objectRenderer.onNoteRightClick.add((n) -> rightClickObject(CNote(n)));
+
+        objectRenderer.onEventClick.add((e) -> selectObjects([CEvent(e)]));
+		objectRenderer.onEventRightClick.add((e) -> rightClickObject(CEvent(e)));
 
 		objectRenderer.onNoteHit.add((note:ChartEditorNote) -> {
             if(!inst.playing || playBar.songSlider.dragging)
@@ -304,16 +294,39 @@ class ChartEditor extends UIState {
                     FlxG.sound.play(Paths.sound('editors/charter/sfx/hitsound'));
             }
         });
-		objectRenderer.notes = [
-			for (n in rawNotes) {
+		objectRenderer.notes = [for (n in rawNotes) {
             final t = Conductor.instance.getTimingPointAtTime(n.time);
             final step = Conductor.instance.getStepAtTime(n.time, t);
             {
                 data: n,
-                step: Conductor.instance.getStepAtTime(n.time, t),
+                step: step,
                 stepLength: Conductor.instance.getStepAtTime(n.time + n.length, t) - step
             };
         }];
+        var lastEventTime:Float = -999999;
+        objectRenderer.events = [];
+
+        var event:ChartEditorEvent = null;
+        for(e in rawEvents) {
+            if(Math.abs(e.time - lastEventTime) > 5) {
+                // if the event is more than 5ms away from last event,
+                // then create a separate event object
+                final t = Conductor.instance.getTimingPointAtTime(e.time);
+                final step = Conductor.instance.getStepAtTime(e.time, t);
+
+                event = {
+                    step: step,
+                    events: [e]
+                };
+                objectRenderer.events.push(event);
+            }
+            else {
+                // if the event is 5ms or closer to last event,
+                // then add it to the last event object
+                event.events.push(e);
+            }
+            lastEventTime = e.time;
+        }
 		objectRenderer.cameras = [noteCam];
 		add(objectRenderer);
         
@@ -322,6 +335,24 @@ class ChartEditor extends UIState {
         strumLine.scrollFactor.set();
         strumLine.cameras = [noteCam];
         add(strumLine);
+
+        iconP2 = new HealthIcon(currentChart.meta.game.getCharacter("opponent"), OPPONENT);
+        add(iconP2);
+        
+        iconP1 = new HealthIcon(currentChart.meta.game.getCharacter("player"), PLAYER);
+        iconP1.flipX = true;
+        add(iconP1);
+        
+        for(icon in [iconP1, iconP2]) {
+            icon.size.scale(0.5);
+            icon.scale.scale(0.5);
+            icon.updateHitbox();
+            icon.centered = true;
+            icon.cameras = [noteCam];
+            icon.scrollFactor.set();
+        }
+        iconP2.setPosition(grid.x - (iconP2.width + 12), 38);
+        iconP1.setPosition(grid.x + (grid.width + 12), 38);
 
         selectionBox = new SelectionPanel(0, 0, 16, 16);
         selectionBox.kill();
@@ -466,7 +497,8 @@ class ChartEditor extends UIState {
                         selectionBox.setPosition(-99999, -99999);
                         selectionBox.kill();
                     });
-                } else {
+                }
+                else if(!objectRenderer._movingObjects) {
 					final direction:Int = Math.floor((_mousePos.x - objectRenderer.x) / CELL_SIZE);
                     if(direction < 0 || direction >= (Constants.KEY_COUNT * 2))
                         selectObjects([]);
@@ -681,6 +713,10 @@ class ChartEditor extends UIState {
                 stepLength: 0
             })]);
         }
+        else if(direction > -3 && direction < 0) {
+           // TODO: show a menu for this
+           trace("event adding NOT implemented!!!");
+        }
     }
 
     public function selectObjects(objects:Array<ChartEditorObject>):Void {
@@ -704,13 +740,32 @@ class ChartEditor extends UIState {
             switch(object) {
                 case CNote(note):
                     rawNotes.remove(note.data);
-					objectRenderer.notes.remove(note);
+                    objectRenderer.notes.remove(note);
 
                 case CEvent(event):
-                    // TODO
+                    for(e in event.events)
+                        rawEvents.remove(e);
+
+                    objectRenderer.events.remove(event);
             }
         }
         selectObjects([]);
+    }
+
+    public function rightClickObject(object:ChartEditorObject):Void {
+        if(UIUtil.isModifierKeyPressed(CTRL))
+            deleteObjects([object]);
+        else {
+            switch(object) {
+                case CNote(note):
+                    // TODO: pull up a dropdown for this
+                    trace("note right click NOT implemented!!");
+
+                case CEvent(event):
+                    // TODO: pull up a dropdown for this
+                    trace("event right click NOT implemented!!");
+            }
+        }
     }
 
     public function addSustainLength(objects:Array<ChartEditorObject>):Void {
@@ -910,7 +965,7 @@ class ChartEditorEvent {
     public var step:Float;
     public var lastStep:Float = 0;
     
-    public var data:EventData;
+    public var events:Array<EventData>;
 
     public var wasHit:Bool = false;
     public var selected:Bool = false;

@@ -1,5 +1,7 @@
 package funkin.ui;
 
+import flixel.input.keyboard.FlxKey;
+
 enum abstract ModifierKey(String) from String to String {
     final CTRL = "CTRL";
     final ALT = "ALT";
@@ -44,10 +46,20 @@ class UIUtil {
 
     public static function isModifierKeyPressed(mk:ModifierKey):Bool {
         switch(mk) {
-            case ModifierKey.CTRL: return FlxG.keys.pressed.CONTROL;
+            case ModifierKey.CTRL: return #if (mac || macos) FlxG.keys.pressed.WINDOWS #else FlxG.keys.pressed.CONTROL #end;
             case ModifierKey.ALT: return FlxG.keys.pressed.ALT;
             case ModifierKey.SHIFT: return FlxG.keys.pressed.SHIFT;
             case ModifierKey.ANY: return FlxG.keys.pressed.CONTROL || FlxG.keys.pressed.ALT || FlxG.keys.pressed.SHIFT;
         }
+    }
+
+    public static function correctModifierKey(key:FlxKey):FlxKey {
+        #if (mac || macos)
+        switch(key) {
+            case CONTROL:
+                return WINDOWS;
+        }
+        #end
+        return key;
     }
 }

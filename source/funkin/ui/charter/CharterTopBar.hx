@@ -33,38 +33,38 @@ class CharterTopBar extends TopBar {
 
         leftItems = [
             DropDown("File", [
-                Button("New", [[CONTROL, N]], () -> {trace("new NOT IMPLEMENTED!!");}),
+                Button("New", [[UIUtil.correctModifierKey(CONTROL), N]], () -> {trace("new NOT IMPLEMENTED!!");}),
                 
                 Separator,
 
-                Button("Open", [[CONTROL, O]], () -> {trace("open NOT IMPLEMENTED!!");}),
-                Button("Save", [[CONTROL, S]], charter.save),
+                Button("Open", [[UIUtil.correctModifierKey(CONTROL), O]], () -> {trace("open NOT IMPLEMENTED!!");}),
+                Button("Save", [[UIUtil.correctModifierKey(CONTROL), S]], charter.save),
                 
                 Separator,
                 
-                Button("Save Chart As", [[CONTROL, SHIFT, S]], charter.saveChartAs),
-                Button("Save Meta As", [[CONTROL, ALT, SHIFT, S]], charter.saveMetaAs),
+                Button("Save Chart As", [[UIUtil.correctModifierKey(CONTROL), SHIFT, S]], charter.saveChartAs),
+                Button("Save Meta As", [[UIUtil.correctModifierKey(CONTROL), ALT, SHIFT, S]], charter.saveMetaAs),
                 
                 Separator,
 
-                Button("Convert Chart", [[CONTROL, SHIFT, C]], () -> {trace("convert chart NOT IMPLEMENTED!!");}),
+                Button("Convert Chart", [[UIUtil.correctModifierKey(CONTROL), SHIFT, C]], () -> {trace("convert chart NOT IMPLEMENTED!!");}),
 
                 Separator,
 
                 Button("Exit", null, () -> {trace("exit NOT IMPLEMENTED!!");})
             ]),
             DropDown("Edit", [
-                Button("Undo", [[CONTROL, Z]], () -> {trace("undo NOT IMPLEMENTED!!");}),
-                Button("Redo", [[CONTROL, Y], [CONTROL, SHIFT, Z]], () -> {trace("redo NOT IMPLEMENTED!!");}),
+                Button("Undo", [[UIUtil.correctModifierKey(CONTROL), Z]], () -> {trace("undo NOT IMPLEMENTED!!");}),
+                Button("Redo", [[UIUtil.correctModifierKey(CONTROL), Y], [UIUtil.correctModifierKey(CONTROL), SHIFT, Z]], () -> {trace("redo NOT IMPLEMENTED!!");}),
                 
                 Separator,
                 
-                Button("Copy", [[CONTROL, C]], () -> {trace("copy NOT IMPLEMENTED!!");}),
-                Button("Paste", [[CONTROL, V]], () -> {trace("paste NOT IMPLEMENTED!!");}),
+                Button("Copy", [[UIUtil.correctModifierKey(CONTROL), C]], () -> {trace("copy NOT IMPLEMENTED!!");}),
+                Button("Paste", [[UIUtil.correctModifierKey(CONTROL), V]], () -> {trace("paste NOT IMPLEMENTED!!");}),
                 
                 Separator,
                 
-                Button("Cut", [[CONTROL, X]], () -> {trace("cut NOT IMPLEMENTED!!");}),
+                Button("Cut", [[UIUtil.correctModifierKey(CONTROL), X]], () -> {trace("cut NOT IMPLEMENTED!!");}),
                 Button("Delete", [[DELETE]], () -> charter.deleteObjects(charter.selectedObjects))
             ]),
             DropDown("Chart", [
@@ -76,9 +76,9 @@ class CharterTopBar extends TopBar {
                 Button("Edit chart metadata", null, charter.openMetadataWindow)
             ]),
             DropDown("View", [
-                Button("Zoom In", [[CONTROL, NUMPADPLUS]], charter.zoomIn),
-                Button("Zoom Out", [[CONTROL, NUMPADMINUS]], charter.zoomOut),
-                Button("Reset Zoom", [[CONTROL, NUMPADZERO]], charter.resetZoom)
+                Button("Zoom In", [[UIUtil.correctModifierKey(CONTROL), NUMPADPLUS]], charter.zoomIn),
+                Button("Zoom Out", [[UIUtil.correctModifierKey(CONTROL), NUMPADMINUS]], charter.zoomOut),
+                Button("Reset Zoom", [[UIUtil.correctModifierKey(CONTROL), NUMPADZERO]], charter.resetZoom)
             ]),
             DropDown("Song", [
                 Button("Go back to the start", [[HOME]], charter.goBackToStart),
@@ -95,8 +95,8 @@ class CharterTopBar extends TopBar {
                 
                 Separator,
                 
-                Button("Select all", [[CONTROL, A]], () -> {trace("select all NOT IMPLEMENTED!!");}),
-                Button("Select measure", [[CONTROL, SHIFT, A]], () -> {trace("select measure NOT IMPLEMENTED!!");}),
+                Button("Select all", [[UIUtil.correctModifierKey(CONTROL), A]], () -> {trace("select all NOT IMPLEMENTED!!");}),
+                Button("Select measure", [[UIUtil.correctModifierKey(CONTROL), SHIFT, A]], () -> {trace("select measure NOT IMPLEMENTED!!");}),
                 
                 Separator,
             ].concat(noteTypeItems))

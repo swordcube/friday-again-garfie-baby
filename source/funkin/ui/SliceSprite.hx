@@ -8,6 +8,8 @@ import flixel.graphics.tile.FlxDrawQuadsItem;
 
 import flixel.system.FlxAssets.FlxGraphicAsset;
 
+using flixel.util.FlxColorTransformUtil;
+
 class SliceSprite extends UISprite {
 	public var leftBorder:Float = 5;
 	public var rightBorder:Float = 5;
@@ -38,8 +40,11 @@ class SliceSprite extends UISprite {
 		_frameX = frame.frame.x;
 		_frameY = frame.frame.y;
 
+		final isColored:Bool = (alpha != 1) || (color != 0xFFFFFF);
+		final hasColorOffsets:Bool = (colorTransform != null && colorTransform.hasRGBAOffsets());
+
 		final rf:FlxFrame = _frame;
-		final draw:FlxDrawQuadsItem = camera.startQuadBatch(_frame.parent, false, false, blend, antialiasing, shader);
+		final draw:FlxDrawQuadsItem = camera.startQuadBatch(_frame.parent, isColored, hasColorOffsets, blend, antialiasing, shader);
 
 		for (i in 0...9) {
 			final slice:Slice = _slices.unsafeGet(i);
