@@ -29,7 +29,7 @@ class CharterGrid extends FlxBackdrop implements IUIComponent {
         _checkingOverlap = true;
         FlxG.mouse.getViewPosition(getDefaultCamera(), _mousePos);
 
-        final v:Bool = _mousePos.x > x - ChartEditor.CELL_SIZE && _mousePos.x < x + width && !UIUtil.isHoveringAnyComponent();
+        final v:Bool = _mousePos.x > x - (ChartEditor.CELL_SIZE * 2) && _mousePos.x < x + width && !UIUtil.isHoveringAnyComponent();
         _checkingOverlap = false;
         return v;
     }

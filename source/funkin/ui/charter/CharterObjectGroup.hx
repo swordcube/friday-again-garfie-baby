@@ -56,6 +56,7 @@ class CharterObjectGroup extends FlxObject {
         charter = cast FlxG.state;
 
         _eventBGSprite = new SliceSprite();
+        _eventBGSprite.cursorType = POINTER;
         _eventBGSprite.loadGraphic(Paths.image("editors/charter/images/event_bg"));
         _eventBGSprite.setBorders(20, 20, 14, 14);
         _eventBGSprite.width = 70;
