@@ -1,33 +1,24 @@
 package funkin.states.editors;
 
-import sys.io.File;
-import openfl.net.FileReference;
-
-import flixel.text.FlxText;
-import flixel.math.FlxPoint;
-
-import flixel.util.FlxTimer;
-import flixel.util.FlxDestroyUtil;
-
-import openfl.geom.Rectangle;
-import openfl.display.BitmapData;
-
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
-
+import flixel.math.FlxPoint;
+import flixel.text.FlxText;
+import flixel.util.FlxDestroyUtil;
+import flixel.util.FlxTimer;
 import funkin.backend.Main;
-
-import funkin.ui.*;
-import funkin.ui.panel.*;
-import funkin.ui.topbar.*;
-import funkin.ui.charter.*;
-
 import funkin.gameplay.HealthIcon;
-
 import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.SongMetadata;
-
 import funkin.gameplay.song.VocalGroup;
+import funkin.ui.*;
+import funkin.ui.charter.*;
+import funkin.ui.panel.*;
+import funkin.ui.topbar.*;
+import openfl.display.BitmapData;
+import openfl.geom.Rectangle;
+import openfl.net.FileReference;
+import sys.io.File;
 
 // TODO: undos & redos
 
@@ -36,7 +27,7 @@ import funkin.gameplay.song.VocalGroup;
 
 // TODO: waveforms for inst and each vocal track
 
-@:allow(funkin.ui.charter.CharterObjectRenderer)
+@:allow(funkin.ui.charter.CharterObjectGroup)
 class ChartEditor extends UIState {
     public static final CELL_SIZE:Int = 40;
     public static final ALL_GRID_SNAPS:Array<Int> = [4, 8, 12, 16, 20, 24, 32, 48, 64, 192];
@@ -76,7 +67,7 @@ class ChartEditor extends UIState {
     public var beatSeparators:FlxSpriteContainer;
     public var measureSeparators:FlxSpriteContainer;
 
-	public var objectRenderer:CharterObjectRenderer;
+	public var objectGroup:CharterObjectGroup;
     public var selectionBox:SelectionPanel;
 
     public var opponentStrumLine:CharterStrumLine;
@@ -269,17 +260,16 @@ class ChartEditor extends UIState {
         rawEvents = currentChart.events;
         rawEvents.sort((a, b) -> Std.int(a.time - b.time));
 
-		objectRenderer = new CharterObjectRenderer(grid.x, grid.y);
+		objectGroup = new CharterObjectGroup(grid.x, grid.y);
+		objectGroup.onEmptyCellClick.add(addObjectOnCursor);
 
-		objectRenderer.onEmptyCellClick.add(addObjectOnCursor);
+		objectGroup.onNoteClick.add((n) -> selectObjects([CNote(n)]));
+		objectGroup.onNoteRightClick.add((n) -> rightClickObject(CNote(n)));
 
-		objectRenderer.onNoteClick.add((n) -> selectObjects([CNote(n)]));
-		objectRenderer.onNoteRightClick.add((n) -> rightClickObject(CNote(n)));
+        objectGroup.onEventClick.add((e) -> selectObjects([CEvent(e)]));
+		objectGroup.onEventRightClick.add((e) -> rightClickObject(CEvent(e)));
 
-        objectRenderer.onEventClick.add((e) -> selectObjects([CEvent(e)]));
-		objectRenderer.onEventRightClick.add((e) -> rightClickObject(CEvent(e)));
-
-		objectRenderer.onNoteHit.add((note:ChartEditorNote) -> {
+		objectGroup.onNoteHit.add((note:ChartEditorNote) -> {
             if(!inst.playing || playBar.songSlider.dragging)
                 return;
 
@@ -294,7 +284,7 @@ class ChartEditor extends UIState {
                     FlxG.sound.play(Paths.sound('editors/charter/sfx/hitsound'));
             }
         });
-		objectRenderer.notes = [for (n in rawNotes) {
+		objectGroup.notes = [for (n in rawNotes) {
             final t = Conductor.instance.getTimingPointAtTime(n.time);
             final step = Conductor.instance.getStepAtTime(n.time, t);
             {
@@ -304,7 +294,7 @@ class ChartEditor extends UIState {
             };
         }];
         var lastEventTime:Float = -999999;
-        objectRenderer.events = [];
+        objectGroup.events = [];
 
         var event:ChartEditorEvent = null;
         for(e in rawEvents) {
@@ -318,7 +308,7 @@ class ChartEditor extends UIState {
                     step: step,
                     events: [e]
                 };
-                objectRenderer.events.push(event);
+                objectGroup.events.push(event);
             }
             else {
                 // if the event is 5ms or closer to last event,
@@ -327,8 +317,8 @@ class ChartEditor extends UIState {
             }
             lastEventTime = e.time;
         }
-		objectRenderer.cameras = [noteCam];
-		add(objectRenderer);
+		objectGroup.cameras = [noteCam];
+		add(objectGroup);
         
         strumLine = new FlxSprite().makeSolid(gridBitmap.width, 4, FlxColor.WHITE);
         strumLine.screenCenter();
@@ -454,7 +444,7 @@ class ChartEditor extends UIState {
                     _middleScrolling = false;
             }
         }
-		if (!objectRenderer._movingObjects) {
+		if (!objectGroup._movingObjects) {
             if(FlxG.mouse.justPressed && !isUIActive)
                 _selectingObjects = true;
 
@@ -490,7 +480,7 @@ class ChartEditor extends UIState {
             if(FlxG.mouse.justReleased && !isUIActive) {
                 _selectingObjects = false;
                 if(selectionBox.exists) {
-					var selected:Array<ChartEditorObject> = objectRenderer.checkSelection();
+					var selected:Array<ChartEditorObject> = objectGroup.checkSelection();
                     selectObjects(selected);
         
                     FlxTimer.wait(0.001, () -> {
@@ -498,8 +488,8 @@ class ChartEditor extends UIState {
                         selectionBox.kill();
                     });
                 }
-                else if(!objectRenderer._movingObjects) {
-					final direction:Int = Math.floor((_mousePos.x - objectRenderer.x) / CELL_SIZE);
+                else if(!objectGroup._movingObjects) {
+					final direction:Int = Math.floor((_mousePos.x - objectGroup.x) / CELL_SIZE);
                     if(direction < 0 || direction >= (Constants.KEY_COUNT * 2))
                         selectObjects([]);
                 }
@@ -547,11 +537,11 @@ class ChartEditor extends UIState {
         }
         else {
             if(Conductor.instance.time <= 0) {
-				for (i in 0...objectRenderer.notes.length) {
-					if (objectRenderer.notes[i].data.time > 0)
+				for (i in 0...objectGroup.notes.length) {
+					if (objectGroup.notes[i].data.time > 0)
                         break;
 
-					objectRenderer.notes[i].wasHit = false;
+					objectGroup.notes[i].wasHit = false;
                 }
             }
             Conductor.instance.music = inst;
@@ -681,8 +671,8 @@ class ChartEditor extends UIState {
             switch(object) {
                 case CNote(note):
                     rawNotes.push(note.data);
-					objectRenderer.notes.push(note);
-					objectRenderer.notes.sort((a, b) -> Std.int(a.data.time - b.data.time));
+					objectGroup.notes.push(note);
+					objectGroup.notes.sort((a, b) -> Std.int(a.data.time - b.data.time));
     
                 case CEvent(event):
                     // TODO:
@@ -740,13 +730,13 @@ class ChartEditor extends UIState {
             switch(object) {
                 case CNote(note):
                     rawNotes.remove(note.data);
-                    objectRenderer.notes.remove(note);
+                    objectGroup.notes.remove(note);
 
                 case CEvent(event):
                     for(e in event.events)
                         rawEvents.remove(e);
 
-                    objectRenderer.events.remove(event);
+                    objectGroup.events.remove(event);
             }
         }
         selectObjects([]);

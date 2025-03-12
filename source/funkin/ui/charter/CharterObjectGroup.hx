@@ -1,15 +1,12 @@
 package funkin.ui.charter;
 
-import flixel.math.FlxRect;
 import flixel.math.FlxPoint;
-
-import flixel.util.FlxTimer;
-import flixel.util.FlxSignal;
+import flixel.math.FlxRect;
 import flixel.util.FlxDestroyUtil;
-
+import flixel.util.FlxSignal;
+import flixel.util.FlxTimer;
 import funkin.gameplay.song.ChartData;
 import funkin.states.editors.ChartEditor;
-
 import funkin.ui.SliceSprite;
 import funkin.utilities.SortedArrayUtil;
 
@@ -21,13 +18,11 @@ import funkin.utilities.SortedArrayUtil;
  * sprites to chart data is a pain in the ass!!
  * 
  * NOTE: This does NOT support animations on the rendered notes!!
+ * 
+ * NOTE: This does NOT extend `FlxGroup`, or support any of it's API.
  */
-
-// TODO: sustain support :p
-// TODO: better name for this class
-
 @:allow(funkin.states.editors.ChartEditor)
-class CharterObjectRenderer extends FlxObject {
+class CharterObjectGroup extends FlxObject {
     public var charter(default, null):ChartEditor;
 
     public var onNoteHit(default, null):FlxTypedSignal<ChartEditorNote->Void> = new FlxTypedSignal<ChartEditorNote->Void>(); 
