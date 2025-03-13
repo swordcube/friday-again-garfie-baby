@@ -95,8 +95,8 @@ class CharterTopBar extends TopBar {
                 
                 Separator,
                 
-                Button("Select all", [[UIUtil.correctModifierKey(CONTROL), A]], () -> {trace("select all NOT IMPLEMENTED!!");}),
-                Button("Select measure", [[UIUtil.correctModifierKey(CONTROL), SHIFT, A]], () -> {trace("select measure NOT IMPLEMENTED!!");}),
+                Button("Select all", [[UIUtil.correctModifierKey(CONTROL), A]], charter.selectAllNotes),
+                Button("Select measure", [[UIUtil.correctModifierKey(CONTROL), SHIFT, A]], charter.selectMeasureNotes),
                 
                 Separator,
             ].concat(noteTypeItems))

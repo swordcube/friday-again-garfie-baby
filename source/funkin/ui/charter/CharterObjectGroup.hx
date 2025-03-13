@@ -73,7 +73,7 @@ class CharterObjectGroup extends FlxObject {
             final snapY:Float = (FlxG.keys.pressed.SHIFT) ? charter._mousePos.y : Math.floor(charter._mousePos.y / snapMult) * snapMult;
             
             if(FlxG.mouse.justReleased)
-                FlxTimer.wait(0.001, () -> _movingObjects = false);
+                _movingObjects = false;
             
             for(object in charter.selectedObjects) {
                 switch(object) {
@@ -243,7 +243,7 @@ class CharterObjectGroup extends FlxObject {
             sustain.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + ((ChartEditor.CELL_SIZE - sustain.strip.width) * 0.5) + offsetX, y + (ChartEditor.CELL_SIZE * note.step) + (ChartEditor.CELL_SIZE * 0.5));
             sustain.draw();
 
-            final colorOffset:Float = (note.selected) ? 65 : 0;
+            final colorOffset:Float = (note.selected) ? 75 : 0;
             sprite.colorTransform.redOffset = sprite.colorTransform.greenOffset = sprite.colorTransform.blueOffset = colorOffset;
             
             sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + offsetX, y + (ChartEditor.CELL_SIZE * note.step));
@@ -262,7 +262,7 @@ class CharterObjectGroup extends FlxObject {
             final offsetX:Float = -1;
 
             // draw bg
-            final colorOffset:Float = (event.selected) ? 65 : 0;
+            final colorOffset:Float = (event.selected) ? 75 : 0;
             _eventBGSprite.colorTransform.redOffset = _eventBGSprite.colorTransform.greenOffset = _eventBGSprite.colorTransform.blueOffset = colorOffset;
             _eventBGSprite.cameras = getCameras();
             

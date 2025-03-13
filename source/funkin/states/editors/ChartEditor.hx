@@ -138,11 +138,15 @@ class ChartEditor extends UIState {
 		
         inst = FlxG.sound.music;
         inst.onComplete = () -> {
+            inst.pause();
             inst.time = inst.length;
             vocals.pause();
+
             Conductor.instance.music = null;
             Conductor.instance.time = inst.length;
-        }
+
+            playBar.playPauseButton.icon = Paths.image("editors/charter/images/playbar/play");
+        };
         Conductor.instance.music = inst;
 
         inst.pause();
@@ -239,6 +243,10 @@ class ChartEditor extends UIState {
         bottomCover.alpha = 0.5;
         bottomCover.cameras = [noteCam];
         add(bottomCover);
+
+        final endSep:FlxSprite = new FlxSprite(grid.x, grid.y + (CELL_SIZE * endStep)).makeSolid(gridBitmap.width, 2, FlxColor.WHITE);
+        endSep.cameras = [noteCam];
+        add(endSep);
 
         opponentStrumLine = new CharterStrumLine(0, 75);
         opponentStrumLine.screenCenter();
@@ -481,7 +489,10 @@ class ChartEditor extends UIState {
                 _selectingObjects = false;
                 if(selectionBox.exists) {
 					var selected:Array<ChartEditorObject> = objectGroup.checkSelection();
-                    selectObjects(selected);
+                    if(UIUtil.isModifierKeyPressed(CTRL))
+                        selectObjects(selectedObjects.concat(selected));
+                    else
+                        selectObjects(selected);
         
                     FlxTimer.wait(0.001, () -> {
                         selectionBox.setPosition(-99999, -99999);
@@ -544,12 +555,16 @@ class ChartEditor extends UIState {
 					objectGroup.notes[i].wasHit = false;
                 }
             }
+            var newTime:Float = FlxMath.bound(Conductor.instance.time, 0, inst.length);
+            if(newTime >= inst.length)
+                newTime = 0;
+
+            inst.play();
+            inst.time = newTime;
             Conductor.instance.music = inst;
-            inst.time = FlxMath.bound(Conductor.instance.time, 0, inst.length);
-            vocals.seek(inst.time);
             
             vocals.play();
-            inst.play();
+            vocals.seek(inst.time);
 
             visualMetronome.bigBars.visible = true;
             visualMetronome.tick(Conductor.instance.curBeat);
@@ -710,19 +725,42 @@ class ChartEditor extends UIState {
     }
 
     public function selectObjects(objects:Array<ChartEditorObject>):Void {
+        // deselect previous objects
         for(object in selectedObjects) {
             switch(object) {
                 case CNote(note): note.selected = false;
                 case CEvent(event): event.selected = false;
             }
         }
+        final objectDataList:Array<Dynamic> = [];
+        final filteredObjects:Array<ChartEditorObject> = [];
+
         for(object in objects) {
+            switch(object) {
+                case CNote(note):
+                    // make sure the note is never selected twice
+                    // before marking it as selectable
+                    if(!objectDataList.contains(note)) {
+                        objectDataList.push(note);
+                        filteredObjects.push(object);
+                    }
+                    
+                case CEvent(event):
+                    // make sure the event is never selected twice
+                    // before marking it as selectable
+                    if(!objectDataList.contains(event)) {
+                        objectDataList.push(event);
+                        filteredObjects.push(object);
+                    }
+            }
+        }
+        for(object in filteredObjects) {
             switch(object) {
                 case CNote(note): note.selected = true;
                 case CEvent(event): event.selected = true;
             }
         }
-        selectedObjects = objects.copy();
+        selectedObjects = filteredObjects;
     }
 
     public function deleteObjects(objects:Array<ChartEditorObject>):Void {
@@ -854,6 +892,34 @@ class ChartEditor extends UIState {
         final window = new CharterMetadataWindow(topBar.x + 12, topBar.y + topBar.bg.height + 12);
         window.cameras = [uiCam];
         uiLayer.add(window);
+    }
+
+    public function selectAllNotes():Void {
+        final selected:Array<ChartEditorObject> = [];
+        for(note in objectGroup.notes)
+            selected.push(CNote(note));
+
+        selectObjects(selected);
+    }
+
+    public function selectMeasureNotes():Void {
+        final selected:Array<ChartEditorObject> = [];
+        final curMeasure:Int = Conductor.instance.curMeasure;
+
+        @:privateAccess
+        final latestTimingPoint:TimingPoint = Conductor.instance._latestTimingPoint;
+        final timeSignature:TimeSignature = latestTimingPoint.getTimeSignature();
+
+        for(note in objectGroup.notes) {
+            final step:Float = note.step + 0.01;
+            final measureLength:Float = timeSignature.getDenominator() * timeSignature.getNumerator();
+
+            if(step < curMeasure * measureLength || step > (curMeasure + 1) * measureLength)
+                continue;
+
+            selected.push(CNote(note));
+        }
+        selectObjects(selected);
     }
 
     public function save():Void {
