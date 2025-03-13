@@ -435,7 +435,7 @@ class CharterObjectGroup extends FlxObject {
             if(FlxG.assets.exists(iconPath))
                 sprite.loadGraphic(iconPath);
             else
-                sprite.loadGraphic(Paths.image('editors/charter/images/events/unknown'));
+                sprite.loadGraphic(Paths.image('editors/charter/images/events/Unknown'));
 
             sprite.antialiasing = false;
             sprite.setGraphicSize(20, 20);
