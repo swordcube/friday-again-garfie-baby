@@ -89,8 +89,21 @@ class Conductor extends FlxBasic {
 
     public var music:FlxSound;
 
+    /**
+     * The current time in milliseconds.
+     * 
+     * Use `playhead` instead of this value if you want
+     * a smoother representation of it.
+     */
     public var time(get, set):Float;
-    public var rawTime:Float = 0;
+
+    /**
+     * The current playhead position in milliseconds.
+     */
+    public var playhead(get, never):Float;
+
+    public var rawTime(default, set):Float = 0;
+    public var rawPlayhead(default, null):Float = 0;
 
     public var curDecStep:Float = 0;
     public var curDecBeat:Float = 0;
@@ -138,7 +151,9 @@ class Conductor extends FlxBasic {
         curMeasure = -1;
 
         rawTime = 0;
-        _lastMusicTime = -999999;
+        rawPlayhead = 0;
+        
+        _lastPlayhead = -999999;
     }
 
     public function setupTimingPoints(timingPoints:Array<TimingPoint>) {
@@ -260,16 +275,17 @@ class Conductor extends FlxBasic {
 
     override function update(elapsed:Float) {
         if(music != null && music.playing) {
-            final musicTime:Float = music.time;
-            if(musicTime != _lastMusicTime) {
-                @:bypassAccessor rawTime = musicTime;
-                _lastMusicTime = musicTime;
-            } else
-                @:bypassAccessor rawTime += elapsed * 1000 * rate;
+            @:bypassAccessor rawTime = music.time;
+
+            if(_lastPlayhead != rawTime)
+                rawPlayhead = _lastPlayhead = rawTime;
+            else
+                rawPlayhead += elapsed * 1000 * rate;
         }
-        else if(autoIncrement)
+        else if(autoIncrement) {
             @:bypassAccessor rawTime += elapsed * 1000 * rate;
-        
+            rawPlayhead = rawTime;
+        }
         var curTimingPoint:TimingPoint = getTimingPointAtTime(time);
         _latestTimingPoint = curTimingPoint;
 
@@ -330,7 +346,7 @@ class Conductor extends FlxBasic {
 
     //----------- [ Private API ] -----------//
 
-    private var _lastMusicTime:Float = 0;
+    private var _lastPlayhead:Float = 0;
     private var _latestTimingPoint:TimingPoint = null;
 
     @:noCompletion
@@ -370,9 +386,14 @@ class Conductor extends FlxBasic {
 
     @:noCompletion
     private inline function set_rawTime(newTime:Float):Float {
-        rawTime = newTime;
+        rawTime = rawPlayhead = _lastPlayhead = newTime;
         _latestTimingPoint = getTimingPointAtTime(time);
         return rawTime;
+    }
+
+    @:noCompletion
+    private inline function get_playhead():Float {
+        return rawPlayhead - offset;
     }
 
     @:noCompletion

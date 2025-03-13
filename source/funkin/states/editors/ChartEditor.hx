@@ -418,7 +418,7 @@ class ChartEditor extends UIState {
         Conductor.instance.hasMetronome = editorSettings.metronome && inst.playing;
         conductorInfoText.text = 'Step: ${Conductor.instance.curStep}\nBeat: ${Conductor.instance.curBeat}\nMeasure: ${Conductor.instance.curMeasure}';
 
-        final targetScrollY:Float = (CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.time)) - (FlxG.height * 0.5);
+        final targetScrollY:Float = (CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.playhead)) - (FlxG.height * 0.5);
         if(inst.playing || isUIFocused)
             noteCam.scroll.y = targetScrollY;
         else {

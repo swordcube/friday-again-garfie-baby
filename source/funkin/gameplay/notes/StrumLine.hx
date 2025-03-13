@@ -60,7 +60,7 @@ class StrumLine extends FlxSpriteGroup {
         if(note.wasHit && !note.wasMissed) {
             note.y = strum.y + note.offsetY;
             
-            final sexo:Float = Constants.PIXELS_PER_MS * (attachedConductor.time - note.time) * absSpeed;
+            final sexo:Float = Constants.PIXELS_PER_MS * (attachedConductor.playhead - note.time) * absSpeed;
             final calcHeight:Float = Math.max((Constants.PIXELS_PER_MS * note.length * absSpeed) - sexo, 0);
             
             note.holdTrail.y = strum.y + note.holdTrail.offsetY + (strum.height * 0.5);
@@ -82,7 +82,7 @@ class StrumLine extends FlxSpriteGroup {
             }
 
         } else {
-            note.y = strum.y + note.offsetY + (Constants.PIXELS_PER_MS * (note.time - attachedConductor.time) * absSpeed * scrollMult);
+            note.y = strum.y + note.offsetY + (Constants.PIXELS_PER_MS * (note.time - attachedConductor.playhead) * absSpeed * scrollMult);
             
             final calcHeight:Float = (Constants.PIXELS_PER_MS * note.length * absSpeed);
             note.holdTrail.y = note.y + note.holdTrail.offsetY + (strum.height * 0.5);
