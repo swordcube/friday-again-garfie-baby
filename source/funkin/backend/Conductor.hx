@@ -8,8 +8,13 @@ enum abstract TimeSignature(Array<Int>) from Array<Int> to Array<Int> {
     public static function fromString(str:String):TimeSignature {
         var split:Array<String> = str.split("/");
 
-        var numerator:Int = Std.parseInt(split[0]);
-        var denominator:Int = Std.parseInt(split[1]);
+        var numerator:Null<Int> = Std.parseInt(split[0]);
+        if(numerator == null)
+            numerator = 4;
+
+        var denominator:Null<Int> = Std.parseInt(split[1]);
+        if(denominator == null)
+            denominator = 4;
 
         return [numerator, denominator];
     }

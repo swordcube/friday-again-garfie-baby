@@ -8,8 +8,7 @@ class ScriptedHUD extends BaseHUD {
 
     public function new(playField:PlayField, skin:String) {
         this.skin = skin;
-
-        trace(Paths.script('gameplay/hudskins/${skin}/script'));
+        
         script = FunkinScript.fromFile(Paths.script('gameplay/hudskins/${skin}/script'));
         script.setParent(this);
         script.set("getHUDImage", (name:String) -> {

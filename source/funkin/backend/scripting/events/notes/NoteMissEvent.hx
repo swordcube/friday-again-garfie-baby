@@ -74,6 +74,11 @@ class NoteMissEvent extends ScriptEvent {
     public var character:Character;
 
     /**
+     * The suffix of the character's miss animation.
+     */
+    public var missAnimSuffix:String;
+
+    /**
      * This is the constructor for this event, mainly
      * used just to specify it's type.
      */

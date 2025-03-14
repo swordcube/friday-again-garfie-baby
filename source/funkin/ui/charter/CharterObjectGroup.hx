@@ -10,6 +10,8 @@ import funkin.states.editors.ChartEditor;
 import funkin.ui.SliceSprite;
 import funkin.utilities.SortedArrayUtil;
 
+// TODO: show note type id on each note
+
 /**
  * A class specifically designed to handle note & event objects
  * in the chart editor.

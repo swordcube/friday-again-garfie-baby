@@ -20,7 +20,7 @@ class ClassicHUD extends BaseHUD {
         final barY:Float = (Options.downscroll) ? 72 : FlxG.height * 0.9;
 
         healthBarBG = new FlxSprite(0, barY);
-        healthBarBG.loadGraphic(getHUDImage("healthBar"));
+        healthBarBG.loadGraphic(Paths.image("gameplay/healthBar"));
         healthBarBG.screenCenter(X);
         add(healthBarBG);
 

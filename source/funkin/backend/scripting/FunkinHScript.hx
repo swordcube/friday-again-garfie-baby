@@ -20,6 +20,7 @@ class FunkinHScript extends FunkinScript {
         this.code = code;
 
         _parser = new Parser();
+        _parser.allowJSON = _parser.allowMetadata = _parser.allowTypes = true;
         try {
             _expr = _parser.parseString(code, fileName);
         }

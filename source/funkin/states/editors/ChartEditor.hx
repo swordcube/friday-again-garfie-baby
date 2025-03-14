@@ -19,6 +19,7 @@ import openfl.display.BitmapData;
 import openfl.geom.Rectangle;
 import openfl.net.FileReference;
 import sys.io.File;
+import haxe.io.Path;
 
 // TODO: undos & redos
 
@@ -123,7 +124,11 @@ class ChartEditor extends UIState {
 			currentChart = lastParams._chart;
 		else
             currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
-		
+
+        Paths.iterateDirectory("gameplay/notetypes", (scriptPath:String) -> {
+            if(Paths.isAssetType(scriptPath, SCRIPT))
+                noteTypes.push(Path.withoutDirectory(Path.withoutExtension(scriptPath)));
+        });
         Conductor.instance.time = 0;
         Conductor.instance.rate = 1;
         Conductor.instance.offset = 0;
@@ -637,14 +642,14 @@ class ChartEditor extends UIState {
         if(UIUtil.isAnyComponentFocused([grid]))
             return;
 
-        editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom + 0.2, 2), 0.5, 2.0);
+        editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom + 0.2, 2), 0.2, 2.0);
     }
 
     public function zoomOut():Void {
         if(UIUtil.isAnyComponentFocused([grid]))
             return;
 
-        editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom - 0.2, 2), 0.5, 2.0);
+        editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom - 0.2, 2), 0.2, 2.0);
     }
 
     public function resetZoom():Void {

@@ -180,12 +180,20 @@ class Character extends FlxSprite implements IBeatReceiver {
         offset.set(-data.position.x, height - data.position.y);
     }
 
-    public inline function playSingAnim(direction:Int, ?force:Bool = false, ?reversed:Bool = false, ?frame:Int = 0):Void {
-        playAnim(data.singSteps[direction % data.singSteps.length], SING, force, reversed, frame);
+    public inline function playSingAnim(direction:Int, ?suffix:String, ?force:Bool = false, ?reversed:Bool = false, ?frame:Int = 0):Void {
+        var anim:String = data.singSteps[direction % data.singSteps.length];
+        if(suffix != null && suffix.length != 0)
+            anim += suffix;
+        
+        playAnim(anim, SING, force, reversed, frame);
     }
 
-    public inline function playMissAnim(direction:Int, ?force:Bool = false, ?reversed:Bool = false, ?frame:Int = 0):Void {
-        playAnim(data.missSteps[direction % data.missSteps.length], SING, force, reversed, frame);
+    public inline function playMissAnim(direction:Int, ?suffix:String, ?force:Bool = false, ?reversed:Bool = false, ?frame:Int = 0):Void {
+        var anim:String = data.missSteps[direction % data.missSteps.length];
+        if(suffix != null && suffix.length != 0)
+            anim += suffix;
+
+        playAnim(anim, SING, force, reversed, frame);
     }
 
     public function dance():Void {

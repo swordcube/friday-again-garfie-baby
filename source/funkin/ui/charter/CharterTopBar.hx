@@ -16,7 +16,7 @@ class CharterTopBar extends TopBar {
     public function updateLeftSideItems():Void {
         final noteTypeItems:Array<DropDownItemType> = [];
         for(i in 0...charter.noteTypes.length)
-            noteTypeItems.push(Checkbox('(${i}) ${charter.noteTypes[i]}', (value:Bool) -> {trace('${charter.noteTypes[i]} NOT IMPLEMENTED!!');}, () -> return charter.curNoteType == i));
+            noteTypeItems.push(Checkbox('(${i}) ${charter.noteTypes[i]}', (value:Bool) -> charter.curNoteType = i, () -> return charter.curNoteType == i));
         
         final vocalItems:Array<DropDownItemType> = [];
         if(charter.vocals.spectator != null)

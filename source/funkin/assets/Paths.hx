@@ -1,7 +1,6 @@
 package funkin.assets;
 
 import haxe.io.Path;
-import flixel.graphics.frames.FlxAtlasFrames;
 import sys.io.File;
 import sys.FileSystem;
 
@@ -9,6 +8,7 @@ import openfl.text.Font;
 import openfl.media.Sound;
 import openfl.display.BitmapData;
 
+import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.system.frontEnds.AssetFrontEnd;
 
 import haxe.ds.ReadOnlyArray;
@@ -217,6 +217,15 @@ class Paths {
         return getAsset('${name}.hx');
     }
 
+    public static function isAssetType(path:String, type:AssetType):Bool {
+        final exts:Array<String> = ASSET_EXTENSIONS.get(type);
+        for(i in 0...exts.length) {
+            if(path.endsWith(exts[i]))
+                return true;
+        }
+        return false;
+    }
+
     public static function getSparrowAtlas(name:String, ?loaderID:String):FlxAtlasFrames {
         if(Cache.atlasCache.get(name) == null) {
             final atlas:FlxAtlasFrames = FlxAtlasFrames.fromSparrow(
@@ -231,6 +240,22 @@ class Paths {
             Cache.atlasCache.set(name, atlas);
         }
         return cast Cache.atlasCache.get(name);
+    }
+
+    public static function iterateDirectory(dir:String, callback:String->Void, ?recursive:Bool = false):Void {
+        for(loader in _registeredAssetLoaders) {
+            final dirPath:String = loader.getPath(dir);
+            if(!FileSystem.exists(dirPath))
+                continue;
+            
+            for(item in FileSystem.readDirectory(dirPath)) {
+                final itemPath:String = '${dirPath}/${item}';
+                if(recursive && FileSystem.isDirectory(itemPath))
+                    iterateDirectory(itemPath, callback, true);
+                else
+                    callback(itemPath);
+            }
+        }
     }
 
     //----------- [ Private API ] -----------//

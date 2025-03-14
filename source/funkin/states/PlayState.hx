@@ -53,6 +53,14 @@ class PlayState extends FunkinState {
 
 	public var stage:Stage;
 	public var camFollow:FlxObject;
+
+	/**
+	 * The current character that is being followed by the camera.
+	 * 
+	 * - `0` - Opponent
+	 * - `1` - Player
+	 * - `2` - Spectator
+	 */
 	public var curCameraTarget:CameraTarget = OPPONENT;
 
 	public var camGame:FunkinCamera;
@@ -67,8 +75,17 @@ class PlayState extends FunkinState {
 	public var startingSong:Bool = true;
 	public var endingSong:Bool = false;
 
+	/**
+	 * How many beats it will take before the camera bumps.
+	 * 
+	 * If this value is exactly `0`, the camera won't bump.
+	 * If this value is below `0`, the camera will bump every measure.
+	 */
+	public var camZoomingInterval:Int = -1;
+
 	#if SCRIPTING_ALLOWED
 	public var scripts:FunkinScriptGroup;
+	public var noteTypeScripts:Map<String, FunkinScript> = [];
 	#end
 
 	public function new(?params:PlayStateParams) {
@@ -161,17 +178,22 @@ class PlayState extends FunkinState {
 					scripts.add(FunkinScript.fromFile(path));
 			}
 		}
-		inline function addSongScripts(loader:AssetLoader) {
-			final dir:String = 'gameplay/songs/${currentSong}/${currentMix}/scripts';
-			addScripts(loader, dir);
-		}
-		inline function addGameScripts(loader:AssetLoader) {
-			final dir:String = 'gameplay/scripts';
-			addScripts(loader, dir);
-		}
 		for(i in 0...loaders.length) {
-			addSongScripts(loaders[i]);
-			addGameScripts(loaders[i]);
+			addScripts(loaders[i], 'gameplay/songs/${currentSong}/${currentMix}/scripts');
+			addScripts(loaders[i], "gameplay/scripts");
+		}
+		for(note in currentChart.notes.get(currentDifficulty)) {
+			if(noteTypeScripts.exists(note.type))
+				continue;
+
+			final scriptPath:String = Paths.script('gameplay/notetypes/${note.type}');
+			if(!FlxG.assets.exists(scriptPath))
+				continue;
+
+			final script:FunkinScript = FunkinScript.fromFile(scriptPath);
+			script.set("NOTE_TYPE_ID", note.type);
+			noteTypeScripts.set(note.type, script);
+			scripts.add(script);
 		}
 		final leScripts:Array<FunkinScript> = scripts.members.copy();
 		for(i in 0...leScripts.length) {
@@ -376,7 +398,7 @@ class PlayState extends FunkinState {
 			return;
 		
 		if(event.playSingAnim) {
-			event.character.playSingAnim(event.direction, true);
+			event.character.playSingAnim(event.direction, event.singAnimSuffix, true);
 			event.character.holdTimer += event.length;
 			event.character._holdingPose = isPlayer;
 		}
@@ -406,8 +428,8 @@ class PlayState extends FunkinState {
 			return;
 		
 		if(event.playMissAnim) {
+			event.character.playMissAnim(event.direction, event.missAnimSuffix, true);
 			event.character._holdingPose = isPlayer;
-			event.character.playMissAnim(event.direction, true);
 		}
 	}
 
@@ -428,7 +450,11 @@ class PlayState extends FunkinState {
 	}
 
 	override function beatHit(beat:Int):Void {
-		if(beat > 0 && beat % Conductor.instance.timeSignature.getNumerator() == 0) {
+		var interval:Int = camZoomingInterval;
+		if(interval < 0)
+			interval = Conductor.instance.timeSignature.getNumerator();
+
+		if(interval > 0 && beat > 0 && beat % interval == 0) {
 			camGame.extraZoom += 0.015;
 			camHUD.extraZoom += 0.03;
 		}
