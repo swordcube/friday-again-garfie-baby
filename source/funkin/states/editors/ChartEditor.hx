@@ -1,5 +1,6 @@
 package funkin.states.editors;
 
+import funkin.ui.dropdown.DropDown;
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.math.FlxPoint;
@@ -695,7 +696,7 @@ class ChartEditor extends UIState {
 					objectGroup.notes.sort((a, b) -> Std.int(a.data.time - b.data.time));
     
                 case CEvent(event):
-                    // TODO:
+                    // TODO: this shit
             }
         }
         selectObjects(objects);
@@ -791,12 +792,26 @@ class ChartEditor extends UIState {
         else {
             switch(object) {
                 case CNote(note):
-                    // TODO: pull up a dropdown for this
-                    trace("note right click NOT implemented!!");
+                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, [
+                        Button("Edit", null, () -> trace("edit note NOT IMPLEMENTED!!")),
+
+                        Separator,
+
+                        Button("Delete", [[DELETE]], () -> deleteObjects([object])),
+                    ]);
+                    dropdown.cameras = [uiCam];
+                    add(dropdown);
 
                 case CEvent(event):
-                    // TODO: pull up a dropdown for this
-                    trace("event right click NOT implemented!!");
+                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, [
+                        Button("Edit", null, () -> trace("edit event NOT IMPLEMENTED!!")),
+
+                        Separator,
+
+                        Button("Delete", [[DELETE]], () -> deleteObjects([object])),
+                    ]);
+                    dropdown.cameras = [uiCam];
+                    add(dropdown);
             }
         }
     }

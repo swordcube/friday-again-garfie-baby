@@ -2,6 +2,8 @@ package funkin.ui.topbar;
 
 import flixel.text.FlxText;
 
+using flixel.util.FlxColorTransformUtil;
+
 class TopBarButton extends UIComponent {
     public var bg:FlxSprite;
     public var label:FlxText;
@@ -12,6 +14,7 @@ class TopBarButton extends UIComponent {
         cursorType = POINTER;
 
         bg = new FlxSprite().loadGraphic(Paths.image("ui/images/top_bar"));
+        bg.visible = false;
         add(bg);
 
         label = new FlxText(8, 0, 0, text);
@@ -28,10 +31,20 @@ class TopBarButton extends UIComponent {
     override function update(elapsed:Float):Void {
         var offset:Float = (isHovered()) ? (FlxG.mouse.pressed ? -15 : 15) : 0;
         bg.colorTransform.redOffset = FlxMath.lerp(bg.colorTransform.redOffset, offset, FlxMath.getElapsedLerp(0.32, elapsed));
-        bg.colorTransform.greenOffset = FlxMath.lerp(bg.colorTransform.greenOffset, offset, FlxMath.getElapsedLerp(0.32, elapsed));
-        bg.colorTransform.blueOffset = FlxMath.lerp(bg.colorTransform.blueOffset, offset, FlxMath.getElapsedLerp(0.32, elapsed));
+        if(Math.abs(bg.colorTransform.redOffset) < 0.001)
+            bg.colorTransform.redOffset = 0;
 
-        if(isHovered() && FlxG.mouse.justPressed) {
+        bg.colorTransform.greenOffset = FlxMath.lerp(bg.colorTransform.greenOffset, offset, FlxMath.getElapsedLerp(0.32, elapsed));
+        if(Math.abs(bg.colorTransform.greenOffset) < 0.001)
+            bg.colorTransform.greenOffset = 0;
+
+        bg.colorTransform.blueOffset = FlxMath.lerp(bg.colorTransform.blueOffset, offset, FlxMath.getElapsedLerp(0.32, elapsed));
+        if(Math.abs(bg.colorTransform.blueOffset) < 0.001)
+            bg.colorTransform.blueOffset = 0;
+
+        bg.visible = bg.colorTransform.hasRGBOffsets();
+
+        if(isHovered() && FlxG.mouse.justReleased) {
             if(callback != null)
                 callback();
         }

@@ -43,7 +43,7 @@ class DropDownItem extends UIComponent {
         if(Math.abs(bg.alpha) < 0.001)
             bg.alpha = 0;
 
-        if(FlxG.mouse.justPressed && callback != null && isHovered)
+        if(FlxG.mouse.justReleased && callback != null && isHovered)
             callback();
 
         super.update(elapsed);
