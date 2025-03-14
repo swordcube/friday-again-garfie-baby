@@ -19,6 +19,8 @@ class Constants {
     public static final KEY_COUNT:Int = 4;
     public static final STRUM_SPACING:Float = 112;
     public static final PIXELS_PER_MS:Float = 0.45;
+    public static final MAX_UNDOS:Int = 120;
+    public static final WINDOW_TITLE:String = "friday again garfie baby";
     public static final SAVE_DIR:String = "swordcube/GarfieFunkin";
     public static final DEFAULT_CHARACTER:String = "bf";
     public static final DEFAULT_HEALTH_ICON:String = "face";

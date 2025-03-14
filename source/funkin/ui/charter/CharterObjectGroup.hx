@@ -72,8 +72,6 @@ class CharterObjectGroup extends FlxObject {
         final direction:Int = Math.floor((charter._mousePos.x - x) / ChartEditor.CELL_SIZE);
         if(_movingObjects) {
             final snapMult:Float = ChartEditor.CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
-            final snapY:Float = (FlxG.keys.pressed.SHIFT) ? charter._mousePos.y : Math.floor(charter._mousePos.y / snapMult) * snapMult;
-            
             if(FlxG.mouse.justReleased)
                 _movingObjects = false;
             
@@ -101,6 +99,15 @@ class CharterObjectGroup extends FlxObject {
                     default:
                         continue;
                 }
+            }
+            if(!_movingObjects) {
+                var change:Float = (charter._mousePos.y - _lastMouseY);
+                change = (FlxG.keys.pressed.SHIFT) ? (change / ChartEditor.CELL_SIZE) : (Math.floor(change / snapMult) * snapMult) / ChartEditor.CELL_SIZE;
+
+                charter.undos.add(CMoveObjects({
+                    change: new FlxPoint(direction - _lastDirection, change),
+                    objects: charter.selectedObjects.copy()
+                }));
             }
             return;
         }

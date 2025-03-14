@@ -1,30 +1,39 @@
 package funkin.states.editors;
 
-import funkin.ui.dropdown.DropDown;
-import flixel.addons.display.FlxBackdrop;
-import flixel.addons.display.FlxGridOverlay;
+import haxe.io.Path;
+import sys.io.File;
+
+import openfl.geom.Rectangle;
+import openfl.net.FileReference;
+import openfl.display.BitmapData;
+
 import flixel.math.FlxPoint;
 import flixel.text.FlxText;
-import flixel.util.FlxDestroyUtil;
+
 import flixel.util.FlxTimer;
+import flixel.util.FlxDestroyUtil;
+import flixel.addons.display.FlxBackdrop;
+import flixel.addons.display.FlxGridOverlay;
+
 import funkin.backend.Main;
-import funkin.gameplay.HealthIcon;
-import funkin.gameplay.song.ChartData;
-import funkin.gameplay.song.SongMetadata;
-import funkin.gameplay.song.VocalGroup;
+
 import funkin.ui.*;
 import funkin.ui.charter.*;
 import funkin.ui.panel.*;
 import funkin.ui.topbar.*;
-import openfl.display.BitmapData;
-import openfl.geom.Rectangle;
-import openfl.net.FileReference;
-import sys.io.File;
-import haxe.io.Path;
+import funkin.ui.dropdown.*;
+
+import funkin.gameplay.HealthIcon;
+import funkin.gameplay.song.ChartData;
+import funkin.gameplay.song.SongMetadata;
+import funkin.gameplay.song.VocalGroup;
+
+import funkin.utilities.UndoList;
 
 // TODO: undos & redos
+// TODO: chart metadata window
 
-// TODO: have some way to place & select events
+// TODO: allow the user to edit events (along with a popup when placing a new one)
 // TODO: have some way to place & select timing points
 
 // TODO: waveforms for inst and each vocal track
@@ -51,6 +60,7 @@ class ChartEditor extends UIState {
     public var inst:FlxSound;
     public var vocals:VocalGroup;
 
+    public var undos:UndoList<ChartEditorChange>;
     public var selectedObjects:Array<ChartEditorObject> = [];
     
     // note layer
@@ -126,6 +136,7 @@ class ChartEditor extends UIState {
 		else
             currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
 
+        undos = new UndoList<ChartEditorChange>();
         Paths.iterateDirectory("gameplay/notetypes", (scriptPath:String) -> {
             if(Paths.isAssetType(scriptPath, SCRIPT))
                 noteTypes.push(Path.withoutDirectory(Path.withoutExtension(scriptPath)));
@@ -235,7 +246,7 @@ class ChartEditor extends UIState {
             measureSeparators.add(new FlxSprite(grid.x, grid.y + (CELL_SIZE * Conductor.instance.getStepAtTime(measureTime))).makeSolid(gridBitmap.width, 4, FlxColor.WHITE));
             curMeasure++;
         }
-        topCover = new FlxSprite(grid.x, grid.y).makeSolid(gridBitmap.width, FlxG.height * 1.5, FlxColor.BLACK);
+        topCover = new FlxSprite(grid.x, grid.y).makeSolid(gridBitmap.width, FlxG.height * 2.5, FlxColor.BLACK);
         topCover.y -= topCover.height;
         topCover.scrollFactor.x = 0;
         topCover.alpha = 0.5;
@@ -243,7 +254,7 @@ class ChartEditor extends UIState {
         add(topCover);
         
         final endStep:Float = Conductor.instance.getStepAtTime(inst.length);
-        bottomCover = new FlxSprite(grid.x, grid.y).makeSolid(gridBitmap.width, FlxG.height * 1.5, FlxColor.BLACK);
+        bottomCover = new FlxSprite(grid.x, grid.y).makeSolid(gridBitmap.width, FlxG.height * 2.5, FlxColor.BLACK);
         bottomCover.y = CELL_SIZE * endStep;
         bottomCover.scrollFactor.x = 0;
         bottomCover.alpha = 0.5;
@@ -340,24 +351,6 @@ class ChartEditor extends UIState {
         strumLine.cameras = [noteCam];
         add(strumLine);
 
-        iconP2 = new HealthIcon(currentChart.meta.game.getCharacter("opponent"), OPPONENT);
-        add(iconP2);
-        
-        iconP1 = new HealthIcon(currentChart.meta.game.getCharacter("player"), PLAYER);
-        iconP1.flipX = true;
-        add(iconP1);
-        
-        for(icon in [iconP1, iconP2]) {
-            icon.size.scale(0.5);
-            icon.scale.scale(0.5);
-            icon.updateHitbox();
-            icon.centered = true;
-            icon.cameras = [noteCam];
-            icon.scrollFactor.set();
-        }
-        iconP2.setPosition(grid.x - (iconP2.width + 12), 38);
-        iconP1.setPosition(grid.x + (grid.width + 12), 38);
-
         selectionBox = new SelectionPanel(0, 0, 16, 16);
         selectionBox.kill();
         selectionBox.cameras = [noteCam];
@@ -372,6 +365,24 @@ class ChartEditor extends UIState {
         uiLayer = new FlxContainer();
         uiLayer.cameras = [uiCam];
         add(uiLayer);
+
+        iconP2 = new HealthIcon(currentChart.meta.game.getCharacter("opponent"), OPPONENT);
+        uiLayer.add(iconP2);
+        
+        iconP1 = new HealthIcon(currentChart.meta.game.getCharacter("player"), PLAYER);
+        iconP1.flipX = true;
+        uiLayer.add(iconP1);
+
+        for(icon in [iconP1, iconP2]) {
+            icon.size.scale(0.5);
+            icon.scale.scale(0.5);
+            icon.updateHitbox();
+            icon.centered = true;
+            icon.cameras = [uiCam];
+            icon.scrollFactor.set();
+        }
+        iconP2.setPosition(grid.x - (iconP2.width + 12), 38);
+        iconP1.setPosition(grid.x + (grid.width + 12), 38);
 
         visualMetronome = new CharterVisualMetronome(0, 24);
         visualMetronome.cameras = [uiCam];
@@ -422,6 +433,12 @@ class ChartEditor extends UIState {
 
         final isUIActive:Bool = UIUtil.isHoveringAnyComponent([grid]) || isUIFocused;
         noteCam.zoom = FlxMath.lerp(noteCam.zoom, editorSettings.gridZoom, FlxMath.getElapsedLerp(0.32, elapsed));
+
+        @:privateAccess
+        final gridPos = grid.getScreenPosition(grid._point, noteCam);
+
+        iconP2.setPosition((gridPos.x + (grid.width - (grid.width * (1 + ((noteCam.zoom - 1) * 0.5))))) - ((iconP2.frameWidth * iconP2.size.x) + 12), 38);
+        iconP1.setPosition(gridPos.x + ((grid.width * (1 + ((noteCam.zoom - 1) * 0.5))) + 12), 38);
 
         if(Conductor.instance.time >= inst.length)
             Conductor.instance.time = inst.length;
@@ -509,6 +526,27 @@ class ChartEditor extends UIState {
 					final direction:Int = Math.floor((_mousePos.x - objectGroup.x) / CELL_SIZE);
                     if(direction < 0 || direction >= (Constants.KEY_COUNT * 2))
                         selectObjects([]);
+                }
+            }
+            if(FlxG.mouse.justReleasedRight && !isUIActive) {
+                final direction:Int = Math.floor((_mousePos.x - objectGroup.x) / CELL_SIZE);
+                if(direction < 0 || direction >= (Constants.KEY_COUNT * 2)) {
+                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, [
+                        Button("Undo", [[UIUtil.correctModifierKey(CONTROL), Z]], undo),
+                        Button("Redo", [[UIUtil.correctModifierKey(CONTROL), Y], [UIUtil.correctModifierKey(CONTROL), SHIFT, Z]], redo),
+                        
+                        Separator,
+                        
+                        Button("Copy", [[UIUtil.correctModifierKey(CONTROL), C]], () -> {trace("copy NOT IMPLEMENTED!!");}),
+                        Button("Paste", [[UIUtil.correctModifierKey(CONTROL), V]], () -> {trace("paste NOT IMPLEMENTED!!");}),
+                        
+                        Separator,
+                        
+                        Button("Cut", [[UIUtil.correctModifierKey(CONTROL), X]], () -> {trace("cut NOT IMPLEMENTED!!");}),
+                        Button("Delete", [[DELETE]], () -> deleteObjects(selectedObjects))
+                    ]);
+                    dropdown.cameras = [uiCam];
+                    add(dropdown);
                 }
             }
         }
@@ -687,7 +725,7 @@ class ChartEditor extends UIState {
         Conductor.instance.time = newTime;
     }
 
-    public function addObjects(objects:Array<ChartEditorObject>):Void {
+    public function addObjects(objects:Array<ChartEditorObject>, ?unsafe:Bool = false):Void {
         for(object in objects) {
             switch(object) {
                 case CNote(note):
@@ -699,7 +737,9 @@ class ChartEditor extends UIState {
                     // TODO: this shit
             }
         }
-        selectObjects(objects);
+        selectObjects(objects, true);
+        if(!unsafe)
+            undos.add(CAddObjects(objects));
     }
 
     public function addObjectOnCursor():Void {
@@ -713,7 +753,7 @@ class ChartEditor extends UIState {
 
         final direction:Int = Math.floor((_mousePos.x - grid.x) / CELL_SIZE);
         if(direction > -1) {
-            addObjects([CNote({
+            final object:ChartEditorObject = CNote({
                 data: {
                     time: Conductor.instance.getTimeAtStep(newStep),
                     direction: direction,
@@ -722,7 +762,8 @@ class ChartEditor extends UIState {
                 },
                 step: newStep,
                 stepLength: 0
-            })]);
+            });
+            addObjects([object]);
         }
         else if(direction > -3 && direction < 0) {
            // TODO: show a menu for this
@@ -730,7 +771,7 @@ class ChartEditor extends UIState {
         }
     }
 
-    public function selectObjects(objects:Array<ChartEditorObject>):Void {
+    public function selectObjects(objects:Array<ChartEditorObject>, ?unsafe:Bool = false):Void {
         // deselect previous objects
         for(object in selectedObjects) {
             switch(object) {
@@ -766,10 +807,13 @@ class ChartEditor extends UIState {
                 case CEvent(event): event.selected = true;
             }
         }
+        if(!unsafe)
+            undos.add(CSelectObjects(filteredObjects, selectedObjects.copy()));
+        
         selectedObjects = filteredObjects;
     }
 
-    public function deleteObjects(objects:Array<ChartEditorObject>):Void {
+    public function deleteObjects(objects:Array<ChartEditorObject>, ?unsafe:Bool = false):Void {
         for(object in objects) {
             switch(object) {
                 case CNote(note):
@@ -783,7 +827,9 @@ class ChartEditor extends UIState {
                     objectGroup.events.remove(event);
             }
         }
-        selectObjects([]);
+        selectObjects([], true);
+        if(!unsafe)
+            undos.add(CRemoveObjects(objects)); 
     }
 
     public function rightClickObject(object:ChartEditorObject):Void {
@@ -962,6 +1008,78 @@ class ChartEditor extends UIState {
         fileRef.save(SongMetadata.stringify(currentChart.meta), 'meta.json');
     }
 
+    public function undo():Void {
+        final action:ChartEditorChange = undos.undo();
+        if(action == null)
+            return;
+
+        trace(action);
+        
+        switch(action) {
+            case CAddObjects(objects):
+                deleteObjects(objects, true);
+
+            case CRemoveObjects(objects):
+                addObjects(objects, true);
+
+            case CMoveObjects(data):
+                for(object in data.objects) {
+                    switch(object) {
+                        case CNote(note):
+                            note.step -= data.change.y;
+                            note.data.direction = FlxMath.boundInt(Std.int(note.data.direction - data.change.x), 0, (Constants.KEY_COUNT * 2) - 1);
+                            note.data.time = Conductor.instance.getTimeAtStep(note.step);
+                        
+                        case CEvent(event):
+                            event.step -= data.change.y;
+                            for(e in event.events)
+                                e.time = Conductor.instance.getTimeAtStep(event.step);
+                    }
+                }
+
+            case CSelectObjects(_, lastSelectedObjects):
+                selectObjects(lastSelectedObjects.copy(), true);
+
+            default:
+                // do nothing           :p
+        }
+    }
+
+    public function redo():Void {
+        final action:ChartEditorChange = undos.redo();
+        if(action == null)
+            return;
+
+        switch(action) {
+            case CAddObjects(objects):
+                addObjects(objects, true);
+
+            case CRemoveObjects(objects):
+                deleteObjects(objects, true);
+
+            case CMoveObjects(data):
+                for(object in data.objects) {
+                    switch(object) {
+                        case CNote(note):
+                            note.step += data.change.y;
+                            note.data.direction = FlxMath.boundInt(Std.int(note.data.direction + data.change.x), 0, (Constants.KEY_COUNT * 2) - 1);
+                            note.data.time = Conductor.instance.getTimeAtStep(note.step);
+                        
+                        case CEvent(event):
+                            event.step += data.change.y;
+                            for(e in event.events)
+                                e.time = Conductor.instance.getTimeAtStep(event.step);
+                    }
+                }
+
+            case CSelectObjects(newObjects, _):
+                selectObjects(newObjects.copy(), true);
+
+            default:
+                // do nothing           :p
+        }
+    }
+
     //----------- [ Private API ] -----------//
 
     private var _middleScrolling:Bool = false;
@@ -1047,18 +1165,21 @@ class ChartEditorEvent {
     public var selected:Bool = false;
 }
 
+@:structInit
+class ChartEditorMoveObjectData {
+    public var change:FlxPoint;
+    public var objects:Array<ChartEditorObject>;
+}
+
 enum ChartEditorObject {
     CNote(note:ChartEditorNote);
     CEvent(event:ChartEditorEvent);
 }
 
 enum ChartEditorChange {
-    CCutObjects(objects:Array<ChartEditorObject>);
-    CPasteObjects(objects:Array<ChartEditorObject>);
+    CAddObjects(objects:Array<ChartEditorObject>);
+    CRemoveObjects(objects:Array<ChartEditorObject>);
     
-    CMoveObjects(objects:Array<ChartEditorObject>);
-    CSelectObjects(objects:Array<ChartEditorObject>);
-
-    CAddObject(object:ChartEditorObject);
-    CRemoveObject(object:ChartEditorObject);
+    CMoveObjects(data:ChartEditorMoveObjectData);
+    CSelectObjects(newObjects:Array<ChartEditorObject>, lastSelectedObjects:Array<ChartEditorObject>);
 }

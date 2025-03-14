@@ -54,8 +54,8 @@ class CharterTopBar extends TopBar {
                 Button("Exit", null, () -> {trace("exit NOT IMPLEMENTED!!");})
             ]),
             DropDown("Edit", [
-                Button("Undo", [[UIUtil.correctModifierKey(CONTROL), Z]], () -> {trace("undo NOT IMPLEMENTED!!");}),
-                Button("Redo", [[UIUtil.correctModifierKey(CONTROL), Y], [UIUtil.correctModifierKey(CONTROL), SHIFT, Z]], () -> {trace("redo NOT IMPLEMENTED!!");}),
+                Button("Undo", [[UIUtil.correctModifierKey(CONTROL), Z]], charter.undo),
+                Button("Redo", [[UIUtil.correctModifierKey(CONTROL), Y], [UIUtil.correctModifierKey(CONTROL), SHIFT, Z]], charter.redo),
                 
                 Separator,
                 
