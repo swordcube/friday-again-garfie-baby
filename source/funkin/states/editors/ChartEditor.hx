@@ -28,6 +28,8 @@ import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.SongMetadata;
 import funkin.gameplay.song.VocalGroup;
 
+import funkin.substates.charter.*;
+
 import funkin.utilities.UndoList;
 
 // TODO: undos & redos
@@ -222,12 +224,17 @@ class ChartEditor extends UIState {
 		eventGrid.alpha = 0.45;
 		add(eventGrid);
 
+        // TODO: manually draw these, don't need to
+        // manually sync them to timing point changes constantly
+
         beatSeparators = new FlxSpriteContainer();
         beatSeparators.cameras = [noteCam];
+        beatSeparators.active = false;
         add(beatSeparators);
 
         measureSeparators = new FlxSpriteContainer();
         measureSeparators.cameras = [noteCam];
+        measureSeparators.active = false;
         add(measureSeparators);
 
         var curBeat:Int = -16;
@@ -251,6 +258,7 @@ class ChartEditor extends UIState {
         topCover.scrollFactor.x = 0;
         topCover.alpha = 0.5;
         topCover.cameras = [noteCam];
+        topCover.active = false;
         add(topCover);
         
         final endStep:Float = Conductor.instance.getStepAtTime(inst.length);
@@ -259,10 +267,12 @@ class ChartEditor extends UIState {
         bottomCover.scrollFactor.x = 0;
         bottomCover.alpha = 0.5;
         bottomCover.cameras = [noteCam];
+        bottomCover.active = false;
         add(bottomCover);
 
         final endSep:FlxSprite = new FlxSprite(grid.x, grid.y + (CELL_SIZE * endStep)).makeSolid(gridBitmap.width, 2, FlxColor.WHITE);
         endSep.cameras = [noteCam];
+        endSep.active = false;
         add(endSep);
 
         opponentStrumLine = new CharterStrumLine(0, 75);
@@ -955,9 +965,10 @@ class ChartEditor extends UIState {
     }
 
     public function openMetadataWindow():Void {
-        final window = new CharterMetadataWindow(topBar.x + 12, topBar.y + topBar.bg.height + 12);
-        window.cameras = [uiCam];
-        uiLayer.add(window);
+        if(inst.playing)
+            playPause();
+
+        openSubState(new CharterMetadataMenu());
     }
 
     public function selectAllNotes():Void {
@@ -1012,8 +1023,6 @@ class ChartEditor extends UIState {
         final action:ChartEditorChange = undos.undo();
         if(action == null)
             return;
-
-        trace(action);
         
         switch(action) {
             case CAddObjects(objects):

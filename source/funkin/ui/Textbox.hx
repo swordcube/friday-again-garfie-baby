@@ -28,7 +28,9 @@ class Textbox extends UIComponent {
     public var position:Int = 0;
     public var maxCharacters:Int = 0;
 
-    public function new(x:Float = 0, y:Float = 0, text:String, ?autoSize:Bool = false, ?width:Float = 100, ?height:Float = 26, ?callback:String->Void = null) {
+    public var restrictChars:String = "";
+
+    public function new(x:Float = 0, y:Float = 0, text:String, ?autoSize:Bool = false, ?width:Float = 100, ?height:Float = 22, ?callback:String->Void = null) {
         super(x, y);
         cursorType = TEXT;
 
@@ -38,7 +40,6 @@ class Textbox extends UIComponent {
 
         label = new FlxText(8, 0, 0, text);
         label.setFormat(Paths.font("fonts/montserrat/semibold"), 14, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
-        label.y = bg.y + ((bg.height - label.height) * 0.5);
         add(label);
 
         caret = new FlxSprite(8, 1).makeSolid(1, 18);
@@ -170,19 +171,35 @@ class Textbox extends UIComponent {
     }
 
     private function _onTextInput(text:String):Void {
-        if(maxCharacters > 0 && this.text.length >= maxCharacters)
+        if(!typing || (maxCharacters > 0 && this.text.length >= maxCharacters))
             return;
-
+        
+        if(restrictChars != null && restrictChars.length != 0) {
+            var excludeEReg:EReg = ~/\^(.-.|.)/gu;
+            var excludeChars:String = '';
+            
+            final includeChars:String = excludeEReg.map(restrictChars, (ereg:EReg) -> {
+                excludeChars += ereg.matched(1);
+                return '';
+            });
+            final testRegexpParts:Array<String> = [];
+            
+            if(includeChars.length > 0)
+                testRegexpParts.push('[^${restrictChars}]');
+            
+            if(excludeChars.length > 0)
+                testRegexpParts.push('[${excludeChars}]');
+            
+            final regexp:EReg = new EReg('(${testRegexpParts.join(' | ')})', 'g');
+            if(regexp != null)
+                text = regexp.replace(text, '');
+        }
         this.text = this.text.substr(0, position) + text + this.text.substr(position);
-		position += text.length;
+        position += text.length;
     }
 
     private function _onTextEdit(text:String, start:Int, end:Int):Void {
-        if(maxCharacters > 0 && this.text.length >= maxCharacters)
-            return;
-        
-        this.text = this.text.substr(0, position) + text + this.text.substr(position);
-		position += text.length;
+        _onTextInput(text);
     }
 
     override function set_width(Value:Float):Float {
@@ -190,6 +207,8 @@ class Textbox extends UIComponent {
             return Value;
 
         bg.width = Value;
+        label.fieldWidth = Std.int(Value - 16); // TODO: handle text wrapping better
+
         return width = Value;
     }
 
@@ -220,7 +239,6 @@ class Textbox extends UIComponent {
             bg.width = label.width + 16;
             bg.height = label.height - 2;
         }
-        label.setPosition(bg.x + ((bg.width - label.width) * 0.5), bg.y + ((bg.height - label.height) * 0.5));
         return Value;
     }
 

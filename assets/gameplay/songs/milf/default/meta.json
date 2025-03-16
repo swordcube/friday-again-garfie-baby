@@ -5,7 +5,7 @@
 		"ratings": {}
 	},
 	"game": {
-		"stage": "limoRide",
+		"stage": "limo",
 		"scrollSpeed": {
 			"easy": 1.9,
 			"normal": 2.2,

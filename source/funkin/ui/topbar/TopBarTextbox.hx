@@ -10,6 +10,7 @@ class TopBarTextbox extends UIComponent {
         this.valueFactory = valueFactory;
 
         bg = new FlxSprite().loadGraphic(Paths.image("ui/images/top_bar"));
+        bg.visible = false;
         add(bg);
 
         textbox = new Textbox(4, 2, text, autoSize, width, 22, callback);

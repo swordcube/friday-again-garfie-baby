@@ -61,6 +61,8 @@ class CharterObjectGroup extends FlxObject {
         _eventBGSprite.cursorType = POINTER;
         _eventBGSprite.loadGraphic(Paths.image("editors/charter/images/event_bg"));
         _eventBGSprite.setBorders(20, 20, 14, 14);
+        _eventBGSprite.cameras = getCameras();
+        _eventBGSprite.container = charter;
         _eventBGSprite.width = 70;
         _eventBGSprite.height = 42;
 
@@ -114,7 +116,7 @@ class CharterObjectGroup extends FlxObject {
         isHoveringNote = false;
         isHoveringEvent = false;
 
-		if(direction < (Constants.KEY_COUNT * 2) && ((FlxG.mouse.pressed && FlxG.mouse.justMoved) || FlxG.mouse.justReleased || FlxG.mouse.justReleasedRight)) {
+		if(direction < (Constants.KEY_COUNT * 2)) {
             final max:Float = FlxG.height / 70 / getDefaultCamera().zoom;
     
             var sprite:FlxSprite = null;
@@ -173,11 +175,14 @@ class CharterObjectGroup extends FlxObject {
                     event = events[i];
                     
                     final offsetX:Float = -1;
+                    _eventBGSprite.cameras = getCameras();
+            
                     _eventBGSprite.width = 70 + ((event.events.length - 1) * 30);
                     _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step));
 
                     if (FlxG.mouse.overlaps(_eventBGSprite, charter.noteCam)) {
                         isHoveringEvent = true;
+                        
                         if(FlxG.mouse.pressed && FlxG.mouse.justMoved && event.selected && !charter.selectionBox.exists) {
                             for(object in charter.selectedObjects) {
                                 switch(object) {
@@ -428,6 +433,7 @@ class CharterObjectGroup extends FlxObject {
             sprite.setGraphicSize(ChartEditor.CELL_SIZE);
             sprite.updateHitbox();
 
+            sprite.container = charter;
 			_noteSpriteMap.set(noteType, sprite);
         }
 		final sprite:FlxSprite = _noteSpriteMap.get(noteType);

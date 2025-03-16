@@ -22,6 +22,11 @@ class CharterGrid extends FlxBackdrop implements IUIComponent {
         UIUtil.allComponents.push(this);
     }
 
+    override function update(elapsed:Float) {
+        cursorType = (charter.objectGroup.isHoveringNote || charter.objectGroup.isHoveringEvent) ? POINTER : CELL;
+        super.update(elapsed);
+    }
+
     public function checkMouseOverlap():Bool {
         if(_checkingOverlap)
             return false; // prevent infinite recursion

@@ -10,6 +10,7 @@ class TopBarText extends FlxSpriteContainer {
         super(x, y);
 
         bg = new FlxSprite().loadGraphic(Paths.image("ui/images/top_bar"));
+        bg.visible = false;
         add(bg);
 
         label = new FlxText(8, 0, 0, text);

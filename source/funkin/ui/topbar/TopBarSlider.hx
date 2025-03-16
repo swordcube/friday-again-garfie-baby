@@ -12,6 +12,7 @@ class TopBarSlider extends FlxSpriteContainer {
         super(x, y);
 
         bg = new FlxSprite().loadGraphic(Paths.image("ui/images/top_bar"));
+        bg.visible = false;
         add(bg);
 
         slider = new HorizontalSlider(8, 0, width);
