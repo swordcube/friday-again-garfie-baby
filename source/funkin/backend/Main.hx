@@ -6,6 +6,10 @@ import flixel.FlxGame;
 import funkin.backend.InitState;
 import funkin.backend.StatsDisplay;
 
+#if (linux && !debug)
+@:cppInclude('../../../../vendor/gamemode_client.h')
+@:cppFileCode('#define GAMEMODE_AUTO')
+#end
 class Main extends Sprite {
 	public static var changeID:Int = 0;
     public static var audioDisconnected:Bool = false;
