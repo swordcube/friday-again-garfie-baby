@@ -99,12 +99,6 @@ class FlxUtil {
             // Handle keybind to toggle fullscreen
             if (Controls.instance.justPressed.FULLSCREEN)
                 FlxG.fullscreen = !FlxG.fullscreen;
-
-            // Handle keybind to reload modding stuff
-            if(Controls.instance.justPressed.DEBUG_RELOAD) {
-                FlxG.game._nextState = FlxG.state._constructor;
-                FlxG.game.switchState();
-            }
         });
     }
 }

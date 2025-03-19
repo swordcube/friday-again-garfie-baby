@@ -1,5 +1,6 @@
 package funkin.gameplay.hud;
 
+#if SCRIPTING_ALLOWED
 import funkin.backend.scripting.FunkinScript;
 
 class ScriptedHUD extends BaseHUD {
@@ -22,6 +23,7 @@ class ScriptedHUD extends BaseHUD {
     override function generateHealthBar():Void {
         script.call("generateHealthBar");
     }
+    
     override function generatePlayerStats():Void {
         script.call("generatePlayerStats");
     }
@@ -29,6 +31,7 @@ class ScriptedHUD extends BaseHUD {
     override function updateHealthBar():Void {
         script.call("updateHealthBar");
     }
+
     override function updatePlayerStats():Void {
         script.call("updatePlayerStats");
     }
@@ -36,9 +39,11 @@ class ScriptedHUD extends BaseHUD {
     override function stepHit(step:Int) {
         script.call("stepHit", [step]);
     }
+
     override function beatHit(beat:Int) {
         script.call("beatHit", [beat]);
     }
+
     override function measureHit(measure:Int) {
         script.call("measureHit", [measure]);
     }
@@ -48,3 +53,4 @@ class ScriptedHUD extends BaseHUD {
         super.destroy();
     }
 }
+#end

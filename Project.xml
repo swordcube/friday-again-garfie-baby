@@ -36,8 +36,55 @@
 
 	<!-- ____________________________ Funkin Defines ____________________________ -->
 
-	<!-- Comment/delete this line below to disable lua scripting -->
-	<define name="SCRIPTING_ALLOWED" if="cpp" />
+	<!--
+		Comment/delete this line below to disable all scripting
+		Or compile with the NO_SCRIPTING define, like so:
+		
+		lime test platform -DNO_SCRIPTING
+	-->
+	<define name="SCRIPTING_ALLOWED" unless="NO_SCRIPTING" />
+
+	<!--
+		Comment/delete this line below to disable HScript
+		Or compile with the NO_HSCRIPT define, like so:
+
+		lime test platform -DNO_HSCRIPT
+	-->
+	<define name="HSCRIPT_ALLOWED" if="SCRIPTING_ALLOWED" unless="NO_HSCRIPT" />
+
+	<!--
+		Comment/delete this line below to disable LuaJIT scripts
+		Or compile with the NO_LUA define, like so:
+
+		lime test platform -DNO_LUA
+	-->
+	<define name="LUA_ALLOWED" if="SCRIPTING_ALLOWED" unless="NO_LUA" />
+
+	<!--
+		Comment/delete this line below to disable the crash handler
+		Or compile with the NO_CRASH_HANDLER define, like so:
+		
+		lime test platform -DNO_CRASH_HANDLER
+	-->
+	<define name="CRASH_HANDLER" unless="NO_CRASH_HANDLER" />
+
+	<!--
+		Comment/delete this line below to disable the ability to
+		return to the main menu after a crash (Windows only)
+
+		Or compile with the NO_WINDOWS_CRASH_HANDLER define, like so:
+
+		lime test platform -DNO_WINDOWS_CRASH_HANDLER
+	-->
+	<define name="WINDOWS_CRASH_HANDLER" unless="NO_WINDOWS_CRASH_HANDLER" />
+
+	<!--
+		Comment/delete this line below to disable crash log saving
+		Or compile with the NO_SAVE_CRASH_LOGS define, like so:
+
+		lime test platform -DNO_SAVE_CRASH_LOGS
+	-->
+	<define name="SAVE_CRASH_LOGS" if="CRASH_HANDLER" unless="NO_SAVE_CRASH_LOGS" />
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 
@@ -65,9 +112,14 @@
 	<haxelib name="json2object" />
 
 	<section if="SCRIPTING_ALLOWED">
-		<haxelib name="linc_luajit" />
-		<haxelib name="lscript" /> <!-- Library for easier OOP interfacing with Lua/Haxe -->
-		<haxelib name="hscript-improved" />
+		<!-- The core library for Lua scripting -->
+		<haxelib name="linc_luajit" if="LUA_ALLOWED" />
+
+		<!-- The wrapper library for OOP Lua -->
+		<haxelib name="lscript" if="LUA_ALLOWED" />
+
+		<!-- The core library for Haxe scripting -->
+		<haxelib name="hscript-improved" if="HSCRIPT_ALLOWED" />
 	</section>
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
@@ -96,11 +148,13 @@
         <haxedef name="NAPE_RELEASE_BUILD" />
 
         <!-- Crash tracing on release builds -->
-        <haxedef name="HXCPP_CHECK_POINTER" />
-        <haxedef name="HXCPP_STACK_LINE" />
-        <haxedef name="HXCPP_STACK_TRACE" />
-        <haxedef name="HXCPP_CATCH_SEGV" />
-		<haxedef name="openfl-enable-handle-error" />
+		<section if="CRASH_HANDLER">
+			<haxedef name="HXCPP_CHECK_POINTER" />
+			<haxedef name="HXCPP_STACK_LINE" />
+			<haxedef name="HXCPP_STACK_TRACE" />
+			<haxedef name="HXCPP_CATCH_SEGV" />
+			<haxedef name="openfl-enable-handle-error" />
+		</section>
     </section>
 
     <!-- Self explanatory i'd say -->
@@ -110,8 +164,11 @@
 	<!-- pretty (haxeflixel default), indent, classic (haxe compiler default) -->
 	<haxedef name="message.reporting" value="pretty" />
 
-	<haxedef name="hscriptPos" if="SCRIPTING_ALLOWED" />
-	<haxedef name="NO_PRECOMPILED_HEADERS" /> <!-- Fixes linux compilation?? -->
+	<!-- Better error reporting for HScript -->
+	<haxedef name="hscriptPos" if="HSCRIPT_ALLOWED" />
+
+	<!-- Fixes linux compilation?? -->
+	<haxedef name="NO_PRECOMPILED_HEADERS" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 

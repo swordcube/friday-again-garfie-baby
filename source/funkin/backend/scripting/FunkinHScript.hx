@@ -1,6 +1,6 @@
 package funkin.backend.scripting;
 
-#if SCRIPTING_ALLOWED
+#if HSCRIPT_ALLOWED
 import haxe.io.Path;
 import haxe.PosInfos;
 
@@ -129,4 +129,6 @@ class FunkinHScript extends FunkinScript {
     @:unreflective
     private var _expr:Expr;
 }
+#elseif SCRIPTING_ALLOWED
+class FunkinHScript extends FunkinScript {} // dummy class
 #end

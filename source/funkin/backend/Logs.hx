@@ -149,9 +149,13 @@ class Logs {
 			final chunk:LogChunk = chunks[i];
 			NativeAPI.setConsoleColors(chunk.fgColor, chunk.bgColor);
 			Sys.print(chunk.text);
+			Sys.stdout().flush();
+			// Sys.sleep(0.001);
 		}
 		NativeAPI.setConsoleColors();
 		Sys.print("\r\n");
+		Sys.stdout().flush();
+
 		_showing = false;
 	}
 

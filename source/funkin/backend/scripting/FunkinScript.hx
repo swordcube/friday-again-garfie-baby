@@ -65,7 +65,10 @@ class FunkinScript {
         setClass(Cache);
         setClass(Logs);
         setClass(Options);
+        
         setClass(Controls);
+        set("Control", funkin.backend.Controls.Control);
+
         setClass(Conductor);
         setClass(ModManager);
         setClass(Constants);

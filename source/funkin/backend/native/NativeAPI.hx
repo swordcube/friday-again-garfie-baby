@@ -230,6 +230,13 @@ enum abstract MessageBoxOptions(Int) from Int to Int {
 	var CANCEL_TRY_CONTINUE = 0x00000006;
 }
 
+enum abstract MessageBoxDefaultButton(Int) to Int {
+	var BUTTON_1 = 0x00000000;
+	var BUTTON_2 = 0x00000100;
+	var BUTTON_3 = 0x00000200;
+	var BUTTON_4 = 0x00000300;
+}
+
 enum abstract MessageBoxReturnValue(Int) from Int to Int {
 	var OK = 1;
 	var CANCEL = 2;

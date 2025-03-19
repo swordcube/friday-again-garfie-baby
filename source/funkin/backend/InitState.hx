@@ -1,8 +1,8 @@
 package funkin.backend;
 
-import flixel.input.keyboard.FlxKey;
-
 import funkin.backend.native.NativeAPI;
+import funkin.backend.plugins.ForceCrashPlugin;
+
 import funkin.graphics.RatioScaleModeEx;
 
 import funkin.utilities.FlxUtil;
@@ -17,7 +17,11 @@ class InitState extends FlxState {
     override function create() {
         super.create();
 
+        // init audio device switch fix
         AudioSwitchFix.init();
+
+        // set fixed timestep to false, to make elapsed not a constant value
+        // this makes menus really slow to get thru on low framerates
         FlxG.fixedTimestep = false;
 
         #if windows
@@ -30,14 +34,15 @@ class InitState extends FlxState {
         FlxG.stage.window.borderless = !FlxG.stage.window.borderless;
         #end
 
+        // init logging & asset system
         Logs.init();
         Paths.initAssetSystem();
 
+        // init controls and mod manager
         Controls.init();
+        ModManager.init();
 
-        ModManager.scanMods();
-        ModManager.registerMods();
-
+        // init some flixel stuff
         FlxUtil.init();
         FlxG.scaleMode = new RatioScaleModeEx();
 
@@ -47,21 +52,33 @@ class InitState extends FlxState {
             }
             _lastState = Type.getClass(newState);
         });
+
+        // init cursor
         Cursor.init();
         
+        // init conductor
         Conductor.instance = new Conductor();
         FlxG.plugins.addPlugin(Conductor.instance);
 
+        // init extra plugins
+        FlxG.plugins.addPlugin(new ForceCrashPlugin());
+
+        // hide cursor, we probably don't need it rn
         FlxG.mouse.visible = false;
         FlxSprite.defaultAntialiasing = true;
 
         final args = Sys.args();
         if(args.contains("--song")) {
+            // if song arguments are passed, immediately go
+            // to playstate with that song
+            // 
+            // NOTE: difficulty MUST be passed!!
             FlxG.switchState(PlayState.new.bind({
                 song: args[args.indexOf("--song") + 1],
                 difficulty: args[args.indexOf("--diff") + 1]
             }));    
         } else {
+            // otherwise do normal starting logic
             FlxG.switchState(FreeplayState.new);
         }
     }

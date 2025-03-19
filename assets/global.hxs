@@ -1,0 +1,9 @@
+function onUpdate(dt) {
+    if(Controls.instance.justPressed.check(Control.DEBUG_RELOAD)) {
+        if(FlxG.keys.pressed.SHIFT) {
+            ModManager.scanMods();
+            ModManager.registerMods();
+        }
+        FlxG.resetState();
+    }
+}

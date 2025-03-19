@@ -1,5 +1,7 @@
 package funkin.backend;
 
+import haxe.CallStack;
+
 import openfl.display.Sprite;
 import flixel.FlxGame;
 
@@ -19,9 +21,21 @@ class Main extends Sprite {
 
 	public function new() {
 		super();
-		addChild(new FlxGame(0, 0, InitState.new, 0, 0, true));
+		addChild(new FunkinGame(0, 0, InitState.new, 0, 0, true));
 		
 		statsDisplay = new StatsDisplay(10, 3);
 		addChild(statsDisplay);
+	}
+
+	public static function callstackToString(callstack:Array<StackItem>):String {
+		var str:String = "";
+		for (stackItem in callstack) {
+			switch (stackItem) {
+				case FilePos(s, file, line, column):
+					str += '$file:$line\n';
+				default:
+			}
+		}
+		return str;
 	}
 }

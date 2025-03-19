@@ -1,6 +1,6 @@
 package funkin.backend.scripting;
 
-#if SCRIPTING_ALLOWED
+#if LUA_ALLOWED
 import llua.Lua;
 import haxe.io.Path;
 
@@ -99,4 +99,6 @@ class FunkinLua extends FunkinScript {
     @:unreflective
     private var _lua:LScript;
 }
+#elseif SCRIPTING_ALLOWED
+class FunkinLua extends FunkinScript {} // dummy class
 #end

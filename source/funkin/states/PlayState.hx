@@ -17,11 +17,13 @@ import funkin.gameplay.character.Character;
 import funkin.gameplay.hud.*;
 import funkin.gameplay.hud.BaseHUD;
 
-#if SCRIPTING_ALLOWED
+// import scripting events anyways because i'm too lazy
+// to make it work on no scripting mode lol!!
 import funkin.backend.scripting.events.*;
 import funkin.backend.scripting.events.notes.*;
 import funkin.backend.scripting.events.gameplay.*;
 
+#if SCRIPTING_ALLOWED
 import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
 #end
@@ -231,18 +233,22 @@ class PlayState extends FunkinState {
 		playField.cameras = [camHUD];
 		add(playField);
 		
-		var event:HUDGenerationEvent = Events.get(HUD_GENERATION);
+		var event:HUDGenerationEvent = cast Events.get(HUD_GENERATION);
+		event = event.recycle(Options.hudType);
+
 		#if SCRIPTING_ALLOWED
 		event = scripts.event("onHUDGeneration", event.recycle(Options.hudType));
-		#else
-		event = event.recycle(Options.hudType);
 		#end
 		switch(event.hudType) {
 			case "Classic":
 				playField.hud = new ClassicHUD(playField);
-
+				
 			default:
+				#if SCRIPTING_ALLOWED
 				playField.hud = new ScriptedHUD(playField, event.hudType);
+				#else
+				playField.hud = new ClassicHUD(playField);
+				#end
 		}
 		playField.hud.cameras = [camHUD];
 		add(playField.hud);
@@ -298,9 +304,10 @@ class PlayState extends FunkinState {
 			case SPECTATOR:
 				spectator.getCameraPosition(cameraPos);
 		}
+		var event:CameraMoveEvent = cast Events.get(CAMERA_MOVE);
+		event.recycle(cameraPos);
 		#if SCRIPTING_ALLOWED
-		var event:CameraMoveEvent = Events.get(CAMERA_MOVE);
-		event = scripts.event("onCameraMove", event.recycle(cameraPos));
+		event = scripts.event("onCameraMove", event);
 		#end
 		if(!event.cancelled)
 			camFollow.setPosition(event.position.x, event.position.y);
