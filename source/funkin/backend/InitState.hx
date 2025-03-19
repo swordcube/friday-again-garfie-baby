@@ -17,6 +17,19 @@ class InitState extends FlxState {
     override function create() {
         super.create();
 
+        #if cpp
+        // ugly hack to make printing actually work
+        //
+        // it stopped working due to a recent hxcpp change:
+        // https://github.com/HaxeFoundation/hxcpp/pull/1199
+        //
+        // should be line buffered now, but it instead does nothing
+        // so i have to do this now :/
+        // 
+        // TODO: better solution, this sucks and only works on hxcpp
+        untyped __cpp__("setbuf(stdout, 0)");
+        #end
+
         // init audio device switch fix
         AudioSwitchFix.init();
 
