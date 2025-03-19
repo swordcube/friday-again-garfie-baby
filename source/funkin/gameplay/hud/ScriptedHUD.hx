@@ -13,7 +13,7 @@ class ScriptedHUD extends BaseHUD {
         script = FunkinScript.fromFile(Paths.script('gameplay/hudskins/${skin}/script'));
         script.setParent(this);
         script.set("getHUDImage", (name:String) -> {
-            return Paths.image('gameplay/hudskins/${this.skin}/images/${name}');
+            return Paths.image('gameplay/hudskins/${skin}/images/${name}');
         });
         script.execute();
         
@@ -36,15 +36,15 @@ class ScriptedHUD extends BaseHUD {
         script.call("updatePlayerStats");
     }
 
-    override function stepHit(step:Int) {
+    override function stepHit(step:Int):Void {
         script.call("stepHit", [step]);
     }
 
-    override function beatHit(beat:Int) {
+    override function beatHit(beat:Int):Void {
         script.call("beatHit", [beat]);
     }
 
-    override function measureHit(measure:Int) {
+    override function measureHit(measure:Int):Void {
         script.call("measureHit", [measure]);
     }
 

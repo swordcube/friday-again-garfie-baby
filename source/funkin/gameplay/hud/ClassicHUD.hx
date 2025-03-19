@@ -91,8 +91,4 @@ class ClassicHUD extends BaseHUD {
             positionIcons();
         };
     }
-
-    private function getHUDImage(name:String):String {
-        return Paths.image('gameplay/hudskins/classic/images/${name}');
-    }
 }

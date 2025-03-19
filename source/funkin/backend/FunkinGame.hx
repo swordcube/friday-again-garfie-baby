@@ -14,16 +14,15 @@ import flixel.util.typeLimit.NextState.InitialState;
 
 import funkin.backend.native.NativeAPI;
 
+using funkin.utilities.OpenFLUtil;
+
 class FunkinGame extends FlxGame {
     public function new(gameWidth = 0, gameHeight = 0, ?initialState:InitialState, updateFramerate = 60, drawFramerate = 60, skipSplash = false, ?startFullscreen:Bool = false) {
         super(gameWidth, gameHeight, initialState, updateFramerate, drawFramerate, skipSplash, startFullscreen);
 
         #if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, (event:UncaughtErrorEvent) -> {
-            // cancel god damn it
-            event.stopImmediatePropagation();
-            event.stopPropagation();
-            event.preventDefault();
+            event.cancelEvent();
             _onCrash(event.error);
         });
 
@@ -74,7 +73,7 @@ class FunkinGame extends FlxGame {
 				// Close the game
 		}
 		#else
-		lime.app.Application.current.window.alert(callstack, err);
+		FlxG.stage.window.alert(callstack, err);
 		#end
         
 		System.exit(1);
