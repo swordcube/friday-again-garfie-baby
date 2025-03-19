@@ -44,10 +44,6 @@ class FunkinGame extends FlxGame {
 		var callstack:String = Main.callstackToString(CallStack.exceptionStack(true));
 		Sys.print('\n${callstack}\n${err}\n');
 
-        var stdout = Sys.stdout();
-        if(stdout != null)
-            stdout.flush();
-
 		var boxMessage:String = '${callstack}\n${err}\n';
         
 		#if SAVE_CRASH_LOGS
