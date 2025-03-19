@@ -21,12 +21,22 @@ then use hmm to install the libs:
 haxelib run hmm install
 ```
 
-### **step 3:** actually compiling the thing
+### **step 3:** making lime work
+this engine uses a custom lime fork, for extra features and patches
+that regular lime doesn't have, so we need to run this before compiling:
+
+```sh
+haxelib run lime rebuild <platform>
+```
+replace <platform> with whatever OS you're running on, such as
+`windows`, `mac`, `linux`, etc
+
+### **step 4:** actually compiling the thing
 ```sh
 haxelib run lime test <platform>
 ```
 replace <platform> with whatever OS you're running on, such as
 `windows`, `mac`, `linux`, etc
 
-### **step 4:** there is no step 4
+### **step 5:** there is no step 5
 that's it, you compiled the game (hopefully)
