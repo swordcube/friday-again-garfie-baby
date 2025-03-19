@@ -28,14 +28,14 @@ that regular lime doesn't have, so we need to run this before compiling:
 ```sh
 haxelib run lime rebuild <platform>
 ```
-replace <platform> with whatever OS you're running on, such as
+replace `<platform>` with whatever OS you're running on, such as
 `windows`, `mac`, `linux`, etc
 
 ### **step 4:** actually compiling the thing
 ```sh
 haxelib run lime test <platform>
 ```
-replace <platform> with whatever OS you're running on, such as
+replace `<platform>` with whatever OS you're running on, such as
 `windows`, `mac`, `linux`, etc
 
 ### **step 5:** there is no step 5
