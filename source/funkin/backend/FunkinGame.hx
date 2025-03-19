@@ -78,10 +78,8 @@ class FunkinGame extends FlxGame {
 		#else
 		lime.app.Application.current.window.alert(callstack, err);
 		#end
-
-		#if sys 
+        
 		System.exit(1);
-		#end
     }
 
     @:unreflective
