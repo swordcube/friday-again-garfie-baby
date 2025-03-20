@@ -1,0 +1,162 @@
+{
+    "apiVersion": "0.1.0",
+    "weeks": [
+        {
+            "tagline": "HITTIN' THE BADDIE",
+            "characters": [null, "bf", "gf"],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "songs": ["tutorial"],
+            "freeplayCategory": "main",
+
+            "mixes": [],
+            "difficulties": {
+                "default": ["easy", "normal", "hard"]
+            }
+        },
+        {
+            "tagline": "FATHER OF SOME",
+            "characters": ["dad", "bf", "gf"],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "songs": ["bopeebo", "fresh", "dadbattle"],
+            "freeplayCategory": "main",
+
+            "mixes": ["erect"],
+            "difficulties": {
+                "default": ["easy", "normal", "hard"],
+                "erect": ["erect", "nightmare"]
+            }
+        },
+        {
+            "tagline": "THE SPOOKY MANSION",
+            "characters": ["spooky-kids", "bf", "gf"],
+
+            "hiddenSongs": {
+                "story": ["monster"],
+                "freeplay": []
+            },
+            "songs": ["spookeez", "south", "monster"],
+            "freeplayCategory": "main",
+
+            "mixes": ["erect"],
+            "difficulties": {
+                "default": ["easy", "normal", "hard"],
+                "erect": ["erect", "nightmare"]
+            }
+        },
+        {
+            "tagline": "SOUL FOR SOME CASH",
+            "characters": ["pico", "bf", "gf"],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "songs": ["pico", "philly-nice", "blammed"],
+            "freeplayCategory": "main",
+
+            "mixes": ["erect"],
+            "difficulties": {
+                "default": ["easy", "normal", "hard"],
+                "erect": ["erect", "nightmare"]
+            }
+        },
+        {
+            "tagline": "MA'S RUNNING CAR",
+            "characters": ["mom", "bf", "gf"],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "songs": ["satin-panties", "high", "milf"],
+            "freeplayCategory": "main",
+
+            "mixes": [],
+            "difficulties": {
+                "default": ["easy", "normal", "hard"]
+            }
+        },
+        {
+            "tagline": "UNDER THE MALL'S SNOWY ROOF",
+            "characters": ["parents-christmas", "bf", "gf"],
+
+            "hiddenSongs": {
+                "story": ["winter-horrorland"],
+                "freeplay": []
+            },
+            "songs": ["cocoa", "eggnog", "winter-horrorland"],
+            "freeplayCategory": "main",
+
+            "mixes": ["erect"],
+            "difficulties": {
+                "default": ["easy", "normal", "hard"],
+                "erect": ["erect", "nightmare"]
+            }
+        },
+        {
+            "tagline": "16-BIT ROMANCE DRAMA",
+            "characters": ["senpai", "bf", "gf"],
+
+            "hiddenSongs": {
+                "story": ["thorns"],
+                "freeplay": []
+            },
+            "songs": ["senpai", "roses", "thorns"],
+            "freeplayCategory": "main",
+
+            "mixes": ["erect"],
+            "difficulties": {
+                "default": ["easy", "normal", "hard"],
+                "erect": ["erect", "nightmare"]
+            }
+        },
+        {
+            "tagline": "MUSICAL MILITARY",
+            "characters": ["tankman", "bf", "gf"],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "songs": ["ugh", "guns", "stress"],
+            "freeplayCategory": "main",
+
+            "mixes": ["erect"],
+            "difficulties": {
+                "default": ["easy", "normal", "hard"],
+                "erect": ["erect", "nightmare"]
+            }
+        },
+        {
+            "tagline": "DUE DEBTS",
+            "characters": ["darnell", "pico", "nene"],
+
+            "hiddenSongs": {
+                "story": ["blazin"],
+                "freeplay": []
+            },
+            "songs": ["darnell", "lit-up", "2hot", "blazin"],
+            "freeplayCategory": "main",
+
+            "mixes": [],
+            "difficulties": {
+                "default": ["easy", "normal", "hard"]
+            }
+        }
+    ],
+    "freeplayCategories": [
+        {
+            "id": "main",
+            "name": "Base Game - Main"
+        }
+    ],
+    "defaultCategory": "main"
+}

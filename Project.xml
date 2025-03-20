@@ -89,8 +89,12 @@
 	<!-- _____________________________ Path Settings ____________________________ -->
 
 	<assets path="assets" type="template" />
-	<assets path="mods" type="template" />
-	<assets path="tools" type="template" />
+	
+	<section unless="TEST_BUILD">
+		<!-- Don't copy content over if it's a test build -->
+		<assets path="content" type="template" />
+		<assets path="tools" type="template" />
+	</section>
 
 	<section if="desktop">
 		<assets path="alsoft.ini" rename="plugins/alsoft.ini" type="text" if="windows"/>

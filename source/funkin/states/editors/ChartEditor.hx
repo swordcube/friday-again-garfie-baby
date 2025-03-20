@@ -128,7 +128,7 @@ class ChartEditor extends UIState {
 		if(lastParams.mod != null && lastParams.mod.length > 0)
 			Paths.forceMod = lastParams.mod;
 		else {
-            if(instPath.startsWith('${ModManager.MOD_DIRECTORY}/'))
+            if(instPath.startsWith('${Paths.CONTENT_DIRECTORY}/'))
 				Paths.forceMod = instPath.split("/")[1];
             else
                 Paths.forceMod = lastParams.mod;
@@ -1006,7 +1006,7 @@ class ChartEditor extends UIState {
             return;
         }
         File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/chart', lastParams.mod), ChartData.stringify(currentChart));
-        File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/meta', lastParams.mod), SongMetadata.stringify(currentChart.meta));
+        File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/metadata', lastParams.mod), SongMetadata.stringify(currentChart.meta));
     }
 
     public function saveChartAs():Void {

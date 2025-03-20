@@ -3,7 +3,9 @@ package funkin.states.menus;
 import flixel.text.FlxText;
 
 import funkin.ui.AtlasText;
+
 import funkin.backend.WeekData;
+import funkin.backend.ContentMetadata;
 
 import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.SongMetadata;
@@ -12,15 +14,20 @@ import funkin.states.editors.ChartEditor;
 
 @:structInit
 class FreeplaySongData {
-    public var meta:Map<String, SongMetadata>;
-    public var data:WeekSongData;
+    public var metadata:Map<String, SongMetadata>;
+    public var id:String;
+    public var difficulties:Map<String, Array<String>>;
 }
 
 class FreeplayState extends FunkinState {
     public var bg:FlxSprite;
-    public var songs:Array<FreeplaySongData> = [];
-
+    
+    public var categories:Array<FreeplayCategory> = [];
+    public static var curCategory:Int = 0;
+    
+    public var songs:Map<String, Array<FreeplaySongData>> = [];
     public var curSelected:Int = 0;
+
     public var grpSongs:FlxTypedGroup<AtlasText>;
 
     public var curDifficulty:String = "normal";
@@ -41,30 +48,46 @@ class FreeplayState extends FunkinState {
         grpSongs = new FlxTypedGroup();
         add(grpSongs);
 
-        for(weekList in WeekData.getWeekLists()) {
-            for(weekID in weekList.data) {
-                final weekData:WeekData = WeekData.load(weekID, weekList.loaderID);
-                for(songData in weekData.songs) {
-                    if(songData.hiddenOnFreeplay)
+        for(contentFolder in Paths.contentFolders) {
+            final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentFolder);
+            if(contentMetadata == null)
+                continue; // if no metadata was found for this content pack, then don't bother
+
+            for(category in contentMetadata.freeplayCategories) {
+                categories.push({
+                    id: '${contentFolder}:${category.id}',
+                    name: category.name
+                });
+            }
+            for(week in contentMetadata.weeks) {
+                final categoryID:String = '${contentFolder}:${week.freeplayCategory}';
+                if(!songs.exists(categoryID))
+                    songs.set(categoryID, []);
+
+                final category:Array<FreeplaySongData> = songs.get(categoryID);
+                for(song in week.songs) {
+                    if(week.hiddenSongs.freeplay.contains(song))
                         continue;
 
-                    if(!FlxG.assets.exists(Paths.json('gameplay/songs/${songData.id}/default/meta', weekList.loaderID)))
+                    if(!FlxG.assets.exists(Paths.json('gameplay/songs/${song}/default/metadata', contentFolder)))
                         continue;
 
-                    final meta:SongMetadata = SongMetadata.load(songData.id, null, weekList.loaderID);
-                    final metaMap:Map<String, SongMetadata> = ["default" => meta];
+                    final defaultMetadata:SongMetadata = SongMetadata.load(song, null, contentFolder);
+                    final metadataMap:Map<String, SongMetadata> = ["default" => defaultMetadata];
                     
-                    for(mix in meta.song.mixes)
-                        metaMap.set(mix, SongMetadata.load(songData.id, mix, weekList.loaderID));
-                    
-                    songs.push({
-                        meta: metaMap,
-                        data: songData
+                    for(mix in defaultMetadata.song.mixes)
+                        metadataMap.set(mix, SongMetadata.load(song, mix, contentFolder));
+
+                    final difficultyMap:Map<String, Array<String>> = ["default" => defaultMetadata.song.difficulties];
+                    for(metadata in metadataMap) {
+                        for(mix in metadata.song.mixes)
+                            difficultyMap.set(mix, metadataMap.get(mix).song.difficulties);
+                    }
+                    category.push({
+                        metadata: metadataMap,
+                        id: song,
+                        difficulties: difficultyMap
                     });
-                    final text:AtlasText = new AtlasText(0, 0, "bold", LEFT, meta.song.title);
-                    text.isMenuItem = true;
-                    text.targetY = grpSongs.length;
-                    grpSongs.add(text);
                 }
             }
         }
@@ -80,12 +103,18 @@ class FreeplayState extends FunkinState {
 		diffText.setFormat(Paths.font("fonts/vcr"), 24, FlxColor.WHITE, CENTER);
 		add(diffText);
 
-        changeSelection(0, true);
+        changeCategory(0, true);
     }
 
     override function update(elapsed:Float) {
         scoreText.text = 'PERSONAL BEST:N/A';
         positionHighscore();
+
+        if(FlxG.keys.justPressed.Q)
+            changeCategory(-1);
+
+        if(FlxG.keys.justPressed.E)
+            changeCategory(1);
 
         if(controls.justPressed.UI_UP)
             changeSelection(-1);
@@ -108,6 +137,29 @@ class FreeplayState extends FunkinState {
         super.update(elapsed);
     }
 
+    public function changeCategory(by:Int = 0, ?force:Bool = false):Void {
+        if(by == 0 && !force)
+            return;
+
+        while(grpSongs.length > 0) {
+            final song:AtlasText = grpSongs.members[0];
+            song.destroy();
+            grpSongs.remove(song, true);
+        }
+        curCategory = FlxMath.wrap(curCategory + by, 0, categories.length - 1);
+        
+        for(song in songs.get(categories[curCategory].id)) {
+            final text:AtlasText = new AtlasText(0, 0, "bold", LEFT, song.metadata.get("default").song.title);
+            text.isMenuItem = true;
+            text.targetY = grpSongs.length;
+            grpSongs.add(text);
+        }
+        curSelected = 0;
+        curDifficulty = "normal";
+        curMix = "default";
+        changeSelection(0, true);
+    }
+
     public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
         if(by == 0 && !force)
             return;
@@ -128,21 +180,21 @@ class FreeplayState extends FunkinState {
         if(by == 0 && !force)
             return;
 
-        final song:FreeplaySongData = songs[curSelected];
-        final defaultMeta:SongMetadata = song.meta.get("default");
+        final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+        final defaultMeta:SongMetadata = song.metadata.get("default");
 
-        var meta:SongMetadata = song.meta.get(curMix);
+        var meta:SongMetadata = song.metadata.get(curMix);
         if(meta == null) {
             curMix = "default"; // fallback to default mix
             curDifficulty = "normal"; // attempt to fallback to normal diff, if this fails the code below should correct it
-            meta = song.meta.get(curMix);
+            meta = song.metadata.get(curMix);
         }
         var newDiffIndex:Int = meta.song.difficulties.indexOf(curDifficulty) + by;
 
         if(newDiffIndex < 0) {
             // go back a mix
             curMix = defaultMeta.song.mixes[FlxMath.wrap(defaultMeta.song.mixes.indexOf(curMix) - 1, 0, defaultMeta.song.mixes.length - 1)];
-            meta = song.meta.get(curMix);
+            meta = song.metadata.get(curMix);
 
             // reset difficulty to first of this mix
             curDifficulty = meta.song.difficulties.last() ?? "normal";
@@ -150,7 +202,7 @@ class FreeplayState extends FunkinState {
         else if(newDiffIndex > meta.song.difficulties.length - 1) {
             // go forward a mix
             curMix = defaultMeta.song.mixes[FlxMath.wrap(defaultMeta.song.mixes.indexOf(curMix) + 1, 0, defaultMeta.song.mixes.length - 1)];
-            meta = song.meta.get(curMix);
+            meta = song.metadata.get(curMix);
 
             // reset difficulty to first of this mix
             curDifficulty = meta.song.difficulties.first() ?? "normal";
@@ -175,18 +227,18 @@ class FreeplayState extends FunkinState {
 	}
 
     public function loadIntoCharter():Void {
-        final songData:FreeplaySongData = songs[curSelected];
+        final songData:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
         FlxG.switchState(ChartEditor.new.bind({
-            song: songData.data.id,
+            song: songData.id,
             difficulty: curDifficulty,
             mix: curMix
         }));
     }
 
     public function loadIntoSong():Void {
-        final songData:FreeplaySongData = songs[curSelected];
+        final songData:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
         FlxG.switchState(PlayState.new.bind({
-            song: songData.data.id,
+            song: songData.id,
             difficulty: curDifficulty,
             mix: curMix
         }));

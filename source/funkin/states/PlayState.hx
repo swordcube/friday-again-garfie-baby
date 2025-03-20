@@ -117,7 +117,7 @@ class PlayState extends FunkinState {
 			Paths.forceMod = lastParams.mod;
 		else {
 			Paths.forceMod = null;
-			if(instPath.startsWith('${ModManager.MOD_DIRECTORY}/'))
+			if(instPath.startsWith('${Paths.CONTENT_DIRECTORY}/'))
 				Paths.forceMod = instPath.split("/")[1];
 		}
 		if(lastParams._chart != null) {

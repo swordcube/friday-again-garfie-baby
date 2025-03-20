@@ -1,9 +1,9 @@
 package funkin.backend.scripting;
 
 #if SCRIPTING_ALLOWED
-import haxe.io.Path;
 import flixel.util.FlxSignal.FlxTypedSignal;
 import funkin.states.PlayState;
+import haxe.io.Path;
 
 class FunkinScript {
     public var code(default, null):String = null;
@@ -70,7 +70,7 @@ class FunkinScript {
         set("Control", funkin.backend.Controls.Control);
 
         setClass(Conductor);
-        setClass(ModManager);
+        setClass(GlobalScript);
         setClass(Constants);
 
         setClass(FunkinLua);

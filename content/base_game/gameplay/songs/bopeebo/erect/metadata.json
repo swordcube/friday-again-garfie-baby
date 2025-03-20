@@ -1,0 +1,42 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "bf",
+		"ratings": {}
+	},
+	"game": {
+		"stage": "stage",
+		"scrollSpeed": {
+			"nightmare": 2.2,
+			"erect": 2.2
+		},
+		"characters": {
+			"spectator": "gf",
+			"opponent": "dad",
+			"player": "bf"
+		},
+		"uiSkin": "default"
+	},
+	"song": {
+		"timingPoints": [
+			{
+				"b": 123,
+				"s": 0,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"artist": "Kawai Sprite (feat. Saruky)",
+		"charter": "Jenny Crowe + fabs",
+		"bpm": 123,
+		"difficulties": [
+			"erect",
+			"nightmare"
+		],
+		"mixes": [],
+		"title": "Bopeebo Erect"
+	}
+}

@@ -38,7 +38,10 @@ import funkin.backend.Options;
 import funkin.backend.Controls;
 
 import funkin.backend.Conductor;
-import funkin.backend.ModManager;
+
+#if SCRIPTING_ALLOWED
+import funkin.backend.scripting.GlobalScript;
+#end
 
 import funkin.ui.Cursor;
 

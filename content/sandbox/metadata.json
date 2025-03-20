@@ -1,0 +1,23 @@
+{
+    "apiVersion": "0.1.0",
+    "weeks": [
+        {
+            "tagline": "TESTING GROUNDS",
+            "characters": [null, "bf", null],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "songs": ["test", "tophat-guy", "tempo-katana"],
+            "freeplayCategory": "main"
+        }
+    ],
+    "freeplayCategories": [
+        {
+            "id": "main",
+            "name": "Sandbox - Main"
+        }
+    ],
+    "defaultCategory": "main"
+}

@@ -10,19 +10,19 @@
 
     "glyphs": {
         "'": {
-            "offset": {"x": 0, "y": -30}
+            "offset": {"x": 0, "y": 30}
         },
         "-": {
-            "offset": {"x": 0, "y": -20}
+            "offset": {"x": 0, "y": 20}
         },
         "=": {
-            "offset": {"x": 0, "y": -15}
+            "offset": {"x": 0, "y": 15}
         },
         "+": {
-            "offset": {"x": 0, "y": -15}
+            "offset": {"x": 0, "y": 15}
         },
         "^": {
-            "offset": {"x": 0, "y": -25}
+            "offset": {"x": 0, "y": 25}
         },
         "&": {
             "prefix": "and"
@@ -32,19 +32,19 @@
             "offset": {"x": 0, "y": 8}
         },
         "~": {
-            "offset": {"x": 0, "y": -20}
+            "offset": {"x": 0, "y": 20}
         },
         "“": {
             "prefix": "start parentheses",
-            "offset": {"x": 0, "y": -30}
+            "offset": {"x": 0, "y": 30}
         },
         "”": {
             "prefix": "end parentheses",
-            "offset": {"x": 0, "y": -30}
+            "offset": {"x": 0, "y": 30}
         },
         "\"": {
             "prefix": "end parentheses",
-            "offset": {"x": 0, "y": -30}
+            "offset": {"x": 0, "y": 30}
         },
         "!": {
             "prefix": "exclamation mark"

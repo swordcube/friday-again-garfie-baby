@@ -1,7 +1,10 @@
 # friday again garfie baby
 dumb dipshit fnf engine
 
-very experimental
+very experimental, gonna be used for sword's cubical saturday, which is
+my (currently unreleased) mod
+
+so expect some code specific to it later on (will be wrapped under the SCS define)
 
 # compiling guide
 ### **step 1:** install dependencies

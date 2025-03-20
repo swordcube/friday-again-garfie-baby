@@ -53,7 +53,10 @@ class InitState extends FlxState {
 
         // init controls and mod manager
         Controls.init();
-        ModManager.init();
+
+        #if SCRIPTING_ALLOWED
+        GlobalScript.init();
+        #end
 
         // init some flixel stuff
         FlxUtil.init();

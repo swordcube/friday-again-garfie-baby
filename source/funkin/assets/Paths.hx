@@ -1,6 +1,8 @@
 package funkin.assets;
 
 import haxe.io.Path;
+import haxe.ds.ReadOnlyArray;
+
 import sys.io.File;
 import sys.FileSystem;
 
@@ -11,8 +13,12 @@ import openfl.display.BitmapData;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.system.frontEnds.AssetFrontEnd;
 
-import haxe.ds.ReadOnlyArray;
+import funkin.backend.WeekData;
+import funkin.backend.ContentMetadata;
+
 import funkin.assets.loaders.AssetLoader;
+import funkin.assets.loaders.ContentAssetLoader;
+import funkin.assets.loaders.DefaultAssetLoader;
 
 enum AssetType {
     IMAGE;
@@ -23,8 +29,10 @@ enum AssetType {
     SCRIPT;
 }
 
+#if SCRIPTING_ALLOWED
+@:allow(funkin.backend.scripting.GlobalScript)
+#end
 @:allow(funkin.backend.WeekData)
-@:allow(funkin.backend.ModManager)
 class Paths {
     public static final ASSET_EXTENSIONS:Map<AssetType, Array<String>> = [
         IMAGE => [".png", ".jpg", ".jpeg", ".bmp"],
@@ -32,7 +40,12 @@ class Paths {
         FONT => [".ttf", ".otf"],
         SCRIPT => [".hx", ".hxs", ".hsc", ".hscript", ".lua"]
     ];
+    public static final CONTENT_DIRECTORY:String = "content";
+
     public static var forceMod:String = null;
+
+    public static var contentFolders:Array<String> = [];
+    public static var contentMetadata:Map<String, ContentMetadata> = [];
 
     /**
      * A list of every registered asset loader.
@@ -124,6 +137,7 @@ class Paths {
             
             return list;
         };
+        reloadContent();
     }
 
     public static function registerAssetLoader(id:String, loader:AssetLoader, ?priority:Int = 0):Void {
@@ -145,6 +159,61 @@ class Paths {
         _registeredAssetLoadersMap.remove(id);
     }
 
+    /**
+     * Returns the content directory used by the game
+     * to load in new content packs.
+     * 
+     * Mainly used to find content packs in the directory
+     * of the engine's source code rather than the export folder
+     * when compiling a build.
+     */
+    public static function getContentDirectory():String {
+        return '${Sys.args().contains("-livereload") ? "../../../../" : ""}${CONTENT_DIRECTORY}';
+    }
+
+    /**
+     * Scans for any content packs inside the content directory
+     * and loads them if they exist.
+     * 
+     * This will clear out any previously loaded content packs.
+     */
+    public static function reloadContent():Void {
+        contentFolders.clear();
+        contentMetadata.clear();
+
+        final contentDir:String = getContentDirectory();
+        final dirItems:Array<String> = FileSystem.readDirectory(contentDir);
+
+        for(i in 0...dirItems.length) {
+            final item:String = dirItems[i];
+            if(!FileSystem.isDirectory('${contentDir}/${item}'))
+                continue;
+            
+            contentFolders.push(item);
+        }
+        final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders.copy();
+        for(i in 0...loaders.length) {
+            final loader:AssetLoader = loaders[i];
+            Paths.unregisterAssetLoader(loader.id);
+        }
+        Paths.registerAssetLoader("default", new DefaultAssetLoader());
+
+        for(i in 0...contentFolders.length) {
+            final folder:String = contentFolders[i];
+            Paths.registerAssetLoader(folder, new ContentAssetLoader(folder));
+
+            final metaPath:String = Paths.json("metadata", folder);
+            if(FlxG.assets.exists(metaPath)) {
+                final parser:JsonParser<ContentMetadata> = new JsonParser<ContentMetadata>();
+                parser.ignoreUnknownVariables = true;
+
+                final meta:ContentMetadata = parser.fromJson(FlxG.assets.getText(metaPath));
+                meta.folder = folder;
+                contentMetadata.set(folder, meta);
+            }
+        }
+    }
+
     public static function getAsset(name:String, ?loaderID:String):String {
         if(loaderID == null || loaderID.length == 0)
             loaderID = Paths.forceMod;
@@ -159,7 +228,8 @@ class Paths {
         } else {
             final loader:AssetLoader = _registeredAssetLoadersMap.get(loaderID);
             final path:String = loader.getPath(name);
-            if(loader != null && FlxG.assets.exists(path))
+
+            if(FlxG.assets.exists(path))
                 return path;
         }
         return 'assets/${name}';

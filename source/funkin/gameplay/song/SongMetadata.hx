@@ -55,7 +55,7 @@ class SongMetadata {
 		final parser:JsonParser<SongMetadata> = new JsonParser<SongMetadata>();
 		parser.ignoreUnknownVariables = true;
 
-		final meta:SongMetadata = parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/songs/${song}/${mix}/meta', loaderID)));
+		final meta:SongMetadata = parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/songs/${song}/${mix}/metadata', loaderID)));
 		if(mix == "default")
 			meta.song.mixes.insert(0, "default");
 
