@@ -85,6 +85,8 @@ class PlayState extends FunkinState {
 	 */
 	public var camZoomingInterval:Int = -1;
 
+	public var chartingMode:Bool = false;
+
 	#if SCRIPTING_ALLOWED
 	public var scripts:FunkinScriptGroup;
 	public var noteTypeScripts:Map<String, FunkinScript> = [];
@@ -125,6 +127,8 @@ class PlayState extends FunkinState {
 			lastParams._chart = null; // this is only useful for changing difficulties mid song, so we don't need to keep this value
 		} else
 			currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
+
+		chartingMode = lastParams.chartingMode ?? false;
 		
 		FlxG.sound.playMusic(instPath, 0, false);
 		inst = FlxG.sound.music;
@@ -164,6 +168,9 @@ class PlayState extends FunkinState {
 		inst.pause();
 		inst.volume = 1;
 		inst.onComplete = finishSong;
+
+		WindowUtil.titlePrefix = (lastParams._unsaved) ? "* " : "";
+		WindowUtil.titleSuffix = (chartingMode) ? " - Chart Playtesting" : "";
 
 		#if SCRIPTING_ALLOWED
 		scripts = new FunkinScriptGroup();
@@ -284,7 +291,9 @@ class PlayState extends FunkinState {
 				difficulty: currentDifficulty,
 				mix: currentMix,
 				mod: lastParams.mod,
-				_chart: currentChart
+
+				_chart: currentChart,
+				_unsaved: lastParams._unsaved
 			}));
 		}
 		camGame.extraZoom = FlxMath.lerp(camGame.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
@@ -483,8 +492,13 @@ class PlayState extends FunkinState {
 		#end
 		PlayState.instance = null;
 		Paths.forceMod = null;
+
 		Conductor.instance.music = null;
 		Conductor.instance.offset = 0;
+		
+		WindowUtil.resetTitle();
+		WindowUtil.resetTitleAffixes();
+
 		super.destroy();
 	}
 }
@@ -500,6 +514,11 @@ typedef PlayStateParams = {
 
 	var ?mod:String;
 
+	var ?chartingMode:Bool;
+
 	@:noCompletion
 	var ?_chart:ChartData;
+
+	@:noCompletion
+	var ?_unsaved:Bool;
 }

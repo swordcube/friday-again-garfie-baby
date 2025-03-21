@@ -45,6 +45,8 @@ class UIState extends FunkinState {
 
     override function destroy():Void {
         Cursor.type = DEFAULT; // reset to default, since the state we're heading to may not be another UIState!
+        WindowUtil.resetTitleAffixes(); // reset window prefix & suffix to default
+        
         super.destroy();
     }
 }

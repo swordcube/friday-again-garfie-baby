@@ -47,6 +47,7 @@ import funkin.ui.Cursor;
 
 import funkin.utilities.Typedefs;
 import funkin.utilities.Constants;
+import funkin.utilities.WindowUtil;
 
 using StringTools;
 using funkin.utilities.ArrayUtil;

@@ -72,6 +72,7 @@ class FunkinScript {
         setClass(Conductor);
         setClass(GlobalScript);
         setClass(Constants);
+        setClass(WindowUtil); // this util only lets you change the title
 
         setClass(FunkinLua);
         setClass(FunkinHScript);

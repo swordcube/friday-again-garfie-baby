@@ -139,6 +139,8 @@ class ChartEditor extends UIState {
             currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
 
         undos = new UndoList<ChartEditorChange>();
+        undos.unsaved = lastParams._unsaved ?? false;
+
         Paths.iterateDirectory("gameplay/notetypes", (scriptPath:String) -> {
             if(Paths.isAssetType(scriptPath, SCRIPT))
                 noteTypes.push(Path.withoutDirectory(Path.withoutExtension(scriptPath)));
@@ -429,19 +431,21 @@ class ChartEditor extends UIState {
         noteCam.zoom = editorSettings.gridZoom;
         noteCam.scroll.y -= FlxG.height * 0.5;
         setPlaybackRate(editorSettings.playbackRate);
+
+        WindowUtil.titleSuffix = " - Chart Editor";
         
         super.create();
     }
 
     override function update(elapsed:Float) {
-        final isUIFocused:Bool = UIUtil.isAnyComponentFocused([grid]);
+        final isUIFocused:Bool = UIUtil.isAnyComponentFocused([grid, selectionBox]);
 
         FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY) && !isUIFocused;
         FlxG.mouse.getWorldPosition(noteCam, _mousePos);
 
         super.update(elapsed);
 
-        final isUIActive:Bool = UIUtil.isHoveringAnyComponent([grid]) || isUIFocused;
+        final isUIActive:Bool = UIUtil.isHoveringAnyComponent([grid, selectionBox]) || isUIFocused;
         noteCam.zoom = FlxMath.lerp(noteCam.zoom, editorSettings.gridZoom, FlxMath.getElapsedLerp(0.32, elapsed));
 
         @:privateAccess
@@ -486,7 +490,7 @@ class ChartEditor extends UIState {
             }
         }
 		if (!objectGroup._movingObjects) {
-            if(FlxG.mouse.justPressed && !isUIActive)
+            if(FlxG.mouse.pressed && FlxG.mouse.justMoved && !isUIActive)
                 _selectingObjects = true;
 
             if(_selectingObjects) {
@@ -532,7 +536,7 @@ class ChartEditor extends UIState {
                         selectionBox.kill();
                     });
                 }
-                else if(!objectGroup._movingObjects) {
+                else {
 					final direction:Int = Math.floor((_mousePos.x - objectGroup.x) / CELL_SIZE);
                     if(direction < 0 || direction >= (Constants.KEY_COUNT * 2))
                         selectObjects([]);
@@ -560,6 +564,7 @@ class ChartEditor extends UIState {
                 }
             }
         }
+        WindowUtil.titlePrefix = (undos.unsaved) ? "* " : "";
     }
 
     override function beatHit(beat:Int):Void {
@@ -586,7 +591,7 @@ class ChartEditor extends UIState {
     }
 
     public function playPause():Void {
-        if(UIUtil.isAnyComponentFocused([grid]))
+        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
 
         if(inst.playing) {
@@ -628,7 +633,7 @@ class ChartEditor extends UIState {
     }
 
     public function goBackABeat():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
 
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.floor(Conductor.instance.getBeatAtTime(Conductor.instance.time + (FlxMath.EPSILON * 1000))) - 1), 0, inst.length);
@@ -636,7 +641,7 @@ class ChartEditor extends UIState {
     }
 
     public function goBackAMeasure():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
         
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.floor(Conductor.instance.getMeasureAtTime(Conductor.instance.time + (FlxMath.EPSILON * 1000))) - 1), 0, inst.length);
@@ -644,7 +649,7 @@ class ChartEditor extends UIState {
     }
     
     public function goForwardABeat():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
         
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtBeat(Math.floor(Conductor.instance.getBeatAtTime(Conductor.instance.time + (FlxMath.EPSILON * 1000))) + 1), 0, inst.length);
@@ -652,7 +657,7 @@ class ChartEditor extends UIState {
     }
 
     public function goForwardAMeasure():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
         
         final newTime:Float = FlxMath.bound(Conductor.instance.getTimeAtMeasure(Math.floor(Conductor.instance.getMeasureAtTime(Conductor.instance.time + (FlxMath.EPSILON * 1000))) + 1), 0, inst.length);
@@ -660,49 +665,54 @@ class ChartEditor extends UIState {
     }
 
     public function goBackToStart():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
 
         seekToTime(0);
     }
 
     public function goToEnd():Void {
-        if(inst.playing || UIUtil.isAnyComponentFocused([grid]))
+        if(inst.playing || UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
 
         seekToTime(inst.length);
     }
 
     public function playTest():Void {
-        if(UIUtil.isAnyComponentFocused([grid]))
+        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
 
         lastParams = null;
         FlxG.switchState(PlayState.new.bind({
             song: currentSong,
             difficulty: currentDifficulty,
+
             mix: currentMix,
             mod: Paths.forceMod,
-            _chart: currentChart
+
+            chartingMode: true,
+
+            _chart: currentChart,
+            _unsaved: undos.unsaved
         }));
     }
 
     public function zoomIn():Void {
-        if(UIUtil.isAnyComponentFocused([grid]))
+        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
 
         editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom + 0.2, 2), 0.2, 2.0);
     }
 
     public function zoomOut():Void {
-        if(UIUtil.isAnyComponentFocused([grid]))
+        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
 
         editorSettings.gridZoom = FlxMath.bound(FlxMath.roundDecimal(editorSettings.gridZoom - 0.2, 2), 0.2, 2.0);
     }
 
     public function resetZoom():Void {
-        if(UIUtil.isAnyComponentFocused([grid]))
+        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
         
         editorSettings.gridZoom = 1.0;
@@ -748,12 +758,14 @@ class ChartEditor extends UIState {
             }
         }
         selectObjects(objects, true);
-        if(!unsafe)
+        if(!unsafe) {
+            undos.unsaved = true;
             undos.add(CAddObjects(objects));
+        }
     }
 
     public function addObjectOnCursor():Void {
-        if(UIUtil.isHoveringAnyComponent([grid]) || UIUtil.isAnyComponentFocused([grid]))
+        if(UIUtil.isHoveringAnyComponent([grid, selectionBox]) || UIUtil.isAnyComponentFocused([grid, selectionBox]))
             return;
 
         final snapMult:Float = CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
@@ -817,9 +829,10 @@ class ChartEditor extends UIState {
                 case CEvent(event): event.selected = true;
             }
         }
-        if(!unsafe)
+        if(!unsafe) {
+            undos.unsaved = true;
             undos.add(CSelectObjects(filteredObjects, selectedObjects.copy()));
-        
+        }
         selectedObjects = filteredObjects;
     }
 
@@ -838,8 +851,10 @@ class ChartEditor extends UIState {
             }
         }
         selectObjects([], true);
-        if(!unsafe)
+        if(!unsafe) {
+            undos.unsaved = true;
             undos.add(CRemoveObjects(objects)); 
+        }
     }
 
     public function rightClickObject(object:ChartEditorObject):Void {
@@ -1000,6 +1015,7 @@ class ChartEditor extends UIState {
     }
 
     public function save():Void {
+        undos.unsaved = false;
         if(currentSong == null || currentMix == null) {
             saveChartAs();
             FlxTimer.wait(0.1, () -> saveMetaAs());
@@ -1017,6 +1033,11 @@ class ChartEditor extends UIState {
     public function saveMetaAs():Void {
         final fileRef:FileReference = new FileReference();
         fileRef.save(SongMetadata.stringify(currentChart.meta), 'meta.json');
+    }
+
+    public function exit():Void {
+        // TODO: show a warning when chart is unsaved
+        FlxG.switchState(funkin.states.menus.FreeplayState.new);
     }
 
     public function undo():Void {
@@ -1052,6 +1073,7 @@ class ChartEditor extends UIState {
             default:
                 // do nothing           :p
         }
+        undos.unsaved = true;
     }
 
     public function redo():Void {
@@ -1087,6 +1109,7 @@ class ChartEditor extends UIState {
             default:
                 // do nothing           :p
         }
+        undos.unsaved = true;
     }
 
     //----------- [ Private API ] -----------//
@@ -1127,6 +1150,9 @@ typedef ChartEditorParams = {
 
 	@:noCompletion
 	var ?_chart:ChartData;
+
+    @:noCompletion
+    var ?_unsaved:Bool;
 }
 
 @:structInit
