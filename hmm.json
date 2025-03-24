@@ -14,7 +14,7 @@
       "name": "hxcpp",
       "type": "git",
       "dir": null,
-      "ref": "fa83d1964a4aac1e7a4bd68c75a962106324ddb6",
+      "ref": "master",
       "url": "https://github.com/HaxeFoundation/hxcpp"
     },
     {
@@ -33,7 +33,7 @@
       "name": "openfl",
       "type": "git",
       "dir": null,
-      "ref": "dev",
+      "ref": "develop",
       "url": "https://github.com/swordcubes-grave-of-shite/openfl"
     },
     {
