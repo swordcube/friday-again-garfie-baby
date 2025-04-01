@@ -3,6 +3,7 @@ package funkin.states.menus;
 import flixel.text.FlxText;
 
 import funkin.ui.AtlasText;
+import funkin.ui.AtlasTextList;
 
 import funkin.backend.WeekData;
 import funkin.backend.ContentMetadata;
@@ -28,7 +29,7 @@ class FreeplayState extends FunkinState {
     public var songs:Map<String, Array<FreeplaySongData>> = [];
     public var curSelected:Int = 0;
 
-    public var grpSongs:FlxTypedGroup<AtlasText>;
+    public var grpSongs:AtlasTextList;
 
     public var curDifficulty:String = "normal";
     public var curMix:String = "default";
@@ -37,6 +38,11 @@ class FreeplayState extends FunkinState {
 
     public var scoreText:FlxText;
     public var diffText:FlxText;
+
+    public var hintBG:FlxSprite;
+
+    public var hintText:FlxText;
+    public var categoryText:FlxText;
     
     override function create() {
         super.create();
@@ -45,7 +51,7 @@ class FreeplayState extends FunkinState {
         bg.screenCenter();
         add(bg);
 
-        grpSongs = new FlxTypedGroup();
+        grpSongs = new AtlasTextList();
         add(grpSongs);
 
         for(contentFolder in Paths.contentFolders) {
@@ -103,6 +109,20 @@ class FreeplayState extends FunkinState {
 		diffText.setFormat(Paths.font("fonts/vcr"), 24, FlxColor.WHITE, CENTER);
 		add(diffText);
 
+        hintBG = new FlxSprite().makeSolid(FlxG.width, 26, FlxColor.BLACK);
+		hintBG.y = FlxG.height - hintBG.height;
+		hintBG.alpha = 0.6;
+		add(hintBG);
+
+		hintText = new FlxText(hintBG.x, hintBG.y + 4, 0, "Q/E - Change Category | CTRL - Gameplay Modifiers");
+		hintText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, RIGHT);
+        hintText.x += FlxG.width - (hintText.width + 4);
+		add(hintText);
+
+        categoryText = new FlxText(hintBG.x + 4, hintBG.y + 4, 0, "N/A");
+		categoryText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, LEFT);
+		add(categoryText);
+
         changeCategory(0, true);
     }
 
@@ -116,24 +136,12 @@ class FreeplayState extends FunkinState {
         if(FlxG.keys.justPressed.E)
             changeCategory(1);
 
-        if(controls.justPressed.UI_UP)
-            changeSelection(-1);
-
-        if(controls.justPressed.UI_DOWN)
-            changeSelection(1);
-
         if(controls.justPressed.UI_LEFT)
             changeDifficulty(-1);
 
         if(controls.justPressed.UI_RIGHT)
             changeDifficulty(1);
 
-        if(controls.justPressed.ACCEPT) {
-            if(FlxG.keys.pressed.SHIFT)
-                loadIntoCharter();
-            else
-                loadIntoSong();
-        }
         super.update(elapsed);
     }
 
@@ -141,39 +149,26 @@ class FreeplayState extends FunkinState {
         if(by == 0 && !force)
             return;
 
-        while(grpSongs.length > 0) {
-            final song:AtlasText = grpSongs.members[0];
-            song.destroy();
-            grpSongs.remove(song, true);
-        }
+        grpSongs.clearList();
         curCategory = FlxMath.wrap(curCategory + by, 0, categories.length - 1);
         
         for(song in songs.get(categories[curCategory].id)) {
-            final text:AtlasText = new AtlasText(0, 0, "bold", LEFT, song.metadata.get("default").song.title);
-            text.isMenuItem = true;
-            text.targetY = grpSongs.length;
-            grpSongs.add(text);
+            grpSongs.addItem(song.metadata.get("default").song.title, {
+                onSelect: onChangeSelection,
+                onAccept: onAccept
+            });
         }
         curSelected = 0;
         curDifficulty = "normal";
         curMix = "default";
-        changeSelection(0, true);
+
+        categoryText.text = categories[curCategory].name;
+        grpSongs.changeSelection(0, true);
     }
 
-    public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
-        if(by == 0 && !force)
-            return;
-
-        var song:AtlasText = null;
-        curSelected = FlxMath.wrap(curSelected + by, 0, grpSongs.length - 1);
-        
-        for(i in 0...grpSongs.length) {
-            song = grpSongs.members[i];
-            song.targetY = i - curSelected;
-            song.alpha = (i == curSelected) ? 1.0 : 0.6;
-        }
+    public function onChangeSelection(index:Int, item:AtlasText):Void {
+        curSelected = index;
         changeDifficulty(0, true);
-        FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
     }
 
     public function changeDifficulty(by:Int = 0, ?force:Bool):Void {
@@ -225,6 +220,13 @@ class FreeplayState extends FunkinState {
 		diffText.x = Std.int(scoreBG.x + scoreBG.width / 2);
 		diffText.x -= (diffText.width / 2);
 	}
+
+    public function onAccept(index:Int, item:AtlasText):Void {
+        if(FlxG.keys.pressed.SHIFT)
+            loadIntoCharter();
+        else
+            loadIntoSong();
+    }
 
     public function loadIntoCharter():Void {
         final songData:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
