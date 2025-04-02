@@ -1,10 +1,9 @@
-package funkin.assets;
-
-import openfl.media.Sound;
-import openfl.utils.AssetCache as OpenFLAssetCache;
+package funkin.backend.assets;
 
 import flixel.graphics.frames.FlxFramesCollection;
 import funkin.gameplay.UISkin.UISkinData;
+import openfl.media.Sound;
+import openfl.utils.AssetCache as OpenFLAssetCache;
 
 class Cache {
     public static var atlasCache(default, never):Map<String, FlxFramesCollection> = [];

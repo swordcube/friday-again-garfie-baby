@@ -1,7 +1,7 @@
-package funkin.assets.loaders;
+package funkin.backend.assets.loaders;
 
-import sys.FileSystem;
 import haxe.ds.ReadOnlyArray;
+import sys.FileSystem;
 
 class AssetLoader {
     /**

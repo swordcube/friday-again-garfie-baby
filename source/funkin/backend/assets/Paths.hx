@@ -1,24 +1,19 @@
-package funkin.assets;
-
-import haxe.io.Path;
-import haxe.ds.ReadOnlyArray;
-
-import sys.io.File;
-import sys.FileSystem;
-
-import openfl.text.Font;
-import openfl.media.Sound;
-import openfl.display.BitmapData;
+package funkin.backend.assets;
 
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.system.frontEnds.AssetFrontEnd;
-
-import funkin.backend.WeekData;
 import funkin.backend.ContentMetadata;
-
-import funkin.assets.loaders.AssetLoader;
-import funkin.assets.loaders.ContentAssetLoader;
-import funkin.assets.loaders.DefaultAssetLoader;
+import funkin.backend.WeekData;
+import funkin.backend.assets.loaders.AssetLoader;
+import funkin.backend.assets.loaders.ContentAssetLoader;
+import funkin.backend.assets.loaders.DefaultAssetLoader;
+import haxe.ds.ReadOnlyArray;
+import haxe.io.Path;
+import openfl.display.BitmapData;
+import openfl.media.Sound;
+import openfl.text.Font;
+import sys.FileSystem;
+import sys.io.File;
 
 enum AssetType {
     IMAGE;

@@ -1,4 +1,4 @@
-package funkin.assets.loaders;
+package funkin.backend.assets.loaders;
 
 class ContentAssetLoader extends AssetLoader {
     public var folder:String;

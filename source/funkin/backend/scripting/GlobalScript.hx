@@ -1,9 +1,9 @@
 package funkin.backend.scripting;
 
 #if SCRIPTING_ALLOWED
-import funkin.assets.loaders.AssetLoader;
-import funkin.assets.loaders.ContentAssetLoader;
-import funkin.assets.loaders.DefaultAssetLoader;
+import funkin.backend.assets.loaders.AssetLoader;
+import funkin.backend.assets.loaders.ContentAssetLoader;
+import funkin.backend.assets.loaders.DefaultAssetLoader;
 import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
 

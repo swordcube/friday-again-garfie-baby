@@ -1,6 +1,6 @@
 package funkin.backend;
 
-import funkin.assets.loaders.AssetLoader;
+import funkin.backend.assets.loaders.AssetLoader;
 
 @:structInit
 class WeekData {

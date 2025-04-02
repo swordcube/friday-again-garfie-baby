@@ -2,35 +2,28 @@ package funkin.states;
 
 import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
-
 import funkin.backend.Conductor.IBeatReceiver;
-
-import funkin.gameplay.PlayField;
+import funkin.backend.assets.loaders.AssetLoader;
+import funkin.backend.scripting.events.*;
+import funkin.backend.scripting.events.gameplay.*;
+import funkin.backend.scripting.events.notes.*;
 import funkin.gameplay.FunkinCamera;
-
-import funkin.gameplay.song.ChartData;
-import funkin.gameplay.song.VocalGroup;
-
-import funkin.gameplay.stage.Stage;
+import funkin.gameplay.PlayField;
 import funkin.gameplay.character.Character;
-
 import funkin.gameplay.hud.*;
 import funkin.gameplay.hud.BaseHUD;
+import funkin.gameplay.song.ChartData;
+import funkin.gameplay.song.VocalGroup;
+import funkin.gameplay.stage.Stage;
+import funkin.states.editors.ChartEditor;
+import funkin.states.menus.FreeplayState;
 
 // import scripting events anyways because i'm too lazy
 // to make it work on no scripting mode lol!!
-import funkin.backend.scripting.events.*;
-import funkin.backend.scripting.events.notes.*;
-import funkin.backend.scripting.events.gameplay.*;
-
 #if SCRIPTING_ALLOWED
 import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
 #end
-import funkin.assets.loaders.AssetLoader;
-
-import funkin.states.menus.FreeplayState;
-import funkin.states.editors.ChartEditor;
 
 enum abstract CameraTarget(Int) from Int to Int {
 	final OPPONENT = 0;

@@ -87,7 +87,6 @@
 	<define name="SAVE_CRASH_LOGS" if="CRASH_HANDLER" unless="NO_SAVE_CRASH_LOGS" />
 
 	<!-- _____________________________ Path Settings ____________________________ -->
-
 	
 	<section unless="TEST_BUILD">
 		<!-- Don't copy content over if it's a test build -->
