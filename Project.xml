@@ -88,10 +88,10 @@
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 
-	<assets path="assets" type="template" />
 	
 	<section unless="TEST_BUILD">
 		<!-- Don't copy content over if it's a test build -->
+		<assets path="assets" type="template" />
 		<assets path="content" type="template" />
 		<assets path="tools" type="template" />
 	</section>
@@ -134,6 +134,7 @@
 	<!--Allow for easier support of custom asset loading-->
 	<haxedef name="FLX_CUSTOM_ASSETS_DIRECTORY" value="assets" />
 	<haxedef name="FLX_CUSTOM_RUNTIME_ASSETS_DIRECTORY" />
+	<haxedef name="FLX_NO_VALIDATE_CUSTOM_ASSETS_DIRECTORY" />
 
 	<!--Optimise inputs, be careful you will get null errors if you don't use conditionals in your game-->
 	<haxedef name="FLX_NO_MOUSE" if="mobile" />

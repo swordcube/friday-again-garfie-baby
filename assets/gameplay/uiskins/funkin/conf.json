@@ -137,6 +137,77 @@
             }
         }
     },
+    "splash": {
+        "atlas": {
+            "type": "sparrow",
+            "path": "images/splashes"
+        },
+        "alpha": 0.6,
+        "scale": 1,
+        
+        "animation": {
+            "splash1": {
+                "left": {
+                    "prefix": "note splash 1 left",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "note splash 1 down",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "note splash 1 up",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "note splash 1 right",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            },
+            "splash2": {
+                "left": {
+                    "prefix": "note splash 2 left",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "note splash 2 down",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "note splash 2 up",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "note splash 2 right",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            }
+        }
+    },
     "hold": {
         "atlas": {
             "type": "sparrow",

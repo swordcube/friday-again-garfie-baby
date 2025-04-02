@@ -45,11 +45,6 @@ class NoteSpawner extends FlxBasic {
     }
 
     @:noCompletion
-    private function _holdTrailFactory():HoldTrail {
-        return new HoldTrail(-999999, -999999);
-    }
-
-    @:noCompletion
     private function set_pendingNotes(newPendingNotes:Array<NoteData>):Array<NoteData> {
         newPendingNotes.sort((a, b) -> Std.int(a.time - b.time));
         return pendingNotes = newPendingNotes;

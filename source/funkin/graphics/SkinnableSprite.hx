@@ -34,6 +34,13 @@ typedef AnimationData = {
 @:structInit
 class SkinnableSpriteData {
 	public var atlas:AtlasData;
+	
+    @:optional
+    @:default(1.0)
+    public var alpha:Float;
+
+    @:optional
+    @:default(1.0)
 	public var scale:Float;
 
 	@:optional

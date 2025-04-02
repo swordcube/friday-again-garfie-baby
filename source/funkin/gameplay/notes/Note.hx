@@ -75,7 +75,7 @@ class Note extends SkinnableSprite {
         // which i underestimated when writing this comment
         // holy SHIT there's a lot to account for
         angle = 0;
-        alpha = 1;
+        alpha = _skinData.alpha;
         shader = null;
         visible = true;
         wasHit = false;
@@ -83,10 +83,11 @@ class Note extends SkinnableSprite {
         frameOffset.set();
         color = FlxColor.WHITE;
 
-        holdTrail.alpha = 1;
-        holdTrail.strip.alpha = 1;
-        holdTrail.tail.alpha = 1;
-
+        @:privateAccess {
+            holdTrail.alpha = holdTrail.strip._skinData.alpha;
+            holdTrail.strip.alpha = holdTrail.strip._skinData.alpha;
+            holdTrail.tail.alpha = holdTrail.strip._skinData.alpha;
+        }
         holdTrail.angle = 0;
         holdTrail.visible = true;
 

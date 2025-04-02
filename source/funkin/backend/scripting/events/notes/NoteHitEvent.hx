@@ -47,6 +47,12 @@ class NoteHitEvent extends ScriptEvent {
     public var rating:String;
 
     /**
+     * Whether or not to show a note splash, usually
+     * similar to a firework effect, upon hitting this note.
+     */
+    public var showSplash:Bool;
+
+    /**
      * Whether or not to show the rating of
      * the note that was hit.
      */

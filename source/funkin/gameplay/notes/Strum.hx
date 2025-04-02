@@ -41,7 +41,7 @@ class Strum extends SkinnableSprite {
         super.update(elapsed);
     }
 
-    override function loadSkin(newSkin:String) {
+    override function loadSkin(newSkin:String):Void {
         if(_skin == newSkin)
             return;
 

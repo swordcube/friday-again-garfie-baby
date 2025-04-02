@@ -68,7 +68,11 @@ class GlobalScript {
         for(i in 0...Paths._registeredAssetLoaders.length) {
 			// go thru all asset loaders
             final loader:AssetLoader = Paths._registeredAssetLoaders[i];
-            final globalScriptPath:String = Paths.script("global", loader.id);
+
+			// the extra false is to prevent this falling back to assets/global.hxs
+			// which would effectively load the main global script for as many content packs
+			// as there are that don't have a global script
+            final globalScriptPath:String = Paths.script("global", loader.id, false);
 			
             if(FlxG.assets.exists(globalScriptPath)) {
                 // if global script for this asset loader exists, load it

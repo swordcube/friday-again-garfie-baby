@@ -14,7 +14,8 @@ class CountdownData {
 	public var scale:Float;
 
 	@:optional
-	public var antialiasing:Bool;
+	@:default(null)
+	public var antialiasing:Null<Bool>;
 
 	public var animation:Map<String, Map<String, AnimationData>>;//DynamicAccess<DynamicAccess<AnimationData>>;
 
@@ -25,6 +26,7 @@ class CountdownData {
 class UISkinData {
 	public var strum:SkinnableSpriteData;
 	public var note:SkinnableSpriteData;
+	public var splash:SkinnableSpriteData;
 	public var hold:SkinnableSpriteData;
 
 	public var rating:SkinnableSpriteData;

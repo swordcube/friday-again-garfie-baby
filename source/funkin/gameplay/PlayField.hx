@@ -92,7 +92,7 @@ class PlayField extends FlxGroup {
         final isPlayer:Bool = note.strumLine == playerStrumLine;
         onNoteHit.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
-            true, false, judgement, isPlayer, !isPlayer,
+            true, false, judgement, isPlayer && Scoring.splashAllowed(judgement), isPlayer, !isPlayer,
             Scoring.scoreNote(note, timestamp), Scoring.getAccuracyScore(judgement), 0.0115,
             Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true, true, null, ""
         ));
@@ -124,6 +124,9 @@ class PlayField extends FlxGroup {
             stats.accuracyScore += event.accuracyScore;
             stats.totalNotesHit++;
         }
+        if(event.showSplash)
+            event.note.strumLine.showSplash(event.direction);
+        
         if(event.showRating) {
             // TODO: this shit
         }

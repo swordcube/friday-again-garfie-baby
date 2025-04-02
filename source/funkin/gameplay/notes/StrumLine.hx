@@ -7,6 +7,7 @@ class StrumLine extends FlxSpriteGroup {
     public var strums:FlxTypedSpriteGroup<Strum>;
     public var notes:FlxTypedSpriteGroup<Note>;
     public var holdTrails:FlxTypedSpriteGroup<HoldTrail>;
+    public var splashes:FlxTypedSpriteGroup<NoteSplash>;
 
     public var downscroll:Bool = false;
     public var botplay:Bool = false;
@@ -29,6 +30,9 @@ class StrumLine extends FlxSpriteGroup {
         notes = new FlxTypedSpriteGroup<Note>();
         add(notes);
 
+        splashes = new FlxTypedSpriteGroup<NoteSplash>();
+        add(splashes);
+
         for(i in 0...Constants.KEY_COUNT) {
             final strum:Strum = new Strum((i - (Constants.KEY_COUNT * 0.5)) * Constants.STRUM_SPACING, 0, i, skin);
             strum.strumLine = this;
@@ -39,6 +43,25 @@ class StrumLine extends FlxSpriteGroup {
             note.kill();
             notes.add(note);
         }
+        for(i in 0...8) {
+            final splash:NoteSplash = new NoteSplash().setup(this, i % Constants.KEY_COUNT, strums.members[i % Constants.KEY_COUNT].skin);
+            splash.kill();
+            splashes.add(splash);
+        }
+        @:privateAccess {
+            // force this splash to draw to force it
+            // into vram, since flixel only puts the shit in vram when the sprite is drawn
+            // instead of immediately as the graphic is loaded
+            final cacheSplash:NoteSplash = splashes.members[0];
+            cacheSplash.alpha = 0.001;
+            cacheSplash.drawComplex(FlxG.camera);
+        }
+    }
+
+    public function showSplash(direction:Int):Void {
+        final strum:Strum = strums.members[direction];
+        final splash:NoteSplash = splashes.recycle(_splashFactory).setup(this, direction, strum.skin);
+        splash.setPosition(strum.x - ((splash.width - strum.width) * 0.5), strum.y - ((splash.height - strum.height) * 0.5));
     }
 
     public function processNote(note:Note):Void {
@@ -124,5 +147,9 @@ class StrumLine extends FlxSpriteGroup {
     override function update(elapsed:Float) {
         notes.forEachAlive(processNote);
         super.update(elapsed);
+    }
+
+    private function _splashFactory():NoteSplash {
+        return new NoteSplash();
     }
 }

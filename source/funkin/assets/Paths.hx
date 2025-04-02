@@ -137,6 +137,7 @@ class Paths {
             
             return list;
         };
+        FlxG.bitmap.autoClearCache = false;
         reloadContent();
     }
 
@@ -214,7 +215,7 @@ class Paths {
         }
     }
 
-    public static function getAsset(name:String, ?loaderID:String):String {
+    public static function getAsset(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
         if(loaderID == null || loaderID.length == 0)
             loaderID = Paths.forceMod;
 
@@ -232,59 +233,59 @@ class Paths {
             if(FlxG.assets.exists(path))
                 return path;
         }
-        return 'assets/${name}';
+        return (useFallback) ? 'assets/${name}' : null;
     }
 
-    public static function image(name:String, ?loaderID:String):String {
+    public static function image(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
         final exts:Array<String> = ASSET_EXTENSIONS.get(IMAGE);
         for(i in 0...exts.length) {
-            final path:String = getAsset('${name}${exts[i]}', loaderID);
+            final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
             if(FlxG.assets.exists(path))
                 return path;
         }
-        return getAsset('${name}.png');
+        return getAsset('${name}.png', loaderID, useFallback);
     }
 
-    public static function sound(name:String, ?loaderID:String):String {
+    public static function sound(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
         final exts:Array<String> = ASSET_EXTENSIONS.get(SOUND);
         for(i in 0...exts.length) {
-            final path:String = getAsset('${name}${exts[i]}', loaderID);
+            final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
             if(FlxG.assets.exists(path))
                 return path;
         }
-        return getAsset('${name}.ogg');
+        return getAsset('${name}.ogg', loaderID, useFallback);
     }
 
-    public static function font(name:String, ?loaderID:String):String {
+    public static function font(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
         final exts:Array<String> = ASSET_EXTENSIONS.get(FONT);
         for(i in 0...exts.length) {
-            final path:String = getAsset('${name}${exts[i]}', loaderID);
+            final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
             if(FlxG.assets.exists(path))
                 return path;
         }
-        return getAsset('${name}.ttf', loaderID);
+        return getAsset('${name}.ttf', loaderID, useFallback);
     }
 
-    public static function json(name:String, ?loaderID:String):String {
-        return getAsset('${name}.json', loaderID);
+    public static function json(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        return getAsset('${name}.json', loaderID, useFallback);
     }
 
-    public static function xml(name:String, ?loaderID:String):String {
-        return getAsset('${name}.xml', loaderID);
+    public static function xml(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        return getAsset('${name}.xml', loaderID, useFallback);
     }
 
-    public static function txt(name:String, ?loaderID:String):String {
-        return getAsset('${name}.txt', loaderID);
+    public static function txt(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        return getAsset('${name}.txt', loaderID, useFallback);
     }
 
-    public static function script(name:String, ?loaderID:String):String {
+    public static function script(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
         final exts:Array<String> = ASSET_EXTENSIONS.get(SCRIPT);
         for(i in 0...exts.length) {
-            final path:String = getAsset('${name}${exts[i]}', loaderID);
+            final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
             if(FlxG.assets.exists(path))
                 return path;
         }
-        return getAsset('${name}.hx');
+        return getAsset('${name}.hx', loaderID, useFallback);
     }
 
     public static function isAssetType(path:String, type:AssetType):Bool {
@@ -296,11 +297,11 @@ class Paths {
         return false;
     }
 
-    public static function getSparrowAtlas(name:String, ?loaderID:String):FlxAtlasFrames {
+    public static function getSparrowAtlas(name:String, ?loaderID:String, ?useFallback:Bool = true):FlxAtlasFrames {
         if(Cache.atlasCache.get(name) == null) {
             final atlas:FlxAtlasFrames = FlxAtlasFrames.fromSparrow(
-                image(name, loaderID),
-                xml(name, loaderID)
+                image(name, loaderID, useFallback),
+                xml(name, loaderID, useFallback)
             );
             if(atlas.parent != null) {
                 atlas.parent.persist = true;

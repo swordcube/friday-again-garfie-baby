@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Created with Funkin Packer v0.1.3 https://neeeoo.github.io/funkin-packer/
+-->
+<TextureAtlas imagePath="texture.png" width="1600" height="1600">
+	<SubTexture name="right splash0000" x="511.5" y="867.5" width="254" height="256.5" frameX="-30.5" frameY="-39" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="right splash0001" x="0.5" y="293.5" width="282" height="291.5" frameX="-14" frameY="-20.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="right splash0002" x="567.5" y="578.5" width="271" height="287.5" frameX="-11" frameY="-13.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="right splash0003" x="840" y="281.5" width="271.5" height="279.5" frameX="-11" frameY="-16" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="right splash0004" x="1232" y="1119.5" width="209.5" height="231" frameX="-34.5" frameY="-38" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="right splash0005" x="543.5" y="1368.5" width="164.5" height="165" frameX="-56.5" frameY="-68" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="right splash0006" x="1022.5" y="964.5" width="144.5" height="141" frameX="-76.5" frameY="-93.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="right splash0007" x="1367.5" y="218.5" width="232" height="216.5" frameX="-33.5" frameY="-62" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="right splash0008" x="1113" y="482.5" width="253" height="239.5" frameX="-24.5" frameY="-50" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="right splash0009" x="499.5" y="1133.5" width="248" height="233.5" frameX="-26.5" frameY="-52" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0000" x="0.5" y="875.5" width="254" height="256.5" frameX="-30.5" frameY="-39" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0001" x="0.5" y="0.5" width="282" height="291.5" frameX="-14" frameY="-20.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0002" x="567.5" y="0.5" width="271" height="287.5" frameX="-11" frameY="-13.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0003" x="273" y="586.5" width="271.5" height="279.5" frameX="-11" frameY="-16" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0004" x="1367.5" y="654.5" width="209.5" height="231" frameX="-34.5" frameY="-38" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0005" x="211.5" y="1368.5" width="164.5" height="165" frameX="-56.5" frameY="-68" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0006" x="1443" y="1119.5" width="144.5" height="141" frameX="-76.5" frameY="-93.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0007" x="998.5" y="1125.5" width="232" height="216.5" frameX="-33.5" frameY="-62" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0008" x="1113" y="0.5" width="253" height="239.5" frameX="-24.5" frameY="-50" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="down splash0009" x="0.5" y="1133.5" width="248" height="233.5" frameX="-26.5" frameY="-52" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0000" x="256" y="875.5" width="254" height="256.5" frameX="-30.5" frameY="-39" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0001" x="284" y="0.5" width="282" height="291.5" frameX="-14" frameY="-20.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0002" x="567.5" y="289.5" width="271" height="287.5" frameX="-11" frameY="-13.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0003" x="840" y="0.5" width="271.5" height="279.5" frameX="-11" frameY="-16" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0004" x="1367.5" y="887" width="209.5" height="231" frameX="-34.5" frameY="-38" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0005" x="377.5" y="1368.5" width="164.5" height="165" frameX="-56.5" frameY="-68" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0006" x="1443" y="1262" width="144.5" height="141" frameX="-76.5" frameY="-93.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0007" x="1367.5" y="0.5" width="232" height="216.5" frameX="-33.5" frameY="-62" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0008" x="1113" y="241.5" width="253" height="239.5" frameX="-24.5" frameY="-50" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="left splash0009" x="250" y="1133.5" width="248" height="233.5" frameX="-26.5" frameY="-52" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0000" x="767" y="867.5" width="254" height="256.5" frameX="-30.5" frameY="-39" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0001" x="284" y="293.5" width="282" height="291.5" frameX="-14" frameY="-20.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0002" x="0.5" y="586.5" width="271" height="287.5" frameX="-11" frameY="-13.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0003" x="840" y="562.5" width="271.5" height="279.5" frameX="-11" frameY="-16" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0004" x="0.5" y="1368.5" width="209.5" height="231" frameX="-34.5" frameY="-38" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0005" x="709.5" y="1368.5" width="164.5" height="165" frameX="-56.5" frameY="-68" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0006" x="1168.5" y="964.5" width="144.5" height="141" frameX="-76.5" frameY="-93.5" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0007" x="1367.5" y="436.5" width="232" height="216.5" frameX="-33.5" frameY="-62" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0008" x="1113" y="723.5" width="253" height="239.5" frameX="-24.5" frameY="-50" frameWidth="320" frameHeight="320"/>
+	<SubTexture name="up splash0009" x="749" y="1125.5" width="248" height="233.5" frameX="-26.5" frameY="-52" frameWidth="320" frameHeight="320"/>
+</TextureAtlas>

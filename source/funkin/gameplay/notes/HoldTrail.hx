@@ -77,14 +77,15 @@ class HoldTrail extends FlxSpriteGroup {
     private function set_skin(newSkin:String):String {
         if(skin != newSkin) {
             skin = newSkin;
+            @:privateAccess {
+                strip.loadSkin(skin);
+                strip.alpha = strip._skinData.alpha;
     
-            strip.loadSkin(skin);
-            strip.alpha = 1;
-
-            tail.loadSkin(skin);
-            tail.alpha = 1;
-            
-            @:bypassAccessor alpha = 1;
+                tail.loadSkin(skin);
+                tail.alpha = strip._skinData.alpha;
+                
+                @:bypassAccessor alpha = strip._skinData.alpha;
+            }
             height = height;
         }
         return skin;

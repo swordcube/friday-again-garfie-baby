@@ -77,8 +77,10 @@ class PBotSystem extends ScoringSystem {
         
         for(i in 0..._judgementList.length) {
             final judgement:String = _judgementList[i];
-            if(diff >= getJudgementTiming(judgement))
+            if(diff <= getJudgementTiming(judgement)) {
                 result = judgement;
+                break;
+            }
         }
         return result;
     }
@@ -98,7 +100,7 @@ class PBotSystem extends ScoringSystem {
 
     @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.splashAllowed)
     override function splashAllowed(judgement:String):Bool {
-        return judgement == "sick";
+        return judgement == "killer" || judgement == "sick";
     }
 
     @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.holdHealthIncreasingAllowed)
@@ -115,5 +117,5 @@ class PBotSystem extends ScoringSystem {
     // [ Private API ] //
     // --------------- //
 
-    private static final _judgementList:Array<String> = ["sick", "good", "bad", "shit"];
+    private static final _judgementList:Array<String> = ["killer", "sick", "good", "bad", "shit"];
 }
