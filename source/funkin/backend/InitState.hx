@@ -26,7 +26,7 @@ class InitState extends FlxState {
         // should be line buffered now, but it instead does nothing
         // so i have to do this now :/
         // 
-        // TODO: better solution, this sucks and only works on hxcpp
+        // TODO: better solution, this sucks
         untyped __cpp__("setbuf(stdout, 0)");
         #end
 

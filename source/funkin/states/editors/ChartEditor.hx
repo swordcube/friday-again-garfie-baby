@@ -32,11 +32,10 @@ import funkin.substates.charter.*;
 
 import funkin.utilities.UndoList;
 
-// TODO: undos & redos
 // TODO: chart metadata window
 
 // TODO: allow the user to edit events (along with a popup when placing a new one)
-// TODO: have some way to place & select timing points
+// TODO: have some way to place & select timing points (maybe just treat them as if they were events??)
 
 // TODO: waveforms for inst and each vocal track
 

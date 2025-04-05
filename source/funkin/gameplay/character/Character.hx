@@ -243,7 +243,6 @@ class Character extends FlxSprite implements IBeatReceiver {
     }
 
     public function beatHit(beat:Int):Void {
-        // TODO: script calls??
         final canDance:Bool = danceInterval > 0 && (beat % danceInterval == 0);
         switch(curAnimContext) {
             case SING:
