@@ -1036,6 +1036,10 @@ class ChartEditor extends UIState {
 
     public function exit():Void {
         // TODO: show a warning when chart is unsaved
+        FlxG.sound.music.looped = true;
+        FlxG.sound.music.onComplete = null;
+        FlxG.sound.music.play();
+
         FlxG.switchState(funkin.states.menus.FreeplayState.new);
     }
 
