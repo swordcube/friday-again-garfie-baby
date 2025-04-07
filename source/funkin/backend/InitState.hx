@@ -68,7 +68,7 @@ class InitState extends FlxState {
             }
             _lastState = Type.getClass(newState);
         });
-        WindowUtil.resetTitle();
+        WindowUtil.init();
 
         // init cursor
         Cursor.init();

@@ -3,6 +3,8 @@ package funkin.states.editors;
 import haxe.io.Path;
 import sys.io.File;
 
+import lime.system.System;
+
 import openfl.geom.Rectangle;
 import openfl.net.FileReference;
 import openfl.display.BitmapData;
@@ -29,6 +31,7 @@ import funkin.gameplay.song.SongMetadata;
 import funkin.gameplay.song.VocalGroup;
 
 import funkin.substates.charter.*;
+import funkin.substates.UnsavedWarningSubState;
 
 import funkin.utilities.UndoList;
 
@@ -38,6 +41,7 @@ import funkin.utilities.UndoList;
 // TODO: have some way to place & select timing points (maybe just treat them as if they were events??)
 
 // TODO: waveforms for inst and each vocal track
+// TODO: performers for the opponent & player notes (kinda like fps plus lil buddies, won't be on by default)
 
 @:allow(funkin.ui.charter.CharterObjectGroup)
 class ChartEditor extends UIState {
@@ -98,6 +102,7 @@ class ChartEditor extends UIState {
     public var uiLayer:FlxContainer;
 
     public var visualMetronome:CharterVisualMetronome;
+    public var miniPerformers:CharterMiniPerformers;
 
     public var topBar:CharterTopBar;
     public var playBar:CharterPlayBar;
@@ -151,7 +156,7 @@ class ChartEditor extends UIState {
         Conductor.instance.autoIncrement = false;
         Conductor.instance.hasMetronome = editorSettings.metronome;
 
-        Conductor.instance.reset(currentChart.meta.song.bpm);
+        Conductor.instance.reset(currentChart.meta.song.timingPoints.first()?.bpm ?? 100);
 		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
 
         FlxG.sound.playMusic(instPath, 0, false);
@@ -310,12 +315,16 @@ class ChartEditor extends UIState {
                 return;
 
             if(note.data.direction < Constants.KEY_COUNT) {
+                miniPerformers.opponent.sing(note.data.direction % Constants.KEY_COUNT, Math.max(note.data.length, 0.0) + (Conductor.instance.stepLength * 4));
                 opponentStrumLine.glowStrum(note.data.direction % Constants.KEY_COUNT, Math.max(note.data.length, Conductor.instance.stepLength));
+                
                 if(editorSettings.opponentHitsounds)
                     FlxG.sound.play(Paths.sound('editors/charter/sfx/hitsound'));
             }
             else {
+                miniPerformers.player.sing(note.data.direction % Constants.KEY_COUNT, Math.max(note.data.length, 0.0) + (Conductor.instance.stepLength * 4));
                 playerStrumLine.glowStrum(note.data.direction % Constants.KEY_COUNT, Math.max(note.data.length, Conductor.instance.stepLength));
+                
                 if(editorSettings.playerHitsounds)
                     FlxG.sound.play(Paths.sound('editors/charter/sfx/hitsound'));
             }
@@ -405,6 +414,16 @@ class ChartEditor extends UIState {
         visualMetronome.bigBars.visible = false;
         uiLayer.add(visualMetronome);
 
+        miniPerformers = new CharterMiniPerformers(0, FlxG.height - 40);
+        miniPerformers.y -= miniPerformers.bg.height;
+        miniPerformers.cameras = [uiCam];
+        miniPerformers.screenCenter(X);
+
+        if(!editorSettings.miniPerformers)
+            miniPerformers.visible = false;
+
+        uiLayer.add(miniPerformers);
+
         topBar = new CharterTopBar();
         topBar.zIndex = 1;
         uiLayer.add(topBar);
@@ -432,7 +451,25 @@ class ChartEditor extends UIState {
         setPlaybackRate(editorSettings.playbackRate);
 
         WindowUtil.titleSuffix = " - Chart Editor";
-        
+        WindowUtil.onClose = () -> {
+            if(!WindowUtil.preventClosing)
+                return;
+
+            if(inst.playing)
+                playPause();
+
+            final warning = new UnsavedWarningSubState();
+            warning.onAccept.add(() -> {
+                WindowUtil.preventClosing = false;
+                WindowUtil.resetClosing();
+                System.exit(0);
+            });
+            warning.onCancel.add(() -> {
+                WindowUtil.resetClosing();
+                warning.close();
+            });
+            openSubState(warning);
+        };
         super.create();
     }
 
@@ -564,6 +601,7 @@ class ChartEditor extends UIState {
             }
         }
         WindowUtil.titlePrefix = (undos.unsaved) ? "* " : "";
+        WindowUtil.preventClosing = undos.unsaved;
     }
 
     override function beatHit(beat:Int):Void {
@@ -586,6 +624,11 @@ class ChartEditor extends UIState {
         
         FlxG.sound.acceptInputs = true;
         Paths.forceMod = null;
+
+        WindowUtil.preventClosing = false;
+        WindowUtil.onClose = null;
+        WindowUtil.resetClosing();
+
         super.destroy();
     }
 
@@ -677,10 +720,7 @@ class ChartEditor extends UIState {
         seekToTime(inst.length);
     }
 
-    public function playTest():Void {
-        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
-            return;
-
+    public function unsafePlayTest():Void {
         lastParams = null;
         FlxG.switchState(PlayState.new.bind({
             song: currentSong,
@@ -694,6 +734,13 @@ class ChartEditor extends UIState {
             _chart: currentChart,
             _unsaved: undos.unsaved
         }));
+    }
+
+    public function playTest():Void {
+        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
+            return;
+
+        unsafePlayTest();
     }
 
     public function zoomIn():Void {
@@ -943,6 +990,11 @@ class ChartEditor extends UIState {
         visualMetronome.tick(true);
     }
 
+    public function toggleMiniPerformers(value:Bool):Void {
+        editorSettings.miniPerformers = value;
+        miniPerformers.visible = editorSettings.miniPerformers;
+    }
+
     public function toggleInstrumental(value:Bool):Void {
         editorSettings.muteInstrumental = value;
         inst.muted = editorSettings.muteInstrumental;
@@ -1034,13 +1086,26 @@ class ChartEditor extends UIState {
         fileRef.save(SongMetadata.stringify(currentChart.meta), 'meta.json');
     }
 
-    public function exit():Void {
-        // TODO: show a warning when chart is unsaved
+    public function unsafeExit():Void {
         FlxG.sound.music.looped = true;
         FlxG.sound.music.onComplete = null;
         FlxG.sound.music.play();
 
         FlxG.switchState(funkin.states.menus.FreeplayState.new);
+    }
+
+    public function exit():Void {
+        if(undos.unsaved) {
+            if(inst.playing)
+                playPause();
+
+            final warning = new UnsavedWarningSubState();
+            warning.onAccept.add(unsafeExit);
+            warning.onCancel.add(warning.close);
+            openSubState(warning);
+            return;
+        }
+        unsafeExit();
     }
 
     public function undo():Void {
@@ -1166,6 +1231,7 @@ class ChartEditorSettings {
     public var gridSnap:Int = 16;
     public var metronome:Bool = false;
     public var visualMetronome:Bool = false;
+    public var miniPerformers:Bool = false;
 
     public var muteInstrumental:Bool = false;
     public var muteAllVocals:Bool = false;

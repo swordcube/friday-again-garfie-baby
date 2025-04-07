@@ -143,9 +143,13 @@ class CharterTopBar extends TopBar {
                 Checkbox("Play player hitsounds", (value:Bool) -> ChartEditor.editorSettings.playerHitsounds = value, () -> return ChartEditor.editorSettings.playerHitsounds),
 
                 Separator,
-
+                
                 Checkbox("Metronome", (value:Bool) -> charter.toggleMetronome(!ChartEditor.editorSettings.metronome), () -> return ChartEditor.editorSettings.metronome),
                 Checkbox("Visual metronome", (value:Bool) -> charter.toggleVisualMetronome(!ChartEditor.editorSettings.visualMetronome), () -> return ChartEditor.editorSettings.visualMetronome),
+                
+                Separator,
+                
+                Checkbox("Mini performers", (value:Bool) -> charter.toggleMiniPerformers(!ChartEditor.editorSettings.miniPerformers), () -> return ChartEditor.editorSettings.miniPerformers),
             ]),
             Textbox(Std.string(ChartEditor.editorSettings.playbackRate), (value:String) -> charter.setPlaybackRate(Std.parseFloat(value)), 4, true, null, () -> return Std.string(ChartEditor.editorSettings.playbackRate)),
             Slider(0.25, 3, 0.01, ChartEditor.editorSettings.playbackRate, 130, (value:Float) -> charter.setPlaybackRate(value), () -> return ChartEditor.editorSettings.playbackRate),

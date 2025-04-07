@@ -158,7 +158,7 @@ class PlayState extends FunkinState {
 		Conductor.instance.offset = Options.songOffset + inst.latency;
 		Conductor.instance.autoIncrement = true;
 		
-		Conductor.instance.reset(currentChart.meta.song.bpm);
+		Conductor.instance.reset(currentChart.meta.song.timingPoints.first()?.bpm ?? 100.0);
 		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
 		
 		Conductor.instance.time = -((Conductor.instance.beatLength * 4) + Conductor.instance.offset);
@@ -280,8 +280,10 @@ class PlayState extends FunkinState {
 		if(startingSong && Conductor.instance.time >= -Conductor.instance.offset)
 			startSong();
 
-		if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.END)
+		if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.END) {
+			// TODO: warning for unsaved charts
 			endSong(); // end the song immediately when SHIFT + END is pressed, as emergency
+		}
 
 		if(controls.justPressed.DEBUG) {
 			FlxG.switchState(ChartEditor.new.bind({

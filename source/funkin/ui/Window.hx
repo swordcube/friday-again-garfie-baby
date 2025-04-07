@@ -78,8 +78,12 @@ class Window extends UIComponent {
     }
 
     public function close():Void {
-        onClose.dispatch();
         destroy();
+    }
+    
+    override function destroy():Void {
+        onClose.dispatch();
+        super.destroy();
     }
 
     private var _pendingComponents:Array<FlxSprite> = [];

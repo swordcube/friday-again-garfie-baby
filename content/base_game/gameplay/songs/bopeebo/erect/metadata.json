@@ -21,7 +21,6 @@
 		"timingPoints": [
 			{
 				"b": 123,
-				"s": 0,
 				"t": 0,
 				"ts": [
 					4,
@@ -31,7 +30,6 @@
 		],
 		"artist": "Kawai Sprite (feat. Saruky)",
 		"charter": "Jenny Crowe + fabs",
-		"bpm": 123,
 		"difficulties": [
 			"erect",
 			"nightmare"

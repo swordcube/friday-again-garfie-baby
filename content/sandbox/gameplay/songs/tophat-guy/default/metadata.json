@@ -20,7 +20,6 @@
 		"timingPoints": [
 			{
 				"b": 155,
-				"s": 0,
 				"t": 0,
 				"ts": [
 					4,
@@ -30,7 +29,6 @@
 		],
 		"artist": "Unknown",
 		"charter": "Unknown",
-		"bpm": 155,
 		"difficulties": [
 			"hard"
 		],

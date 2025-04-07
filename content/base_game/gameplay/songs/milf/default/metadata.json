@@ -22,7 +22,6 @@
 		"timingPoints": [
 			{
 				"b": 180,
-				"s": 0,
 				"t": 0,
 				"ts": [
 					4,
@@ -32,7 +31,6 @@
 		],
 		"artist": "Kawai Sprite",
 		"charter": "ninjamuffin99 + MtH + Spazkid",
-		"bpm": 180,
 		"difficulties": [
 			"easy",
 			"normal",

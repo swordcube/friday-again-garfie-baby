@@ -15,7 +15,7 @@ class CharterVisualMetronome extends FlxSpriteContainer {
         super(x, y);
 
         bg = new FlxSprite(0, -14).loadGraphic(Paths.image("editors/charter/images/metronome/tray"));
-        bg.scale.set(0.15, 0.15);
+        bg.scale.set(0.5, 0.5);
         bg.updateHitbox();
         add(bg);
 

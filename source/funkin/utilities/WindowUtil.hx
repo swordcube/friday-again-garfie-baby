@@ -5,20 +5,43 @@ class WindowUtil {
     public static var titlePrefix(default, set):String = "";
     public static var titleSuffix(default, set):String = "";
 
+    public static var preventClosing:Bool = false;
+    public static var onClose:Void->Void;
+    
     public static function resetTitle():Void {
         title = FlxG.stage.application.meta.get("name");
     }
-
+    
     public static function updateTitle():Void {
         FlxG.stage.window.title = '${titlePrefix}${title}${titleSuffix}';
     }
-
+    
     public static function resetTitleAffixes():Void {
         titlePrefix = titleSuffix = "";
         updateTitle();
     }
 
+    public static function init():Void {
+        resetTitle();
+        resetClosing();
+
+        FlxG.stage.window.onClose.add(() -> {
+			if(preventClosing && !_triedClosing) {
+				FlxG.stage.window.onClose.cancel();
+				_triedClosing = true;
+			}
+			if(onClose != null)
+                onClose();
+		});
+    }
+
+    public static function resetClosing():Void {
+        _triedClosing = false;
+    }
+
     //----------- [ Private API ] -----------//
+
+    private static var _triedClosing:Bool = false;
 
     @:noCompletion
     private static function set_title(newTitle:String):String {

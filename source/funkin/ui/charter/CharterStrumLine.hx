@@ -49,8 +49,9 @@ class CharterStrumLine extends FlxSpriteContainer {
     }
 
     override function update(elapsed:Float):Void {
+        final rate:Float = Conductor.instance.rate;
         for(i in 0...keyCount) {
-            strumGlowTimers[i] -= elapsed * 1000;
+            strumGlowTimers[i] -= elapsed * 1000 * rate;
             if(strumGlowTimers[i] <= 0)
                 resetStrum(i);
         }

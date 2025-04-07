@@ -77,7 +77,7 @@ class Button extends UIComponent {
     override function set_height(Value:Float):Float {
         if(bg != null) {
             if(Value <= 0)
-                bg.height = contentContainer.height + 8;
+                bg.height = contentContainer.height + 2;
             else
                 bg.height = Value;
 

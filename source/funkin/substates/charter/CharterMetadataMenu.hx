@@ -21,7 +21,7 @@ class CharterMetadataMenu extends UISubState {
         FlxG.cameras.add(camera, false);
         
         window = new CharterMetadataWindow();
-        window.onClose.add(() -> close());
+        window.onClose.add(close);
         window.screenCenter();
         add(window);
 
@@ -30,7 +30,7 @@ class CharterMetadataMenu extends UISubState {
 
     override function update(elapsed:Float):Void {
         if(FlxG.mouse.justReleased && !window.checkMouseOverlap())
-            FlxTimer.wait(0.001, () -> window.close());
+            FlxTimer.wait(0.001, window.close);
         
         super.update(elapsed);
     }
@@ -119,14 +119,14 @@ class CharterMetadataWindow extends Window {
         final bpmLabel:Label = new Label(10, sep.y + 15, "Song BPM");
         addToContents(bpmLabel);
         
-        final bpmTextbox:Textbox = new Textbox(bpmLabel.x, bpmLabel.y + 22, Std.string(meta.song.bpm), false, 200);
+        final bpmTextbox:Textbox = new Textbox(bpmLabel.x, bpmLabel.y + 22, Std.string(meta.song.timingPoints.first()?.bpm ?? 100.0), false, 200);
         bpmTextbox.callback = (text:String) -> {
             var bpm:Float = Std.parseFloat(text);
             if(Math.isNaN(bpm))
                 bpm = 100;
 
             meta.song.bpm = bpm;
-            Conductor.instance.reset(meta.song.bpm);
+            Conductor.instance.reset(meta.song.timingPoints.first()?.bpm ?? 100.0);
 		    Conductor.instance.setupTimingPoints(meta.song.timingPoints);
         };
         bpmTextbox.restrictChars = "0-9.";
