@@ -69,6 +69,11 @@ class NoteMissEvent extends ScriptEvent {
     public var playMissAnim:Bool;
 
     /**
+     * Whether or not to mute the character's vocals.
+     */
+    public var muteVocals:Bool;
+
+    /**
      * The character that will miss the note.
      */
     public var character:Character;

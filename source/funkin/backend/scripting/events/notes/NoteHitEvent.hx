@@ -100,6 +100,11 @@ class NoteHitEvent extends ScriptEvent {
     public var playSingAnim:Bool;
 
     /**
+     * Whether or not to unmute the character's vocals.
+     */
+    public var unmuteVocals:Bool;
+
+    /**
      * The character that will sing the note.
      */
     public var character:Character;

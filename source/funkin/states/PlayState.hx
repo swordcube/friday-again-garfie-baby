@@ -78,6 +78,11 @@ class PlayState extends FunkinState {
 	 */
 	public var camZoomingInterval:Int = -1;
 
+	/**
+	 * The intensity of the camera bumping.
+	 */
+	public var camZoomingIntensity:Float = 1;
+
 	public var chartingMode:Bool = false;
 
 	#if SCRIPTING_ALLOWED
@@ -406,6 +411,15 @@ class PlayState extends FunkinState {
 		if(event.cancelled)
 			return;
 		
+		if(event.unmuteVocals && !vocals.isSingleTrack) {
+			if(isPlayer) {
+				if(vocals.player != null)
+					vocals.player.muted = false;
+			} else {
+				if(vocals.opponent != null)
+					vocals.opponent.muted = false;
+			}
+		}
 		if(event.playSingAnim) {
 			event.character.playSingAnim(event.direction, event.singAnimSuffix, true);
 			event.character.holdTimer += event.length;
@@ -436,6 +450,15 @@ class PlayState extends FunkinState {
 		if(event.cancelled)
 			return;
 		
+		if(event.muteVocals && !vocals.isSingleTrack) {
+			if(isPlayer) {
+				if(vocals.player != null)
+					vocals.player.muted = true;
+			} else {
+				if(vocals.opponent != null)
+					vocals.opponent.muted = true;
+			}
+		}
 		if(event.playMissAnim) {
 			event.character.playMissAnim(event.direction, event.missAnimSuffix, true);
 			event.character._holdingPose = isPlayer;
@@ -463,9 +486,12 @@ class PlayState extends FunkinState {
 		if(interval < 0)
 			interval = Conductor.instance.timeSignature.getNumerator();
 
-		if(interval > 0 && beat > 0 && beat % interval == 0) {
-			camGame.extraZoom += 0.015;
-			camHUD.extraZoom += 0.03;
+		@:privateAccess
+		final timingPoint:TimingPoint = Conductor.instance._latestTimingPoint;
+		
+		if(interval > 0 && beat > 0 && Math.floor(Conductor.instance.curDecBeat - timingPoint.beat) % interval == 0) {
+			camGame.extraZoom += 0.015 * camZoomingIntensity;
+			camHUD.extraZoom += 0.03 * camZoomingIntensity;
 		}
 		#if SCRIPTING_ALLOWED
 		scripts.call("onBeatHit", [beat]);

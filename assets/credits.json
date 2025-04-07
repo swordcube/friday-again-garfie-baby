@@ -1,0 +1,54 @@
+{
+    "categories": [
+        {
+            "name": "Engine Contributors",
+            "items": [
+                {
+                    "name": "swordcube",
+                    "description": "Creator of the engine\nthink fast, think stupid - me 2024",
+                    
+                    "icon": "swordcube",
+                    "color": "#9ec8ff",
+            
+                    "roles": ["Programmer", "Artist"],
+                    "url": "https://bsky.app/profile/swordcube.bsky.social"
+                }
+            ]
+        },
+        {
+            "name": "Special Thanks",
+            "items": [
+                {
+                    "name": "The Funkin' Crew",
+                    "description": "Made the original game, please go check it out!",
+                    
+                    "icon": "funkincrew",
+                    "color": "#26a6f8",
+                    
+                    "roles": ["Programmer", "Artist", "Composer"],
+                    "url": "https://github.com/FunkinCrew/Funkin"
+                },
+                {
+                    "name": "TheConcealedCow",
+                    "description": "Made the Killer!!! judgement asset",
+                    
+                    "icon": "concow",
+                    "color": "#e3e3e3",
+                    
+                    "roles": ["Artist"],
+                    "url": "https://gamebanana.com/members/1739194"
+                },
+                {
+                    "name": "You",
+                    "description": "Thank you for trying out funkin.lua!",
+                    
+                    "icon": "you",
+                    "color": "#bb8b68",
+                    
+                    "roles": ["player"],
+                    "url": "https://pointerpointer.com/"
+                }
+            ]
+        }
+    ]
+}

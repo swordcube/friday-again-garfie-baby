@@ -88,13 +88,20 @@
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 	
+	<!--
+		Don't copy content over if it's a test build
+		We'll load from source directory instead of export directory instead
+	-->
 	<section unless="TEST_BUILD">
-		<!-- Don't copy content over if it's a test build -->
 		<assets path="assets" type="template" />
 		<assets path="content" type="template" />
 		<assets path="tools" type="template" />
 	</section>
 
+	<!--
+		Copy ALSoft configuration to export directory
+		This allows for better sounding audio
+	-->
 	<section if="desktop">
 		<assets path="alsoft.ini" rename="plugins/alsoft.ini" type="text" if="windows"/>
 		<assets path="alsoft.ini" rename="plugins/alsoft.conf" type="text" unless="windows"/>
@@ -107,13 +114,17 @@
 	<haxelib name="flixel-addons" />
 	<haxelib name="flixel-controls" />
 
-	<!-- Useful Libraries -->
+	<!-- Loading Animate Atlas -->
 	<haxelib name="flxanimate" />
 
+	<!-- Versioning Libraries -->
 	<haxelib name="thx.core" />
 	<haxelib name="thx.semver" />
+
+	<!-- JSON Parsing (Parses to classes instead of dynamic objects) -->
 	<haxelib name="json2object" />
 
+	<!-- Runtime scripting -->
 	<section if="SCRIPTING_ALLOWED">
 		<!-- The core library for Lua scripting -->
 		<haxelib name="linc_luajit" if="LUA_ALLOWED" />
@@ -177,10 +188,10 @@
 	<!-- _________________________________ Custom _______________________________ -->
 
 	<!--Allows unused classes to be compiled, useful for scripting-->
-    <haxeflag name="-dce" value="no" />
+    <haxeflag name="-dce" value="no" if="SCRIPTING_ALLOWED" />
 
     <!--Include every class into the executable, useful for scripting -->
-    <haxeflag name="--macro" value="funkin.backend.macros.IncludeMacro.build()" />
+    <haxeflag name="--macro" value="funkin.backend.macros.IncludeMacro.build()" if="SCRIPTING_ALLOWED" />
 
     <!-- Fix compiling issues with local libraries -->
     <setenv name="HAXEPATH" value="./"/>

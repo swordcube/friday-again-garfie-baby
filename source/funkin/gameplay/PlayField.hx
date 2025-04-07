@@ -94,7 +94,7 @@ class PlayField extends FlxGroup {
             note, note.time, note.direction, note.length, note.type,
             true, false, judgement, isPlayer && Scoring.splashAllowed(judgement), isPlayer, !isPlayer,
             Scoring.scoreNote(note, timestamp), Scoring.getAccuracyScore(judgement), 0.0115,
-            Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true, true, null, ""
+            Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true, true, true, null, ""
         ));
         if(event.cancelled)
             return;
@@ -107,7 +107,7 @@ class PlayField extends FlxGroup {
         if(event.note.length <= 0)
             killNote(event.note);
         else
-            event.note.colorTransform.redOffset = event.note.colorTransform.greenOffset = event.note.colorTransform.blueOffset = 45;
+            event.note.visible = false;
         
         if(isPlayer) {
             stats.score += event.score;
@@ -155,7 +155,7 @@ class PlayField extends FlxGroup {
         onNoteMiss.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
             true, true, note.strumLine == playerStrumLine, note.strumLine == playerStrumLine,
-            10, 0.02375 + (Math.min(note.length * 0.001, 0.25) * 0.5), true, null, ""
+            10, 0.02375 + (Math.min(note.length * 0.001, 0.25) * 0.5), true, true, null, ""
         ));
         if(event.cancelled)
             return;

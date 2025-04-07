@@ -569,7 +569,7 @@ class ChartEditor extends UIState {
     override function beatHit(beat:Int):Void {
         iconP2.bop();
         iconP1.bop();
-        visualMetronome.tick(beat);
+        visualMetronome.tick();
         super.beatHit(beat);
     }
     
@@ -625,7 +625,7 @@ class ChartEditor extends UIState {
             vocals.seek(inst.time);
 
             visualMetronome.bigBars.visible = true;
-            visualMetronome.tick(Conductor.instance.curBeat);
+            visualMetronome.tick();
 
             playBar.playPauseButton.icon = Paths.image("editors/charter/images/playbar/pause");
         }
@@ -940,7 +940,7 @@ class ChartEditor extends UIState {
         visualMetronome.visible = editorSettings.visualMetronome;
         visualMetronome.bigBars.visible = inst.playing;
         
-        visualMetronome.tick(Conductor.instance.curBeat, true);
+        visualMetronome.tick(true);
     }
 
     public function toggleInstrumental(value:Bool):Void {

@@ -164,7 +164,8 @@ class Paths {
      * when compiling a build.
      */
     public static function getContentDirectory():String {
-        return '${Sys.args().contains("-livereload") ? "../../../../" : ""}${CONTENT_DIRECTORY}';
+        final liveReload:Bool = #if TEST_BUILD true #else Sys.args().contains("-livereload") #end;
+        return '${(liveReload) ? "../../../../" : ""}${CONTENT_DIRECTORY}';
     }
 
     /**

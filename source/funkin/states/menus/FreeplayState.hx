@@ -97,6 +97,18 @@ class FreeplayState extends FunkinState {
                 }
             }
         }
+        for(category in categories.copy()) {
+            final songList:Array<FreeplaySongData> = songs.get(category.id);
+            if(songList != null && songList.length != 0)
+                continue;
+
+            // no songs were found for this category
+            Logs.warn('No songs found for category "${category.id}"');
+
+            // which means it'd be pointless to show it, so remove it
+            songs.remove(category.id);
+            categories.remove(category);
+        }
 		scoreBG = new FlxSprite((FlxG.width * 0.7) - 6, 0).makeGraphic(1, 66, 0x99000000);
 		scoreBG.antialiasing = false;
 		add(scoreBG);
@@ -151,7 +163,7 @@ class FreeplayState extends FunkinState {
 
         grpSongs.clearList();
         curCategory = FlxMath.wrap(curCategory + by, 0, categories.length - 1);
-        
+
         for(song in songs.get(categories[curCategory].id)) {
             grpSongs.addItem(song.metadata.get("default").song.title, {
                 onSelect: onChangeSelection,
@@ -159,8 +171,16 @@ class FreeplayState extends FunkinState {
             });
         }
         curSelected = 0;
+        grpSongs.curSelected = 0;
+
         curDifficulty = "normal";
         curMix = "default";
+
+        final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+        final meta:SongMetadata = song.metadata.get(curMix);
+        
+        if(!meta.song.difficulties.contains(curDifficulty))
+            curDifficulty = meta.song.difficulties.first();
 
         categoryText.text = categories[curCategory].name;
         grpSongs.changeSelection(0, true);
@@ -206,7 +226,7 @@ class FreeplayState extends FunkinState {
             // change difficulty but keep current mix
             curDifficulty = meta.song.difficulties[newDiffIndex];
         }
-        final showArrows:Bool = (meta.song.difficulties.length > 1 || meta.song.mixes.length > 1);
+        final showArrows:Bool = (meta.song.difficulties.length > 1 || defaultMeta.song.mixes.length > 1);
         diffText.text = '${(showArrows) ? "< " : ""}${curDifficulty.toUpperCase()}${(showArrows) ? " >" : ""}';
         positionHighscore();
     }

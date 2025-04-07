@@ -1,8 +1,11 @@
 # project stuff
 .haxelib/
-/dump
-/export
+dump/
+export/
 
 # this file is used for quicker development
 # of the UI system, prevents me from having to recomp the game over and over again
 assets/dev.hxs
+
+# i'm not leaking my mod so easily!
+content/swords_cubical_saturday/

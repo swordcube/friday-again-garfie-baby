@@ -33,6 +33,8 @@ class AtlasText extends FlxTypedSpriteGroup<FlxSpriteGroup> {
 		this.font = font;
 		this.text = text;
 		this.alignment = alignment;
+
+		directAlpha = true;
 	}
 
 	public static function loadFontData(name:String):AtlasFont {
@@ -101,14 +103,6 @@ class AtlasText extends FlxTypedSpriteGroup<FlxSpriteGroup> {
         return super.set_color(color);
 	}
 
-	override function set_alpha(alpha:Float):Float {
-		for (line in members) {
-			for (glyph in line.members)
-				glyph.alpha = alpha;
-		}
-        return super.set_alpha(alpha);
-	}
-
 	private function _regenGlyphs():Void {
 		while (members.length > 0) {
 			var actor:FlxSpriteGroup = members[0];
@@ -124,6 +118,7 @@ class AtlasText extends FlxTypedSpriteGroup<FlxSpriteGroup> {
 		var glyphY:Float = 0.0;
 
 		var line:FlxSpriteGroup = new FlxSpriteGroup();
+		line.directAlpha = true;
 
 		for (i in 0...textLength) {
 			var char:String = text.charAt(i);

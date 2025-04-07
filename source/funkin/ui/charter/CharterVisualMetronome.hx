@@ -28,8 +28,11 @@ class CharterVisualMetronome extends FlxSpriteContainer {
         beatsPerMeasure = 4;
     }
 
-    public function tick(beat:Int, ?instant:Bool = false):Void {
-        final barIndex:Int = beat % beatsPerMeasure;
+    public function tick(?instant:Bool = false):Void {
+        @:privateAccess
+        final timingPoint:TimingPoint = Conductor.instance._latestTimingPoint;
+
+        final barIndex:Int = FlxMath.wrap((beatsPerMeasure != 0) ? Math.floor(Conductor.instance.curDecBeat - timingPoint.beat) % beatsPerMeasure : 0, 0, bigBars.length - 1);
         bigBars.forEach((b) -> b.visible = false);
 
         final bigBar:FlxSprite = bigBars.members[barIndex];
@@ -49,6 +52,14 @@ class CharterVisualMetronome extends FlxSpriteContainer {
     @:noCompletion
     private function set_beatsPerMeasure(newValue:Int):Int {
         if(beatsPerMeasure != newValue) {
+            beatsPerMeasure = newValue;
+
+            for(timer in barTimers) {
+                if(timer != null)
+                    timer.cancel();
+            }
+            barTimers = [for(_ in 0...newValue) null];
+
             for(bars in [smallBars, bigBars]) {
                 bars.forEach((b) -> b.destroy());
                 bars.clear();
@@ -78,7 +89,10 @@ class CharterVisualMetronome extends FlxSpriteContainer {
             }
             smallBars.x += (bg.width - bigBars.width) * 0.5;
             bigBars.x += (bg.width - bigBars.width) * 0.5;
+
+            bg.y = y - 14 + (54 * ((4 / beatsPerMeasure) - 1));
+            tick();
         }
-        return beatsPerMeasure = newValue;
+        return beatsPerMeasure;
     }
 }

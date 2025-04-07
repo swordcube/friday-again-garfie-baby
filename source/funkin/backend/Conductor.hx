@@ -41,7 +41,7 @@ class TimingPoint {
     @:alias("t")
     public var time:Float;
 
-    @:alias("s")
+    @:jignored
     public var step:Float;
 
     @:jignored
@@ -163,30 +163,31 @@ class Conductor extends FlxBasic {
 
     public function setupTimingPoints(timingPoints:Array<TimingPoint>) {
         var timeOffset:Float = 0;
+        var stepOffset:Float = 0;
         var beatOffset:Float = 0;
         var measureOffset:Float = 0;
 
         // the top number in the time signature represents the amount of beats per measure
-        var lastTopNumber:Float = 0;
-        var lastBPM:Float = 0;
+        var lastTopNumber:Float = timingPoints[0].getTimeSignature().getNumerator();
 
+        // the bottom number in the time signature represents the amount of steps per beat
+        var lastBottomNumber:Float = timingPoints[0].getTimeSignature().getDenominator();
+
+        var lastBPM:Float = timingPoints[0].bpm;
         timingPoints.sort((a, b) -> Std.int(a.time - b.time));
 
-        for(point in timingPoints) {
-            if (point.time == 0) {
-                // avoids few divisions by 0 that led to issues, assuming the first timing point is always at the start of a song
-                lastTopNumber = point.getTimeSignature().getNumerator();
-                lastBPM = point.bpm;
-                continue;
-            }
-            final beatDifference:Float = (point.time - timeOffset) / ((60 * lastBPM) * 1000);
+        for(i in 1...timingPoints.length) {
+            final point:TimingPoint = timingPoints[i];
+            final beatDifference:Float = (point.time - timeOffset) / ((60 / lastBPM) * 1000);
+
             measureOffset += beatDifference / lastTopNumber;
             beatOffset += beatDifference;
+            stepOffset += beatDifference * lastBottomNumber;
             
             final newPoint:TimingPoint = {
                 time: point.time,
-
-                step: point.step,
+                
+                step: stepOffset,
                 beat: beatOffset,
                 measure: measureOffset,
 
@@ -194,9 +195,12 @@ class Conductor extends FlxBasic {
                 timeSignature: point.timeSignature
             };
             this.timingPoints.push(newPoint);
-
+            
             timeOffset = point.time;
+
             lastTopNumber = point.getTimeSignature().getNumerator();
+            lastBottomNumber = point.getTimeSignature().getDenominator();
+
             lastBPM = point.bpm;
         }
         _latestTimingPoint = this.timingPoints[0];
@@ -319,7 +323,7 @@ class Conductor extends FlxBasic {
         if(curBeat > lastBeat) {
             if(hasMetronome) {
                 final sound:FlxSound = FlxG.sound.play(Paths.sound('editors/charter/sfx/metronome'));
-                sound.pitch = (curBeat % curTimingPoint.getTimeSignature().getNumerator() == 0) ? 1.5 : 1.12;
+                sound.pitch = (Math.floor(curDecBeat - curTimingPoint.beat) % curTimingPoint.getTimeSignature().getNumerator() == 0) ? 1.5 : 1.12;
             }
             for(i in lastBeat...curBeat) {
                 if(Conductor.instance == this) {
