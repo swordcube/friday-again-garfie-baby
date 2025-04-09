@@ -178,7 +178,7 @@ class CharterObjectGroup extends FlxObject {
                     _eventBGSprite.cameras = getCameras();
             
                     _eventBGSprite.width = 70 + ((event.events.length - 1) * 30);
-                    _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step));
+                    _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step) - (_eventBGSprite.height * 0.5));
 
                     if (FlxG.mouse.overlaps(_eventBGSprite, charter.noteCam)) {
                         isHoveringEvent = true;
@@ -281,7 +281,7 @@ class CharterObjectGroup extends FlxObject {
             _eventBGSprite.cameras = getCameras();
             
             _eventBGSprite.width = 70 + ((event.events.length - 1) * 30);
-            _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step));
+            _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step) - (_eventBGSprite.height * 0.5));
             _eventBGSprite.draw();
 
             if(FlxG.mouse.overlaps(_eventBGSprite, charter.noteCam))

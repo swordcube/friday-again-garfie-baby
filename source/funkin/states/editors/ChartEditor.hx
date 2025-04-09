@@ -38,10 +38,10 @@ import funkin.utilities.UndoList;
 // TODO: chart metadata window
 
 // TODO: allow the user to edit events (along with a popup when placing a new one)
-// TODO: have some way to place & select timing points (maybe just treat them as if they were events??)
+// TODO: have some way to place & select timing points (put them on the right side of the grid, make them purple to indicate them being apart of song metadata)
 
 // TODO: waveforms for inst and each vocal track
-// TODO: performers for the opponent & player notes (kinda like fps plus lil buddies, won't be on by default)
+// TODO: rework how zooming works (aka don't zoom the camera)
 
 @:allow(funkin.ui.charter.CharterObjectGroup)
 class ChartEditor extends UIState {
@@ -108,6 +108,7 @@ class ChartEditor extends UIState {
     public var playBar:CharterPlayBar;
 
     public var conductorInfoText:FlxText;
+    public var rightClickMenu:DropDown;
 
     public function new(params:ChartEditorParams) {
         super();
@@ -581,7 +582,10 @@ class ChartEditor extends UIState {
             if(FlxG.mouse.justReleasedRight && !isUIActive) {
                 final direction:Int = Math.floor((_mousePos.x - objectGroup.x) / CELL_SIZE);
                 if(direction < 0 || direction >= (Constants.KEY_COUNT * 2)) {
-                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, [
+                    if(rightClickMenu != null)
+                        rightClickMenu.destroy();
+
+                    rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, [
                         Button("Undo", [[UIUtil.correctModifierKey(CONTROL), Z]], undo),
                         Button("Redo", [[UIUtil.correctModifierKey(CONTROL), Y], [UIUtil.correctModifierKey(CONTROL), SHIFT, Z]], redo),
                         
@@ -595,8 +599,8 @@ class ChartEditor extends UIState {
                         Button("Cut", [[UIUtil.correctModifierKey(CONTROL), X]], () -> {trace("cut NOT IMPLEMENTED!!");}),
                         Button("Delete", [[DELETE]], () -> deleteObjects(selectedObjects))
                     ]);
-                    dropdown.cameras = [uiCam];
-                    add(dropdown);
+                    rightClickMenu.cameras = [uiCam];
+                    add(rightClickMenu);
                 }
             }
         }
@@ -875,7 +879,7 @@ class ChartEditor extends UIState {
                 case CEvent(event): event.selected = true;
             }
         }
-        if(!unsafe) {
+        if(!unsafe && filteredObjects.length != 0) {
             undos.unsaved = true;
             undos.add(CSelectObjects(filteredObjects, selectedObjects.copy()));
         }
