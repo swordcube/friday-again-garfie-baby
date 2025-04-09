@@ -21,7 +21,7 @@ class Main extends Sprite {
 
 	public function new() {
 		super();
-		addChild(new FunkinGame(0, 0, InitState.new, 0, 0, true));
+		addChild(new FunkinGame(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, InitState.new, 0, 0, true));
 		
 		statsDisplay = new StatsDisplay(10, 3);
 		addChild(statsDisplay);

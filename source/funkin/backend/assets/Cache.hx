@@ -10,6 +10,14 @@ class Cache {
     public static var uiSkinCache(default, never):Map<String, UISkinData> = [];
 
     public static function clearAll():Void {
+        // Clear atlases
+        for(atlas in atlasCache) {
+            if(atlas.parent != null) {
+                atlas.parent.persist = false;
+                atlas.parent.decrementUseCount();
+            }
+            atlas.destroy();
+        }
         // Clear graphics
         @:privateAccess {
             for(key => graph in FlxG.bitmap._cache) {
@@ -17,14 +25,10 @@ class Cache {
                 // with some HaxeUI elements will try to access an invalid graphic
                 // and immediately crash the game
                 if(graph != null && !graph.persist && graph.destroyOnNoUse) {
-                    if(graph.bitmap.__texture != null)
-                        graph.bitmap.__texture.dispose();
-
-                    graph.bitmap.disposeImage();
-                    graph.bitmap.dispose();
-                    
+                    // The extra disposing code that was here has
+                    // been added to the flixel fork
                     graph.destroy();
-
+                    
                     FlxG.bitmap.removeKey(key);
                     OpenFLAssets.cache.removeBitmapData(key);
                 }
@@ -50,14 +54,6 @@ class Cache {
                     cache.removeSound(key);
                 }
             }
-        }
-        for(atlas in atlasCache) {
-            if(atlas.parent != null) {
-                atlas.parent.persist = false;
-                atlas.parent.destroyOnNoUse = true;
-                atlas.parent.decrementUseCount();
-            }
-            atlas.destroy();
         }
         atlasCache.clear();
         uiSkinCache.clear();

@@ -186,8 +186,9 @@ class PlayState extends FunkinState {
 			}
 		}
 		for(i in 0...loaders.length) {
-			addScripts(loaders[i], 'gameplay/songs/${currentSong}/${currentMix}/scripts');
-			addScripts(loaders[i], "gameplay/scripts");
+			addScripts(loaders[i], 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // load from specific song and specific mix first
+			addScripts(loaders[i], 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
+			addScripts(loaders[i], "gameplay/scripts"); // then load any gameplay script
 		}
 		for(note in currentChart.notes.get(currentDifficulty)) {
 			if(noteTypeScripts.exists(note.type))

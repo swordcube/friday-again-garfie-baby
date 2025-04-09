@@ -1,18 +1,17 @@
+function reloadAssets() {
+    Cache.clearAll();
+    Paths.reloadContent();
+    GlobalScript.reloadScripts();
+}
+
 function onUpdate(dt) {
     if(Controls.instance.justPressed.check(Control.DEBUG_RELOAD)) {
         if(FlxG.keys.pressed.SHIFT) {
-            // TODO: this breaks the fuck out of PlayState
-            // more specifically the UI and chart get fucked
-            trace("reloading fucking everything");
-
             FlxG.inputs.onStateSwitch();
-
-            Paths.reloadContent();
-            GlobalScript.reloadScripts();
-            
-            FlxG.signals.preStateCreate.addOnce(() -> Cache.clearAll());
+            FlxG.signals.preStateCreate.addOnce(reloadAssets);
         }
-        FlxG.game._nextState = FlxG.state._constructor;
+        final constructor = FlxG.state._constructor;
+        FlxG.game._nextState = constructor;
         FlxG.game.switchState();
     }
 }

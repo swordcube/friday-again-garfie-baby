@@ -301,7 +301,6 @@ class Paths {
             );
             if(atlas.parent != null) {
                 atlas.parent.persist = true;
-                atlas.parent.destroyOnNoUse = false;
                 atlas.parent.incrementUseCount();
             }
             Cache.atlasCache.set(name, atlas);

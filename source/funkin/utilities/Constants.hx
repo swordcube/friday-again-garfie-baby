@@ -26,6 +26,16 @@ class Constants {
     };
 
     /**
+     * The width of the game area (in pixels).
+     */
+    public static final GAME_WIDTH:Int = 1280;
+
+    /**
+     * The height of the game area (in pixels).
+     */
+    public static final GAME_HEIGHT:Int = 720;
+
+    /**
      * The number of keys per strumline.
      */
     public static final KEY_COUNT:Int = 4;

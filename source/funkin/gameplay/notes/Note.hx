@@ -65,7 +65,7 @@ class Note extends SkinnableSprite {
         scoreSteps.resize(0);
 
         for(i in 0...Std.int(this.length / stepLength))
-            scoreSteps.push({time: time + ((i + 1) * stepLength), score: 4});
+            scoreSteps.push({time: time + ((i + 1) * stepLength), score: 10});
         
         holdTrail.setup(this, skin);
 
