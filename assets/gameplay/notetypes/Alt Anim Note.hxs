@@ -1,9 +1,7 @@
 function onNoteHit(e:NoteHitEvent) {
-    if(e.type == NOTE_TYPE_ID) // TODO: not require this if statement
-        e.singAnimSuffix = "-alt";
+    e.singAnimSuffix = "-alt";
 }
 
 function onNoteMiss(e:NoteMissEvent) {
-    if(e.type == NOTE_TYPE_ID) // TODO: not require this if statement
-        e.missAnimSuffix = "-alt";
+    e.missAnimSuffix = "-alt";
 }

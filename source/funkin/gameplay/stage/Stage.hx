@@ -3,6 +3,10 @@ package funkin.gameplay.stage;
 import funkin.gameplay.character.Character;
 import funkin.gameplay.stage.props.*;
 
+#if SCRIPTING_ALLOWED
+import funkin.backend.scripting.FunkinScript;
+#end
+
 typedef CharacterSet = {
     var spectator:Character;
     var opponent:Character;
@@ -11,22 +15,37 @@ typedef CharacterSet = {
 
 class Stage extends FlxContainer {
     public var id:String;
+
+    #if SCRIPTING_ALLOWED
+    public var script:FunkinScript;
+    #end
+    
     public var data:StageData;
     public var characters:CharacterSet;
-
+    
     public var props:Map<String, StageProp> = [];
     public var layers:Array<FlxContainer> = [];
-
+    
     public function new(?id:String, characters:CharacterSet) {
         super();
         if(id == null || id.length == 0)
             id = "stage";
-
+        
         this.id = id;
         this.characters = characters;
         Logs.verbose('Loading stage: ${id}');
-
+        
         data = StageData.load(id);
+
+        #if SCRIPTING_ALLOWED
+        final scriptPath:String = Paths.script('gameplay/stages/${id}/script');
+        if(FlxG.assets.exists(scriptPath)) {
+            script = FunkinScript.fromFile(scriptPath);
+            script.setParent(this);
+            script.execute();
+            script.call("onLoad");
+        }
+        #end
 
         var spectatorAdded:Bool = false;
         var opponentAdded:Bool = false;
@@ -44,11 +63,13 @@ class Stage extends FlxContainer {
                         prop = new SpriteProp(0, 0, this, layer);
                         prop.applyProperties(propData.properties);
                         layer.add(cast prop);
-
+                        props.set(propData.id, prop);
+                        
                     case BOX:
                         prop = new BoxProp(0, 0, this, layer);
                         prop.applyProperties(propData.properties);
                         layer.add(cast prop);
+                        props.set(propData.id, prop);
 
                     case SPECTATOR:
                         if(!spectatorAdded) {
@@ -94,6 +115,18 @@ class Stage extends FlxContainer {
             addOnLastLayer(characters.player);
             playerAdded = true;
         }
+        #if SCRIPTING_ALLOWED
+        if(script != null)
+            script.call("onLoadPost");
+        #end
+    }
+
+    public function getStageImage(id:String):String {
+        return Paths.image('${data.getImageFolder()}/${id}');
+    }
+
+    public function getStageSFX(id:String):String {
+        return Paths.sound('${data.getSFXFolder()}/${id}');
     }
 
     public function addOnLastLayer<T:FlxBasic>(obj:T):T {
@@ -105,7 +138,14 @@ class Stage extends FlxContainer {
         return obj;
     }
 
-    override function destroy() {
+    override function destroy():Void {
+        if(script != null) {
+            if(!script.closed) {
+                script.call("onDestroy");
+                script.close();
+            }
+            script = null;
+        }
         props.clear();
         layers.clear();
         super.destroy();

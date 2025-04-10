@@ -18,9 +18,7 @@ class CharacterData {
     @:default({x: 0, y: 0})
     public var gridSize:PointData<Float> = {x: 0, y: 0};
     
-    @:jcustomparse(funkin.utilities.DataParse.dynamicValue)
-	@:jcustomwrite(funkin.utilities.DataWrite.dynamicValue)
-    public var animations:Dynamic;//DynamicAccess<AnimationData>;
+    public var animations:Map<String, AnimationData>;//DynamicAccess<AnimationData>;
     
     @:optional
     @:default({x: 0, y: 0})

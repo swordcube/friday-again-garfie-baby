@@ -1,5 +1,7 @@
 package funkin.backend;
 
+import flixel.util.FlxTimer;
+
 import funkin.backend.native.NativeAPI;
 import funkin.backend.plugins.ForceCrashPlugin;
 
@@ -82,6 +84,8 @@ class InitState extends FlxState {
 
         // hide cursor, we probably don't need it rn
         FlxG.mouse.visible = false;
+
+        // enable antialiasing by default
         FlxSprite.defaultAntialiasing = true;
 
         final args = Sys.args();

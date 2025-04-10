@@ -15,6 +15,7 @@ class BoxProp extends FlxSprite implements StageProp {
     }
 
     public function applyProperties(properties:Dynamic):Void {
+        var updateLeHitbox:Bool = false;
         for(field in Reflect.fields(properties)) {
             final value:Dynamic = Reflect.field(properties, field);
             switch(field.toLowerCase()) {
@@ -33,7 +34,7 @@ class BoxProp extends FlxSprite implements StageProp {
                 case "scroll":
                     scrollFactor.set(value.x ?? 1.0, value.y ?? 1.0);
 
-                case "scale":
+                case "scale", "size":
                     scale.set(value.x ?? 1.0, value.y ?? value.x ?? 1.0);
 
                 case "width":
@@ -44,11 +45,13 @@ class BoxProp extends FlxSprite implements StageProp {
 
                 case "updatehitbox":
                     if(value == true)
-                        updateHitbox();
+                        updateLeHitbox = true;
 
                 default:
                     Reflect.setProperty(this, field, value);
             }
         }
+        if(updateLeHitbox)
+            updateHitbox();
     }
 }

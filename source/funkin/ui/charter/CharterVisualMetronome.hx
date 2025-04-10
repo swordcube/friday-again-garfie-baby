@@ -31,7 +31,7 @@ class CharterVisualMetronome extends FlxSpriteContainer {
     public function tick(?instant:Bool = false):Void {
         @:privateAccess
         final timingPoint:TimingPoint = Conductor.instance._latestTimingPoint;
-
+        
         final barIndex:Int = FlxMath.wrap((beatsPerMeasure != 0) ? Math.floor(Conductor.instance.curDecBeat - timingPoint.beat) % beatsPerMeasure : 0, 0, bigBars.length - 1);
         bigBars.forEach((b) -> b.visible = false);
 

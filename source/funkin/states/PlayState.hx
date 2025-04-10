@@ -2,19 +2,29 @@ package funkin.states;
 
 import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
+
 import funkin.backend.Conductor.IBeatReceiver;
 import funkin.backend.assets.loaders.AssetLoader;
+
 import funkin.backend.scripting.events.*;
 import funkin.backend.scripting.events.gameplay.*;
 import funkin.backend.scripting.events.notes.*;
-import funkin.gameplay.FunkinCamera;
+
 import funkin.gameplay.PlayField;
+import funkin.gameplay.FunkinCamera;
 import funkin.gameplay.character.Character;
+
 import funkin.gameplay.hud.*;
 import funkin.gameplay.hud.BaseHUD;
+
 import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.VocalGroup;
+
 import funkin.gameplay.stage.Stage;
+
+import funkin.gameplay.events.*;
+import funkin.gameplay.events.EventRunner;
+
 import funkin.states.editors.ChartEditor;
 import funkin.states.menus.FreeplayState;
 
@@ -67,6 +77,8 @@ class PlayState extends FunkinState {
 	public var currentChart:ChartData;
 	public var playField:PlayField;
 
+	public var eventRunner:EventRunner;
+
 	public var startingSong:Bool = true;
 	public var endingSong:Bool = false;
 
@@ -87,7 +99,12 @@ class PlayState extends FunkinState {
 
 	#if SCRIPTING_ALLOWED
 	public var scripts:FunkinScriptGroup;
+
 	public var noteTypeScripts:Map<String, FunkinScript> = [];
+	public var noteTypeScriptsArray:Array<FunkinScript> = []; // to avoid stupid for loop shit on maps, for convienience really
+
+	public var eventScripts:Map<String, FunkinScript> = [];
+	public var eventScriptsArray:Array<FunkinScript> = []; // to avoid stupid for loop shit on maps, for convienience really
 	#end
 
 	public function new(?params:PlayStateParams) {
@@ -170,6 +187,14 @@ class PlayState extends FunkinState {
 		WindowUtil.titlePrefix = (lastParams._unsaved) ? "* " : "";
 		WindowUtil.titleSuffix = (chartingMode) ? " - Chart Playtesting" : "";
 
+		stage = new Stage(currentChart.meta.game.stage, {
+			spectator: new Character(currentChart.meta.game.getCharacter("spectator"), false),
+			opponent: new Character(currentChart.meta.game.getCharacter("opponent"), false),
+			player: new Character(currentChart.meta.game.getCharacter("player"), true)
+		});
+		camGame.zoom = stage.data.zoom;
+		add(stage);
+
 		#if SCRIPTING_ALLOWED
 		scripts = new FunkinScriptGroup();
 		scripts.setParent(this);
@@ -190,6 +215,9 @@ class PlayState extends FunkinState {
 			addScripts(loaders[i], 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
 			addScripts(loaders[i], "gameplay/scripts"); // then load any gameplay script
 		}
+		if(stage.script != null)
+			scripts.add(stage.script);
+
 		for(note in currentChart.notes.get(currentDifficulty)) {
 			if(noteTypeScripts.exists(note.type))
 				continue;
@@ -200,8 +228,32 @@ class PlayState extends FunkinState {
 
 			final script:FunkinScript = FunkinScript.fromFile(scriptPath);
 			script.set("NOTE_TYPE_ID", note.type);
-			noteTypeScripts.set(note.type, script);
 			scripts.add(script);
+
+			noteTypeScripts.set(note.type, script);
+			noteTypeScriptsArray.push(script);
+		}
+		eventRunner = new EventRunner(currentChart.events);
+		eventRunner.onExecute.add(onEvent);
+		eventRunner.onExecutePost.add(onEventPost);
+		add(eventRunner);
+
+		for(e in eventRunner.events.filter((i) -> i.type == "Camera Pan")) {
+			if(e.time > 10)
+				break;
+
+			eventRunner.execute(e);
+		}
+		for(b in eventRunner.behaviors) {
+			if(b is ScriptedEventBehavior) {
+				final sb:ScriptedEventBehavior = cast b;
+				if(sb.script != null) {
+					scripts.add(sb.script);
+	
+					eventScripts.set(sb.eventType, sb.script);
+					eventScriptsArray.push(sb.script);
+				}
+			}
 		}
 		final leScripts:Array<FunkinScript> = scripts.members.copy();
 		for(i in 0...leScripts.length) {
@@ -209,14 +261,6 @@ class PlayState extends FunkinState {
 			leScripts[i].call("onCreate");
 		}
 		#end
-
-		stage = new Stage(currentChart.meta.game.stage, {
-			spectator: new Character(currentChart.meta.game.getCharacter("spectator"), false),
-			opponent: new Character(currentChart.meta.game.getCharacter("opponent"), false),
-			player: new Character(currentChart.meta.game.getCharacter("player"), true)
-		});
-		camGame.zoom = stage.data.zoom;
-		add(stage);
 
 		spectator = stage.characters.spectator;
 		opponent = stage.characters.opponent;
@@ -406,10 +450,19 @@ class PlayState extends FunkinState {
 			event.character = opponent;
 		
 		#if SCRIPTING_ALLOWED
-		scripts.event("onNoteHit", event);
-		scripts.event((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", event);
-		scripts.event((isPlayer) ? "onPlayerHit" : "onOpponentHit", event);
-		scripts.event((isPlayer) ? "goodNoteHit" : "dadNoteHit", event);
+		final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray.concat(eventScriptsArray);
+		scripts.event("onNoteHit", event, excludedScripts);
+		scripts.event((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", event, excludedScripts);
+		scripts.event((isPlayer) ? "onPlayerHit" : "onOpponentHit", event, excludedScripts);
+		scripts.event((isPlayer) ? "goodNoteHit" : "dadNoteHit", event, excludedScripts);
+
+		final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
+		if(noteTypeScript != null) {
+			noteTypeScript.call("onNoteHit", [event]);
+			noteTypeScript.call((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", [event]);
+			noteTypeScript.call((isPlayer) ? "onPlayerHit" : "onOpponentHit", [event]);
+			noteTypeScript.call((isPlayer) ? "goodNoteHit" : "dadNoteHit", [event]);
+		}
 		#end
 		if(event.cancelled)
 			return;
@@ -433,10 +486,19 @@ class PlayState extends FunkinState {
 	private function onNoteHitPost(event:NoteHitEvent):Void {
 		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
 		#if SCRIPTING_ALLOWED
-		scripts.event("onNoteHitPost", event);
-		scripts.event((isPlayer) ? "onPlayerNoteHitPost" : "onOpponentNoteHitPost", event);
-		scripts.event((isPlayer) ? "onPlayerHitPost" : "onOpponentHitPost", event);
-		scripts.event((isPlayer) ? "goodNoteHitPost" : "dadNoteHitPost", event);
+		final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray.concat(eventScriptsArray);
+		scripts.event("onNoteHitPost", event, excludedScripts);
+		scripts.event((isPlayer) ? "onPlayerNoteHitPost" : "onOpponentNoteHitPost", event, excludedScripts);
+		scripts.event((isPlayer) ? "onPlayerHitPost" : "onOpponentHitPost", event, excludedScripts);
+		scripts.event((isPlayer) ? "goodNoteHitPost" : "dadNoteHitPost", event, excludedScripts);
+
+		final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
+		if(noteTypeScript != null) {
+			noteTypeScript.call("onNoteHit", [event]);
+			noteTypeScript.call((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", [event]);
+			noteTypeScript.call((isPlayer) ? "onPlayerHit" : "onOpponentHit", [event]);
+			noteTypeScript.call((isPlayer) ? "goodNoteHit" : "dadNoteHit", [event]);
+		}
 		#end
 	}
 	
@@ -448,7 +510,19 @@ class PlayState extends FunkinState {
 			event.character = opponent;
 
 		#if SCRIPTING_ALLOWED
-		scripts.event("onNoteMiss", event);
+		final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray.concat(eventScriptsArray);
+		scripts.event("onNoteMiss", event, excludedScripts);
+
+		if(!isPlayer)
+			scripts.event("onOpponentNoteMiss", event, excludedScripts);
+
+		final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
+		if(noteTypeScript != null) {
+			noteTypeScript.call("onNoteMiss", [event]);
+
+			if(!isPlayer)
+				noteTypeScript.call("onOpponentNoteMiss", [event]);
+		}
 		#end
 		if(event.cancelled)
 			return;
@@ -475,6 +549,18 @@ class PlayState extends FunkinState {
 		scripts.event((isPlayer) ? "onPlayerNoteMissPost" : "onOpponentNoteMissPost", event);
 		scripts.event((isPlayer) ? "onPlayerMissPost" : "onOpponentMissPost", event);
 		scripts.event((isPlayer) ? "goodNoteMissPost" : "dadNoteMissPost", event);
+		#end
+	}
+
+	private function onEvent(event:SongEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onEvent", [event]);
+		#end
+	}
+
+	private function onEventPost(event:SongEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onEventPost", [event]);
 		#end
 	}
 

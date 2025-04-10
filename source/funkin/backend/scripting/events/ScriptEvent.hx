@@ -8,6 +8,7 @@ enum abstract ScriptEventType(String) from String to String {
 	final NOTE_HIT = "NOTE_HIT";
 	final NOTE_MISS = "NOTE_MISS";
 	final CAMERA_MOVE = "CAMERA_MOVE";
+	final SONG_EVENT = "SONG_EVENT";
 }
 
 @:autoBuild(funkin.backend.macros.EventMacro.build())

@@ -58,6 +58,9 @@ class FunkinHScript extends FunkinScript {
 
             Logs.error('${fn}${err}');
         };
+        _interp.allowPublicVariables = _interp.allowStaticVariables = true;
+        _interp.staticVariables = FunkinScript.staticVariables;
+        
         super(code, unsafe);
     }
 
@@ -116,6 +119,11 @@ class FunkinHScript extends FunkinScript {
     override function setParent(parent:Dynamic):Void {
         if(closed) return;
         _interp.scriptObject = parent;
+    }
+
+    override function setPublicMap(map:Map<String, Dynamic>):Void {
+        if(closed) return;
+        _interp.publicVariables = map;
     }
 
     //----------- [ Private API ] -----------//

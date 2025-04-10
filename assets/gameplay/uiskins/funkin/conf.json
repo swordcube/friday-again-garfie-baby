@@ -142,7 +142,7 @@
             "type": "sparrow",
             "path": "images/splashes"
         },
-        "alpha": 0.6,
+        "alpha": 0.8,
         "scale": 1,
         
         "animation": {
@@ -269,6 +269,145 @@
                 },
                 "right": {
                     "prefix": "right tail",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            }
+        }
+    },
+    "holdCovers": {
+        "atlas": {
+            "type": "sparrow",
+            "path": "images/hold_covers"
+        },
+        "scale": 1,
+        "animation": {
+            "start": {
+                "left": {
+                    "prefix": "start left",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "start down",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "start up",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "start right",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            },
+            "hold": {
+                "left": {
+                    "prefix": "left",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": true,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "down",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": true,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "up",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": true,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "right",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": true,
+                    "offset": {"x": 0, "y": 0}
+                }
+            },
+            "end": {
+                "left": {
+                    "prefix": "end left",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "end down",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "end up",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "end right",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                }
+            }
+        },
+        "offset": {"x": 12, "y": -45}
+    },
+    "holdGradients": {
+        "atlas": {
+            "type": "sparrow",
+            "path": "images/hold_covers"
+        },
+        "scale": 0.7825,
+        "animation": {
+            "gradient": {
+                "left": {
+                    "prefix": "gradient left",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "down": {
+                    "prefix": "gradient down",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "up": {
+                    "prefix": "gradient up",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": {"x": 0, "y": 0}
+                },
+                "right": {
+                    "prefix": "gradient right",
                     "indices": null,
                     "fps": 24,
                     "looped": false,

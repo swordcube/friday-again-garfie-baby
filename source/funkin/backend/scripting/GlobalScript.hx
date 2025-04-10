@@ -64,6 +64,7 @@ class GlobalScript {
     public static function reloadScripts():Void {
 		scripts.close(); // this just closes the scripts, doesn't de-init the script group
 		WindowUtil.resetTitle(); // reset window title, incase a global script changes it
+		FunkinScript.staticVariables.clear(); // reset static variables
 		
         for(i in 0...Paths._registeredAssetLoaders.length) {
 			// go thru all asset loaders

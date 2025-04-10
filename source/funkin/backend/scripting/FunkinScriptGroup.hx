@@ -7,10 +7,19 @@ import funkin.backend.scripting.events.ScriptEvent;
 class FunkinScriptGroup {
     public var parent:Dynamic;
     public var members(default, null):Array<FunkinScript>;
+
     public var additionalDefaults:Map<String, Dynamic> = [];
+    public var publicVariables:Map<String, Dynamic> = [];
 
     public function new() {
+        additionalDefaults.set("importScript", importScript);
         members = [];
+    }
+
+    public function importScript(path:String):Void {
+        final script:FunkinScript = FunkinScript.fromFile(path);
+        add(script);
+        script.execute();
     }
 
     public function execute():Void {
@@ -42,26 +51,33 @@ class FunkinScriptGroup {
             members[i].setClass(value);
     }
 
-    public function call(method:String, ?args:Array<Dynamic>, ?defaultValue:Dynamic):Dynamic {
+    public function call(method:String, ?args:Array<Dynamic>, ?exclude:Array<FunkinScript>, ?defaultValue:Dynamic):Dynamic {
         var member:FunkinScript = null;
         var value:Dynamic = null;
-
+        
         for(i in 0...members.length) {
             member = members[i];
+            if(exclude != null && exclude.length != 0 && exclude.contains(member))
+                continue;
+            
             value = member.call(method, args);
-
             if(value != defaultValue)
                 return value;
         }
         return defaultValue;
     }
-
-    public function event<T:ScriptEvent>(method:String, event:T):T {
+    
+    public function event<T:ScriptEvent>(method:String, event:T, ?exclude:Array<FunkinScript>):T {
+        var member:FunkinScript = null;
         for(i in 0...members.length) {
             if(!event._canPropagate)
                 break;
 
-            members[i].call(method, [event]);
+            member = members[i];
+            if(exclude != null && exclude.length != 0 && exclude.contains(member))
+                continue;
+
+            member.call(method, [event]);
         }
         return event;
     }
@@ -82,6 +98,7 @@ class FunkinScriptGroup {
 
     public function preAdd(script:FunkinScript):Void {
         script.setParent(parent);
+        script.setPublicMap(publicVariables);
         script.onClose.add(() -> remove(script));
 
         for(k => v in additionalDefaults)

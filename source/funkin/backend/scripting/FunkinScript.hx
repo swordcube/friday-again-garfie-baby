@@ -6,6 +6,8 @@ import funkin.states.PlayState;
 import haxe.io.Path;
 
 class FunkinScript {
+    public static var staticVariables(default, null):Map<String, Dynamic> = [];
+
     public var code(default, null):String = null;
     public var filePath(default, null):String = null;
     public var fileName(default, null):String = null;
@@ -135,6 +137,8 @@ class FunkinScript {
     }
 
     public function setParent(parent:Dynamic):Void {}
+
+    public function setPublicMap(map:Map<String, Dynamic>):Void {}
 
     public function close():Void {
         if(closed) return;

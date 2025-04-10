@@ -25,6 +25,9 @@ class Events {
                 case CAMERA_MOVE:
                     _events.set(type, new CameraMoveEvent());
 
+                case SONG_EVENT:
+                    _events.set(type, new SongEvent());
+
                 default:
                     _events.set(type, new ScriptEvent(UNKNOWN));
             }

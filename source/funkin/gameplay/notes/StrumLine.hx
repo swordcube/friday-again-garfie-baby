@@ -5,8 +5,10 @@ import funkin.gameplay.notes.HoldTrail;
 
 class StrumLine extends FlxSpriteGroup {
     public var strums:FlxTypedSpriteGroup<Strum>;
-    public var notes:FlxTypedSpriteGroup<Note>;
     public var holdTrails:FlxTypedSpriteGroup<HoldTrail>;
+    public var notes:FlxTypedSpriteGroup<Note>;
+    public var holdGradients:FlxTypedSpriteGroup<HoldGradient>;
+    public var holdCovers:FlxTypedSpriteGroup<HoldCover>;
     public var splashes:FlxTypedSpriteGroup<NoteSplash>;
 
     public var downscroll:Bool = false;
@@ -30,6 +32,12 @@ class StrumLine extends FlxSpriteGroup {
         notes = new FlxTypedSpriteGroup<Note>();
         add(notes);
 
+        holdGradients = new FlxTypedSpriteGroup<HoldGradient>();
+        add(holdGradients);
+        
+        holdCovers = new FlxTypedSpriteGroup<HoldCover>();
+        add(holdCovers);
+
         splashes = new FlxTypedSpriteGroup<NoteSplash>();
         add(splashes);
 
@@ -37,14 +45,27 @@ class StrumLine extends FlxSpriteGroup {
             final strum:Strum = new Strum((i - (Constants.KEY_COUNT * 0.5)) * Constants.STRUM_SPACING, 0, i, skin);
             strum.strumLine = this;
             strums.add(strum);
+            
+            final gradient:HoldGradient = new HoldGradient((i - (Constants.KEY_COUNT * 0.5)) * Constants.STRUM_SPACING, 0, i, skin);
+            gradient.strumLine = this;
+            gradient.kill();
+            holdGradients.add(gradient);
+
+            final cover:HoldCover = new HoldCover((i - (Constants.KEY_COUNT * 0.5)) * Constants.STRUM_SPACING, 0, i, skin);
+            cover.strumLine = this;
+            cover.onHoldStart.add(updateHoldCover.bind(i));
+            cover.onHold.add(updateHoldCover.bind(i));
+            cover.onHoldEnd.add(updateHoldCover.bind(i));
+            cover.kill();
+            holdCovers.add(cover);
         }
         for(i in 0...48) {
-            final note:Note = new Note().setup(this, 0, i % Constants.KEY_COUNT, 0, "Default", strums.members[i % Constants.KEY_COUNT].skin);
+            final note:Note = new Note().setup(this, 0, i % Constants.KEY_COUNT, 0, "Default", skin);
             note.kill();
             notes.add(note);
         }
         for(i in 0...8) {
-            final splash:NoteSplash = new NoteSplash().setup(this, i % Constants.KEY_COUNT, strums.members[i % Constants.KEY_COUNT].skin);
+            final splash:NoteSplash = new NoteSplash().setup(this, i % Constants.KEY_COUNT, skin);
             splash.kill();
             splashes.add(splash);
         }
@@ -64,8 +85,37 @@ class StrumLine extends FlxSpriteGroup {
         splash.setPosition(strum.x - ((splash.width - strum.width) * 0.5), strum.y - ((splash.height - strum.height) * 0.5));
     }
 
+    public function showHoldGradient(direction:Int):Void {
+        final strum:Strum = strums.members[direction];
+        final gradient:HoldGradient = holdGradients.members[direction];
+        gradient.revive();
+        gradient.setPosition(strum.x - ((gradient.width - strum.width) * 0.5), strum.y - ((downscroll) ? gradient.height - (strum.height * 0.75) : 0));
+        
+        gradient.alpha = gradient.skinData.alpha;
+        gradient.flipY = downscroll;
+        gradient.holding = true;
+    }
+
+    public function showHoldCover(direction:Int):Void {
+        final cover:HoldCover = holdCovers.members[direction];
+        cover.start();
+    }
+    
+    public function updateHoldCover(direction:Int):Void {
+        final strum:Strum = strums.members[direction];
+        final cover:HoldCover = holdCovers.members[direction];
+        cover.updateHitbox();
+        cover.centerOrigin();
+
+        cover.centerOffsets();
+        cover.offset.add(cover.skinData.offset.x, cover.skinData.offset.y);
+        
+        cover.setPosition(strum.x - ((cover.width - strum.width) * 0.5), strum.y - ((cover.height - strum.height) * 0.5));
+    }
+
     public function processNote(note:Note):Void {
         final strum:Strum = strums.members[note.direction];
+        final gradient:HoldGradient = holdGradients.members[note.direction];
         final attachedConductor:Conductor = playField?.attachedConductor ?? Conductor.instance;
         
         final absSpeed:Float = Math.abs(scrollSpeed);
@@ -82,13 +132,14 @@ class StrumLine extends FlxSpriteGroup {
         
         if(note.wasHit && !note.wasMissed) {
             note.y = strum.y + note.offsetY;
-            
             final sexo:Float = Constants.PIXELS_PER_MS * (attachedConductor.playhead - note.time) * absSpeed;
             final calcHeight:Float = Math.max((Constants.PIXELS_PER_MS * note.length * absSpeed) - sexo, 0);
             
             note.holdTrail.y = strum.y + note.holdTrail.offsetY + (strum.height * 0.5);
             note.holdTrail.height = calcHeight;
-
+            
+            gradient.holding = (note.holdTrail.strip.height > gradient.height * 0.85);
+            
             if(playField != null && playField.playerStrumLine == this && note.scoreSteps.length != 0) {
                 while(note.curScoreStep < note.scoreSteps.length && attachedConductor.time >= note.scoreSteps[note.curScoreStep].time) {
                     if(note.hitEvent.gainHealthFromHolds)
@@ -103,14 +154,13 @@ class StrumLine extends FlxSpriteGroup {
                     }
                 }
             }
-
         } else {
             note.y = strum.y + note.offsetY + (Constants.PIXELS_PER_MS * (note.time - attachedConductor.playhead) * absSpeed * scrollMult);
             
             final calcHeight:Float = (Constants.PIXELS_PER_MS * note.length * absSpeed);
             note.holdTrail.y = note.y + note.holdTrail.offsetY + (strum.height * 0.5);
             
-            note.holdTrail.height = calcHeight; 
+            note.holdTrail.height = calcHeight;
         }
         if(botplay) {
             // use playhead instead of time, otherwise automatic note hitting becomes slightly delayed sometimes
@@ -118,6 +168,10 @@ class StrumLine extends FlxSpriteGroup {
                 playField.hitNote(note);
             
             if(note.wasHit && note.length > 0 && note.time <= attachedConductor.time - note.length) {
+                // end the hold cover if it is a hold note and
+                // it was held the entire way through
+                note.strumLine.holdCovers.members[note.direction].kill();
+                        
                 // kill the note if it is a hold note and it was
                 // held the entire way through
                 playField.killNote(note);
@@ -133,6 +187,10 @@ class StrumLine extends FlxSpriteGroup {
                 playField.missNote(note);
             }
             if(note.wasHit && note.length > 0 && note.time <= attachedConductor.time - note.length) {
+                // end the hold cover if it is a hold note and
+                // it was held the entire way through
+                note.strumLine.holdCovers.members[note.direction].end();
+
                 // kill the note if it is a hold note and it was
                 // held the entire way through
                 playField.killNote(note);

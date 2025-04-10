@@ -11,24 +11,25 @@ class AtlasData {
 	public var gridSize:PointData<Int>;
 }
 
-typedef AnimationData = {
+@:structInit
+class AnimationData {
 	@:optional
-	var prefix:String;
+	public var prefix:String;
 
 	@:optional
-	var indices:Array<Int>;
+	public var indices:Array<Int>;
 
     @:optional
 	@:default(24)
-    var fps:Float;
+    public var fps:Float;
 
 	@:optional
 	@:default(false)
-	var looped:Bool;
+	public var looped:Bool;
 
 	@:optional
 	@:default({x: 0, y: 0})
-	var offset:PointData<Float>;
+	public var offset:PointData<Float>;
 }
 
 @:structInit
@@ -46,6 +47,10 @@ class SkinnableSpriteData {
 	@:optional
     @:default(null)
 	public var antialiasing:Null<Bool>;
+
+    @:optional
+	@:default({x: 0, y: 0})
+	public var offset:PointData<Float>;
 
 	public var animation:Map<String, Map<String, AnimationData>>;//DynamicAccess<DynamicAccess<AnimationData>>;
 }

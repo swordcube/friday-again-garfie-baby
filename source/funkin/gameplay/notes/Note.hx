@@ -138,7 +138,9 @@ class Note extends SkinnableSprite {
 
         centerOrigin();        
         updateHitbox();
+
         centerOffsets();
+        offset.add(skinData.offset.x, skinData.offset.y);
 
         return direction;
     }

@@ -53,6 +53,12 @@ class NoteHitEvent extends ScriptEvent {
     public var showSplash:Bool;
 
     /**
+     * Whether or not to show the hold covers
+     * of the note that was hit.
+     */
+    public var showHoldCovers:Bool;
+
+    /**
      * Whether or not to show the rating of
      * the note that was hit.
      */

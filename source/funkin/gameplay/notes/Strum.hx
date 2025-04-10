@@ -26,6 +26,7 @@ class Strum extends SkinnableSprite {
 
         centerOrigin();
         centerOffsets();
+        offset.add(skinData.offset.x, skinData.offset.y);
     }
 
     override function update(elapsed:Float) {
@@ -49,10 +50,11 @@ class Strum extends SkinnableSprite {
         loadSkinComplex(newSkin, json.strum, 'gameplay/uiskins/${newSkin}');
 
         direction = direction; // force animation update
-
         updateHitbox();
         centerOrigin();
+
         centerOffsets();
+        offset.add(skinData.offset.x, skinData.offset.y);
     }
     
     //----------- [ Private API ] -----------//

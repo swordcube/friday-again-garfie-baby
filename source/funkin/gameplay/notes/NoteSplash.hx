@@ -55,10 +55,10 @@ class NoteSplash extends SkinnableSprite {
 
     override function update(elapsed:Float):Void {
         super.update(elapsed);
-        // if(strumLine != null) {
-        //     final strum:Strum = strumLine.strums.members[direction];
-        //     setPosition(strum.x - (width * 0.5), strum.y - (height * 0.5));
-        // }
+        if(strumLine != null) {
+            final strum:Strum = strumLine.strums.members[direction];
+            setPosition(strum.x - ((width - strum.width) * 0.5), strum.y - ((height - strum.height) * 0.5));
+        }
     }
     
     //----------- [ Private API ] -----------//
@@ -70,7 +70,9 @@ class NoteSplash extends SkinnableSprite {
 
         centerOrigin();        
         updateHitbox();
+
         centerOffsets();
+        offset.add(skinData.offset.x, skinData.offset.y);
 
         return direction;
     }

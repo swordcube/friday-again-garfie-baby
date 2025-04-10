@@ -92,7 +92,7 @@ class PlayField extends FlxGroup {
         final isPlayer:Bool = note.strumLine == playerStrumLine;
         onNoteHit.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
-            true, false, judgement, isPlayer && Scoring.splashAllowed(judgement), isPlayer, !isPlayer,
+            true, false, judgement, isPlayer && Scoring.splashAllowed(judgement), true, isPlayer, !isPlayer,
             Scoring.scoreNote(note, timestamp), Scoring.getAccuracyScore(judgement), 0.0115,
             Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true, true, true, null, ""
         ));
@@ -126,7 +126,15 @@ class PlayField extends FlxGroup {
         }
         if(event.showSplash)
             event.note.strumLine.showSplash(event.direction);
-        
+
+        if(event.showHoldCovers && event.length > 0) {
+            // TODO: add a thing in event for hold covers
+            event.note.strumLine.showHoldGradient(event.direction);
+            event.note.strumLine.showHoldCover(event.direction);
+        } else {
+            event.note.strumLine.holdGradients.members[event.direction].holding = false;
+            event.note.strumLine.holdCovers.members[event.direction].kill();
+        }
         if(event.showRating) {
             // TODO: this shit
         }
@@ -148,6 +156,7 @@ class PlayField extends FlxGroup {
     public function killNote(note:Note):Void {
         note.kill();
         note.holdTrail.kill();
+        note.strumLine.holdGradients.members[note.direction].kill();
     }
 
     public function missNote(note:Note):Void {
@@ -174,6 +183,11 @@ class PlayField extends FlxGroup {
     
             if(event.countAsMiss)
                 stats.missCombo++;
+        }
+        if(event.length > 0) {
+            // TODO: add a thing in event for hold covers
+            event.note.strumLine.holdGradients.members[event.direction].holding = false;
+            event.note.strumLine.holdCovers.members[event.direction].kill();
         }
         if(event.showRating) {
             // TODO: this shit

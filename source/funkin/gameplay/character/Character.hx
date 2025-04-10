@@ -84,8 +84,8 @@ class Character extends FlxSprite implements IBeatReceiver {
         switch(data.atlas.type) {
             case SPARROW:
                 frames = Paths.getSparrowAtlas('gameplay/characters/${characterID}/${data.atlas.path}');
-                for(name in Reflect.fields(data.animations)) {
-                    final data:AnimationData = Reflect.field(data.animations, name);
+                for(name in data.animations.keys()) {
+                    final data:AnimationData = data.animations.get(name);
                     if(data.indices != null && data.indices.length != 0)
                         animation.addByIndices(name, data.prefix, data.indices, "", data.fps, data.looped);
                     else
