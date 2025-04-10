@@ -2,10 +2,11 @@ package funkin.backend.scripting;
 
 #if SCRIPTING_ALLOWED
 import funkin.backend.assets.loaders.AssetLoader;
-import funkin.backend.assets.loaders.ContentAssetLoader;
-import funkin.backend.assets.loaders.DefaultAssetLoader;
+
 import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
+
+import funkin.states.menus.MainMenuState;
 
 class GlobalScript {
 	public static var scripts(default, null):FunkinScriptGroup;
@@ -64,7 +65,9 @@ class GlobalScript {
     public static function reloadScripts():Void {
 		scripts.close(); // this just closes the scripts, doesn't de-init the script group
 		WindowUtil.resetTitle(); // reset window title, incase a global script changes it
+
 		FunkinScript.staticVariables.clear(); // reset static variables
+		MainMenuState.curSelected = 0; // reset main menu selection
 		
         for(i in 0...Paths._registeredAssetLoaders.length) {
 			// go thru all asset loaders

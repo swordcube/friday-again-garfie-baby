@@ -44,8 +44,9 @@ class FreeplayState extends FunkinState {
     public var hintText:FlxText;
     public var categoryText:FlxText;
     
-    override function create() {
-        super.create();
+    override function create():Void {
+        if(FlxG.sound.music == null || !FlxG.sound.music.playing)
+            CoolUtil.playMenuMusic();
 
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_blue"));
         bg.screenCenter();
@@ -136,6 +137,7 @@ class FreeplayState extends FunkinState {
 		add(categoryText);
 
         changeCategory(0, true);
+        super.create();
     }
 
     override function update(elapsed:Float) {
@@ -154,6 +156,10 @@ class FreeplayState extends FunkinState {
         if(controls.justPressed.UI_RIGHT)
             changeDifficulty(1);
 
+        if(controls.justPressed.BACK) {
+            FlxG.switchState(new MainMenuState());
+            FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
+        }
         super.update(elapsed);
     }
 

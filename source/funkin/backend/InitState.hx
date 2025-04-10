@@ -11,7 +11,7 @@ import funkin.utilities.FlxUtil;
 import funkin.utilities.AudioSwitchFix;
 
 import funkin.states.PlayState;
-import funkin.states.menus.FreeplayState;
+import funkin.states.menus.MainMenuState;
 
 class InitState extends FlxState {
     private static var _lastState:Class<FlxState>;
@@ -100,7 +100,7 @@ class InitState extends FlxState {
             }));    
         } else {
             // otherwise do normal starting logic
-            FlxG.switchState(FreeplayState.new);
+            FlxG.switchState(MainMenuState.new);
         }
     }
 }

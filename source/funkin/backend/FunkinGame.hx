@@ -13,6 +13,7 @@ import flixel.FlxGame;
 import flixel.util.typeLimit.NextState.InitialState;
 
 import funkin.backend.native.NativeAPI;
+import funkin.states.menus.MainMenuState;
 
 using funkin.utilities.OpenFLUtil;
 
@@ -91,7 +92,7 @@ class FunkinGame extends FlxGame {
             Logs.error('Failed to destroy state: ${e}');
             _state = null;
         }
-        _nextState = new funkin.states.menus.FreeplayState();
+        _nextState = new MainMenuState();
         switchState();
     }
     #end

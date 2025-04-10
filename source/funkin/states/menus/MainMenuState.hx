@@ -1,0 +1,194 @@
+package funkin.states.menus;
+
+import flixel.effects.FlxFlicker;
+import flixel.text.FlxText;
+import flixel.util.FlxTimer;
+
+class MainMenuState extends FunkinState {
+    public var options:Array<MainMenuOption>;
+
+    public var bg:FlxSprite;
+    public var magenta:FlxSprite;
+    
+    public var menuItems:FlxTypedContainer<FlxSprite>;
+    public var camFollow:FlxObject;
+
+    public var versionText:FlxText;
+
+    public static var curSelected:Int = 0;
+
+    public function initOptions():Void {
+        options = [
+            {
+                name: "storymode",
+                callback: () -> trace("story menu TODO"),
+            },
+            {
+                name: "freeplay",
+                callback: () -> FlxG.switchState(new FreeplayState()),
+            },
+            {
+                name: "credits",
+                callback: () -> trace("credits menu TODO"),
+            },
+            {
+                name: "options",
+                callback: () -> trace("options menu TODO"),
+            },
+        ];
+    }
+
+    override function create():Void {
+        initOptions();
+        if(FlxG.sound.music == null || !FlxG.sound.music.playing)
+            CoolUtil.playMenuMusic();
+
+        bg = new FlxSprite().loadGraphic(Paths.image("menus/bg"));
+        bg.scrollFactor.set(0, Math.max(0.1, 0.25 - (0.05 * (options.length - 4))));
+        bg.scale.set(1.175, 1.175);
+        bg.updateHitbox();
+        bg.screenCenter();
+        add(bg);
+
+        magenta = new FlxSprite().loadGraphic(Paths.image("menus/bg_desat"));
+        magenta.scrollFactor.set(bg.scrollFactor.x, bg.scrollFactor.y);
+        magenta.scale.set(bg.scale.x, bg.scale.y);
+        magenta.updateHitbox();
+        magenta.screenCenter();
+        magenta.color = 0xFFFD719B;
+        magenta.visible = false;
+        add(magenta);
+
+        menuItems = new FlxTypedContainer<FlxSprite>();
+        add(menuItems);
+
+        final offset:Float = 108 - (Math.max(options.length, 4) - 4) * 80;
+		final scr:Float = (options.length < 6) ? 0 : (options.length - 4) * 0.135;
+        
+        for(i => option in options) {
+            final menuItem:FlxSprite = new FlxSprite(0, (i * 140) + offset);
+			
+			menuItem.frames = Paths.getSparrowAtlas('menus/main/${option.name}');
+			menuItem.animation.addByPrefix("idle", '${option.name} idle', 24);
+			menuItem.animation.addByPrefix("selected", '${option.name} selected', 24);
+			menuItem.animation.play("idle");
+
+			menuItem.scrollFactor.set(0, scr);
+			menuItem.updateHitbox();
+			menuItem.screenCenter(X);
+
+			menuItems.add(menuItem);   
+        }
+        camFollow = new FlxObject(0, 0, 1, 1);
+        add(camFollow);
+
+        var versionString:String = 'Garfie Engine v${FlxG.stage.application.meta.get("version")}';
+        versionString += "\nFriday Night Funkin' v0.6.0";
+        
+        versionText = new FlxText(0, FlxG.height, 0, versionString);
+		versionText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		versionText.scrollFactor.set();
+        versionText.y -= versionText.height;
+		add(versionText);
+        
+        FlxG.camera.follow(camFollow, LOCKON, 0.06);
+        changeSelection(0, true);
+
+        super.create();
+    }
+
+    override function update(elapsed:Float):Void {
+        if(controls.justPressed.UI_UP)
+            changeSelection(-1);
+
+        if(controls.justPressed.UI_DOWN)
+            changeSelection(1);
+
+        if(controls.justPressed.ACCEPT)
+            onSelect();
+
+        super.update(elapsed);
+    }
+
+    public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
+        curSelected = FlxMath.wrap(curSelected + by, 0, options.length - 1);
+
+        for(i => item in menuItems) {
+            if(curSelected == i) {
+                item.animation.play("selected");
+                item.centerOffsets();
+
+                final add:Float = (menuItems.length > 4) ? (menuItems.length * 8) : 0;
+				camFollow.setPosition(item.getGraphicMidpoint().x, item.getGraphicMidpoint().y - add);
+            }
+            else {
+                item.animation.play("idle");
+                item.centerOffsets();
+            }
+        }
+        FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
+    }
+    
+    public function onSelect():Void {
+        final option:MainMenuOption = options[curSelected];
+        if(option.fireImmediately) {
+            if(option.callback != null)
+                option.callback();
+            
+            return;
+        }
+        _bgFlicker();
+
+        for(i => item in menuItems) {
+            if(curSelected == i) {
+                FlxFlicker.flicker(item, 1, 0.06, false, false, (_) -> {
+                    if(option.callback != null)
+                        option.callback();
+                });
+            }
+            else {
+                FlxTween.tween(item, {alpha: 0.0}, 0.25, {
+                    ease: FlxEase.quadOut,
+					onComplete: (_) -> {
+                        item.kill();
+					}
+				});
+            }
+        }
+        FlxG.sound.play(Paths.sound("menus/sfx/select"));
+    }
+
+    //----------- [ Private API ] -----------//
+
+    private var magTwn:FlxTween = null;
+
+	private function _magentaFlicker(?tmr:FlxTimer):Void {
+		if(magTwn != null)
+            magTwn.cancel();
+		
+		magenta.alpha = 1.0;
+		magTwn = FlxTween.tween(magenta, {alpha: 0}, 0.12, {ease: FlxEase.circIn});
+	}
+	
+	private function _bgFlicker():Void {
+		magenta.visible = true;
+		
+		if(Options.flashingLights) {
+			_magentaFlicker();
+			new FlxTimer().start(0.24, _magentaFlicker, Math.floor(1 / 0.24));
+		}
+        else {
+			magenta.alpha = 0.0;
+			FlxTween.tween(magenta, {alpha: 1.0}, 0.96, {ease: FlxEase.quintOut});
+		}
+	}
+}
+
+@:structInit
+class MainMenuOption {
+    public var name:String;
+    public var callback:Void->Void;
+
+    @:optional
+    public var fireImmediately:Bool = false;
+}
