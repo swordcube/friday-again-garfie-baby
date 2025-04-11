@@ -9,9 +9,11 @@ function onUpdate(dt) {
         if(FlxG.keys.pressed.SHIFT) {
             FlxG.inputs.onStateSwitch();
             FlxG.signals.preStateCreate.addOnce(reloadAssets);
-        }
-        final constructor = FlxG.state._constructor;
-        FlxG.game._nextState = constructor;
-        FlxG.game.switchState();
+
+            final constructor = FlxG.state._constructor;
+            FlxG.game._nextState = constructor;
+            FlxG.game.switchState();
+        } else
+            FlxG.resetState();
     }
 }
