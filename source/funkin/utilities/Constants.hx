@@ -71,6 +71,11 @@ class Constants {
     public static final DEFAULT_HEALTH_ICON:String = "face";
 
     /**
+     * The default note skin used as a fallback.
+     */
+    public static final DEFAULT_NOTE_SKIN:String = "funkin";
+
+    /**
      * A list of every possible note direction in order.
      */
     public static final NOTE_DIRECTIONS:Array<String> = ["left", "down", "up", "right"];

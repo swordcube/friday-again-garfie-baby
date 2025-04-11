@@ -2,7 +2,7 @@ package funkin.gameplay.notes;
 
 import flixel.util.FlxSignal;
 
-import funkin.gameplay.UISkin;
+import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
 
 class HoldCover extends SkinnableSprite {
@@ -50,8 +50,8 @@ class HoldCover extends SkinnableSprite {
         if(_skin == newSkin)
             return;
 
-        final json:UISkinData = UISkin.get(newSkin);
-        loadSkinComplex(newSkin, json.holdCovers, 'gameplay/uiskins/${newSkin}');
+        final json:NoteSkinData = NoteSkin.get(newSkin);
+        loadSkinComplex(newSkin, json.holdCovers, 'gameplay/noteskins/${newSkin}');
 
         direction = direction; // force animation update
     }

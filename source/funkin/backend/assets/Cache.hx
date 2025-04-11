@@ -1,13 +1,18 @@
 package funkin.backend.assets;
 
-import flixel.graphics.frames.FlxFramesCollection;
-import funkin.gameplay.UISkin.UISkinData;
 import openfl.media.Sound;
 import openfl.utils.AssetCache as OpenFLAssetCache;
 
+import flixel.graphics.frames.FlxFramesCollection;
+
+import funkin.gameplay.UISkin;
+import funkin.gameplay.notes.NoteSkin;
+
 class Cache {
     public static var atlasCache(default, never):Map<String, FlxFramesCollection> = [];
+    
     public static var uiSkinCache(default, never):Map<String, UISkinData> = [];
+    public static var noteSkinCache(default, never):Map<String, NoteSkinData> = [];
 
     public static function clearAll():Void {
         // Clear atlases
@@ -18,6 +23,8 @@ class Cache {
             }
             atlas.destroy();
         }
+        atlasCache.clear();
+
         // Clear graphics
         @:privateAccess {
             for(key => graph in FlxG.bitmap._cache) {
@@ -55,7 +62,8 @@ class Cache {
                 }
             }
         }
-        atlasCache.clear();
+        // Clear note & UI skins
         uiSkinCache.clear();
+        noteSkinCache.clear();
     }
 }

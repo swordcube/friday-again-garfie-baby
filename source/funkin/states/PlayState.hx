@@ -286,11 +286,13 @@ class PlayState extends FunkinState {
 		playField.cameras = [camHUD];
 		add(playField);
 		
-		var event:HUDGenerationEvent = cast Events.get(HUD_GENERATION);
-		event = event.recycle(Options.hudType);
+		final event:HUDGenerationEvent = cast Events.get(HUD_GENERATION);
+
+		final uiSkin:String = currentChart.meta.game.uiSkin ?? "default";
+		event.recycle((uiSkin == "default") ? Options.hudType : uiSkin);
 
 		#if SCRIPTING_ALLOWED
-		event = scripts.event("onHUDGeneration", event.recycle(Options.hudType));
+		scripts.event("onHUDGeneration", event);
 		#end
 		switch(event.hudType) {
 			case "Classic":

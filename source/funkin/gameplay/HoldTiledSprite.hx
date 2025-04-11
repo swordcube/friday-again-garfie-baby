@@ -4,7 +4,7 @@ import flixel.util.FlxColor;
 import funkin.graphics.TiledSprite;
 
 import funkin.gameplay.notes.Note;
-import funkin.gameplay.UISkin.UISkinData;
+import funkin.gameplay.notes.NoteSkin;
 
 /**
  * Tiled sprite class specifically made for hold notes
@@ -34,8 +34,8 @@ class HoldTiledSprite extends TiledSprite {
         if(_skin == newSkin)
             return;
 
-        final json:UISkinData = UISkin.get(newSkin);
-        loadSkinComplex(newSkin, json.hold, 'gameplay/uiskins/${newSkin}');
+        final json:NoteSkinData = NoteSkin.get(newSkin);
+        loadSkinComplex(newSkin, json.hold, 'gameplay/noteskins/${newSkin}');
 
         direction = direction; // force animation update
     }

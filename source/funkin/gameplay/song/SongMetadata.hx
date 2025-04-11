@@ -31,7 +31,16 @@ class GameplayData {
 	public var characters:Map<String, String>;//DynamicAccess<String>;
 	public var scrollSpeed:Map<String, Float>;//DynamicAccess<Float>;
 
+	@:optional
+	@:default("stage")
 	public var stage:String;
+
+	@:optional
+	@:default("default")
+	public var noteSkin:String;
+
+	@:optional
+	@:default("default")
 	public var uiSkin:String;
 
     public function getCharacter(type:String):String {

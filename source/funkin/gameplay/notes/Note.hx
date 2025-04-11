@@ -2,7 +2,7 @@ package funkin.gameplay.notes;
 
 import flixel.util.FlxColor;
 
-import funkin.gameplay.UISkin;
+import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
 
 import funkin.backend.scripting.events.notes.*;
@@ -123,8 +123,8 @@ class Note extends SkinnableSprite {
         if(_skin == newSkin)
             return;
 
-        final json:UISkinData = UISkin.get(newSkin);
-        loadSkinComplex(newSkin, json.note, 'gameplay/uiskins/${newSkin}');
+        final json:NoteSkinData = NoteSkin.get(newSkin);
+        loadSkinComplex(newSkin, json.note, 'gameplay/noteskins/${newSkin}');
 
         direction = direction; // force animation update
     }

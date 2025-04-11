@@ -2,10 +2,8 @@ package funkin.gameplay.notes;
 
 import flixel.util.FlxColor;
 
-import funkin.gameplay.UISkin;
+import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
-
-import funkin.backend.scripting.events.notes.*;
 
 class NoteSplash extends SkinnableSprite {
     public var strumLine:StrumLine;
@@ -46,8 +44,8 @@ class NoteSplash extends SkinnableSprite {
         if(_skin == newSkin)
             return;
 
-        final json:UISkinData = UISkin.get(newSkin);
-        loadSkinComplex(newSkin, json.splash, 'gameplay/uiskins/${newSkin}');
+        final json:NoteSkinData = NoteSkin.get(newSkin);
+        loadSkinComplex(newSkin, json.splash, 'gameplay/noteskins/${newSkin}');
 
         splashCount = Lambda.count(json.splash.animation);
         direction = direction; // force animation update

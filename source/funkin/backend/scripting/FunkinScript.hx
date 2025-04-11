@@ -89,6 +89,7 @@ class FunkinScript {
         setClass(funkin.gameplay.notes.StrumLine);
 
         setClass(funkin.gameplay.notes.Note);
+        setClass(funkin.gameplay.notes.NoteSkin);
         setClass(funkin.gameplay.notes.NoteSpawner);
 
         setClass(funkin.gameplay.notes.HoldTail);

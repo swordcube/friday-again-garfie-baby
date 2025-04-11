@@ -57,11 +57,15 @@ class PlayField extends FlxGroup {
                 strumLine.playField = null;
             }
         });
-        opponentStrumLine = new StrumLine(FlxG.width * 0.25, 50, Options.downscroll, true, "funkin");
+        var noteSkin:String = currentChart.meta.game.noteSkin ?? "default";
+        if(noteSkin == "default")
+            noteSkin = Constants.DEFAULT_NOTE_SKIN;
+        
+        opponentStrumLine = new StrumLine(FlxG.width * 0.25, 50, Options.downscroll, true, noteSkin);
         opponentStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         add(opponentStrumLine);
 
-        playerStrumLine = new StrumLine(FlxG.width * 0.75, 50, Options.downscroll, false, "funkin");
+        playerStrumLine = new StrumLine(FlxG.width * 0.75, 50, Options.downscroll, false, noteSkin);
         playerStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         add(playerStrumLine);
 

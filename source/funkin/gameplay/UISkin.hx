@@ -24,14 +24,6 @@ class CountdownData {
 
 @:structInit
 class UISkinData {
-	public var strum:SkinnableSpriteData;
-	public var note:SkinnableSpriteData;
-	public var splash:SkinnableSpriteData;
-	public var hold:SkinnableSpriteData;
-
-	public var holdCovers:SkinnableSpriteData;
-	public var holdGradients:SkinnableSpriteData;
-
 	public var rating:SkinnableSpriteData;
 	public var combo:SkinnableSpriteData;
 

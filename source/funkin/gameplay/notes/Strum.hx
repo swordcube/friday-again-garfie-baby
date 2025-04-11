@@ -1,6 +1,6 @@
 package funkin.gameplay.notes;
 
-import funkin.gameplay.UISkin;
+import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
 
 class Strum extends SkinnableSprite {
@@ -46,8 +46,8 @@ class Strum extends SkinnableSprite {
         if(_skin == newSkin)
             return;
 
-        final json:UISkinData = UISkin.get(newSkin);
-        loadSkinComplex(newSkin, json.strum, 'gameplay/uiskins/${newSkin}');
+        final json:NoteSkinData = NoteSkin.get(newSkin);
+        loadSkinComplex(newSkin, json.strum, 'gameplay/noteskins/${newSkin}');
 
         direction = direction; // force animation update
         updateHitbox();
