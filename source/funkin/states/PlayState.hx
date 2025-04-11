@@ -28,6 +28,8 @@ import funkin.gameplay.events.EventRunner;
 import funkin.states.editors.ChartEditor;
 import funkin.states.menus.FreeplayState;
 
+import funkin.substates.PauseSubState;
+
 // import scripting events anyways because i'm too lazy
 // to make it work on no scripting mode lol!!
 #if SCRIPTING_ALLOWED
@@ -95,6 +97,7 @@ class PlayState extends FunkinState {
 	 */
 	public var camZoomingIntensity:Float = 1;
 
+	public var canPause:Bool = true;
 	public var chartingMode:Bool = false;
 
 	#if SCRIPTING_ALLOWED
@@ -123,8 +126,8 @@ class PlayState extends FunkinState {
 		instance = this;
 	}
 
-	override function create() {
-		super.create();
+	override function create():Void {
+		persistentUpdate = true;
 
 		if(FlxG.sound.music != null)
 			FlxG.sound.music.stop();
@@ -316,6 +319,7 @@ class PlayState extends FunkinState {
 		#if SCRIPTING_ALLOWED
 		scripts.call("onCreatePost");
 		#end
+		super.create();
 	}
 
 	override function update(elapsed:Float) {
@@ -329,7 +333,9 @@ class PlayState extends FunkinState {
 			// TODO: warning for unsaved charts
 			endSong(); // end the song immediately when SHIFT + END is pressed, as emergency
 		}
-
+		if(canPause && controls.justPressed.PAUSE)
+			pause();
+		
 		if(controls.justPressed.DEBUG) {
 			FlxG.switchState(ChartEditor.new.bind({
 				song: currentSong,
@@ -374,6 +380,17 @@ class PlayState extends FunkinState {
 		#end
 	}
 
+	public function pause():Void {
+		camGame.followEnabled = false;
+		Conductor.instance.autoIncrement = false;
+
+		FlxG.sound.music.pause();
+		vocals.pause();
+		
+		persistentUpdate = false;
+		openSubState(new PauseSubState());
+	}
+
 	public function startSong():Void {
 		if(!startingSong)
 			return;
@@ -405,23 +422,34 @@ class PlayState extends FunkinState {
 			return;
 
 		endingSong = true;
+		persistentUpdate = false;
+
+		FlxTween.globalManager.forEach((tween:FlxTween) -> {
+			tween.cancel();
+		});
+		FlxTimer.globalManager.forEach((timer:FlxTimer) -> {
+			timer.cancel();
+		});
 
 		#if SCRIPTING_ALLOWED
 		scripts.call("onEndSong");
 		scripts.call("onSongEnd");
 		#end
-
-		FlxG.sound.music.pause();
-		vocals.pause();
-
-		FlxG.sound.music.time = 0;
-		FlxG.sound.music.volume = 0;
 		FlxG.sound.music.looped = true;
-
+		Conductor.instance.music = null;
+		
+		if(FlxG.sound.music.playing)
+			vocals.pause();
+		else {
+			FlxG.signals.postStateSwitch.addOnce(() -> {
+				FlxTimer.wait(0.001, () -> {
+					FlxG.sound.music.time = 0;
+					FlxG.sound.music.play();
+					FlxG.sound.music.fadeIn(2, 0, 1);
+				});
+			});
+		}
 		// TODO: story mode
-		FlxG.signals.postStateSwitch.addOnce(() -> {
-			FlxTimer.wait(0.001, () -> FlxG.sound.music.fadeIn(2, 0, 1));
-		});
 		FlxG.switchState(FreeplayState.new);
 
 		#if SCRIPTING_ALLOWED

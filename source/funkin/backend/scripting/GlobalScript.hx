@@ -6,6 +6,7 @@ import funkin.backend.assets.loaders.AssetLoader;
 import funkin.backend.scripting.FunkinScript;
 import funkin.backend.scripting.FunkinScriptGroup;
 
+import funkin.states.menus.TitleState;
 import funkin.states.menus.MainMenuState;
 
 class GlobalScript {
@@ -65,9 +66,10 @@ class GlobalScript {
     public static function reloadScripts():Void {
 		scripts.close(); // this just closes the scripts, doesn't de-init the script group
 		WindowUtil.resetTitle(); // reset window title, incase a global script changes it
-
 		FunkinScript.staticVariables.clear(); // reset static variables
+
 		MainMenuState.curSelected = 0; // reset main menu selection
+		TitleState.initialized = false; // play thru title screen credits again
 		
         for(i in 0...Paths._registeredAssetLoaders.length) {
 			// go thru all asset loaders

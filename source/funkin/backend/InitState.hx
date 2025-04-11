@@ -11,7 +11,10 @@ import funkin.utilities.FlxUtil;
 import funkin.utilities.AudioSwitchFix;
 
 import funkin.states.PlayState;
-import funkin.states.menus.MainMenuState;
+import funkin.states.menus.TitleState;
+
+import funkin.states.TransitionableState;
+import funkin.substates.transition.FadeTransition;
 
 class InitState extends FlxState {
     private static var _lastState:Class<FlxState>;
@@ -71,6 +74,10 @@ class InitState extends FlxState {
             _lastState = Type.getClass(newState);
         });
         WindowUtil.init();
+        
+        // init the transition shit stuff
+        TransitionableState.defaultTransIn = FadeTransition;
+        TransitionableState.defaultTransOut = FadeTransition;
 
         // init cursor
         Cursor.init();
@@ -100,7 +107,7 @@ class InitState extends FlxState {
             }));    
         } else {
             // otherwise do normal starting logic
-            FlxG.switchState(MainMenuState.new);
+            FlxG.switchState(TitleState.new);
         }
     }
 }

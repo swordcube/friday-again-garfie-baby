@@ -30,6 +30,8 @@ import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.SongMetadata;
 import funkin.gameplay.song.VocalGroup;
 
+import funkin.states.menus.MainMenuState;
+
 import funkin.substates.charter.*;
 import funkin.substates.UnsavedWarningSubState;
 
@@ -726,6 +728,7 @@ class ChartEditor extends UIState {
 
     public function unsafePlayTest():Void {
         lastParams = null;
+        Conductor.instance.music = null;
         FlxG.switchState(PlayState.new.bind({
             song: currentSong,
             difficulty: currentDifficulty,
@@ -1095,7 +1098,8 @@ class ChartEditor extends UIState {
         FlxG.sound.music.onComplete = null;
         FlxG.sound.music.play();
 
-        FlxG.switchState(funkin.states.menus.FreeplayState.new);
+        Conductor.instance.music = null;
+        FlxG.switchState(MainMenuState.new);
     }
 
     public function exit():Void {

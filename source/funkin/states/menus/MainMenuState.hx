@@ -13,6 +13,7 @@ class MainMenuState extends FunkinState {
     public var menuItems:FlxTypedContainer<FlxSprite>;
     public var camFollow:FlxObject;
 
+    public var transitioning:Bool = false;
     public var versionText:FlxText;
 
     public static var curSelected:Int = 0;
@@ -39,9 +40,13 @@ class MainMenuState extends FunkinState {
     }
 
     override function create():Void {
+        persistentUpdate = true;
         initOptions();
+
         if(FlxG.sound.music == null || !FlxG.sound.music.playing)
             CoolUtil.playMenuMusic();
+
+        Conductor.instance.music = FlxG.sound.music;
 
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg"));
         bg.scrollFactor.set(0, Math.max(0.1, 0.25 - (0.05 * (options.length - 4))));
@@ -107,6 +112,11 @@ class MainMenuState extends FunkinState {
         if(controls.justPressed.ACCEPT)
             onSelect();
 
+        if(controls.justPressed.BACK) {
+            persistentUpdate = false;
+            FlxG.switchState(new TitleState());
+            FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
+        }
         super.update(elapsed);
     }
 
@@ -130,6 +140,9 @@ class MainMenuState extends FunkinState {
     }
     
     public function onSelect():Void {
+        if(transitioning)
+            return;
+
         final option:MainMenuOption = options[curSelected];
         if(option.fireImmediately) {
             if(option.callback != null)
@@ -141,7 +154,7 @@ class MainMenuState extends FunkinState {
 
         for(i => item in menuItems) {
             if(curSelected == i) {
-                FlxFlicker.flicker(item, 1, 0.06, false, false, (_) -> {
+                FlxFlicker.flicker(item, 1.1, 0.06, false, false, (_) -> {
                     if(option.callback != null)
                         option.callback();
                 });
@@ -155,6 +168,7 @@ class MainMenuState extends FunkinState {
 				});
             }
         }
+        transitioning = true;
         FlxG.sound.play(Paths.sound("menus/sfx/select"));
     }
 

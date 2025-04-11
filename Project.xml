@@ -58,7 +58,7 @@
 
 		lime test platform -DNO_LUA
 	-->
-	<define name="LUA_ALLOWED" if="SCRIPTING_ALLOWED" unless="NO_LUA" />
+	<define name="LUA_ALLOWED" if="SCRIPTING_ALLOWED cpp" unless="NO_LUA" />
 
 	<!--
 		Comment/delete this line below to disable the crash handler

@@ -42,6 +42,7 @@ import json2object.JsonWriter;
 import openfl.utils.Assets as OpenFLAssets;
 
 using StringTools;
+using funkin.utilities.CoolUtil;
 using funkin.utilities.ArrayUtil;
 
 #if SCRIPTING_ALLOWED

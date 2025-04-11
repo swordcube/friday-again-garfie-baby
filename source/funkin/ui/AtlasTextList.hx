@@ -62,7 +62,7 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
         super.update(elapsed);
     }
 
-    public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
+    public function changeSelection(by:Int = 0, ?force:Bool = false, ?playScrollSFX:Bool = true):Void {
         if(by == 0 && !force)
             return;
 
@@ -78,11 +78,12 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
         if(callback != null)
             callback(curSelected, members.unsafeGet(curSelected));
 
-        FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
+        if(playScrollSFX)
+            FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
     }
 }
 
 typedef ListCallbacks = {
-    var onSelect:(Int, AtlasText) -> Void; // item index, then the item itself
-    var onAccept:(Int, AtlasText) -> Void; // item index, then the item itself
+    var ?onSelect:(Int, AtlasText) -> Void; // item index, then the item itself
+    var ?onAccept:(Int, AtlasText) -> Void; // item index, then the item itself
 }

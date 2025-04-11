@@ -71,6 +71,7 @@ class FunkinScript {
         setClass(Controls);
         set("Control", funkin.backend.Controls.Control);
 
+        setClass(CoolUtil);
         setClass(Conductor);
         setClass(GlobalScript);
         setClass(Constants);
@@ -101,6 +102,10 @@ class FunkinScript {
         setClass(funkin.gameplay.HoldTiledSprite);
         setClass(funkin.gameplay.PlayField);
         setClass(funkin.gameplay.UISkin);
+
+        set("FlxRuntimeShader", funkin.utilities.RuntimeShader);
+        setClass(funkin.utilities.RuntimeShader);
+        setClass(funkin.utilities.CustomShader);
 
         set("BlendMode", funkin.backend.scripting.helpers.BlendModeHelper);
         set("FlxAxes", funkin.backend.scripting.helpers.FlxAxesHelper);

@@ -21,13 +21,14 @@ class FreeplaySongData {
 }
 
 class FreeplayState extends FunkinState {
-    public var bg:FlxSprite;
-    
-    public var categories:Array<FreeplayCategory> = [];
+    public static var curSelected:Int = 0;
     public static var curCategory:Int = 0;
     
+    public var bg:FlxSprite;
+    public var categories:Array<FreeplayCategory> = [];
+    
     public var songs:Map<String, Array<FreeplaySongData>> = [];
-    public var curSelected:Int = 0;
+    public var listeningSong:String = "";
 
     public var grpSongs:AtlasTextList;
 
@@ -45,9 +46,6 @@ class FreeplayState extends FunkinState {
     public var categoryText:FlxText;
     
     override function create():Void {
-        if(FlxG.sound.music == null || !FlxG.sound.music.playing)
-            CoolUtil.playMenuMusic();
-
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_blue"));
         bg.screenCenter();
         add(bg);
@@ -127,7 +125,7 @@ class FreeplayState extends FunkinState {
 		hintBG.alpha = 0.6;
 		add(hintBG);
 
-		hintText = new FlxText(hintBG.x, hintBG.y + 4, 0, "Q/E - Change Category | CTRL - Gameplay Modifiers");
+		hintText = new FlxText(hintBG.x, hintBG.y + 4, 0, "Q/E - Change Category | CTRL - Gameplay Modifiers | SPACE - Listen to Song");
 		hintText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, RIGHT);
         hintText.x += FlxG.width - (hintText.width + 4);
 		add(hintText);
@@ -136,7 +134,12 @@ class FreeplayState extends FunkinState {
 		categoryText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, LEFT);
 		add(categoryText);
 
+        final lastSelected:Int = curSelected;
         changeCategory(0, true);
+
+        grpSongs.curSelected = lastSelected;
+        grpSongs.changeSelection(0, true, false);
+
         super.create();
     }
 
@@ -160,7 +163,29 @@ class FreeplayState extends FunkinState {
             FlxG.switchState(new MainMenuState());
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
+        var tryingToListen:Bool = false;
+        if(FlxG.keys.justPressed.SPACE) {
+            final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+            final newListeningSong:String = '${categories[curCategory].id}:${song.id}:${curMix}';
+
+            if(newListeningSong != listeningSong) {
+                tryingToListen = true;
+                grpSongs.active = false;
+                
+                FlxG.sound.playMusic(Paths.sound('gameplay/songs/${song.id}/${curMix}/music/inst'), 0, false);
+                FlxG.sound.music.fadeIn(2.0, 0.0, 1.0);
+                
+                final meta:SongMetadata = song.metadata.get(curMix);
+                Conductor.instance.reset(meta.song.timingPoints.first()?.bpm ?? 100.0);
+                Conductor.instance.setupTimingPoints(meta.song.timingPoints);
+
+                listeningSong = newListeningSong;
+            }
+        }
         super.update(elapsed);
+
+        if(tryingToListen)
+            grpSongs.active = true;
     }
 
     public function changeCategory(by:Int = 0, ?force:Bool = false):Void {
@@ -252,6 +277,8 @@ class FreeplayState extends FunkinState {
             loadIntoCharter();
         else
             loadIntoSong();
+
+        FlxG.sound.music.fadeOut(0.16, 0);
     }
 
     public function loadIntoCharter():Void {

@@ -274,6 +274,18 @@ class Paths {
         return getAsset('${name}.txt', loaderID, useFallback);
     }
 
+    public static function csv(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        return getAsset('${name}.csv', loaderID, useFallback);
+    }
+
+    public static function frag(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        return getAsset('${name}.frag', loaderID, useFallback);
+    }
+
+    public static function vert(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        return getAsset('${name}.vert', loaderID, useFallback);
+    }
+
     public static function script(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
         final exts:Array<String> = ASSET_EXTENSIONS.get(SCRIPT);
         for(i in 0...exts.length) {
