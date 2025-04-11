@@ -150,6 +150,19 @@ class MainMenuState extends FunkinState {
             
             return;
         }
+        var bgScale = bg.scale.x;
+		var bgTargetScale = FlxG.height / bg.frameHeight;
+		var bgScroll = bg.scrollFactor.y;
+
+		FlxTween.num(0.0, 1.0, 0.25, {ease: FlxEase.backOut}, (progress:Float) -> {
+			progress /= 1.125;
+
+			var scale = FlxMath.lerp(bgScale, bgTargetScale, progress);
+			magenta.scale.x = magenta.scale.y = bg.scale.x = bg.scale.y = scale;
+
+			var scroll = FlxMath.lerp(bgScroll, 0.0, progress);
+			bg.scrollFactor.y = magenta.scrollFactor.y = scroll;
+		});
         _bgFlicker();
 
         for(i => item in menuItems) {
