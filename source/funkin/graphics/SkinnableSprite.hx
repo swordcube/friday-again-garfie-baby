@@ -1,6 +1,7 @@
 package funkin.graphics;
 
 import haxe.DynamicAccess;
+import flixel.graphics.atlas.FlxAtlas;
 
 @:structInit
 class AtlasData {
@@ -15,6 +16,9 @@ class AtlasData {
 class AnimationData {
 	@:optional
 	public var prefix:String;
+
+    @:optional
+	public var texture:String;
 
 	@:optional
 	public var indices:Array<Int>;
@@ -87,17 +91,19 @@ class SkinnableSprite extends FlxSprite {
 
             case ANIMATE:
                 // TODO: this shit
+
+            default:
         }
         for(key => data in _skinData.animation) {
             for(key2 => data2 in data) {
                 final animName:String = '${key2} ${key}';
                 if(data2.prefix != null) {
                     if(!data2.indices.isEmpty())
-                        animation.addByIndices(animName, data2.prefix, data2.indices, "", data2.fps, data2.looped ?? false);
+                        animation.addByIndices(animName, data2.prefix, data2.indices, "", data2.fps ?? 24, data2.looped ?? false);
                     else
-                        animation.addByPrefix(animName, data2.prefix, data2.fps, data2.looped ?? false);
-                } else
-                    animation.add(animName, data2.indices, data2.fps, data2.looped ?? false);
+                        animation.addByPrefix(animName, data2.prefix, data2.fps ?? 24, data2.looped ?? false);
+                } else 
+                    animation.add(animName, data2.indices, data2.fps ?? 24, data2.looped ?? false);
                 
                 animation.setOffset(animName, data2.offset?.x ?? 0.0, data2.offset?.y ?? 0.0);
             }

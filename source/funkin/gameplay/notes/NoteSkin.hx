@@ -18,7 +18,7 @@ class NoteSkin {
         if(Cache.noteSkinCache.get(name) == null) {
 			final parser:JsonParser<NoteSkinData> = new JsonParser<NoteSkinData>();
 			parser.ignoreUnknownVariables = true;
-			Cache.noteSkinCache.set(name, parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/noteskins/${name}/conf'))));
+			Cache.noteSkinCache.set(name, parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/noteskins/${name}/config'))));
         }
         return Cache.noteSkinCache.get(name);
     }

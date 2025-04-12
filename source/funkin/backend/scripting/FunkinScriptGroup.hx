@@ -53,17 +53,20 @@ class FunkinScriptGroup {
 
     public function call(method:String, ?args:Array<Dynamic>, ?exclude:Array<FunkinScript>, ?defaultValue:Dynamic):Dynamic {
         var member:FunkinScript = null;
-        var value:Dynamic = null;
+        var value:Dynamic = defaultValue;
         
         for(i in 0...members.length) {
             member = members[i];
             if(exclude != null && exclude.length != 0 && exclude.contains(member))
                 continue;
             
-            value = member.call(method, args);
-            if(value != defaultValue)
-                return value;
+            final ret:Dynamic = member.call(method, args);
+            if(ret != null)
+                value = ret;
         }
+        if(value != defaultValue)
+            return value;
+
         return defaultValue;
     }
     

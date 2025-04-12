@@ -4,7 +4,7 @@ import flixel.util.FlxTimer;
 import flixel.util.FlxDirectionFlags;
 
 import funkin.ui.AtlasText;
-import funkin.utilities.CustomShader;
+import funkin.graphics.shader.CustomShader;
 
 class TitleState extends FunkinState {
     public static var initialized:Bool = false;
@@ -76,6 +76,7 @@ class TitleState extends FunkinState {
         if(FlxG.sound.music == null || !FlxG.sound.music.playing)
             CoolUtil.playMenuMusic();
 
+        FlxG.sound.music.looped = true;
         Conductor.instance.music = FlxG.sound.music;
         
         quoteText = new AtlasText(0, 200, "bold", CENTER, "");

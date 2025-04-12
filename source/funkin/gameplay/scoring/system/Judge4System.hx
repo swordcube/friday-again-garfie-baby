@@ -10,6 +10,11 @@ class Judge4System extends ScoringSystem {
     override function getJudgements():Array<String> {
         return _judgementList;
     }
+
+    @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.setJudgements)
+    override function setJudgements(judgements:Array<String>):Void {
+        _judgementList = judgements;
+    }
     
     @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.getJudgementTiming)
     override function getJudgementTiming(judgement:String):Float {
@@ -35,19 +40,6 @@ class Judge4System extends ScoringSystem {
         return 0.0;
     }
 
-    @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.judgeNote)
-    override function judgeNote(note:Note, timestamp:Float):String {
-        var diff:Float = Math.abs(note.time - timestamp);
-        var result:String = _judgementList[_judgementList.length - 1];
-        
-        for(i in 0..._judgementList.length) {
-            final judgement:String = _judgementList[i];
-            if(diff >= getJudgementTiming(judgement))
-                result = judgement;
-        }
-        return result;
-    }
-
     @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.scoreNote)
     override function scoreNote(note:Note, timestamp:Float):Int {
         final judgement:String = judgeNote(note, timestamp);
@@ -70,5 +62,5 @@ class Judge4System extends ScoringSystem {
     // [ Private API ] //
     // --------------- //
 
-    private static final _judgementList:Array<String> = ["killer", "sick", "good", "bad", "shit"];
+    private var _judgementList:Array<String> = ["killer", "sick", "good", "bad", "shit"];
 }

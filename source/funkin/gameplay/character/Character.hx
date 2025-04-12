@@ -106,6 +106,8 @@ class Character extends FlxSprite implements IBeatReceiver {
 
             case ANIMATE:
                 // TODO: that shit
+
+            default:
         }
         flipX = data.flip.x;
         flipY = data.flip.y;

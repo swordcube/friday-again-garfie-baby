@@ -27,7 +27,7 @@ function onCreatePost()
     rateText:setFormat(Paths.font("fonts/vcr"), 16)
     rateText:setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 1)
     playField.hud.add(rateText)
-
+    
     setRate(1)
 end
 

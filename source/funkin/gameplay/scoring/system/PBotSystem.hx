@@ -43,7 +43,15 @@ class PBotSystem extends ScoringSystem {
 
     @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.getJudgements)
     override function getJudgements():Array<String> {
-        return _judgementList;
+        return (useKillers) ? _judgementList : _noKillerJudgementList;
+    }
+
+    @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.setJudgements)
+    override function setJudgements(judgements:Array<String>):Void {
+        if(useKillers)
+            _judgementList = judgements;
+        else
+            _noKillerJudgementList = judgements;
     }
     
     @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.getJudgementTiming)
@@ -68,21 +76,6 @@ class PBotSystem extends ScoringSystem {
             case "shit":   return 0.0;
         }
         return 0.0;
-    }
-
-    @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.judgeNote)
-    override function judgeNote(note:Note, timestamp:Float):String {
-        var diff:Float = Math.abs(note.time - timestamp);
-        var result:String = _judgementList[_judgementList.length - 1];
-        
-        for(i in 0..._judgementList.length) {
-            final judgement:String = _judgementList[i];
-            if(diff <= getJudgementTiming(judgement)) {
-                result = judgement;
-                break;
-            }
-        }
-        return result;
     }
 
     @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.scoreNote)
@@ -117,5 +110,6 @@ class PBotSystem extends ScoringSystem {
     // [ Private API ] //
     // --------------- //
 
-    private static final _judgementList:Array<String> = ["killer", "sick", "good", "bad", "shit"];
+    private var _judgementList:Array<String> = ["killer", "sick", "good", "bad", "shit"];
+    private var _noKillerJudgementList:Array<String> = ["sick", "good", "bad", "shit"];
 }

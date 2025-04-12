@@ -46,6 +46,9 @@ class FreeplayState extends FunkinState {
     public var categoryText:FlxText;
     
     override function create():Void {
+        if(FlxG.sound.music != null)
+            FlxG.sound.music.looped = true;
+
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_blue"));
         bg.screenCenter();
         add(bg);

@@ -1,34 +1,33 @@
 {
     "rating": {
         "atlas": {
-            "type": "grid",
-            "path": "images/ratings",
-            "gridSize": {"x": 408, "y": 152}
+            "type": "image",
+            "path": "images/ratings"
         },
-        "scale": 0.65,
+        "scale": 0.7,
         "animation": {
             "killer": {
-                "indices": [0],
+                "prefix": "killer",
                 "offset": {"x": 0, "y": 0}
             },
             "sick": {
-                "indices": [1],
+                "prefix": "sick",
                 "offset": {"x": 0, "y": 0}
             },
             "good": {
-                "indices": [2],
+                "prefix": "good",
                 "offset": {"x": 0, "y": 0}
             },
             "bad": {
-                "indices": [3],
+                "prefix": "bad",
                 "offset": {"x": 0, "y": 0}
             },
             "shit": {
-                "indices": [4],
+                "prefix": "shit",
                 "offset": {"x": 0, "y": 0}
             },
             "miss": {
-                "indices": [5],
+                "prefix": "miss",
                 "offset": {"x": 0, "y": 0}
             }
         }
@@ -39,7 +38,7 @@
             "path": "images/combo",
             "gridSize": {"x": 100, "y": 140}
         },
-        "scale": 0.45,
+        "scale": 0.5,
         "animation": {
             "minus": {
                 "indices": [0],
@@ -89,14 +88,14 @@
     },
     "countdown": {
         "atlas": {
-            "type": "grid",
-            "path": "images/countdown",
-            "gridSize": {"x": 770, "y": 380}
+            "type": "image",
+            "path": "images/countdown"
         },
         "steps": [
             {
                 "name": "prepare",
-                "soundPath": "sfx/intro3"
+                "soundPath": "sfx/intro3",
+                "visible": false
             },
             {
                 "name": "ready",
@@ -113,20 +112,16 @@
         ],
         "scale": 0.8,
         "animation": {
-            "prepare": {
-                "indices": [0],
-                "offset": {"x": 0, "y": 0}
-            },
             "ready": {
-                "indices": [1],
+                "prefix": "ready",
                 "offset": {"x": 0, "y": 0}
             },
             "set": {
-                "indices": [2],
+                "prefix": "set",
                 "offset": {"x": 0, "y": 0}
             },
             "go": {
-                "indices": [3],
+                "prefix": "go",
                 "offset": {"x": 0, "y": 0}
             }
         }

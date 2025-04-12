@@ -5,5 +5,6 @@ class Options {
     public static var songOffset:Float = 50;
     public static var hitWindow:Float = 180;
     public static var hudType:String = "Classic";
+    public static var useKillers:Bool = true;
     public static var flashingLights:Bool = true;
 }

@@ -4,7 +4,7 @@ import flixel.util.FlxDestroyUtil;
 import flixel.sound.FlxSound;
 
 class VocalGroup extends FlxBasic {
-    public var resyncRange:Float = 20;
+    public var resyncRange:Float = 30;
 
     public var spectator(default, null):FlxSound;
     public var opponent(default, null):FlxSound;

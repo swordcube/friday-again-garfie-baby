@@ -40,7 +40,7 @@ class AtlasText extends FlxTypedSpriteGroup<FlxSpriteGroup> {
 	public static function loadFontData(name:String):AtlasFont {
         final parser:JsonParser<AtlasFont> = new JsonParser<AtlasFont>();
         parser.ignoreUnknownVariables = true;
-        return parser.fromJson(FlxG.assets.getText(Paths.json('fonts/alphabet/${name}/conf')));
+        return parser.fromJson(FlxG.assets.getText(Paths.json('fonts/alphabet/${name}/config')));
 	}
 
 	override public function update(elapsed:Float):Void {

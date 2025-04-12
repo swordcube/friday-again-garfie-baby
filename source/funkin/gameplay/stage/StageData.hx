@@ -3,10 +3,12 @@ package funkin.gameplay.stage;
 enum abstract StagePropType(String) from String to String {
     final SPRITE = "sprite";
     final BOX = "box";
-
+    
     final SPECTATOR = "spectator";
     final OPPONENT = "opponent";
     final PLAYER = "player";
+    
+    final COMBO = "combo";
 }
 
 @:structInit
@@ -16,14 +18,11 @@ class StageData {
     public var id:String;
 
     public var zoom:Float;
-
-    @:noCompletion
     public var folders:Map<String, String>;
-
     public var layers:Array<Array<StagePropData>>;
 
     public static function load(stageID:String):StageData {
-        final confPath:String = Paths.json('gameplay/stages/${stageID}/conf');
+        final confPath:String = Paths.json('gameplay/stages/${stageID}/config');
         if(FlxG.assets.exists(confPath)) {
             var data:StageData = null;
             try {

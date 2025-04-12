@@ -1,4 +1,4 @@
-package funkin.utilities;
+package funkin.graphics.shader;
 
 import haxe.io.Path;
 

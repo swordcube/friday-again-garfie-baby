@@ -65,6 +65,6 @@ class EventRunner extends FlxBasic {
         if(e.cancelled)
             return;
 
-        onExecutePost.dispatch(e);
+        onExecutePost.dispatch(cast e.flagAsPost());
     }
 }

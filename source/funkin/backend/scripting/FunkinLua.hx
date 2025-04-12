@@ -85,7 +85,7 @@ class FunkinLua extends FunkinScript {
 
         if(closed) // if the script was closed DURING a func call, wait till after the call to close it
             Lua.close(_lua.luaState); // the one thing lscript doesn't have...
-
+        
         return ret;
     }
 

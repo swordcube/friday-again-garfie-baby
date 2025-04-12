@@ -50,6 +50,7 @@ class Stage extends FlxContainer {
         var spectatorAdded:Bool = false;
         var opponentAdded:Bool = false;
         var playerAdded:Bool = false;
+        var comboAdded:Bool = false;
 
         for(layerData in data.layers) {
             final layer:FlxContainer = new FlxContainer();
@@ -70,11 +71,11 @@ class Stage extends FlxContainer {
                         prop.applyProperties(propData.properties);
                         layer.add(cast prop);
                         props.set(propData.id, prop);
-
-                    case SPECTATOR:
-                        if(!spectatorAdded) {
-                            characters.spectator.x = propData.properties.x ?? 656.0;
-                            characters.spectator.y = propData.properties.y ?? 738.0;
+                        
+                        case SPECTATOR:
+                            if(!spectatorAdded) {
+                                characters.spectator.x = propData.properties.position?.x ?? 412.0;
+                                characters.spectator.y = propData.properties.position?.y ?? 738.0;
                             characters.spectator.scrollFactor.set(propData.properties.scroll?.x ?? 1.0, propData.properties.scroll?.y ?? propData.properties.scroll?.x ?? 1.0);
                             layer.add(characters.spectator);
                             spectatorAdded = true;
@@ -82,20 +83,29 @@ class Stage extends FlxContainer {
                             
                     case OPPONENT:
                         if(!opponentAdded) {
-                            characters.opponent.x = propData.properties.x ?? 244.0;
-                            characters.opponent.y = propData.properties.y ?? 812.0;
+                            characters.opponent.x = propData.properties.position?.x ?? 0.0;
+                            characters.opponent.y = propData.properties.position?.y ?? 812.0;
                             characters.opponent.scrollFactor.set(propData.properties.scroll?.x ?? 1.0, propData.properties.scroll?.y ?? propData.properties.scroll?.x ?? 1.0);
                             layer.add(characters.opponent);
                             opponentAdded = true;
                         }
-
+                        
                     case PLAYER:
                         if(!playerAdded) {
-                            characters.player.x = propData.properties.x ?? 938.0;
-                            characters.player.y = propData.properties.y ?? 812.0;
+                            characters.player.x = propData.properties.position?.x ?? 694.0;
+                            characters.player.y = propData.properties.position?.y ?? 812.0;
                             characters.player.scrollFactor.set(propData.properties.scroll?.x ?? 1.0, propData.properties.scroll?.y ?? propData.properties.scroll?.x ?? 1.0);
                             layer.add(characters.player);
                             playerAdded = true;
+                        }
+                        
+                    case COMBO:
+                        if(!comboAdded) {
+                            prop = new ComboProp(FlxG.width * 0.55, (FlxG.height * 0.5) - 60, this, layer);
+                            prop.applyProperties(propData.properties);
+                            layer.add(cast prop);
+                            props.set("combo", prop);
+                            comboAdded = true;
                         }
                 }
             }
@@ -114,6 +124,12 @@ class Stage extends FlxContainer {
             characters.player.setPosition(938.0, 812.0);
             addOnLastLayer(characters.player);
             playerAdded = true;
+        }
+        if(!comboAdded) {
+            final prop:ComboProp = new ComboProp(FlxG.width * 0.55, (FlxG.height * 0.5) - 60, this, layers.last());
+            addOnLastLayer(cast prop);
+            props.set("combo", prop);
+            comboAdded = true;
         }
         #if SCRIPTING_ALLOWED
         if(script != null)

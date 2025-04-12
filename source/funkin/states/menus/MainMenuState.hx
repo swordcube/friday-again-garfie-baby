@@ -1,8 +1,10 @@
 package funkin.states.menus;
 
-import flixel.effects.FlxFlicker;
 import flixel.text.FlxText;
 import flixel.util.FlxTimer;
+import flixel.effects.FlxFlicker;
+
+import funkin.backend.macros.GitCommitMacro;
 
 class MainMenuState extends FunkinState {
     public var options:Array<MainMenuOption>;
@@ -46,6 +48,7 @@ class MainMenuState extends FunkinState {
         if(FlxG.sound.music == null || !FlxG.sound.music.playing)
             CoolUtil.playMenuMusic();
 
+        FlxG.sound.music.looped = true;
         Conductor.instance.music = FlxG.sound.music;
 
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg"));
@@ -88,9 +91,13 @@ class MainMenuState extends FunkinState {
         add(camFollow);
 
         var versionString:String = 'Garfie Engine v${FlxG.stage.application.meta.get("version")}';
+
+        if(Constants.DEVELOPMENT_BUILD)
+            versionString += ' (${GitCommitMacro.getBranch()}/${GitCommitMacro.getCommitHash()})';
+
         versionString += "\nFriday Night Funkin' v0.6.0";
         
-        versionText = new FlxText(0, FlxG.height, 0, versionString);
+        versionText = new FlxText(5, FlxG.height - 2, 0, versionString);
 		versionText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		versionText.scrollFactor.set();
         versionText.y -= versionText.height;
@@ -103,10 +110,11 @@ class MainMenuState extends FunkinState {
     }
 
     override function update(elapsed:Float):Void {
-        if(controls.justPressed.UI_UP)
+        final wheel:Float = -FlxG.mouse.wheel;
+        if(controls.justPressed.UI_UP || wheel < 0)
             changeSelection(-1);
 
-        if(controls.justPressed.UI_DOWN)
+        if(controls.justPressed.UI_DOWN || wheel > 0)
             changeSelection(1);
 
         if(controls.justPressed.ACCEPT)

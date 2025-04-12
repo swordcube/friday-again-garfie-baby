@@ -17,6 +17,8 @@ import funkin.ui.AtlasTextList;
 import funkin.states.PlayState;
 import funkin.states.menus.FreeplayState;
 
+import funkin.substates.transition.FadeTransition;
+
 @:access(funkin.states.PlayState)
 class PauseSubState extends FunkinSubState {
     public static final CHARTER_FADE_DELAY:Float = 15.0;
@@ -34,7 +36,15 @@ class PauseSubState extends FunkinSubState {
     public var pauseMusic:FlxSound;
     public var inputAllowed:Bool = false;
 
+    public var prevWindowOnClose:Void->Void;
+    public var lastTimeScale:Float = 1;
+
     override function create():Void {
+        lastTimeScale = FlxG.timeScale;
+        FlxG.timeScale = 1;
+
+        prevWindowOnClose = WindowUtil.onClose;
+
         camera = new FlxCamera();
         camera.bgColor = 0;
         FlxG.cameras.add(camera, false);
@@ -105,6 +115,22 @@ class PauseSubState extends FunkinSubState {
         artistText = grpStats.members[1]; // hardcoded but i don't care
         startCharterTimer();
 
+        WindowUtil.onClose = () -> {
+            if(!WindowUtil.preventClosing)
+                return;
+
+            final warning = new UnsavedWarningSubState();
+            warning.onAccept.add(() -> {
+                WindowUtil.preventClosing = false;
+                WindowUtil.resetClosing();
+                unsafeExitToMenu();
+            });
+            warning.onCancel.add(() -> {
+                WindowUtil.resetClosing();
+                warning.close();
+            });
+            openSubState(warning);
+        };
         super.create();
     }
 
@@ -150,13 +176,17 @@ class PauseSubState extends FunkinSubState {
         for(tween in pausedTweens)
             tween.paused = false;
 
+        Conductor.instance.music = FlxG.sound.music;
         Conductor.instance.autoIncrement = true;
 
         final game:PlayState = PlayState.instance;
         game.camGame.followEnabled = true;
 
         if(!game.startingSong) {
+            FlxG.sound.music.time = Conductor.instance.rawTime;
             FlxG.sound.music.resume();
+
+            game.vocals.seek(FlxG.sound.music.time);
             game.vocals.resume();
         }
         close();
@@ -169,6 +199,14 @@ class PauseSubState extends FunkinSubState {
             FlxG.sound.music.pause();
             game.vocals.pause();
 
+            final transitionCam:FlxCamera = new FlxCamera();
+            transitionCam.bgColor = 0;
+            FlxG.cameras.add(transitionCam, false);
+
+            FadeTransition.nextCamera = transitionCam;
+            FlxG.signals.postStateSwitch.addOnce(() -> {
+                FlxG.cameras.remove(FadeTransition.nextCamera);
+            });
             FlxG.switchState(PlayState.new.bind({
                 song: game.currentSong,
                 difficulty: game.currentDifficulty,
@@ -182,12 +220,36 @@ class PauseSubState extends FunkinSubState {
         close();
     }
 
-    public function exitToMenu():Void {
+    public function unsafeExitToMenu():Void {
         // TODO: story mode
         FlxTimer.wait(0.001, () -> {
+            FlxG.sound.music.volume = 0;
+            FlxG.sound.music.looped = true;
+            FlxG.sound.music.play();
+            FlxG.sound.music.fadeIn(0.16, 0, 1);
+
+            final transitionCam:FlxCamera = new FlxCamera();
+            transitionCam.bgColor = 0;
+            FlxG.cameras.add(transitionCam, false);
+
+            FadeTransition.nextCamera = transitionCam;
+            FlxG.signals.postStateSwitch.addOnce(() -> {
+                FlxG.cameras.remove(FadeTransition.nextCamera);
+            });
             FlxG.switchState(FreeplayState.new);
         });
         close();
+    }
+
+    public function exitToMenu():Void {
+        if(PlayState.lastParams._unsaved) {
+            final warning = new UnsavedWarningSubState();
+            warning.onAccept.add(unsafeExitToMenu);
+            warning.onCancel.add(warning.close);
+            openSubState(warning);
+            return;
+        }
+        unsafeExitToMenu();
     }
 
     //----------- [ Private API ] -----------//
@@ -242,7 +304,10 @@ class PauseSubState extends FunkinSubState {
         if(pauseMusic != null)
             pauseMusic = FlxDestroyUtil.destroy(pauseMusic);
         
+        FlxG.timeScale = lastTimeScale;
         FlxG.cameras.remove(camera);
+        
+        WindowUtil.onClose = prevWindowOnClose;
         super.destroy();
     }
 }

@@ -88,7 +88,7 @@ class CharacterData {
      * @param  charID  The name of the character to fetch data from.
      */
     public static function load(charID:String):CharacterData {
-        var confPath:String = Paths.json('gameplay/characters/${charID}/conf');
+        var confPath:String = Paths.json('gameplay/characters/${charID}/config');
         if(FlxG.assets.exists(confPath)) {
             var data:CharacterData = null;
             try {
@@ -107,7 +107,7 @@ class CharacterData {
         Logs.error('Config for character "${charID}" doesn\'t exist!');
         
         charID = Constants.DEFAULT_CHARACTER;
-        confPath = Paths.json('gameplay/characters/${charID}/conf');
+        confPath = Paths.json('gameplay/characters/${charID}/config');
         
         var data:CharacterData = null;
         try {

@@ -7,8 +7,8 @@ import funkin.backend.Conductor.IBeatReceiver;
 import funkin.backend.assets.loaders.AssetLoader;
 
 import funkin.backend.scripting.events.*;
-import funkin.backend.scripting.events.gameplay.*;
 import funkin.backend.scripting.events.notes.*;
+import funkin.backend.scripting.events.gameplay.*;
 
 import funkin.gameplay.PlayField;
 import funkin.gameplay.FunkinCamera;
@@ -21,9 +21,13 @@ import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.VocalGroup;
 
 import funkin.gameplay.stage.Stage;
+import funkin.gameplay.stage.props.ComboProp;
 
 import funkin.gameplay.events.*;
 import funkin.gameplay.events.EventRunner;
+
+import funkin.gameplay.scoring.Scoring;
+import funkin.gameplay.scoring.system.*;
 
 import funkin.states.editors.ChartEditor;
 import funkin.states.menus.FreeplayState;
@@ -100,6 +104,8 @@ class PlayState extends FunkinState {
 	public var canPause:Bool = true;
 	public var chartingMode:Bool = false;
 
+	public var worldCombo(default, set):Bool;
+
 	#if SCRIPTING_ALLOWED
 	public var scripts:FunkinScriptGroup;
 
@@ -174,6 +180,8 @@ class PlayState extends FunkinState {
 		camHUD.bgColor = 0;
 		FlxG.cameras.add(camHUD, false);
 
+		Scoring.currentSystem = new PBotSystem(); // reset the scoring system, cuz you can change it thru scripting n shit, and that shouldn't persist
+
 		Conductor.instance.music = null;
 		Conductor.instance.offset = Options.songOffset + inst.latency;
 		Conductor.instance.autoIncrement = true;
@@ -213,10 +221,33 @@ class PlayState extends FunkinState {
 					scripts.add(FunkinScript.fromFile(path));
 			}
 		}
+		inline function addSingleScript(loader:AssetLoader, path:String) {
+			final scriptPath:String = Paths.script(path, loader.id);
+			if(FlxG.assets.exists(scriptPath))
+				scripts.add(FunkinScript.fromFile(scriptPath));
+		}
+		final rawNoteSkin:String = currentChart.meta.game.noteSkin;
+		final rawUISkin:String = currentChart.meta.game.uiSkin;
+		
+		var noteSkin:String = rawNoteSkin ?? "default";
+		if(noteSkin == "default")
+			currentChart.meta.game.noteSkin = noteSkin = Constants.DEFAULT_NOTE_SKIN;
+		
+		var uiSkin:String = rawUISkin ?? "default";
+		if(uiSkin == "default")
+			currentChart.meta.game.uiSkin = uiSkin = Constants.DEFAULT_UI_SKIN;
+
 		for(i in 0...loaders.length) {
-			addScripts(loaders[i], 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // load from specific song and specific mix first
+			// gameplay scripts
+			addScripts(loaders[i], "gameplay/scripts"); // load any gameplay script first
 			addScripts(loaders[i], 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
-			addScripts(loaders[i], "gameplay/scripts"); // then load any gameplay script
+			addScripts(loaders[i], 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // then load from specific song and specific mix
+		
+			// noteskin script
+			addSingleScript(loaders[i], 'gameplay/noteskins/${noteSkin}/script');
+
+			// uiskin script
+			addSingleScript(loaders[i], 'gameplay/uiskins/${uiSkin}/script');
 		}
 		if(stage.script != null)
 			scripts.add(stage.script);
@@ -283,40 +314,52 @@ class PlayState extends FunkinState {
 		playField.onNoteMiss.add(onNoteMiss);
 		playField.onNoteMissPost.add(onNoteMissPost);
 
+		playField.onDisplayRating.add(onDisplayRating);
+		playField.onDisplayRatingPost.add(onDisplayRatingPost);
+
+		playField.onDisplayCombo.add(onDisplayCombo);
+		playField.onDisplayComboPost.add(onDisplayComboPost);
+
 		playField.cameras = [camHUD];
 		add(playField);
 		
 		final event:HUDGenerationEvent = cast Events.get(HUD_GENERATION);
-
-		final uiSkin:String = currentChart.meta.game.uiSkin ?? "default";
-		event.recycle((uiSkin == "default") ? Options.hudType : uiSkin);
+		event.recycle(Options.hudType);
 
 		#if SCRIPTING_ALLOWED
 		scripts.event("onHUDGeneration", event);
 		#end
-		switch(event.hudType) {
-			case "Classic":
-				playField.hud = new ClassicHUD(playField);
-				
-			default:
-				#if SCRIPTING_ALLOWED
-				playField.hud = new ScriptedHUD(playField, event.hudType);
-				#else
-				playField.hud = new ClassicHUD(playField);
-				#end
+		inline function loadDefaultHUD() {
+			switch(Options.hudType) {
+				case "Classic":
+					playField.hud = new ClassicHUD(playField);
+
+				default:
+					playField.hud = new ClassicHUD(playField); // for now
+			}
 		}
+		#if SCRIPTING_ALLOWED
+		if(FlxG.assets.exists(Paths.script('gameplay/hudskins/${event.hudType}/script')))
+			playField.hud = new ScriptedHUD(playField, event.hudType);
+		else
+			loadDefaultHUD();
+		#else
+		loadDefaultHUD();
+		#end
+
 		playField.hud.cameras = [camHUD];
 		add(playField.hud);
-
+		
 		#if SCRIPTING_ALLOWED
 		if(playField.hud is ScriptedHUD) {
 			final hud:ScriptedHUD = cast playField.hud;
 			scripts.add(hud.script);
-
+			
 			hud.script.setParent(hud);
 			hud.script.call("onCreate");
 		}
 		#end
+		worldCombo = false;
 		
 		#if SCRIPTING_ALLOWED
 		scripts.call("onCreatePost");
@@ -339,6 +382,11 @@ class PlayState extends FunkinState {
 			pause();
 		
 		if(controls.justPressed.DEBUG) {
+			persistentUpdate = false;
+			
+			FlxG.sound.music.pause();
+			vocals.pause();
+
 			FlxG.switchState(ChartEditor.new.bind({
 				song: currentSong,
 				difficulty: currentDifficulty,
@@ -384,6 +432,8 @@ class PlayState extends FunkinState {
 
 	public function pause():Void {
 		camGame.followEnabled = false;
+
+		Conductor.instance.music = null;
 		Conductor.instance.autoIncrement = false;
 
 		FlxG.sound.music.pause();
@@ -438,7 +488,9 @@ class PlayState extends FunkinState {
 		scripts.call("onSongEnd");
 		#end
 		FlxG.sound.music.looped = true;
+
 		Conductor.instance.music = null;
+		Conductor.instance.autoIncrement = false;
 		
 		if(FlxG.sound.music.playing)
 			vocals.pause();
@@ -446,6 +498,8 @@ class PlayState extends FunkinState {
 			FlxG.signals.postStateSwitch.addOnce(() -> {
 				FlxTimer.wait(0.001, () -> {
 					FlxG.sound.music.time = 0;
+					FlxG.sound.music.volume = 0;
+					FlxG.sound.music.looped = true;
 					FlxG.sound.music.play();
 					FlxG.sound.music.fadeIn(2, 0, 1);
 				});
@@ -594,6 +648,30 @@ class PlayState extends FunkinState {
 		#end
 	}
 
+	private function onDisplayRating(event:DisplayRatingEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onDisplayRating", [event]);
+		#end
+	}
+
+	private function onDisplayRatingPost(event:DisplayRatingEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onDisplayRatingPost", [event]);
+		#end
+	}
+
+	private function onDisplayCombo(event:DisplayComboEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onDisplayCombo", [event]);
+		#end
+	}
+
+	private function onDisplayComboPost(event:DisplayComboEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onDisplayComboPost", [event]);
+		#end
+	}
+
 	override function stepHit(step:Int):Void {
 		#if SCRIPTING_ALLOWED
 		scripts.call("onStepHit", [step]);
@@ -623,6 +701,33 @@ class PlayState extends FunkinState {
 		#end
 	}
 
+	//----------- [ Private API ] -----------//
+
+	@:noCompletion
+	private function set_worldCombo(newValue:Bool):Bool {
+		worldCombo = newValue;
+
+		playField.comboDisplay.cameras = (worldCombo) ? [camGame] : [camHUD];
+		playField.comboDisplay.legacyStyle = worldCombo;
+
+		if(worldCombo) {
+			playField.remove(playField.comboDisplay, true);
+			
+			final comboProp:ComboProp = cast stage.props.get("combo");
+			comboProp.container.insert(comboProp.container.members.indexOf(comboProp) + 1, playField.comboDisplay);
+			
+			playField.comboDisplay.scrollFactor.set(comboProp.scrollFactor.x ?? 1.0, comboProp.scrollFactor.y ?? 1.0);
+			playField.comboDisplay.setPosition(comboProp.x, comboProp.y);
+		}
+		else {
+			playField.comboDisplay.container.remove(playField.comboDisplay, true);
+			playField.insert(playField.members.indexOf(playField.playerStrumLine) + 1, playField.comboDisplay);
+			
+			playField.comboDisplay.setPosition(FlxG.width * 0.474, (FlxG.height * 0.45) - 60); 
+		}
+		return worldCombo;
+	}
+
 	override function destroy() {
 		#if SCRIPTING_ALLOWED
 		scripts.call("onDestroy");
@@ -632,6 +737,7 @@ class PlayState extends FunkinState {
 		Paths.forceMod = null;
 
 		Conductor.instance.music = null;
+		Conductor.instance.autoIncrement = true;
 		Conductor.instance.offset = 0;
 		
 		WindowUtil.resetTitle();

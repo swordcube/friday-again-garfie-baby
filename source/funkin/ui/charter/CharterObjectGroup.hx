@@ -252,7 +252,7 @@ class CharterObjectGroup extends FlxObject {
 
             sustain.updateSustain(note.data.direction % Constants.KEY_COUNT, sprite.scale.x);
             sustain.alpha = sprite.alpha;
-            sustain.height = note.stepLength * ChartEditor.CELL_SIZE;
+            sustain.height = (note.stepLength > 0.01) ? (note.stepLength + 0.5) * ChartEditor.CELL_SIZE : 0;
             
             sustain.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + ((ChartEditor.CELL_SIZE - sustain.strip.width) * 0.5) + offsetX, y + (ChartEditor.CELL_SIZE * note.step) + (ChartEditor.CELL_SIZE * 0.5));
             sustain.draw();

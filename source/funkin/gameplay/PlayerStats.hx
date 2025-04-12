@@ -41,7 +41,8 @@ class PlayerStats {
     public var combo:Int = 0;
 
     /**
-     * The current miss combo of the player.
+     * How many notes the player has missed
+     * since their last combo break.
      * 
      * Resets when the player hits a note.
      */

@@ -92,7 +92,7 @@
 		Don't copy content over if it's a test build
 		We'll load from source directory instead of export directory instead
 	-->
-	<section unless="TEST_BUILD">
+	<section unless="TEST_BUILD || display">
 		<assets path="assets" type="template" />
 		<assets path="content" type="template" />
 		<assets path="tools" type="template" />

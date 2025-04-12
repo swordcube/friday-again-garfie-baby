@@ -17,7 +17,12 @@ class UnsavedWarningSubState extends UISubState {
     public var onAccept:FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>(); // accept the loss, you lose your shit!
     public var onCancel:FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>(); // don't accept the loss, you probably saved your shit!
 
+    public var lastMouseVisible:Bool = false;
+
     override function create():Void {
+        lastMouseVisible = FlxG.mouse.visible;
+        FlxG.mouse.visible = true;
+
         camera = new FlxCamera();
         camera.bgColor = 0x80000000;
         FlxG.cameras.add(camera, false);
@@ -41,6 +46,7 @@ class UnsavedWarningSubState extends UISubState {
     }
 
     override function destroy():Void {
+        FlxG.mouse.visible = lastMouseVisible;
         FlxG.cameras.remove(camera);
         super.destroy();
     }

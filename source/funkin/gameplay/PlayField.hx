@@ -3,6 +3,7 @@ package funkin.gameplay;
 import flixel.util.FlxSort;
 import flixel.util.FlxSignal;
 
+import funkin.gameplay.ComboDisplay;
 import funkin.gameplay.hud.BaseHUD;
 
 import funkin.gameplay.notes.Strum;
@@ -15,15 +16,18 @@ import funkin.gameplay.song.ChartData.ChartData;
 
 import funkin.backend.scripting.events.*;
 import funkin.backend.scripting.events.notes.*;
+import funkin.backend.scripting.events.gameplay.*;
 
 import funkin.gameplay.scoring.Scoring;
 
-class PlayField extends FlxGroup {
+class PlayField extends FlxContainer {
     public var opponentStrumLine:StrumLine;
     public var playerStrumLine:StrumLine;
 
     public var stats:PlayerStats;
     public var hud:BaseHUD;
+
+    public var comboDisplay:ComboDisplay;
 
     public var currentChart:ChartData;
     public var currentDifficulty:String;
@@ -36,6 +40,12 @@ class PlayField extends FlxGroup {
     
     public var onNoteMiss:FlxTypedSignal<NoteMissEvent->Void> = new FlxTypedSignal<NoteMissEvent->Void>();
     public var onNoteMissPost:FlxTypedSignal<NoteMissEvent->Void> = new FlxTypedSignal<NoteMissEvent->Void>();
+
+    public var onDisplayRating:FlxTypedSignal<DisplayRatingEvent->Void> = new FlxTypedSignal<DisplayRatingEvent->Void>();
+    public var onDisplayRatingPost:FlxTypedSignal<DisplayRatingEvent->Void> = new FlxTypedSignal<DisplayRatingEvent->Void>();
+
+    public var onDisplayCombo:FlxTypedSignal<DisplayComboEvent->Void> = new FlxTypedSignal<DisplayComboEvent->Void>();
+    public var onDisplayComboPost:FlxTypedSignal<DisplayComboEvent->Void> = new FlxTypedSignal<DisplayComboEvent->Void>();
 
     public var strumsPressed:Array<Bool> = [false, false, false, false];
     public var controls:Array<Control> = [NOTE_LEFT, NOTE_DOWN, NOTE_UP, NOTE_RIGHT];
@@ -57,17 +67,16 @@ class PlayField extends FlxGroup {
                 strumLine.playField = null;
             }
         });
-        var noteSkin:String = currentChart.meta.game.noteSkin ?? "default";
-        if(noteSkin == "default")
-            noteSkin = Constants.DEFAULT_NOTE_SKIN;
-        
-        opponentStrumLine = new StrumLine(FlxG.width * 0.25, 50, Options.downscroll, true, noteSkin);
+        opponentStrumLine = new StrumLine(FlxG.width * 0.25, 50, Options.downscroll, true, currentChart.meta.game.noteSkin);
         opponentStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         add(opponentStrumLine);
 
-        playerStrumLine = new StrumLine(FlxG.width * 0.75, 50, Options.downscroll, false, noteSkin);
+        playerStrumLine = new StrumLine(FlxG.width * 0.75, 50, Options.downscroll, false, currentChart.meta.game.noteSkin);
         playerStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         add(playerStrumLine);
+
+        comboDisplay = new ComboDisplay(FlxG.width * 0.474, (FlxG.height * 0.45) - 60, currentChart.meta.game.uiSkin);
+        add(comboDisplay);
 
         for(strumLine in [opponentStrumLine, playerStrumLine]) {
             if(Options.downscroll)
@@ -90,13 +99,13 @@ class PlayField extends FlxGroup {
     public function hitNote(note:Note):Void {
         final event:NoteHitEvent = Events.get(NOTE_HIT);
 
-        final timestamp:Float = attachedConductor.time;
+        final timestamp:Float = (note.strumLine.botplay) ? note.time : attachedConductor.time;
         final judgement:String = Scoring.judgeNote(note, timestamp);
 
         final isPlayer:Bool = note.strumLine == playerStrumLine;
         onNoteHit.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
-            true, false, judgement, isPlayer && Scoring.splashAllowed(judgement), true, isPlayer, !isPlayer,
+            isPlayer, false, judgement, isPlayer && Scoring.splashAllowed(judgement), true, isPlayer, isPlayer,
             Scoring.scoreNote(note, timestamp), Scoring.getAccuracyScore(judgement), 0.0115,
             Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true, true, true, null, ""
         ));
@@ -128,22 +137,33 @@ class PlayField extends FlxGroup {
             stats.accuracyScore += event.accuracyScore;
             stats.totalNotesHit++;
         }
+        if(event.showRating) {
+            final e:DisplayRatingEvent = cast Events.get(DISPLAY_RATING);
+            onDisplayRating.dispatch(e.recycle(event.rating, null));
+
+            if(!e.cancelled) {
+                e.sprite = comboDisplay.displayRating(e.rating);
+                onDisplayRatingPost.dispatch(cast e.flagAsPost());
+            }
+        }
+        if(event.showCombo) {
+            final e:DisplayComboEvent = cast Events.get(DISPLAY_COMBO);
+            onDisplayCombo.dispatch(e.recycle(stats.combo, null));
+
+            if(!e.cancelled) {
+                e.sprites = comboDisplay.displayCombo(e.combo);
+                onDisplayComboPost.dispatch(cast e.flagAsPost());
+            }
+        }
         if(event.showSplash)
             event.note.strumLine.showSplash(event.direction);
 
         if(event.showHoldCovers && event.length > 0) {
-            // TODO: add a thing in event for hold covers
             event.note.strumLine.showHoldGradient(event.direction);
             event.note.strumLine.showHoldCover(event.direction);
         } else {
             event.note.strumLine.holdGradients.members[event.direction].holding = false;
             event.note.strumLine.holdCovers.members[event.direction].kill();
-        }
-        if(event.showRating) {
-            // TODO: this shit
-        }
-        if(event.showCombo) {
-            // TODO: this shit
         }
         if(event.playConfirmAnim) {
             final strum:Strum = event.note.strumLine.strums.members[event.direction];
@@ -189,15 +209,26 @@ class PlayField extends FlxGroup {
                 stats.missCombo++;
         }
         if(event.length > 0) {
-            // TODO: add a thing in event for hold covers
             event.note.strumLine.holdGradients.members[event.direction].holding = false;
             event.note.strumLine.holdCovers.members[event.direction].kill();
         }
         if(event.showRating) {
-            // TODO: this shit
+            final e:DisplayRatingEvent = cast Events.get(DISPLAY_RATING);
+            onDisplayRating.dispatch(e.recycle("miss", null));
+
+            if(!e.cancelled) {
+                e.sprite = comboDisplay.displayRating(e.rating);
+                onDisplayRatingPost.dispatch(cast e.flagAsPost());
+            }
         }
         if(event.showCombo) {
-            // TODO: this shit
+            final e:DisplayComboEvent = cast Events.get(DISPLAY_COMBO);
+            onDisplayCombo.dispatch(e.recycle(-stats.missCombo, null));
+
+            if(!e.cancelled) {
+                e.sprites = comboDisplay.displayCombo(e.combo);
+                onDisplayComboPost.dispatch(cast e.flagAsPost());
+            }
         }
 
         // the note is now cum colored

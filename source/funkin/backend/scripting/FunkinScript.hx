@@ -80,6 +80,11 @@ class FunkinScript {
         setClass(FunkinLua);
         setClass(FunkinHScript);
 
+        setClass(funkin.gameplay.HealthIcon);
+        setClass(funkin.gameplay.HoldTiledSprite);
+        setClass(funkin.gameplay.PlayField);
+        setClass(funkin.gameplay.UISkin);
+
         setClass(funkin.graphics.SkinnableSprite);
         setClass(funkin.graphics.TiledSprite);
 
@@ -99,14 +104,16 @@ class FunkinScript {
         setClass(funkin.gameplay.song.VocalGroup);
 
         setClass(funkin.gameplay.character.Character);
-        setClass(funkin.gameplay.HealthIcon);
-        setClass(funkin.gameplay.HoldTiledSprite);
-        setClass(funkin.gameplay.PlayField);
-        setClass(funkin.gameplay.UISkin);
 
-        set("FlxRuntimeShader", funkin.utilities.RuntimeShader);
-        setClass(funkin.utilities.RuntimeShader);
-        setClass(funkin.utilities.CustomShader);
+        setClass(funkin.gameplay.scoring.Scoring);
+        setClass(funkin.gameplay.scoring.ScoringSystem);
+
+        setClass(funkin.gameplay.scoring.system.PBotSystem);
+        setClass(funkin.gameplay.scoring.system.Judge4System);
+
+        set("FlxRuntimeShader", funkin.graphics.shader.RuntimeShader);
+        setClass(funkin.graphics.shader.RuntimeShader);
+        setClass(funkin.graphics.shader.CustomShader);
 
         set("BlendMode", funkin.backend.scripting.helpers.BlendModeHelper);
         set("FlxAxes", funkin.backend.scripting.helpers.FlxAxesHelper);

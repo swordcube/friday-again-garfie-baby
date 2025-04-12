@@ -14,10 +14,27 @@ class Scoring {
     public static var currentSystem:ScoringSystem = new PBotSystem();
 
     /**
+     * Whether or not killers are enabled.
+     */
+    public static var useKillers(get, set):Bool;
+
+    /**
      * Returns a list of every judgement type.
      */
     public static function getJudgements():Array<String> {
         return currentSystem.getJudgements();
+    }
+
+    /**
+     * Sets the list of every available judgement.
+     * 
+     * Make sure to order them from best to worst, otherwise
+     * you won't get the correct ratings for the correct timings!
+     * 
+     * @param  judgements  The new set of judgements.
+     */
+    public static function setJudgements(judgements:Array<String>):Void {
+        currentSystem.setJudgements(judgements);
     }
 
     /**
@@ -79,7 +96,19 @@ class Scoring {
      * Returns whether or not the score can increase
      * from hold notes.
      */
-     public static function holdScoreIncreasingAllowed():Bool {
+    public static function holdScoreIncreasingAllowed():Bool {
         return currentSystem.holdScoreIncreasingAllowed();
+    }
+
+    //----------- [ Private API ] -----------//
+
+    @:noCompletion
+    private static function get_useKillers():Bool {
+        return currentSystem.useKillers;
+    }
+
+    @:noCompletion
+    private static function set_useKillers(value:Bool):Bool {
+        return currentSystem.useKillers = value;
     }
 }

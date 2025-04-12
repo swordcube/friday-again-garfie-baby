@@ -61,6 +61,11 @@ class Constants {
     public static final SAVE_DIR:String = "swordcube/GarfieFunkin";
 
     /**
+     * Whether or not the game is a development build.
+     */
+    public static final DEVELOPMENT_BUILD:Bool = true;
+
+    /**
      * The default character used as a fallback.
      */
     public static final DEFAULT_CHARACTER:String = "bf";
@@ -74,6 +79,11 @@ class Constants {
      * The default note skin used as a fallback.
      */
     public static final DEFAULT_NOTE_SKIN:String = "funkin";
+
+    /**
+     * The default UI skin used as a fallback.
+     */
+    public static final DEFAULT_UI_SKIN:String = "funkin";
 
     /**
      * A list of every possible note direction in order.

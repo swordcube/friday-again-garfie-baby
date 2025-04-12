@@ -10,10 +10,14 @@ import funkin.gameplay.notes.Note;
  * and each one judge/score notes differently.
  */
 class ScoringSystem {
+    public var useKillers:Bool = true;
+
     /**
      * Constructs a new `ScoringSystem`.
      */
-    public function new() {}
+    public function new() {
+        useKillers = Options.useKillers;
+    }
 
     /**
      * Returns a list of every judgement type,
@@ -22,6 +26,16 @@ class ScoringSystem {
     public function getJudgements():Array<String> {
         return [];
     }
+
+    /**
+     * Sets the list of every available judgement.
+     * 
+     * Make sure to order them from best to worst, otherwise
+     * you won't get the correct ratings for the correct timings!
+     * 
+     * @param  judgement  The new set of judgements. 
+     */
+    public function setJudgements(judgements:Array<String>):Void {}
 
     /**
      * Returns the timing of a given judgement.
@@ -48,7 +62,19 @@ class ScoringSystem {
      * @param  timestamp  The timestamp that the note was hit at. (in milliseconds)
      */
     public function judgeNote(note:Note, timestamp:Float):String {
-        return null;
+        final judgements:Array<String> = getJudgements();
+
+        var diff:Float = Math.abs(note.time - timestamp);
+        var result:String = judgements[judgements.length - 1];
+        
+        for(i in 0...judgements.length) {
+            final judgement:String = judgements[i];
+            if(diff <= getJudgementTiming(judgement)) {
+                result = judgement;
+                break;
+            }
+        }
+        return result;
     }
 
     /**
