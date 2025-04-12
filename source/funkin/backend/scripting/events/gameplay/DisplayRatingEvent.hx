@@ -9,7 +9,7 @@ class DisplayRatingEvent extends ScriptEvent {
     public var rating:String;
 
     /**
-     * The sprite to display the rating on.
+     * The sprite to display the rating on (only available on post).
      */
     public var sprite:RatingSprite;
 

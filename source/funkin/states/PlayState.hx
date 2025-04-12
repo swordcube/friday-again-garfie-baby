@@ -10,6 +10,7 @@ import funkin.backend.scripting.events.*;
 import funkin.backend.scripting.events.notes.*;
 import funkin.backend.scripting.events.gameplay.*;
 
+import funkin.gameplay.Countdown;
 import funkin.gameplay.PlayField;
 import funkin.gameplay.FunkinCamera;
 import funkin.gameplay.character.Character;
@@ -65,6 +66,8 @@ class PlayState extends FunkinState {
 	public var stage:Stage;
 	public var camFollow:FlxObject;
 
+	public var inCutscene:Bool = false;
+
 	/**
 	 * The current character that is being followed by the camera.
 	 * 
@@ -83,6 +86,7 @@ class PlayState extends FunkinState {
 	public var currentChart:ChartData;
 	public var playField:PlayField;
 
+	public var countdown:Countdown;
 	public var eventRunner:EventRunner;
 
 	public var startingSong:Bool = true;
@@ -189,7 +193,7 @@ class PlayState extends FunkinState {
 		Conductor.instance.reset(currentChart.meta.song.timingPoints.first()?.bpm ?? 100.0);
 		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
 		
-		Conductor.instance.time = -((Conductor.instance.beatLength * 4) + Conductor.instance.offset);
+		Conductor.instance.time = -((Conductor.instance.beatLength * 5) + Conductor.instance.offset);
 
 		inst.pause();
 		inst.volume = 1;
@@ -307,7 +311,6 @@ class PlayState extends FunkinState {
 		camGame.snapToTarget();
 
 		playField = new PlayField(currentChart, currentDifficulty);
-
 		playField.onNoteHit.add(onNoteHit);
 		playField.onNoteHitPost.add(onNoteHitPost);
 
@@ -359,6 +362,19 @@ class PlayState extends FunkinState {
 			hud.script.call("onCreate");
 		}
 		#end
+		countdown = new Countdown();
+		countdown.onStart.add(onCountdownStart);
+		countdown.onStartPost.add(onCountdownStartPost);
+
+		countdown.onStep.add(onCountdownStep);
+		countdown.onStepPost.add(onCountdownStepPost);
+
+		countdown.cameras = [camHUD];
+		add(countdown);
+		
+		if(!inCutscene)
+			countdown.start(uiSkin);
+
 		worldCombo = false;
 		
 		#if SCRIPTING_ALLOWED
@@ -669,6 +685,30 @@ class PlayState extends FunkinState {
 	private function onDisplayComboPost(event:DisplayComboEvent):Void {
 		#if SCRIPTING_ALLOWED
 		scripts.call("onDisplayComboPost", [event]);
+		#end
+	}
+
+	private function onCountdownStart(event:CountdownStartEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onCountdownStart", [event]);
+		#end
+	}
+
+	private function onCountdownStartPost(event:CountdownStartEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onCountdownStartPost", [event]);
+		#end
+	}
+
+	private function onCountdownStep(event:CountdownStepEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onCountdownStep", [event]);
+		#end
+	}
+
+	private function onCountdownStepPost(event:CountdownStepEvent):Void {
+		#if SCRIPTING_ALLOWED
+		scripts.call("onCountdownStepPost", [event]);
 		#end
 	}
 

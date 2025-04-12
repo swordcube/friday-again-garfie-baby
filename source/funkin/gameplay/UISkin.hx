@@ -14,16 +14,7 @@ class CountdownStepData {
 }
 
 @:structInit
-class CountdownData {
-	public var atlas:AtlasData;
-	public var scale:Float;
-
-	@:optional
-	@:default(null)
-	public var antialiasing:Null<Bool>;
-
-	public var animation:Map<String, Map<String, AnimationData>>;//DynamicAccess<DynamicAccess<AnimationData>>;
-
+class CountdownData extends SkinnableUISpriteData {
 	public var steps:Array<CountdownStepData>;
 }
 

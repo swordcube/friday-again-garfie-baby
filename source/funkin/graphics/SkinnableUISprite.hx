@@ -1,11 +1,14 @@
 package funkin.graphics;
 
-import flixel.graphics.FlxGraphic;
-import openfl.display.BitmapData;
-import funkin.gameplay.scoring.Scoring;
 import haxe.DynamicAccess;
+import openfl.display.BitmapData;
+
+import flixel.math.FlxPoint;
+
+import flixel.graphics.FlxGraphic;
 import flixel.graphics.atlas.FlxAtlas;
 
+import funkin.gameplay.scoring.Scoring;
 import funkin.graphics.SkinnableSprite;
 
 @:structInit
@@ -83,9 +86,8 @@ class SkinnableUISprite extends FlxSprite {
                         keys.push('${animName}0000');
                         bitmaps.push(FlxG.assets.getBitmapData(bitmapPath));
                     }
-                    final atlas:FlxAtlas = new FlxAtlas(atlasKey);
+                    final atlas:FlxAtlas = new FlxAtlas(atlasKey, false, 3, true, FlxPoint.get(), FlxPoint.get());
                     atlas.addNodes(bitmaps, keys);
-    
                     frames = atlas.getAtlasFrames();
 
                     // FlxAtlas creates a new graphic containing

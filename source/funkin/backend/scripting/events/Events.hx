@@ -17,6 +17,8 @@ class Events {
                 case SONG_EVENT: _events.set(type, new SongEvent());
                 case DISPLAY_RATING: _events.set(type, new DisplayRatingEvent());
                 case DISPLAY_COMBO: _events.set(type, new DisplayComboEvent());
+                case COUNTDOWN_START: _events.set(type, new CountdownStartEvent());
+                case COUNTDOWN_STEP: _events.set(type, new CountdownStepEvent());
                 default: _events.set(type, new ScriptEvent(UNKNOWN));
             }
         }

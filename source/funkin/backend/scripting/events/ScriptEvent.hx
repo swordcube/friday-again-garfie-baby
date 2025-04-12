@@ -11,6 +11,8 @@ enum abstract ScriptEventType(String) from String to String {
 	final SONG_EVENT = "SONG_EVENT";
 	final DISPLAY_RATING = "DISPLAY_RATING";
 	final DISPLAY_COMBO = "DISPLAY_COMBO";
+	final COUNTDOWN_START = "COUNTDOWN_START";
+	final COUNTDOWN_STEP = "COUNTDOWN_STEP";
 }
 
 @:autoBuild(funkin.backend.macros.EventMacro.build())

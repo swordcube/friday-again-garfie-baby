@@ -9,7 +9,7 @@ class DisplayComboEvent extends ScriptEvent {
     public var combo:Int;
 
     /**
-     * The sprites to display the combo on.
+     * The sprites to display the combo on (only available on post).
      */
     public var sprites:Array<ComboDigitSprite>;
     
