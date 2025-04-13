@@ -32,7 +32,6 @@ import funkin.ui.Cursor;
 
 import funkin.utilities.CoolUtil;
 import funkin.utilities.Constants;
-import funkin.utilities.Typedefs;
 import funkin.utilities.WindowUtil;
 
 import haxe.Json;

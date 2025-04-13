@@ -48,7 +48,7 @@ class HoldGradient extends SkinnableSprite {
         centerOrigin();
     
         centerOffsets();
-        offset.add(skinData.offset.x, skinData.offset.y);
+        offset.add(skinData.offset[0] ?? 0.0, skinData.offset[1] ?? 0.0);
         
         return direction;
     }

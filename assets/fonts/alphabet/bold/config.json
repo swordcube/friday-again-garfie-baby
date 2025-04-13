@@ -3,7 +3,7 @@
 		"type": "sparrow",
 		"path": "sprite"
 	},
-    "offset": {"x": 0, "y": -38},
+    "offset": [0, -38],
 
     "scale": 1,
     "lineHeight": 60,
@@ -11,41 +11,41 @@
     "noLowerCase": true,
     "glyphs": {
         "'": {
-            "offset": {"x": 0, "y": 30}
+            "offset": [0, 30]
         },
         "-": {
-            "offset": {"x": 0, "y": 20}
+            "offset": [0, 20]
         },
         "=": {
-            "offset": {"x": 0, "y": 15}
+            "offset": [0, 15]
         },
         "+": {
-            "offset": {"x": 0, "y": 15}
+            "offset": [0, 15]
         },
         "^": {
-            "offset": {"x": 0, "y": 25}
+            "offset": [0, 25]
         },
         "&": {
             "prefix": "and"
         },
         ",": {
             "prefix": "comma",
-            "offset": {"x": 0, "y": 8}
+            "offset": [0, 8]
         },
         "~": {
-            "offset": {"x": 0, "y": 20}
+            "offset": [0, 20]
         },
         "“": {
             "prefix": "start parentheses",
-            "offset": {"x": 0, "y": 30}
+            "offset": [0, 30]
         },
         "”": {
             "prefix": "end parentheses",
-            "offset": {"x": 0, "y": 30}
+            "offset": [0, 30]
         },
         "\"": {
             "prefix": "end parentheses",
-            "offset": {"x": 0, "y": 30}
+            "offset": [0, 30]
         },
         "!": {
             "prefix": "exclamation mark"

@@ -21,10 +21,10 @@ class ComboProp extends FlxObject implements StageProp {
             final value:Dynamic = Reflect.field(properties, field);
             switch(field.toLowerCase()) {
                 case "position":
-                    setPosition(value.x ?? (FlxG.width * 0.55), value.y ?? ((FlxG.height * 0.5) - 60));
+                    setPosition(value[0] ?? (FlxG.width * 0.55), value[1] ?? ((FlxG.height * 0.5) - 60));
 
                 case "scroll":
-                    scrollFactor.set(value.x ?? 1.0, value.y ?? 1.0);
+                    scrollFactor.set(value[0] ?? 1.0, value[1] ?? 1.0);
 
                 default:
             }

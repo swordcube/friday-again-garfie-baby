@@ -7,8 +7,8 @@ class AtlasFont {
     public var atlas:AtlasData;
 
     @:optional
-    @:default({x: 0, y: 0})
-    public var offset:PointData<Float>;
+    @:default([0, 0])
+    public var offset:Array<Float>;
     
     @:optional
     @:default(24)
@@ -35,8 +35,8 @@ class AtlasFontGlyph {
     public var prefix:String;
 
     @:optional
-    @:default({x: 0, y: 0})
-    public var offset:PointData<Float>;
+    @:default([0, 0])
+    public var offset:Array<Float>;
 
     @:optional
     @:default(0.0)

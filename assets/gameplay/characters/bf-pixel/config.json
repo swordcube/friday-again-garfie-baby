@@ -3,10 +3,7 @@
 		"type": "sparrow",
 		"path": "sprite"
 	},
-	"position": {
-		"x": 0,
-		"y": 0
-	},
+	"position": [0, 0],
 	"scale": 6,
 	"isPlayer": true,
 	"singDuration": 4,
@@ -14,108 +11,69 @@
 		"idle"
 	],
 	"antialiasing": false,
-	"camera": {
-		"x": 0,
-		"y": 0
-	},
+	"camera": [0, 0],
 	"healthIcon": {
-		"isPixel": true,
+		"isPixel": false,
 		"scale": 1,
-		"flip": {
-			"x": false,
-			"y": false
-		},
-		"offset": {
-			"x": 0,
-			"y": 0
-		},
+		"flip": [false, false],
+		"offset": [0, 0],
 		"color": "#31B0D1"
 	},
-	"flip": {
-		"x": true,
-		"y": false
-	},
+	"flip": [true, false],
 	"animations": {
 		"idle": {
 			"fps": 24,
 			"prefix": "BF IDLE0",
-			"offset": {
-				"x": 0,
-				"y": 0
-			},
+			"offset": [0, 0],
 			"looped": false
 		},
 		"singLEFT": {
 			"fps": 24,
 			"prefix": "BF LEFT NOTE0",
-			"offset": {
-				"x": -1,
-				"y": 0
-			},
+			"offset": [-1, 0],
 			"looped": false
 		},
 		"singDOWN": {
 			"fps": 24,
 			"prefix": "BF DOWN NOTE0",
-			"offset": {
-				"x": 0,
-				"y": 0
-			},
+			"offset": [0, 0],
 			"name": "singDOWN",
 			"looped": false
 		},
 		"singUP": {
 			"fps": 24,
 			"prefix": "BF UP NOTE0",
-			"offset": {
-				"x": 0,
-				"y": 0
-			},
+			"offset": [0, 0],
 			"looped": false
 		},
 		"singRIGHT": {
 			"fps": 24,
 			"prefix": "BF RIGHT NOTE0",
-			"offset": {
-				"x": 0,
-				"y": 0
-			},
+			"offset": [0, 0],
 			"looped": false
 		},
 		"singLEFTmiss": {
 			"fps": 24,
 			"prefix": "BF LEFT MISS0",
-			"offset": {
-				"x": -1,
-				"y": 0
-			},
+			"offset": [-1, 0],
 			"looped": false
 		},
 		"singDOWNmiss": {
 			"fps": 24,
 			"prefix": "BF DOWN MISS0",
-			"offset": {
-				"x": 0,
-				"y": 0
-			},
+			"offset": [0, 0],
 			"looped": false
 		},
 		"singUPmiss": {
 			"fps": 24,
 			"prefix": "BF UP MISS0",
-			"offset": {
-				"x": 0,
-				"y": 0
-			},
+			"offset": [0, 0],
 			"looped": false
 		},
 		"singRIGHTmiss": {
 			"fps": 24,
 			"prefix": "BF RIGHT MISS0",
-			"offset": {
-				"x": 0,
-				"y": 0
-			},
+			"offset": [0, 0],
 			"looped": false
 		}
 	}

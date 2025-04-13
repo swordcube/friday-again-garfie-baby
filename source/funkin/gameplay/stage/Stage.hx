@@ -72,29 +72,29 @@ class Stage extends FlxContainer {
                         layer.add(cast prop);
                         props.set(propData.id, prop);
                         
-                        case SPECTATOR:
-                            if(!spectatorAdded) {
-                                characters.spectator.x = propData.properties.position?.x ?? 412.0;
-                                characters.spectator.y = propData.properties.position?.y ?? 738.0;
-                            characters.spectator.scrollFactor.set(propData.properties.scroll?.x ?? 1.0, propData.properties.scroll?.y ?? propData.properties.scroll?.x ?? 1.0);
+                    case SPECTATOR:
+                        if(!spectatorAdded) {
+                            characters.spectator.x = propData.properties?.position[0] ?? 412.0;
+                            characters.spectator.y = propData.properties?.position[1] ?? 738.0;
+                            characters.spectator.scrollFactor.set(propData.properties?.scroll[0] ?? 1.0, propData.properties?.scroll[1] ?? propData.properties?.scroll[0] ?? 1.0);
                             layer.add(characters.spectator);
                             spectatorAdded = true;
                         }
                             
                     case OPPONENT:
                         if(!opponentAdded) {
-                            characters.opponent.x = propData.properties.position?.x ?? 0.0;
-                            characters.opponent.y = propData.properties.position?.y ?? 812.0;
-                            characters.opponent.scrollFactor.set(propData.properties.scroll?.x ?? 1.0, propData.properties.scroll?.y ?? propData.properties.scroll?.x ?? 1.0);
+                            characters.opponent.x = propData.properties?.position[0] ?? 0.0;
+                            characters.opponent.y = propData.properties?.position[1] ?? 812.0;
+                            characters.opponent.scrollFactor.set(propData.properties?.scroll[0] ?? 1.0, propData.properties?.scroll[1] ?? propData.properties?.scroll[0] ?? 1.0);
                             layer.add(characters.opponent);
                             opponentAdded = true;
                         }
                         
                     case PLAYER:
                         if(!playerAdded) {
-                            characters.player.x = propData.properties.position?.x ?? 694.0;
-                            characters.player.y = propData.properties.position?.y ?? 812.0;
-                            characters.player.scrollFactor.set(propData.properties.scroll?.x ?? 1.0, propData.properties.scroll?.y ?? propData.properties.scroll?.x ?? 1.0);
+                            characters.player.x = propData.properties?.position[0] ?? 694.0;
+                            characters.player.y = propData.properties?.position[1] ?? 812.0;
+                            characters.player.scrollFactor.set(propData.properties?.scroll[0] ?? 1.0, propData.properties?.scroll[1] ?? propData.properties?.scroll[0] ?? 1.0);
                             layer.add(characters.player);
                             playerAdded = true;
                         }

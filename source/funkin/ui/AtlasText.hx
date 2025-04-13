@@ -222,11 +222,11 @@ class Glyph extends FlxSprite {
         final fontData:AtlasFont = parent.fontData;
         final glyphData:AtlasFontGlyph = fontData.glyphs[character];
 
-        final fx:Float = fontData.offset.x;
-        final fy:Float = fontData.offset.y;
+        final fx:Float = fontData.offset[0] ?? 0.0;
+        final fy:Float = fontData.offset[1] ?? 0.0;
 
-        final ox:Float = (glyphData != null && glyphData.offset != null) ? glyphData.offset.x : 0.0;
-        final oy:Float = ((glyphData != null && glyphData.offset != null) ? glyphData.offset.y : 0.0) - (110 - frameHeight);
+        final ox:Float = (glyphData != null && glyphData.offset != null) ? glyphData.offset[0] ?? 0.0 : 0.0;
+        final oy:Float = ((glyphData != null && glyphData.offset != null) ? glyphData.offset[1] ?? 0.0 : 0.0) - (110 - frameHeight);
 
         frameOffset.set(ox - fx, oy - fy);
     }

@@ -8,27 +8,27 @@
         "animation": {
             "killer": {
                 "prefix": "killer",
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "sick": {
                 "prefix": "sick",
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "good": {
                 "prefix": "good",
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "bad": {
                 "prefix": "bad",
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "shit": {
                 "prefix": "shit",
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "miss": {
                 "prefix": "miss",
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             }
         }
     },
@@ -36,53 +36,53 @@
         "atlas": {
             "type": "grid",
             "path": "images/combo",
-            "gridSize": {"x": 100, "y": 140}
+            "gridSize": [100, 140]
         },
         "scale": 0.5,
         "animation": {
             "minus": {
                 "indices": [0],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "0": {
                 "indices": [1],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "1": {
                 "indices": [2],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "2": {
                 "indices": [3],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "3": {
                 "indices": [4],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "4": {
                 "indices": [5],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "5": {
                 "indices": [6],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "6": {
                 "indices": [7],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "7": {
                 "indices": [8],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "8": {
                 "indices": [9],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "9": {
                 "indices": [10],
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             }
         }
     },
@@ -114,15 +114,15 @@
         "animation": {
             "ready": {
                 "prefix": "ready",
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "set": {
                 "prefix": "set",
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             },
             "go": {
                 "prefix": "go",
-                "offset": {"x": 0, "y": 0}
+                "offset": [0, 0]
             }
         }
     }

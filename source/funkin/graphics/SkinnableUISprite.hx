@@ -28,8 +28,8 @@ class SkinnableUISpriteData {
 	public var antialiasing:Null<Bool>;
 
     @:optional
-	@:default({x: 0, y: 0})
-	public var offset:PointData<Float>;
+	@:default([0, 0])
+	public var offset:Array<Float>;
 
 	public var animation:Map<String, AnimationData>;//DynamicAccess<DynamicAccess<AnimationData>>;
 }
@@ -61,8 +61,8 @@ class SkinnableUISprite extends FlxSprite {
                 frames = Paths.getSparrowAtlas('${skinDir}/${_skinData.atlas.path}');
 
             case GRID:
-                final gridSize:PointData<Int> = _skinData.atlas.gridSize ?? {x: 0, y: 0};
-                loadGraphic(Paths.image('${skinDir}/${_skinData.atlas.path}'), true, gridSize.x, gridSize.y);
+                final gridSize:Array<Int> = _skinData.atlas.gridSize;
+                loadGraphic(Paths.image('${skinDir}/${_skinData.atlas.path}'), true, gridSize[0] ?? 0, gridSize[1] ?? gridSize[0] ?? 0);
 
             case ANIMATE:
                 // TODO: this shit
@@ -114,7 +114,7 @@ class SkinnableUISprite extends FlxSprite {
             } else
                 animation.add(animName, data.indices, data.fps ?? 24, data.looped ?? false);
             
-            animation.setOffset(animName, data.offset?.x ?? 0.0, data.offset?.y ?? 0.0);
+            animation.setOffset(animName, data.offset[0] ?? 0.0, data.offset[1] ?? 0.0);
         }
         antialiasing = _skinData.antialiasing ?? FlxSprite.defaultAntialiasing;
         

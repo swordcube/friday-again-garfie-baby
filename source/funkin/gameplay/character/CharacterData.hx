@@ -15,26 +15,26 @@ class CharacterData {
     public var atlas:AtlasData;
 
     @:optional
-    @:default({x: 0, y: 0})
-    public var gridSize:PointData<Float> = {x: 0, y: 0};
+    @:default([0, 0])
+    public var gridSize:Array<Float>;
     
     public var animations:Map<String, AnimationData>;//DynamicAccess<AnimationData>;
     
     @:optional
-    @:default({x: 0, y: 0})
-    public var position:PointData<Float> = {x: 0, y: 0};
+    @:default([0, 0])
+    public var position:Array<Float>;
     
     @:optional
-    @:default({x: 0, y: 0})
-    public var camera:PointData<Float> = {x: 0, y: 0};
+    @:default([0, 0])
+    public var camera:Array<Float>;
 
     @:optional
     @:default(1)
     public var scale:Float = 1;
 
     @:optional
-    @:default({x: false, y: false})
-    public var flip:PointData<Bool> = {x: false, y: false};
+    @:default([false, false])
+    public var flip:Array<Bool>;
 
     @:optional
     @:default(false)
@@ -74,8 +74,8 @@ class CharacterData {
             healthIcon: {
                 isPixel: false,
                 scale: 1,
-                flip: {x: false, y: false},
-                offset: {x: 0, y: 0},
+                flip: [false, false],
+                offset: [0, 0],
                 color: "#FFFFFF"
             },
             animations: []
@@ -129,19 +129,19 @@ class CharacterData {
 class HealthIconData {
 	@:optional
 	@:default(false)
-	public var isPixel:Bool = false;
+	public var isPixel:Bool;
 
 	@:optional
 	@:default(1)
-	public var scale:Float = 1;
+	public var scale:Float;
 
 	@:optional
-	@:default({x: false, y: false})
-	public var flip:PointData<Bool> = {x: false, y: false};
+	@:default([false, false])
+	public var flip:Array<Bool>;
 
 	@:optional
-	@:default({x: 0, y: 0})
-	public var offset:PointData<Float> = {x: 0, y: 0};
+	@:default([0, 0])
+	public var offset:Array<Float>;
 
 	@:optional
 	@:default("#FFFFFF")

@@ -19,7 +19,7 @@ class SpriteProp extends FlxSprite implements StageProp {
                 case "texture":
                     final gridSize:Dynamic = value.gridSize;
                     if(gridSize != null)
-                        loadGraphic(Paths.image('${stage.data.getImageFolder()}/${value}'), true, gridSize.x ?? 0, gridSize.y ?? gridSize.x ?? 0);
+                        loadGraphic(Paths.image('${stage.data.getImageFolder()}/${value}'), true, gridSize[0] ?? 0, gridSize[1] ?? gridSize[0] ?? 0);
                     else    
                         loadGraphic(Paths.image('${stage.data.getImageFolder()}/${value}'));
 
@@ -30,16 +30,16 @@ class SpriteProp extends FlxSprite implements StageProp {
                         color = value;
 
                 case "position":
-                    setPosition(value.x ?? 0.0, value.y ?? 0.0);
+                    setPosition(value[0] ?? 0.0, value[1] ?? 0.0);
                 
                 case "offset":
-                    offset.set(value.x ?? 1.0, value.y ?? 0.0);
+                    offset.set(value[0] ?? 1.0, value[1] ?? 0.0);
 
                 case "scroll":
-                    scrollFactor.set(value.x ?? 1.0, value.y ?? 1.0);
+                    scrollFactor.set(value[0] ?? 1.0, value[1] ?? 1.0);
 
                 case "scale":
-                    scale.set(value.x ?? 1.0, value.y ?? value.x ?? 1.0);
+                    scale.set(value[0] ?? 1.0, value[1] ?? value[0] ?? 1.0);
 
                 case "updatehitbox":
                     if(value == true)

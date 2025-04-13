@@ -91,17 +91,17 @@ class Character extends FlxSprite implements IBeatReceiver {
                     else
                         animation.addByPrefix(name, data.prefix, data.fps, data.looped);
                     
-                    animation.setOffset(name, data.offset?.x ?? 0, data.offset?.y ?? data.offset?.x ?? 0);
+                    animation.setOffset(name, data.offset[0] ?? 0.0, data.offset[1] ?? data.offset[0] ?? 0.0);
                 }
 
             case GRID:
-                final gridSize:PointData<Int> = data.atlas.gridSize ?? {x: 0, y: 0};
-                loadGraphic(Paths.image('gameplay/characters/${characterID}/${data.atlas.path}'), true, gridSize.x ?? 0, gridSize.y ?? gridSize.x ?? 0);
+                final gridSize:Array<Int> = data.atlas.gridSize;
+                loadGraphic(Paths.image('gameplay/characters/${characterID}/${data.atlas.path}'), true, gridSize[0] ?? 0, gridSize[1] ?? gridSize[0] ?? 0);
 
                 for(name in Reflect.fields(data.animations)) {
                     final data:AnimationData = Reflect.field(data.animations, name);
                     animation.add(name, data.indices, data.fps, data.looped);
-                    animation.setOffset(name, data.offset?.x ?? 0, data.offset?.y ?? data.offset?.x ?? 0);
+                    animation.setOffset(name, data.offset[0] ?? 0.0, data.offset[1] ?? data.offset[0] ?? 0.0);
                 }
 
             case ANIMATE:
@@ -109,8 +109,8 @@ class Character extends FlxSprite implements IBeatReceiver {
 
             default:
         }
-        flipX = data.flip.x;
-        flipY = data.flip.y;
+        flipX = data.flip[0];
+        flipY = data.flip[1];
 
         scale.set(data.scale, data.scale);
         antialiasing = data.antialiasing ?? FlxSprite.defaultAntialiasing;
@@ -127,7 +127,7 @@ class Character extends FlxSprite implements IBeatReceiver {
         updateHitbox();
         footOffset.set(0, height);
 
-        offset.set(-data.position.x, height - data.position.y);
+        offset.set(-data.position[0] ?? 0.0, height - data.position[1] ?? 0.0);
 
         #if SCRIPTING_ALLOWED
         if(script != null)
@@ -179,7 +179,7 @@ class Character extends FlxSprite implements IBeatReceiver {
         }
         curAnimContext = context;
         animation.play(name, force, reversed, frame);
-        offset.set(-data.position.x, height - data.position.y);
+        offset.set(-data.position[0] ?? 0.0, height - data.position[1] ?? 0.0);
     }
 
     public inline function playSingAnim(direction:Int, ?suffix:String, ?force:Bool = false, ?reversed:Bool = false, ?frame:Int = 0):Void {
@@ -230,8 +230,8 @@ class Character extends FlxSprite implements IBeatReceiver {
 
 		final midpoint:FlxPoint = getMidpoint();
 		final camPos:FlxPoint = point.set(
-            (midpoint.x + (isPlayer ? -100 : 150) + data.position.x + data.camera.x) - footOffset.x,
-			midpoint.y - (100 + footOffset.y) + data.position.y + data.camera.y
+            (midpoint.x + (isPlayer ? -100 : 150) + (data.position[0] ?? 0.0) + (data.camera[0] ?? 0.0)) - footOffset.x,
+			midpoint.y - (100 + footOffset.y) + (data.position[1] ?? 0.0) + (data.camera[1] ?? 0.0)
         );
 		midpoint.put();
 		return camPos;

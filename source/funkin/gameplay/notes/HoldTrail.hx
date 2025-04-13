@@ -62,12 +62,12 @@ class HoldTrail extends FlxSpriteGroup {
             strip.animation.play('${laneStr} hold', true);
             strip.updateHitbox();
             strip.setPosition(-999999, -999999);
-            strip.offset.add(strip.skinData.offset.x, strip.skinData.offset.y);
+            strip.offset.add(strip.skinData.offset[0] ?? 0.0, strip.skinData.offset[1] ?? 0.0);
             
             tail.animation.play('${laneStr} tail', true);
             tail.updateHitbox();
             tail.setPosition(-999999, -999999);
-            tail.offset.add(tail.skinData.offset.x, tail.skinData.offset.y);
+            tail.offset.add(tail.skinData.offset[0] ?? 0.0, tail.skinData.offset[1] ?? 0.0);
 
             height = height;
         }

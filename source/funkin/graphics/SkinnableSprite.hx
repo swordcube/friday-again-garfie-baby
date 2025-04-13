@@ -9,7 +9,7 @@ class AtlasData {
 	public var path:String;
 
 	@:optional
-	public var gridSize:PointData<Int>;
+	public var gridSize:Array<Int>;
 }
 
 @:structInit
@@ -32,8 +32,8 @@ class AnimationData {
 	public var looped:Bool;
 
 	@:optional
-	@:default({x: 0, y: 0})
-	public var offset:PointData<Float>;
+	@:default([0, 0])
+	public var offset:Array<Float>;
 }
 
 @:structInit
@@ -53,8 +53,8 @@ class SkinnableSpriteData {
 	public var antialiasing:Null<Bool>;
 
     @:optional
-	@:default({x: 0, y: 0})
-	public var offset:PointData<Float>;
+	@:default([0, 0])
+	public var offset:Array<Float>;
 
 	public var animation:Map<String, Map<String, AnimationData>>;//DynamicAccess<DynamicAccess<AnimationData>>;
 }
@@ -86,8 +86,8 @@ class SkinnableSprite extends FlxSprite {
                 frames = Paths.getSparrowAtlas('${skinDir}/${_skinData.atlas.path}');
 
             case GRID:
-                final gridSize:PointData<Int> = _skinData.atlas.gridSize ?? {x: 0, y: 0};
-                loadGraphic(Paths.image('${skinDir}/${_skinData.atlas.path}'), true, gridSize.x, gridSize.y);
+                final gridSize:Array<Int> = _skinData.atlas.gridSize;
+                loadGraphic(Paths.image('${skinDir}/${_skinData.atlas.path}'), true, gridSize[0] ?? 0, gridSize[1] ?? gridSize[0] ?? 0);
 
             case ANIMATE:
                 // TODO: this shit
@@ -105,7 +105,7 @@ class SkinnableSprite extends FlxSprite {
                 } else 
                     animation.add(animName, data2.indices, data2.fps ?? 24, data2.looped ?? false);
                 
-                animation.setOffset(animName, data2.offset?.x ?? 0.0, data2.offset?.y ?? 0.0);
+                animation.setOffset(animName, data2.offset[0] ?? 0.0, data2.offset[1] ?? 0.0);
             }
         }
         antialiasing = _skinData.antialiasing ?? FlxSprite.defaultAntialiasing;

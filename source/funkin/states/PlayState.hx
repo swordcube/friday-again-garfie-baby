@@ -768,6 +768,7 @@ class PlayState extends FunkinState {
 			playField.comboDisplay.container.remove(playField.comboDisplay, true);
 			playField.insert(playField.members.indexOf(playField.playerStrumLine) + 1, playField.comboDisplay);
 			
+			playField.comboDisplay.scrollFactor.set();
 			playField.comboDisplay.setPosition(FlxG.width * 0.474, (FlxG.height * 0.45) - 60); 
 		}
 		return worldCombo;

@@ -108,7 +108,7 @@ class StrumLine extends FlxSpriteGroup {
         cover.centerOrigin();
 
         cover.centerOffsets();
-        cover.offset.add(cover.skinData.offset.x, cover.skinData.offset.y);
+        cover.offset.add(cover.skinData.offset[0] ?? 0.0, cover.skinData.offset[1] ?? 0.0);
         
         cover.setPosition(strum.x - ((cover.width - strum.width) * 0.5), strum.y - ((cover.height - strum.height) * 0.5));
     }
