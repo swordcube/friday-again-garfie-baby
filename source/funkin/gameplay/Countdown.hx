@@ -51,7 +51,10 @@ class Countdown extends FlxContainer {
             });
             stepEvent.sprite = sprite;
 
-            final soundPath:String = Paths.sound('gameplay/uiskins/${uiSkin}/${stepEvent.soundPath}');
+            var soundPath:String = Paths.sound('gameplay/uiskins/${uiSkin}/${stepEvent.soundPath}');
+            if(!FlxG.assets.exists(soundPath))
+                soundPath = Paths.sound('gameplay/uiskins/${Constants.DEFAULT_UI_SKIN}/${stepEvent.soundPath}');
+
             if(FlxG.assets.exists(soundPath))
                 FlxG.sound.play(soundPath);
 

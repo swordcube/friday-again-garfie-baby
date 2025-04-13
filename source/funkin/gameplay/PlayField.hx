@@ -105,7 +105,7 @@ class PlayField extends FlxContainer {
         final isPlayer:Bool = note.strumLine == playerStrumLine;
         onNoteHit.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
-            isPlayer, false, judgement, isPlayer && Scoring.splashAllowed(judgement), true, isPlayer, isPlayer,
+            isPlayer, false, judgement, isPlayer && Scoring.splashAllowed(judgement), true, true, isPlayer, isPlayer,
             Scoring.scoreNote(note, timestamp), Scoring.getAccuracyScore(judgement), 0.0115,
             Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true, true, true, null, ""
         ));
@@ -158,13 +158,16 @@ class PlayField extends FlxContainer {
         if(event.showSplash)
             event.note.strumLine.showSplash(event.direction);
 
-        if(event.showHoldCovers && event.length > 0) {
-            event.note.strumLine.showHoldGradient(event.direction);
+        if(event.showHoldCovers && event.length > 0)
             event.note.strumLine.showHoldCover(event.direction);
-        } else {
-            event.note.strumLine.holdGradients.members[event.direction].holding = false;
+        else
             event.note.strumLine.holdCovers.members[event.direction].kill();
-        }
+        
+        if(event.showHoldGradients && event.length > 0)
+            event.note.strumLine.showHoldGradient(event.direction);
+        else
+            event.note.strumLine.holdGradients.members[event.direction].holding = false;
+
         if(event.playConfirmAnim) {
             final strum:Strum = event.note.strumLine.strums.members[event.direction];
             strum.holdTime = Math.max(event.note.length, (event.note.strumLine.botplay) ? attachedConductor.stepLength : 250);

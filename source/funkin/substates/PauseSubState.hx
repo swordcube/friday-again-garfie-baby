@@ -19,6 +19,10 @@ import funkin.states.menus.FreeplayState;
 
 import funkin.substates.transition.FadeTransition;
 
+#if SCRIPTING_ALLOWED
+import funkin.backend.scripting.GlobalScript;
+#end
+
 @:access(funkin.states.PlayState)
 class PauseSubState extends FunkinSubState {
     public static final CHARTER_FADE_DELAY:Float = 15.0;
@@ -202,6 +206,19 @@ class PauseSubState extends FunkinSubState {
             final transitionCam:FlxCamera = new FlxCamera();
             transitionCam.bgColor = 0;
             FlxG.cameras.add(transitionCam, false);
+
+            if(FlxG.keys.pressed.SHIFT) {
+                FlxG.signals.preStateCreate.addOnce((_) -> {
+                    Cache.clearAll();
+                    Paths.reloadContent();
+
+                    #if SCRIPTING_ALLOWED
+                    GlobalScript.reloadScripts();
+                    #end
+                });
+            }
+            Cache.noteSkinCache.clear();
+            Cache.uiSkinCache.clear();
 
             FadeTransition.nextCamera = transitionCam;
             FlxG.signals.postStateSwitch.addOnce(() -> {

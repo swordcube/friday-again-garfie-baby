@@ -193,7 +193,7 @@ class PlayState extends FunkinState {
 		Conductor.instance.reset(currentChart.meta.song.timingPoints.first()?.bpm ?? 100.0);
 		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
 		
-		Conductor.instance.time = -((Conductor.instance.beatLength * 5) + Conductor.instance.offset);
+		Conductor.instance.time = -(Conductor.instance.beatLength * 5);
 
 		inst.pause();
 		inst.volume = 1;
@@ -704,6 +704,11 @@ class PlayState extends FunkinState {
 		#if SCRIPTING_ALLOWED
 		scripts.call("onCountdownStep", [event]);
 		#end
+		if(event.cancelled)
+			return;
+
+		if(playField.hud != null)
+			playField.hud.bopIcons();
 	}
 
 	private function onCountdownStepPost(event:CountdownStepEvent):Void {

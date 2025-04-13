@@ -6,20 +6,10 @@
 
 	<app title="friday again garfie baby" file="Funkin" main="funkin.backend.Main" version="0.1.0" company="swordcube" />
 
-	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
-		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
-	<app preloader="flixel.system.FlxPreloader" />
-
-	<!--Minimum without FLX_NO_GAMEPAD: 11.8, without FLX_NO_NATIVE_CURSOR: 11.2-->
-	<set name="SWF_VERSION" value="11.8" />
-
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
 	<window width="1280" height="720" fps="144" background="#000000" hardware="true" vsync="false" />
-
-	<!--HTML5-specific-->
-	<window if="html5" resizable="true" />
 
 	<!--Desktop-specific-->
 	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" />
@@ -170,7 +160,11 @@
 			<haxedef name="HXCPP_CATCH_SEGV" />
 			<haxedef name="openfl-enable-handle-error" />
 		</section>
+
     </section>
+
+	<!-- Enable generational garbage collection -->
+	<haxedef name="HXCPP_GC_GENERATIONAL" />
 
     <!-- Self explanatory i'd say -->
     <haxedef name="no-deprecation-warnings" />
@@ -182,8 +176,14 @@
 	<!-- Better error reporting for HScript -->
 	<haxedef name="hscriptPos" if="HSCRIPT_ALLOWED" />
 
-	<!-- Fixes linux compilation?? -->
+	<!-- Fixes linux compilation -->
 	<haxedef name="NO_PRECOMPILED_HEADERS" />
+
+	<!--
+		Experimental OpenFL update queue
+		Might increase performance a little bit
+	-->
+	<define name="openfl_enable_experimental_update_queue" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 

@@ -1,4 +1,4 @@
-function reloadAssets() {
+function reloadAssets(_) {
     Cache.clearAll();
     Paths.reloadContent();
     GlobalScript.reloadScripts();

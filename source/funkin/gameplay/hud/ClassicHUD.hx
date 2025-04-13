@@ -84,14 +84,20 @@ class ClassicHUD extends BaseHUD {
         positionIcons();
         super.update(elapsed);
     }
-    
-    override function beatHit(beat:Int):Void {
+
+    override function bopIcons():Void {
         iconP2.bop();
         iconP1.bop();
-        
         iconP1.bopTween.onUpdate = (_) -> {
             iconP1.updateHitbox();
             positionIcons();
         };
+    }
+    
+    override function beatHit(beat:Int):Void {
+        if(beat < 0)
+            return;
+        
+        bopIcons();
     }
 }

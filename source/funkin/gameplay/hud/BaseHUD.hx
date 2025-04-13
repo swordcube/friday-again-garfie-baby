@@ -23,7 +23,10 @@ class BaseHUD extends FlxGroup implements IBeatReceiver {
     public function generatePlayerStats():Void {}
     
     public function updateHealthBar():Void {}
+    
+    public function bopIcons():Void {}
     public function positionIcons():Void {}
+
     public function updatePlayerStats():Void {}
 
     public function stepHit(step:Int) {}

@@ -140,18 +140,27 @@ class StrumLine extends FlxSpriteGroup {
             
             gradient.holding = (note.holdTrail.strip.height > gradient.height * 0.85);
             
-            if(playField != null && playField.playerStrumLine == this && note.scoreSteps.length != 0) {
+            if(playField != null &&  note.scoreSteps.length != 0) {
                 while(note.curScoreStep < note.scoreSteps.length && attachedConductor.time >= note.scoreSteps[note.curScoreStep].time) {
-                    if(note.hitEvent.gainHealthFromHolds)
-                        playField.stats.health += note.hitEvent.healthGain;
-
-                    if(note.hitEvent.gainScoreFromHolds)
-                        playField.stats.score += note.scoreSteps[note.curScoreStep++].score;
-
-                    if(playField.hud != null) {
-                        playField.hud.updateHealthBar();
-                        playField.hud.updatePlayerStats();
+                    if(playField.playerStrumLine == this) {
+                        if(note.hitEvent.gainHealthFromHolds)
+                            playField.stats.health += note.hitEvent.healthGain;
+    
+                        if(note.hitEvent.gainScoreFromHolds)
+                            playField.stats.score += note.scoreSteps[note.curScoreStep].score;
+    
+                        if(playField.hud != null) {
+                            playField.hud.updateHealthBar();
+                            playField.hud.updatePlayerStats();
+                        }
                     }
+                    if(note.hitEvent.playConfirmAnim && note.hitEvent.strumHoldJitter) {
+                        if(botplay)
+                            strum.holdTime = attachedConductor.stepLength;
+                        
+                        strum.animation.play('${Constants.NOTE_DIRECTIONS[note.direction]} confirm', true);
+                    }
+                    note.curScoreStep++;
                 }
             }
         } else {

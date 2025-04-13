@@ -110,16 +110,17 @@ class MainMenuState extends FunkinState {
     }
 
     override function update(elapsed:Float):Void {
-        final wheel:Float = -FlxG.mouse.wheel;
-        if(controls.justPressed.UI_UP || wheel < 0)
-            changeSelection(-1);
-
-        if(controls.justPressed.UI_DOWN || wheel > 0)
-            changeSelection(1);
-
-        if(controls.justPressed.ACCEPT)
-            onSelect();
-
+        if(!transitioning) {
+            final wheel:Float = -FlxG.mouse.wheel;
+            if(controls.justPressed.UI_UP || wheel < 0)
+                changeSelection(-1);
+    
+            if(controls.justPressed.UI_DOWN || wheel > 0)
+                changeSelection(1);
+    
+            if(controls.justPressed.ACCEPT)
+                onSelect();
+        }
         if(controls.justPressed.BACK) {
             persistentUpdate = false;
             FlxG.switchState(new TitleState());

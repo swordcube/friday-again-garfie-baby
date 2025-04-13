@@ -36,11 +36,22 @@ class ScriptedHUD extends BaseHUD {
         script.call("updatePlayerStats");
     }
 
+    override function bopIcons():Void {
+        script.call("bopIcons");
+    }
+
+    override function positionIcons():Void {
+        script.call("positionIcons");
+    }
+
     override function stepHit(step:Int):Void {
         script.call("stepHit", [step]);
     }
 
     override function beatHit(beat:Int):Void {
+        if(beat >= 0)
+            bopIcons();
+        
         script.call("beatHit", [beat]);
     }
 

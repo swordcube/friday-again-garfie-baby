@@ -60,10 +60,14 @@ class HoldTrail extends FlxSpriteGroup {
             final laneStr:String = Constants.NOTE_DIRECTIONS[note.direction];
 
             strip.animation.play('${laneStr} hold', true);
+            strip.updateHitbox();
             strip.setPosition(-999999, -999999);
+            strip.offset.add(strip.skinData.offset.x, strip.skinData.offset.y);
             
             tail.animation.play('${laneStr} tail', true);
+            tail.updateHitbox();
             tail.setPosition(-999999, -999999);
+            tail.offset.add(tail.skinData.offset.x, tail.skinData.offset.y);
 
             height = height;
         }

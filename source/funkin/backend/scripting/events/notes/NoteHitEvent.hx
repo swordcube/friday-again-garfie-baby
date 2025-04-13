@@ -59,6 +59,12 @@ class NoteHitEvent extends ScriptEvent {
     public var showHoldCovers:Bool;
 
     /**
+     * Whether or not to show the hold gradients
+     * of the note that was hit.
+     */
+    public var showHoldGradients:Bool;
+
+    /**
      * Whether or not to show the rating of
      * the note that was hit.
      */
@@ -119,6 +125,12 @@ class NoteHitEvent extends ScriptEvent {
      * The suffix of the character's sing animation.
      */
     public var singAnimSuffix:String;
+
+    /**
+     * Whether or not to jitter the strum animation
+     * on holds, like older versions of Funkin' (pre 0.3).
+     */
+    public var strumHoldJitter:Bool = false;
 
     /**
      * This is the constructor for this event, mainly
