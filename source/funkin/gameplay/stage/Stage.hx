@@ -4,7 +4,7 @@ import funkin.gameplay.character.Character;
 import funkin.gameplay.stage.props.*;
 
 #if SCRIPTING_ALLOWED
-import funkin.backend.scripting.FunkinScript;
+import funkin.scripting.FunkinScript;
 #end
 
 typedef CharacterSet = {
@@ -76,7 +76,13 @@ class Stage extends FlxContainer {
                         if(!spectatorAdded) {
                             characters.spectator.x = propData.properties?.position[0] ?? 412.0;
                             characters.spectator.y = propData.properties?.position[1] ?? 738.0;
-                            characters.spectator.scrollFactor.set(propData.properties?.scroll[0] ?? 1.0, propData.properties?.scroll[1] ?? propData.properties?.scroll[0] ?? 1.0);
+
+                            var scroll:Array<Float> = cast propData.properties?.scroll;
+                            if(scroll == null)
+                                scroll = [1, 1];
+                            
+                            characters.spectator.scrollFactor.set(scroll[0] ?? 1.0, scroll[1] ?? scroll[0] ?? 1.0);
+                            
                             layer.add(characters.spectator);
                             spectatorAdded = true;
                         }
@@ -85,7 +91,13 @@ class Stage extends FlxContainer {
                         if(!opponentAdded) {
                             characters.opponent.x = propData.properties?.position[0] ?? 0.0;
                             characters.opponent.y = propData.properties?.position[1] ?? 812.0;
-                            characters.opponent.scrollFactor.set(propData.properties?.scroll[0] ?? 1.0, propData.properties?.scroll[1] ?? propData.properties?.scroll[0] ?? 1.0);
+
+                            var scroll:Array<Float> = cast propData.properties?.scroll;
+                            if(scroll == null)
+                                scroll = [1, 1];
+                            
+                            characters.opponent.scrollFactor.set(scroll[0] ?? 1.0, scroll[1] ?? scroll[0] ?? 1.0);
+                            
                             layer.add(characters.opponent);
                             opponentAdded = true;
                         }
@@ -94,7 +106,13 @@ class Stage extends FlxContainer {
                         if(!playerAdded) {
                             characters.player.x = propData.properties?.position[0] ?? 694.0;
                             characters.player.y = propData.properties?.position[1] ?? 812.0;
-                            characters.player.scrollFactor.set(propData.properties?.scroll[0] ?? 1.0, propData.properties?.scroll[1] ?? propData.properties?.scroll[0] ?? 1.0);
+
+                            var scroll:Array<Float> = cast propData.properties?.scroll;
+                            if(scroll == null)
+                                scroll = [1, 1];
+                            
+                            characters.player.scrollFactor.set(scroll[0] ?? 1.0, scroll[1] ?? scroll[0] ?? 1.0);
+                            
                             layer.add(characters.player);
                             playerAdded = true;
                         }

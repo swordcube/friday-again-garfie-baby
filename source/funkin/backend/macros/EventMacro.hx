@@ -1,7 +1,7 @@
 package funkin.backend.macros;
 
-import haxe.macro.Expr;
 import haxe.macro.Context;
+import haxe.macro.Expr;
 
 /**
  * Macro that generates all additional fields, making events much easier to code in.
@@ -19,7 +19,7 @@ class EventMacro {
             return fields;
 
         var curClass = curClassRest.get();
-        if(curClass == null || curClass.name == "ScriptEvent")
+        if(curClass == null || curClass.name == "ActionEvent")
             return fields;
 
         for(f in fields) {

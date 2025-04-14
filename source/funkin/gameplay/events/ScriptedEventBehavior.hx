@@ -1,7 +1,7 @@
 package funkin.gameplay.events;
 
-import funkin.backend.scripting.events.gameplay.SongEvent;
-import funkin.backend.scripting.FunkinScript;
+import funkin.backend.events.GameplayEvents;
+import funkin.scripting.FunkinScript;
 
 class ScriptedEventBehavior extends EventBehavior {
     public var script(default, null):FunkinScript;

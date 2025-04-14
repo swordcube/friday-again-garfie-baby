@@ -2,10 +2,10 @@ package funkin.gameplay.notes;
 
 import flixel.util.FlxColor;
 
+import funkin.backend.events.NoteEvents;
+
 import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
-
-import funkin.backend.scripting.events.notes.*;
 
 /**
  * A class representing a step at which you

@@ -6,8 +6,8 @@ import flixel.util.FlxSignal;
 import funkin.gameplay.UISkin;
 import funkin.graphics.SkinnableUISprite;
 
-import funkin.backend.scripting.events.*;
-import funkin.backend.scripting.events.gameplay.*;
+import funkin.backend.events.Events;
+import funkin.backend.events.CountdownEvents;
 
 class Countdown extends FlxContainer {
     public var timer:FlxTimer;

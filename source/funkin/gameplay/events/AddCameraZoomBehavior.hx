@@ -1,6 +1,6 @@
 package funkin.gameplay.events;
 
-import funkin.backend.scripting.events.gameplay.SongEvent;
+import funkin.backend.events.GameplayEvents;
 
 class AddCameraZoomBehavior extends EventBehavior {
     public function new() {

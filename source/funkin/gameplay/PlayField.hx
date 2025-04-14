@@ -14,9 +14,9 @@ import funkin.gameplay.notes.NoteSpawner;
 import funkin.gameplay.song.ChartData.NoteData;
 import funkin.gameplay.song.ChartData.ChartData;
 
-import funkin.backend.scripting.events.*;
-import funkin.backend.scripting.events.notes.*;
-import funkin.backend.scripting.events.gameplay.*;
+import funkin.backend.events.Events;
+import funkin.backend.events.GameplayEvents;
+import funkin.backend.events.NoteEvents;
 
 import funkin.gameplay.scoring.Scoring;
 
@@ -97,7 +97,7 @@ class PlayField extends FlxContainer {
     }
 
     public function hitNote(note:Note):Void {
-        final event:NoteHitEvent = Events.get(NOTE_HIT);
+        final event:NoteHitEvent = cast Events.get(NOTE_HIT);
 
         final timestamp:Float = (note.strumLine.botplay) ? note.time : attachedConductor.time;
         final judgement:String = Scoring.judgeNote(note, timestamp);
@@ -187,7 +187,7 @@ class PlayField extends FlxContainer {
     }
 
     public function missNote(note:Note):Void {
-        final event:NoteMissEvent = Events.get(NOTE_MISS);
+        final event:NoteMissEvent = cast Events.get(NOTE_MISS);
         onNoteMiss.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
             true, true, note.strumLine == playerStrumLine, note.strumLine == playerStrumLine,

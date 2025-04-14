@@ -6,29 +6,30 @@ import flixel.util.FlxTimer;
 import funkin.backend.Conductor.IBeatReceiver;
 import funkin.backend.assets.loaders.AssetLoader;
 
-import funkin.backend.scripting.events.*;
-import funkin.backend.scripting.events.notes.*;
-import funkin.backend.scripting.events.gameplay.*;
-
 import funkin.gameplay.Countdown;
-import funkin.gameplay.PlayField;
 import funkin.gameplay.FunkinCamera;
+import funkin.gameplay.PlayField;
 import funkin.gameplay.character.Character;
+
+import funkin.backend.events.Events;
+import funkin.backend.events.CountdownEvents;
+import funkin.backend.events.GameplayEvents;
+import funkin.backend.events.NoteEvents;
+
+import funkin.gameplay.events.*;
+import funkin.gameplay.events.EventRunner;
 
 import funkin.gameplay.hud.*;
 import funkin.gameplay.hud.BaseHUD;
+
+import funkin.gameplay.scoring.Scoring;
+import funkin.gameplay.scoring.system.*;
 
 import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.VocalGroup;
 
 import funkin.gameplay.stage.Stage;
 import funkin.gameplay.stage.props.ComboProp;
-
-import funkin.gameplay.events.*;
-import funkin.gameplay.events.EventRunner;
-
-import funkin.gameplay.scoring.Scoring;
-import funkin.gameplay.scoring.system.*;
 
 import funkin.states.editors.ChartEditor;
 import funkin.states.menus.FreeplayState;
@@ -38,8 +39,8 @@ import funkin.substates.PauseSubState;
 // import scripting events anyways because i'm too lazy
 // to make it work on no scripting mode lol!!
 #if SCRIPTING_ALLOWED
-import funkin.backend.scripting.FunkinScript;
-import funkin.backend.scripting.FunkinScriptGroup;
+import funkin.scripting.FunkinScript;
+import funkin.scripting.FunkinScriptGroup;
 #end
 
 enum abstract CameraTarget(Int) from Int to Int {

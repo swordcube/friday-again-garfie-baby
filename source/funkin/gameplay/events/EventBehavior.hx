@@ -1,7 +1,7 @@
 package funkin.gameplay.events;
 
+import funkin.backend.events.GameplayEvents;
 import funkin.states.PlayState;
-import funkin.backend.scripting.events.gameplay.SongEvent;
 
 class EventBehavior {
     public var game(default, null):PlayState;

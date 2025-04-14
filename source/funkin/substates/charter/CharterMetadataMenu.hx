@@ -1,16 +1,13 @@
 package funkin.substates.charter;
 
 import flixel.util.FlxTimer;
-
+import funkin.gameplay.song.SongMetadata;
+import funkin.scripting.*;
+import funkin.states.editors.ChartEditor;
 import funkin.ui.*;
+import funkin.ui.dropdown.*;
 import funkin.ui.panel.*;
 import funkin.ui.slider.*;
-import funkin.ui.dropdown.*;
-
-import funkin.backend.scripting.*;
-
-import funkin.gameplay.song.SongMetadata;
-import funkin.states.editors.ChartEditor;
 
 class CharterMetadataMenu extends UISubState {
     public var window:CharterMetadataWindow;

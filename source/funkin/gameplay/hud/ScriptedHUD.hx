@@ -1,7 +1,7 @@
 package funkin.gameplay.hud;
 
 #if SCRIPTING_ALLOWED
-import funkin.backend.scripting.FunkinScript;
+import funkin.scripting.FunkinScript;
 
 class ScriptedHUD extends BaseHUD {
     public var skin(default, null):String;

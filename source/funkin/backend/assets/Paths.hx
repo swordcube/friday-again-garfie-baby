@@ -25,7 +25,7 @@ enum AssetType {
 }
 
 #if SCRIPTING_ALLOWED
-@:allow(funkin.backend.scripting.GlobalScript)
+@:allow(funkin.scripting.GlobalScript)
 #end
 @:allow(funkin.backend.WeekData)
 class Paths {

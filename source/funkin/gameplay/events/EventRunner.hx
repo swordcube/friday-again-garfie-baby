@@ -1,9 +1,11 @@
 package funkin.gameplay.events;
 
-import funkin.backend.scripting.events.*;
-import funkin.backend.scripting.events.gameplay.*;
-
 import flixel.util.FlxSignal.FlxTypedSignal;
+
+import funkin.backend.events.Events;
+import funkin.backend.events.GameplayEvents;
+import funkin.backend.events.NoteEvents;
+
 import funkin.gameplay.song.ChartData.EventData;
 
 class EventRunner extends FlxBasic {

@@ -2,14 +2,12 @@ package funkin.substates;
 
 import flixel.util.FlxSignal.FlxTypedSignal;
 import flixel.util.FlxTimer;
-
+import funkin.scripting.*;
+import funkin.states.editors.ChartEditor;
 import funkin.ui.*;
+import funkin.ui.dropdown.*;
 import funkin.ui.panel.*;
 import funkin.ui.slider.*;
-import funkin.ui.dropdown.*;
-
-import funkin.backend.scripting.*;
-import funkin.states.editors.ChartEditor;
 
 class UnsavedWarningSubState extends UISubState {
     public var window:UnsavedWarningWindow;

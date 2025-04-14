@@ -12,6 +12,7 @@ import openfl.events.UncaughtErrorEvent;
 import flixel.FlxGame;
 import flixel.util.typeLimit.NextState.InitialState;
 
+import funkin.ui.SoundTray;
 import funkin.backend.native.NativeAPI;
 import funkin.states.menus.MainMenuState;
 
@@ -20,6 +21,7 @@ using funkin.utilities.OpenFLUtil;
 class FunkinGame extends FlxGame {
     public function new(gameWidth = 0, gameHeight = 0, ?initialState:InitialState, updateFramerate = 60, drawFramerate = 60, skipSplash = false, ?startFullscreen:Bool = false) {
         super(gameWidth, gameHeight, initialState, updateFramerate, drawFramerate, skipSplash, startFullscreen);
+        _customSoundTray = SoundTray;
 
         #if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, (event:UncaughtErrorEvent) -> {

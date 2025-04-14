@@ -34,7 +34,11 @@ class NoteSpawner extends FlxBasic {
             else
                 note.holdTrail.revive();
 
-            note.setup(strumLine, noteData.time, noteData.direction, noteData.length - playField.attachedConductor.stepLength, noteData.type, strumLine.strums.members[noteData.direction % Constants.KEY_COUNT].skin);
+            var length:Float = noteData.length - playField.attachedConductor.stepLength;
+            if(length <= playField.attachedConductor.stepLength)
+                length = 0;
+
+            note.setup(strumLine, noteData.time, noteData.direction, length, noteData.type, strumLine.strums.members[noteData.direction % Constants.KEY_COUNT].skin);
             
             if(!strumLine.holdTrails.members.contains(note.holdTrail))
                 strumLine.holdTrails.add(note.holdTrail);

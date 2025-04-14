@@ -8,12 +8,15 @@ import funkin.backend.Conductor.IBeatReceiver;
 import funkin.graphics.AtlasType;
 import funkin.graphics.SkinnableSprite;
 
+import funkin.utilities.SpriteUtil;
+
 #if SCRIPTING_ALLOWED
-import funkin.backend.scripting.events.*;
-import funkin.backend.scripting.FunkinScript;
+import funkin.backend.events.Events;
+import funkin.backend.events.ActionEvent;
+
+import funkin.scripting.FunkinScript;
 #end
 
-import funkin.utilities.SpriteUtil;
 
 enum abstract AnimationContext(String) from String to String {
     /**
@@ -200,7 +203,7 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     public function dance():Void {
         #if SCRIPTING_ALLOWED
-        final event:ScriptEvent = Events.get(UNKNOWN).flagAsPre();
+        final event:ActionEvent = Events.get(UNKNOWN).flagAsPre();
         if(script != null) {
             script.call("onDance", [event]);
             if(event.cancelled)

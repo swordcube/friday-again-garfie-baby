@@ -156,7 +156,7 @@ class StrumLine extends FlxSpriteGroup {
                     }
                     if(note.hitEvent.playConfirmAnim && note.hitEvent.strumHoldJitter) {
                         if(botplay)
-                            strum.holdTime = attachedConductor.stepLength;
+                            strum.holdTime = attachedConductor.stepLength * 2;
                         
                         strum.animation.play('${Constants.NOTE_DIRECTIONS[note.direction]} confirm', true);
                     }

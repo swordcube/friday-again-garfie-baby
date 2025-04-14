@@ -1,26 +1,20 @@
 package funkin.substates;
 
+import flixel.sound.FlxSound;
+import flixel.text.FlxText;
+import flixel.tweens.FlxTween;
+import flixel.util.FlxDestroyUtil;
+import flixel.util.FlxTimer;
+import funkin.states.PlayState;
+import funkin.states.menus.FreeplayState;
+import funkin.substates.transition.FadeTransition;
+import funkin.ui.AtlasText;
+import funkin.ui.AtlasTextList;
 import lime.app.Future;
 import openfl.media.Sound;
 
-import flixel.util.FlxTimer;
-import flixel.tweens.FlxTween;
-
-import flixel.text.FlxText;
-import flixel.sound.FlxSound;
-
-import flixel.util.FlxDestroyUtil;
-
-import funkin.ui.AtlasText;
-import funkin.ui.AtlasTextList;
-
-import funkin.states.PlayState;
-import funkin.states.menus.FreeplayState;
-
-import funkin.substates.transition.FadeTransition;
-
 #if SCRIPTING_ALLOWED
-import funkin.backend.scripting.GlobalScript;
+import funkin.scripting.GlobalScript;
 #end
 
 @:access(funkin.states.PlayState)
