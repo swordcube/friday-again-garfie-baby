@@ -26,7 +26,11 @@ import funkin.ui.topbar.*;
 import funkin.ui.dropdown.*;
 
 import funkin.gameplay.HealthIcon;
+
+import funkin.gameplay.song.NoteData;
+import funkin.gameplay.song.EventData;
 import funkin.gameplay.song.ChartData;
+
 import funkin.gameplay.song.SongMetadata;
 import funkin.gameplay.song.VocalGroup;
 

@@ -6,7 +6,8 @@ import funkin.backend.events.Events;
 import funkin.backend.events.GameplayEvents;
 import funkin.backend.events.NoteEvents;
 
-import funkin.gameplay.song.ChartData.EventData;
+import funkin.gameplay.song.NoteData;
+import funkin.gameplay.song.EventData;
 
 class EventRunner extends FlxBasic {
     public var curEvent:Int = 0;
@@ -25,6 +26,24 @@ class EventRunner extends FlxBasic {
         loadBehaviors(events);
     }
 
+    public function loadBehavior(eventType:String):EventBehavior {
+        return switch(eventType) {
+            case "Camera Pan":
+                new CameraPanBehavior();
+
+            case "Add Camera Zoom":
+                new AddCameraZoomBehavior();
+
+            #if SCRIPTING_ALLOWED
+            case "Script Call":
+                new ScriptCallBehavior();
+            #end
+
+            default:
+                new EventBehavior(eventType);
+        }; 
+    }
+
     public function loadBehaviors(events:Array<EventData>):Void {
         for(b in behaviors) {
             if(b != null)
@@ -36,16 +55,7 @@ class EventRunner extends FlxBasic {
             if(behaviors.exists(e.type))
                 continue;
 
-            final behavior:EventBehavior = switch(e.type) {
-                case "Camera Pan":
-                    new CameraPanBehavior();
-
-                case "Add Camera Zoom":
-                    new AddCameraZoomBehavior();
-
-                default:
-                    new EventBehavior(e.type);
-            };
+            final behavior:EventBehavior = loadBehavior(e.type);
             behaviors.set(e.type, behavior);
         }
     }
@@ -59,10 +69,16 @@ class EventRunner extends FlxBasic {
         final e:SongEvent = cast Events.get(SONG_EVENT);
         e.recycle(event.time, event.params, event.type);
         onExecute.dispatch(e);
-
-        final b:EventBehavior = behaviors.get(event.type);
-        if(b != null)
-            b.execute(e);
+        
+        if(e.cancelled)
+            return;
+        
+        var b:EventBehavior = behaviors.get(e.eventType);
+        if(b == null) {
+            b = loadBehavior(e.eventType);
+            behaviors.set(e.eventType, b);
+        }
+        b.execute(e);
 
         if(e.cancelled)
             return;

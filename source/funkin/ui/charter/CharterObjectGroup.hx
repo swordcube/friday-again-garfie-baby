@@ -5,8 +5,13 @@ import flixel.math.FlxRect;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxSignal;
 import flixel.util.FlxTimer;
+
+import funkin.gameplay.song.NoteData;
+import funkin.gameplay.song.EventData;
 import funkin.gameplay.song.ChartData;
+
 import funkin.states.editors.ChartEditor;
+
 import funkin.ui.SliceSprite;
 import funkin.utilities.SortedArrayUtil;
 

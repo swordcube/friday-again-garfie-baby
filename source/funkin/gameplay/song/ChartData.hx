@@ -1,49 +1,6 @@
 package funkin.gameplay.song;
 
 /**
- * Data for a note object, as a class.
- */
-@:structInit
-class NoteData {
-	@:alias("t")
-    public var time:Float;
-
-	@:alias("d")
-    public var direction:Int;
-
-	@:alias("l")
-    public var length:Float;
-
-	@:alias("k")
-    public var type:String;
-
-    public function toString():String {
-        return 'NoteData(time: ${time}, direction: ${direction}, length: ${length}, type: ${type})';
-    }
-}
-
-/**
- * Data for an event object, as a class.
- */
-@:structInit
-class EventData {
-	@:alias("t")
-    public var time:Float;
-
-	@:alias("p")
-	@:jcustomparse(funkin.utilities.DataParse.dynamicValue)
-	@:jcustomwrite(funkin.utilities.DataWrite.dynamicValue)
-    public var params:Dynamic;//DynamicAccess<Dynamic>;
-
-	@:alias("k")
-    public var type:String;
-
-    public function toString():String {
-        return 'EventData(time: ${time}, params: ${params}, type: ${type})';
-    }
-}
-
-/**
  * Data for a chart object, as a class.
  */
 @:structInit

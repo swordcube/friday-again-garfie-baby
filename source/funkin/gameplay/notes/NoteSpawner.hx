@@ -1,6 +1,6 @@
 package funkin.gameplay.notes;
 
-import funkin.gameplay.song.ChartData.NoteData;
+import funkin.gameplay.song.NoteData;
 
 class NoteSpawner extends FlxBasic {
     public var playField:PlayField;

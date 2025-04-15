@@ -11,8 +11,9 @@ import funkin.gameplay.notes.Note;
 import funkin.gameplay.notes.StrumLine;
 import funkin.gameplay.notes.NoteSpawner;
 
-import funkin.gameplay.song.ChartData.NoteData;
-import funkin.gameplay.song.ChartData.ChartData;
+import funkin.gameplay.song.NoteData;
+import funkin.gameplay.song.EventData;
+import funkin.gameplay.song.ChartData;
 
 import funkin.backend.events.Events;
 import funkin.backend.events.GameplayEvents;
@@ -208,8 +209,10 @@ class PlayField extends FlxContainer {
             if(event.resetCombo)
                 stats.combo = 0;
     
-            if(event.countAsMiss)
+            if(event.countAsMiss) {
+                stats.misses++;
                 stats.missCombo++;
+            }
         }
         if(event.length > 0) {
             event.note.strumLine.holdGradients.members[event.direction].holding = false;

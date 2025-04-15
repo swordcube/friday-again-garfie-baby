@@ -25,7 +25,10 @@ import funkin.gameplay.hud.BaseHUD;
 import funkin.gameplay.scoring.Scoring;
 import funkin.gameplay.scoring.system.*;
 
+import funkin.gameplay.song.NoteData;
+import funkin.gameplay.song.EventData;
 import funkin.gameplay.song.ChartData;
+
 import funkin.gameplay.song.VocalGroup;
 
 import funkin.gameplay.stage.Stage;
@@ -258,9 +261,10 @@ class PlayState extends FunkinState {
 			// uiskin script
 			addSingleScript(loaders[i], 'gameplay/uiskins/${uiSkin}/script');
 		}
-		if(stage.script != null)
+		if(stage.script != null) {
 			scripts.add(stage.script);
-
+			stage.script.setParent(stage);
+		}
 		for(note in currentChart.notes.get(currentDifficulty)) {
 			if(noteTypeScripts.exists(note.type))
 				continue;
