@@ -117,9 +117,9 @@ class NoteHitEvent extends ActionEvent {
     public var unmuteVocals:Bool;
 
     /**
-     * The character that will sing the note.
+     * The characters that will sing the note.
      */
-    public var character:Character;
+    public var characters:Array<Character>;
 
     /**
      * The suffix of the character's sing animation.
@@ -131,6 +131,12 @@ class NoteHitEvent extends ActionEvent {
      * on holds, like older versions of Funkin' (pre 0.3).
      */
     public var strumHoldJitter:Bool = false;
+
+    /**
+     * Whether or not to jitter the character's sing animation
+     * on holds, like older versions of Funkin' (pre 0.3).
+     */
+    public var characterHoldJitter:Bool = false;
 
     /**
      * This is the constructor for this event, mainly
@@ -212,9 +218,9 @@ class NoteMissEvent extends ActionEvent {
     public var muteVocals:Bool;
 
     /**
-     * The character that will miss the note.
+     * The characters that will miss the note.
      */
-    public var character:Character;
+    public var characters:Array<Character>;
 
     /**
      * The suffix of the character's miss animation.

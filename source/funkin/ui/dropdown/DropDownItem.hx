@@ -6,6 +6,8 @@ import flixel.util.FlxTimer;
 import funkin.ui.panel.CustomPanel;
 
 class DropDownItem extends UIComponent {
+    public var dropdown:DropDown;
+
     public var bg:CustomPanel;
     public var icon:FlxSprite;
 
@@ -40,6 +42,7 @@ class DropDownItem extends UIComponent {
     override function update(elapsed:Float) {
         final isHovered:Bool = checkMouseOverlap();
         bg.alpha = FlxMath.lerp(bg.alpha, (isHovered) ? 1 : 0, FlxMath.getElapsedLerp(0.32, elapsed));
+
         if(Math.abs(bg.alpha) < 0.001)
             bg.alpha = 0;
 
@@ -47,6 +50,13 @@ class DropDownItem extends UIComponent {
             callback();
 
         super.update(elapsed);
+    }
+
+    override function checkMouseOverlap():Bool {
+        _checkingMouseOverlap = true;
+        final ret:Bool = FlxG.mouse.overlaps(bg, getDefaultCamera()) && !UIUtil.isHoveringAnyComponent([this, dropdown, dropdown.bg, bg]);
+        _checkingMouseOverlap = false;
+        return ret;
     }
 
     //----------- [ Private API ] -----------//

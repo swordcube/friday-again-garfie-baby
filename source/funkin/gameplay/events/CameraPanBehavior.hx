@@ -8,8 +8,15 @@ class CameraPanBehavior extends EventBehavior {
     }
 
     override function execute(e:SongEvent) {
+        super.execute(e);
+        
         final params:CameraPanParams = cast e.params;
         game.curCameraTarget = params.char;
+
+        #if SCRIPTING_ALLOWED
+        if(script != null)
+            script.call("onExecutePost", [e.flagAsPost()]);
+        #end
     }
 }
 

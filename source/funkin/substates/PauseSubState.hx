@@ -218,6 +218,7 @@ class PauseSubState extends FunkinSubState {
             FlxG.signals.postStateSwitch.addOnce(() -> {
                 FlxG.cameras.remove(FadeTransition.nextCamera);
             });
+            FlxG.sound.music.onComplete = null;
             FlxG.switchState(PlayState.new.bind({
                 song: game.currentSong,
                 difficulty: game.currentDifficulty,
@@ -247,6 +248,7 @@ class PauseSubState extends FunkinSubState {
             FlxG.signals.postStateSwitch.addOnce(() -> {
                 FlxG.cameras.remove(FadeTransition.nextCamera);
             });
+            FlxG.sound.music.onComplete = null;
             FlxG.switchState(FreeplayState.new);
         });
         close();

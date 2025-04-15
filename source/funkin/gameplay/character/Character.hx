@@ -17,7 +17,6 @@ import funkin.backend.events.ActionEvent;
 import funkin.scripting.FunkinScript;
 #end
 
-
 enum abstract AnimationContext(String) from String to String {
     /**
      * This animation will play uninterrupted
@@ -46,8 +45,10 @@ enum abstract AnimationContext(String) from String to String {
 @:allow(funkin.states.PlayState)
 class Character extends FlxSprite implements IBeatReceiver {
     public var data(default, null):CharacterData;
+    public var debugMode:Bool = false;
+
     public var characterID(default, null):String;
-    public var isPlayer(default, null):Bool = false;
+    public var isPlayer(default, set):Bool = false;
     
     public var danceInterval:Int = 1;
     public var curDanceStep:Int = -1;
@@ -55,13 +56,14 @@ class Character extends FlxSprite implements IBeatReceiver {
     public var holdTimer:Float = 0;
     public var curAnimContext:AnimationContext = DANCE;
 
+    public var healthColor:FlxColor = FlxColor.WHITE;
     public var footOffset:FlxPoint = FlxPoint.get(0, 0);
 
     #if SCRIPTING_ALLOWED
     public var script:FunkinScript;
     #end
 
-    public function new(characterID:String, isPlayer:Bool = false) {
+    public function new(characterID:String, ?isPlayer:Bool = false, ?debugMode:Bool = false) {
         super();
         if(characterID == null || characterID.length == 0)
             characterID = Constants.DEFAULT_CHARACTER;
@@ -70,20 +72,52 @@ class Character extends FlxSprite implements IBeatReceiver {
         characterID = data.id;
         
         this.characterID = characterID;
-        this.isPlayer = isPlayer;
+        @:bypassAccessor this.isPlayer = isPlayer;
+        this.debugMode = debugMode;
 
         #if SCRIPTING_ALLOWED
-        final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script');
-        if(FlxG.assets.exists(scriptPath)) {
-            script = FunkinScript.fromFile(scriptPath);
-            script.setParent(this);
-            script.set("this", this);
-            
-            script.execute();
-            script.call("onCreate");
+        if(!debugMode) {
+            final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script');
+            if(FlxG.assets.exists(scriptPath)) {
+                final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
+                script = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+
+                script.setParent(this);
+                script.set("this", this);
+                
+                script.execute();
+                script.call("onLoad", [data]);
+            }
         }
         #end
+        applyData(data);
 
+        #if SCRIPTING_ALLOWED
+        if(script != null)
+            script.call("onLoadPost", [data]);
+        #end
+    }
+
+    override function update(elapsed:Float):Void {
+        #if SCRIPTING_ALLOWED
+        if(script != null)
+            script.call("onUpdate", [elapsed]);
+        #end
+
+        if(!debugMode && curAnimContext == SING) {
+            holdTimer -= elapsed * 1000;
+            if(holdTimer <= 0)
+                holdTimer = 0;
+        }
+        super.update(elapsed);
+
+        #if SCRIPTING_ALLOWED
+        if(script != null)
+            script.call("onUpdatePost", [elapsed]);
+        #end
+    }
+
+    public function applyData(data:CharacterData):Void {
         switch(data.atlas.type) {
             case SPARROW:
                 frames = Paths.getSparrowAtlas('gameplay/characters/${characterID}/${data.atlas.path}');
@@ -118,6 +152,19 @@ class Character extends FlxSprite implements IBeatReceiver {
         scale.set(data.scale, data.scale);
         antialiasing = data.antialiasing ?? FlxSprite.defaultAntialiasing;
 
+        healthColor = FlxColor.fromString(data.healthIcon?.color ?? "#FFFFFF");
+
+        if(!debugMode)
+            correctAnimations();
+        
+        dance();
+        updateHitbox();
+        
+        footOffset.set(0, height);
+        offset.set(footOffset.x - data.position[0], footOffset.y - data.position[1]);
+    }
+
+    public function correctAnimations():Void {
         if(isPlayer != data.isPlayer)
             swapLeftRightAnimations();
 
@@ -125,44 +172,17 @@ class Character extends FlxSprite implements IBeatReceiver {
             flipX = !flipX;
 
 		_baseFlipped = flipX;
-        dance();
-
-        updateHitbox();
-        footOffset.set(0, height);
-
-        offset.set(-data.position[0] ?? 0.0, height - data.position[1] ?? 0.0);
-
-        #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onCreatePost");
-        #end
-    }
-
-    override function update(elapsed:Float):Void {
-        #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onUpdate", [elapsed]);
-        #end
-
-        if(curAnimContext == SING) {
-            holdTimer -= elapsed * 1000;
-            if(holdTimer <= 0)
-                holdTimer = 0;
-        }
-        super.update(elapsed);
-
-        #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onUpdatePost", [elapsed]);
-        #end
     }
 
     public function swapLeftRightAnimations():Void {
-		SpriteUtil.switchAnimFrames(animation.getByName('singRIGHT'), animation.getByName('singLEFT'));
-		SpriteUtil.switchAnimFrames(animation.getByName('singRIGHTmiss'), animation.getByName('singLEFTmiss'));
+        SpriteUtil.switchAnimFrames(animation.getByName(data.singSteps.last()), animation.getByName(data.singSteps.first()));
+		SpriteUtil.switchAnimOffset(animation.getByName(data.singSteps.first()), animation.getByName(data.singSteps.last()));
+        
+        if(!animation.exists(data.missSteps.first()) || !animation.exists(data.missSteps.last()))
+            return;
 
-		SpriteUtil.switchAnimOffset(animation.getByName('singLEFT'), animation.getByName('singRIGHT'));
-		SpriteUtil.switchAnimOffset(animation.getByName('singLEFTmiss'), animation.getByName('singRIGHTmiss'));
+		SpriteUtil.switchAnimFrames(animation.getByName(data.missSteps.last()), animation.getByName(data.missSteps.first()));
+		SpriteUtil.switchAnimOffset(animation.getByName(data.missSteps.first()), animation.getByName(data.missSteps.last()));
 	}
 
     public function playAnim(name:String, ?context:AnimationContext = NONE, ?force:Bool = false, ?reversed:Bool = false, ?frame:Int = 0):Void {
@@ -182,7 +202,7 @@ class Character extends FlxSprite implements IBeatReceiver {
         }
         curAnimContext = context;
         animation.play(name, force, reversed, frame);
-        offset.set(-data.position[0] ?? 0.0, height - data.position[1] ?? 0.0);
+        offset.set(footOffset.x - data.position[0] ?? 0.0, footOffset.y - data.position[1] ?? 0.0);
     }
 
     public inline function playSingAnim(direction:Int, ?suffix:String, ?force:Bool = false, ?reversed:Bool = false, ?frame:Int = 0):Void {
@@ -248,15 +268,17 @@ class Character extends FlxSprite implements IBeatReceiver {
     }
 
     public function beatHit(beat:Int):Void {
-        final canDance:Bool = danceInterval > 0 && (beat % danceInterval == 0);
-        switch(curAnimContext) {
-            case SING:
-                if(holdTimer <= 0 && canDance && !_holdingPose)
-                    dance();
-
-            default:
-                if(canDance)
-                    dance();
+        if(!debugMode) {
+            final canDance:Bool = danceInterval > 0 && (beat % danceInterval == 0);
+            switch(curAnimContext) {
+                case SING:
+                    if(holdTimer <= 0 && canDance && !_holdingPose)
+                        dance();
+    
+                default:
+                    if(canDance)
+                        dance();
+            }
         }
         #if SCRIPTING_ALLOWED
         if(script != null)
@@ -304,4 +326,11 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     @:noCompletion
     private var _holdingPose:Bool = false;
+
+    @:noCompletion
+    private function set_isPlayer(value:Bool):Bool {
+        isPlayer = value;
+        correctAnimations();
+        return value;
+    }
 }

@@ -57,7 +57,10 @@ class FunkinScript {
         setClass(FlxMath);
         setClass(FlxEase);
         setClass(FlxTween);
+        set("FlxPoint", flixel.math.FlxPoint.FlxBasePoint);
+        setClass(flixel.math.FlxRect);
         setClass(flixel.util.FlxTimer);
+        setClass(flixel.util.FlxStringUtil);
 
         setClass(flixel.ui.FlxBar);
         setClass(flixel.addons.display.FlxBackdrop);

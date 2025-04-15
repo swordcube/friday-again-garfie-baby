@@ -222,14 +222,18 @@ class PlayState extends FunkinState {
 			final items:Array<String> = loader.readDirectory(dir);
 			for(i in 0...items.length) {
 				final path:String = loader.getPath('${dir}/${items[i]}');
-				if(FlxG.assets.exists(path))
-					scripts.add(FunkinScript.fromFile(path));
+				if(FlxG.assets.exists(path)) {
+					final contentMetadata = Paths.contentMetadata.get(loader.id);
+					scripts.add(FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false));
+				}
 			}
 		}
 		inline function addSingleScript(loader:AssetLoader, path:String) {
 			final scriptPath:String = Paths.script(path, loader.id);
-			if(FlxG.assets.exists(scriptPath))
-				scripts.add(FunkinScript.fromFile(scriptPath));
+			if(FlxG.assets.exists(scriptPath)) {
+				final contentMetadata = Paths.contentMetadata.get(loader.id);
+				scripts.add(FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false));
+			}
 		}
 		final rawNoteSkin:String = currentChart.meta.game.noteSkin;
 		final rawUISkin:String = currentChart.meta.game.uiSkin;
@@ -265,7 +269,8 @@ class PlayState extends FunkinState {
 			if(!FlxG.assets.exists(scriptPath))
 				continue;
 
-			final script:FunkinScript = FunkinScript.fromFile(scriptPath);
+			final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
+			final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
 			script.set("NOTE_TYPE_ID", note.type);
 			scripts.add(script);
 
@@ -284,14 +289,11 @@ class PlayState extends FunkinState {
 			eventRunner.execute(e);
 		}
 		for(b in eventRunner.behaviors) {
-			if(b is ScriptedEventBehavior) {
-				final sb:ScriptedEventBehavior = cast b;
-				if(sb.script != null) {
-					scripts.add(sb.script);
-	
-					eventScripts.set(sb.eventType, sb.script);
-					eventScriptsArray.push(sb.script);
-				}
+			if(b.script != null) {
+				scripts.add(b.script);
+
+				eventScripts.set(b.eventType, b.script);
+				eventScriptsArray.push(b.script);
 			}
 		}
 		final leScripts:Array<FunkinScript> = scripts.members.copy();
@@ -324,11 +326,12 @@ class PlayState extends FunkinState {
 		playField.onDisplayCombo.add(onDisplayCombo);
 		playField.onDisplayComboPost.add(onDisplayComboPost);
 
+		playField.playerStrumLine.onBotplayToggle.add(onBotplayToggle);
 		playField.cameras = [camHUD];
 		add(playField);
 		
 		final event:HUDGenerationEvent = cast Events.get(HUD_GENERATION);
-		event.recycle(Options.hudType);
+		event.recycle(uiSkin);
 
 		#if SCRIPTING_ALLOWED
 		scripts.event("onHUDGeneration", event);
@@ -403,7 +406,8 @@ class PlayState extends FunkinState {
 			
 			FlxG.sound.music.pause();
 			vocals.pause();
-
+			
+			FlxG.sound.music.onComplete = null;
 			FlxG.switchState(ChartEditor.new.bind({
 				song: currentSong,
 				difficulty: currentDifficulty,
@@ -505,6 +509,7 @@ class PlayState extends FunkinState {
 		scripts.call("onSongEnd");
 		#end
 		FlxG.sound.music.looped = true;
+		FlxG.sound.music.onComplete = null;
 
 		Conductor.instance.music = null;
 		Conductor.instance.autoIncrement = false;
@@ -533,6 +538,9 @@ class PlayState extends FunkinState {
 
 	//----------- [ Private API ] -----------//
 
+	@:unreflective
+	private var _saveScore:Bool = true; // unreflective so you can't CHEAT in scripts >:[
+
 	private function finishSong():Void {
 		if(Conductor.instance.offset > 0) {
 			// end the song after waiting for the amount
@@ -546,9 +554,9 @@ class PlayState extends FunkinState {
 	private function onNoteHit(event:NoteHitEvent):Void {
 		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
 		if(isPlayer)
-			event.character = player;
+			event.characters = [player];
 		else
-			event.character = opponent;
+			event.characters = [opponent];
 		
 		#if SCRIPTING_ALLOWED
 		final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray.concat(eventScriptsArray);
@@ -578,9 +586,11 @@ class PlayState extends FunkinState {
 			}
 		}
 		if(event.playSingAnim) {
-			event.character.playSingAnim(event.direction, event.singAnimSuffix, true);
-			event.character.holdTimer += event.length;
-			event.character._holdingPose = isPlayer;
+			for(character in event.characters) {
+				character.playSingAnim(event.direction, event.singAnimSuffix, true);
+				character.holdTimer += event.length;
+				character._holdingPose = isPlayer;
+			}
 		}
 	}
 
@@ -606,9 +616,9 @@ class PlayState extends FunkinState {
 	private function onNoteMiss(event:NoteMissEvent):Void {
 		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
 		if(isPlayer)
-			event.character = player;
+			event.characters = [player];
 		else
-			event.character = opponent;
+			event.characters = [opponent];
 
 		#if SCRIPTING_ALLOWED
 		final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray.concat(eventScriptsArray);
@@ -638,8 +648,10 @@ class PlayState extends FunkinState {
 			}
 		}
 		if(event.playMissAnim) {
-			event.character.playMissAnim(event.direction, event.missAnimSuffix, true);
-			event.character._holdingPose = isPlayer;
+			for(character in event.characters) {
+				character.playMissAnim(event.direction, event.missAnimSuffix, true);
+				character._holdingPose = isPlayer;
+			}
 		}
 	}
 
@@ -716,6 +728,11 @@ class PlayState extends FunkinState {
 		#if SCRIPTING_ALLOWED
 		scripts.call("onCountdownStepPost", [event]);
 		#end
+	}
+
+	private function onBotplayToggle(value:Bool):Void {
+		if(value)
+			_saveScore = false;
 	}
 
 	override function stepHit(step:Int):Void {

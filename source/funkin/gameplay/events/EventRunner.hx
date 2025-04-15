@@ -44,7 +44,7 @@ class EventRunner extends FlxBasic {
                     new AddCameraZoomBehavior();
 
                 default:
-                    new ScriptedEventBehavior(e.type);
+                    new EventBehavior(e.type);
             };
             behaviors.set(e.type, behavior);
         }

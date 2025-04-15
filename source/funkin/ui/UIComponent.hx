@@ -9,7 +9,10 @@ class UIComponent extends FlxSpriteContainer implements IUIComponent {
     }
 
     public function checkMouseOverlap():Bool {
-        return FlxG.mouse.overlaps(this, getDefaultCamera());
+        _checkingMouseOverlap = true;
+        final ret:Bool = FlxG.mouse.overlaps(this, getDefaultCamera()) && !UIUtil.isHoveringAnyComponent([this]);
+        _checkingMouseOverlap = false;
+        return ret;
     }
 
     override function destroy():Void {
@@ -20,4 +23,6 @@ class UIComponent extends FlxSpriteContainer implements IUIComponent {
 
         super.destroy();
     }
+
+    private var _checkingMouseOverlap:Bool = false;
 }

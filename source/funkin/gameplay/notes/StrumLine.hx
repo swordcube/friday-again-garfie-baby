@@ -1,21 +1,27 @@
 package funkin.gameplay.notes;
 
+import flixel.util.FlxSignal;
 import flixel.tweens.FlxTween;
+
 import funkin.gameplay.notes.HoldTrail;
 
 class StrumLine extends FlxSpriteGroup {
     public var strums:FlxTypedSpriteGroup<Strum>;
+    
     public var holdTrails:FlxTypedSpriteGroup<HoldTrail>;
     public var notes:FlxTypedSpriteGroup<Note>;
+
     public var holdGradients:FlxTypedSpriteGroup<HoldGradient>;
     public var holdCovers:FlxTypedSpriteGroup<HoldCover>;
     public var splashes:FlxTypedSpriteGroup<NoteSplash>;
 
     public var downscroll:Bool = false;
-    public var botplay:Bool = false;
+    public var botplay(default, set):Bool = false;
     
     public var scrollSpeed:Float = 1;
     public var playField:PlayField;
+
+    public var onBotplayToggle:FlxTypedSignal<Bool->Void> = new FlxTypedSignal<Bool->Void>();
     
     public function new(x:Float = 0, y:Float = 0, downscroll:Bool, botplay:Bool, skin:String) {
         super(x, y);
@@ -160,6 +166,10 @@ class StrumLine extends FlxSpriteGroup {
                         
                         strum.animation.play('${Constants.NOTE_DIRECTIONS[note.direction]} confirm', true);
                     }
+                    if(note.hitEvent.playSingAnim && note.hitEvent.characterHoldJitter) {
+                        for(character in note.hitEvent.characters)
+                            character.playSingAnim(note.direction, note.hitEvent.singAnimSuffix, true);
+                    }
                     note.curScoreStep++;
                 }
             }
@@ -172,8 +182,9 @@ class StrumLine extends FlxSpriteGroup {
             note.holdTrail.height = calcHeight;
         }
         if(botplay) {
-            // use playhead instead of time, otherwise automatic note hitting becomes slightly delayed sometimes
-            if(!note.wasHit && !note.wasMissed && note.time <= attachedConductor.playhead)
+            // have to add 20ms to the hit window for the botplay otherwise
+            // the notes will occasionally be hit slightly later than normal
+            if(!note.wasHit && !note.wasMissed && note.time <= (attachedConductor.time + 20))
                 playField.hitNote(note);
             
             if(note.wasHit && note.length > 0 && note.time <= attachedConductor.time - note.length) {
@@ -218,5 +229,12 @@ class StrumLine extends FlxSpriteGroup {
 
     private function _splashFactory():NoteSplash {
         return new NoteSplash();
+    }
+
+    @:noCompletion
+    private function set_botplay(newValue:Bool):Bool {
+        botplay = newValue;
+        onBotplayToggle.dispatch(botplay);
+        return botplay;
     }
 }

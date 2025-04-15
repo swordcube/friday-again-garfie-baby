@@ -7,7 +7,9 @@ class AddCameraZoomBehavior extends EventBehavior {
         super("Add Camera Zoom");
     }
 
-    override function execute(e:SongEvent) {
+    override function execute(e:SongEvent):Void {
+        super.execute(e);
+
         final params:AddCameraZoomParams = cast e.params;
         final cam:String = params.camera.toLowerCase();
         
@@ -15,6 +17,11 @@ class AddCameraZoomBehavior extends EventBehavior {
             game.camHUD.extraZoom += params.zoom;
         else
             game.camGame.extraZoom += params.zoom;
+
+        #if SCRIPTING_ALLOWED
+        if(script != null)
+            script.call("onExecutePost", [e.flagAsPost()]);
+        #end
     }
 }
 

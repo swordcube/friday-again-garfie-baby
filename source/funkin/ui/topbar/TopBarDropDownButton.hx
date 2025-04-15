@@ -6,7 +6,7 @@ class TopBarDropDownButton extends TopBarButton {
     public var topBar:TopBar;
 
     override function update(elapsed:Float):Void {
-        final hovered:Bool = isHovered();
+        final hovered:Bool = checkMouseOverlap();
         if(hovered != _hovered) {
             if(hovered && topBar.dropdown != null) {
                 topBar.dropdown = FlxDestroyUtil.destroy(topBar.dropdown);

@@ -40,10 +40,12 @@ class Stage extends FlxContainer {
         #if SCRIPTING_ALLOWED
         final scriptPath:String = Paths.script('gameplay/stages/${id}/script');
         if(FlxG.assets.exists(scriptPath)) {
-            script = FunkinScript.fromFile(scriptPath);
+            final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
+            script = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+
             script.setParent(this);
             script.execute();
-            script.call("onLoad");
+            script.call("onLoad", [data]);
         }
         #end
 
@@ -151,7 +153,7 @@ class Stage extends FlxContainer {
         }
         #if SCRIPTING_ALLOWED
         if(script != null)
-            script.call("onLoadPost");
+            script.call("onLoadPost", [data]);
         #end
     }
 

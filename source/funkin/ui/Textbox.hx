@@ -64,7 +64,7 @@ class Textbox extends UIComponent {
         caret.x = label.x + label.width;
         caret.alpha = (typing) ? Math.abs(Math.sin((System.getTimerPrecise() / 1000) * 2)) : 0;
 
-        if(FlxG.mouse.overlaps(bg)) {
+        if(checkMouseOverlap()) {
             if(FlxG.mouse.justPressed) {
                 typing = true;
                 
@@ -85,8 +85,12 @@ class Textbox extends UIComponent {
             }
         }
         else {
-            if(FlxG.mouse.justReleased && typing)
+            if(FlxG.mouse.justReleased && typing) {
+                if(callback != null)
+                    callback(label.text);
+
                 typing = false;
+            }
         }
         if(typing) {
             var curPos = switch(position) {
@@ -108,6 +112,13 @@ class Textbox extends UIComponent {
             curPos.put();
         }
         super.update(elapsed);
+    }
+
+    override function checkMouseOverlap():Bool {
+        _checkingMouseOverlap = true;
+        final ret:Bool = FlxG.mouse.overlaps(bg) && !UIUtil.isHoveringAnyComponent([this, bg]);
+        _checkingMouseOverlap = false;
+        return ret;
     }
 
     public function changeSelection(change:Int):Void {

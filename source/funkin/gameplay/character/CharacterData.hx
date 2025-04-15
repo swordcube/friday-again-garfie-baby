@@ -123,6 +123,11 @@ class CharacterData {
         }
         return data;
     }
+
+    public static function stringify(data:CharacterData):String {
+        final writer:JsonWriter<CharacterData> = new JsonWriter<CharacterData>();
+		return writer.write(data, "\t");
+    }
 }
 
 @:structInit

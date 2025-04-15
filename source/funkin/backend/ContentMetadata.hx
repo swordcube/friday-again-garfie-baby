@@ -8,6 +8,11 @@ class ContentMetadata {
     @:optional
     @:default("0.1.0")
     public var apiVersion:String;
+
+    @:optional
+    @:default(false)
+    @:unreflective
+    public var allowUnsafeScripts:Bool;
     
     @:optional
     @:default([])

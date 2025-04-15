@@ -5,6 +5,7 @@ import flixel.util.FlxTimer;
 import flixel.effects.FlxFlicker;
 
 import funkin.backend.macros.GitCommitMacro;
+import funkin.substates.EditorPickerSubState;
 
 class MainMenuState extends FunkinState {
     public var options:Array<MainMenuOption>;
@@ -120,6 +121,11 @@ class MainMenuState extends FunkinState {
     
             if(controls.justPressed.ACCEPT)
                 onSelect();
+
+            if(controls.justPressed.DEBUG) {
+                persistentUpdate = false;
+                openSubState(new EditorPickerSubState());
+            }
         }
         if(controls.justPressed.BACK) {
             persistentUpdate = false;

@@ -9,15 +9,20 @@ class ScriptedHUD extends BaseHUD {
 
     public function new(playField:PlayField, skin:String) {
         this.skin = skin;
+
+        final scriptPath:String = Paths.script('gameplay/hudskins/${skin}/script');
+        final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
         
-        script = FunkinScript.fromFile(Paths.script('gameplay/hudskins/${skin}/script'));
+        script = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
         script.setParent(this);
         script.set("getHUDImage", (name:String) -> {
             return Paths.image('gameplay/hudskins/${skin}/images/${name}');
         });
         script.execute();
+        script.call("onLoad");
         
         super(playField);
+        script.call("onLoadPost");
     }
 
     override function generateHealthBar():Void {

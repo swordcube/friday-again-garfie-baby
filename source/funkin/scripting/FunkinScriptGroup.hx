@@ -17,7 +17,8 @@ class FunkinScriptGroup {
     }
 
     public function importScript(path:String):Void {
-        final script:FunkinScript = FunkinScript.fromFile(path);
+        final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(path));
+        final script:FunkinScript = FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false);
         add(script);
         script.execute();
     }

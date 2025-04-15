@@ -19,7 +19,9 @@ class UIUtil {
 
         for(i in 0...allComponents.length) {
             c = allComponents[i];
-            if(hasIgnores && ignoreList.contains(c))
+            
+            @:privateAccess
+            if(c._checkingMouseOverlap || (hasIgnores && ignoreList.contains(c)))
                 continue;
 
             if(c.checkMouseOverlap())

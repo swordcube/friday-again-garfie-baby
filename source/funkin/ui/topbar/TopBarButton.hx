@@ -29,7 +29,9 @@ class TopBarButton extends UIComponent {
     }
 
     override function update(elapsed:Float):Void {
-        var offset:Float = (isHovered()) ? (FlxG.mouse.pressed ? -15 : 15) : 0;
+        final isHovered:Bool = FlxG.mouse.overlaps(bg, bg.getDefaultCamera()) && !UIUtil.isHoveringAnyComponent([this]);
+        final offset:Float = (isHovered) ? (FlxG.mouse.pressed ? -15 : 15) : 0;
+        
         bg.colorTransform.redOffset = FlxMath.lerp(bg.colorTransform.redOffset, offset, FlxMath.getElapsedLerp(0.32, elapsed));
         if(Math.abs(bg.colorTransform.redOffset) < 0.001)
             bg.colorTransform.redOffset = 0;
@@ -44,14 +46,17 @@ class TopBarButton extends UIComponent {
 
         bg.visible = bg.colorTransform.hasRGBOffsets();
 
-        if(isHovered() && FlxG.mouse.justReleased) {
+        if(isHovered && FlxG.mouse.justReleased) {
             if(callback != null)
                 callback();
         }
         super.update(elapsed);
     }
 
-    public function isHovered():Bool {
-        return FlxG.mouse.overlaps(bg, bg.getDefaultCamera());
+    override function checkMouseOverlap():Bool {
+        _checkingMouseOverlap = true;
+        final ret:Bool = FlxG.mouse.overlaps(bg, bg.getDefaultCamera());
+        _checkingMouseOverlap = false;
+        return ret;
     }
 }

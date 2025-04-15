@@ -79,8 +79,10 @@ class GlobalScript {
             final globalScriptPath:String = Paths.script("global", loader.id, false);
 			
             if(FlxG.assets.exists(globalScriptPath)) {
+				final contentMetadata = Paths.contentMetadata.get(loader.id);
+
                 // if global script for this asset loader exists, load it
-                final script:FunkinScript = FunkinScript.fromFile(globalScriptPath);
+                final script:FunkinScript = FunkinScript.fromFile(globalScriptPath, contentMetadata?.allowUnsafeScripts ?? false);
                 scripts.add(script);
             }
         }

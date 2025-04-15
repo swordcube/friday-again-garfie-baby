@@ -45,6 +45,8 @@ import funkin.utilities.UndoList;
 // TODO: waveforms for inst and each vocal track
 // TODO: rework how zooming works (aka don't zoom the camera)
 
+// TODO: if given song or difficulty are null, pull up a window to select a song to chart
+
 @:allow(funkin.ui.charter.CharterObjectGroup)
 class ChartEditor extends UIState {
     public static final CELL_SIZE:Int = 40;
@@ -587,7 +589,7 @@ class ChartEditor extends UIState {
                     if(rightClickMenu != null)
                         rightClickMenu.destroy();
 
-                    rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, [
+                    rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
                         Button("Undo", [[UIUtil.correctModifierKey(CONTROL), Z]], undo),
                         Button("Redo", [[UIUtil.correctModifierKey(CONTROL), Y], [UIUtil.correctModifierKey(CONTROL), SHIFT, Z]], redo),
                         
@@ -916,7 +918,7 @@ class ChartEditor extends UIState {
         else {
             switch(object) {
                 case CNote(note):
-                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, [
+                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
                         Button("Edit", null, () -> trace("edit note NOT IMPLEMENTED!!")),
 
                         Separator,
@@ -927,7 +929,7 @@ class ChartEditor extends UIState {
                     add(dropdown);
 
                 case CEvent(event):
-                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, [
+                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
                         Button("Edit", null, () -> trace("edit event NOT IMPLEMENTED!!")),
 
                         Separator,

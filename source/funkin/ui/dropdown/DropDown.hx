@@ -11,7 +11,7 @@ class DropDown extends UIComponent {
     public var bg:Panel;
     public var topBar:TopBar;
 
-    public function new(x:Float = 0, y:Float = 0, items:Array<DropDownItemType>) {
+    public function new(x:Float = 0, y:Float = 0, width:Float = 0, height:Float = 0, items:Array<DropDownItemType>) {
         super(x, y);
 
         bg = new Panel(0, 0, 32, 32);
@@ -32,14 +32,16 @@ class DropDown extends UIComponent {
                         shortcutText = [for(i in shortcut[0]) InputFormatter.formatFlixel(i)].join("+");
                     
                     final item:DropDownItem = new DropDownItem(2, 2 + totalHeight, name, shortcutText, callback);
+                    item.dropdown = this;
                     totalHeight += item.height;
                     _itemContainer.add(item);
                 
                 case Checkbox(name, callback, valueFactory):
                     if(valueFactory == null)
                         valueFactory = () -> return false;
-
+                    
                     final item:DropDownCheckboxItem = new DropDownCheckboxItem(2, 2 + totalHeight, name, () -> callback(!valueFactory()), valueFactory());
+                    item.dropdown = this;
                     totalHeight += item.height;
                     _itemContainer.add(item);
 
@@ -49,8 +51,8 @@ class DropDown extends UIComponent {
                     _separatorContainer.add(sep);
             }
         }
-        bg.width = _itemContainer.width + 8;
-        bg.height = _itemContainer.height + 4;
+        bg.width = ((width <= 0) ? _itemContainer.width : width) + 8;
+        bg.height = ((height <= 0) ? _itemContainer.height : height) + 4;
 
         for(item in _itemContainer) {
             item.bg.width = bg.width - 4;

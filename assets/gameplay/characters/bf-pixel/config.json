@@ -1,80 +1,156 @@
 {
+	"healthIcon": {
+		"isPixel": false,
+		"scale": 1,
+		"flip": [
+			false,
+			false
+		],
+		"offset": [
+			0,
+			0
+		],
+		"color": "#31B0D1"
+	},
 	"atlas": {
 		"type": "sparrow",
-		"path": "sprite"
+		"path": "sprite",
+		"gridSize": null
 	},
-	"position": [0, 0],
+	"gridSize": [
+		0,
+		0
+	],
+	"animations": {
+		"singDOWN": {
+			"prefix": "BF DOWN NOTE0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				0
+			]
+		},
+		"singRIGHTmiss": {
+			"prefix": "BF RIGHT MISS0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				0
+			]
+		},
+		"singLEFTmiss": {
+			"prefix": "BF LEFT MISS0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				-2,
+				0
+			]
+		},
+		"singUP": {
+			"prefix": "BF UP NOTE0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				0
+			]
+		},
+		"idle": {
+			"prefix": "BF IDLE0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				0
+			]
+		},
+		"singRIGHT": {
+			"prefix": "BF RIGHT NOTE0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				0
+			]
+		},
+		"singDOWNmiss": {
+			"prefix": "BF DOWN MISS0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				0
+			]
+		},
+		"singUPmiss": {
+			"prefix": "BF UP MISS0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				0
+			]
+		},
+		"singLEFT": {
+			"prefix": "BF LEFT NOTE0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				-2,
+				0
+			]
+		}
+	},
+	"position": [
+		100,
+		100
+	],
+	"camera": [
+		-200,
+		-120
+	],
 	"scale": 6,
+	"flip": [
+		true,
+		false
+	],
 	"isPlayer": true,
+	"antialiasing": false,
 	"singDuration": 4,
 	"danceSteps": [
 		"idle"
 	],
-	"antialiasing": false,
-	"camera": [0, 0],
-	"healthIcon": {
-		"isPixel": false,
-		"scale": 1,
-		"flip": [false, false],
-		"offset": [0, 0],
-		"color": "#31B0D1"
-	},
-	"flip": [true, false],
-	"animations": {
-		"idle": {
-			"fps": 24,
-			"prefix": "BF IDLE0",
-			"offset": [0, 0],
-			"looped": false
-		},
-		"singLEFT": {
-			"fps": 24,
-			"prefix": "BF LEFT NOTE0",
-			"offset": [-1, 0],
-			"looped": false
-		},
-		"singDOWN": {
-			"fps": 24,
-			"prefix": "BF DOWN NOTE0",
-			"offset": [0, 0],
-			"name": "singDOWN",
-			"looped": false
-		},
-		"singUP": {
-			"fps": 24,
-			"prefix": "BF UP NOTE0",
-			"offset": [0, 0],
-			"looped": false
-		},
-		"singRIGHT": {
-			"fps": 24,
-			"prefix": "BF RIGHT NOTE0",
-			"offset": [0, 0],
-			"looped": false
-		},
-		"singLEFTmiss": {
-			"fps": 24,
-			"prefix": "BF LEFT MISS0",
-			"offset": [-1, 0],
-			"looped": false
-		},
-		"singDOWNmiss": {
-			"fps": 24,
-			"prefix": "BF DOWN MISS0",
-			"offset": [0, 0],
-			"looped": false
-		},
-		"singUPmiss": {
-			"fps": 24,
-			"prefix": "BF UP MISS0",
-			"offset": [0, 0],
-			"looped": false
-		},
-		"singRIGHTmiss": {
-			"fps": 24,
-			"prefix": "BF RIGHT MISS0",
-			"offset": [0, 0],
-			"looped": false
-		}
-	}
+	"singSteps": [
+		"singLEFT",
+		"singDOWN",
+		"singUP",
+		"singRIGHT"
+	],
+	"missSteps": [
+		"singLEFTmiss",
+		"singDOWNmiss",
+		"singUPmiss",
+		"singRIGHTmiss"
+	]
 }

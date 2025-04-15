@@ -105,7 +105,7 @@ class Conductor extends FlxBasic {
     /**
      * The current playhead position in milliseconds.
      */
-    public var playhead(get, never):Float;
+    public var playhead(get, set):Float;
 
     public var rawTime(default, set):Float = 0;
     public var rawPlayhead(default, null):Float = 0;
@@ -403,6 +403,11 @@ class Conductor extends FlxBasic {
     @:noCompletion
     private inline function get_playhead():Float {
         return rawPlayhead - offset;
+    }
+
+    @:noCompletion
+    private inline function set_playhead(newPlayhead:Float):Float {
+        return rawPlayhead = newPlayhead;
     }
 
     @:noCompletion

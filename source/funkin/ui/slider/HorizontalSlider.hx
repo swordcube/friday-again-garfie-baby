@@ -5,7 +5,7 @@ class HorizontalSlider extends Slider {
     public var middle:FlxSprite;
     public var rightSide:FlxSprite;
 
-    public var thumb:FlxSprite; // til that this is called a thumb (or handle, thumb sounds funnier)
+    public var thumb:UISprite; // til that this is called a thumb (or handle, thumb sounds funnier)
 
     public function new(x:Float = 0, y:Float = 0, width:Float = 17) {
         super(x, y);
@@ -41,7 +41,7 @@ class HorizontalSlider extends Slider {
         final thumbHovered:Bool = FlxG.mouse.overlaps(thumb);
         thumb.frame = thumb.frames.frames[(thumbHovered || dragging) ? 1 : 0];
 
-        if(FlxG.mouse.overlaps(this) && FlxG.mouse.pressed && !dragging) {
+        if(FlxG.mouse.overlaps(this) && !UIUtil.isHoveringAnyComponent([this, thumb]) && FlxG.mouse.pressed && !dragging) {
             dragging = true;
 
             final thumbPosCap = width - (thumb.width - 1);

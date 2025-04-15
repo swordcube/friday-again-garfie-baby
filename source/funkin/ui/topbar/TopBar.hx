@@ -123,7 +123,7 @@ class TopBar extends UIComponent {
                         if(dropdown != null)
                             dropdown = FlxDestroyUtil.destroy(dropdown);
 
-                        dropdown = new DropDown(item.x, item.y + bg.height, items);
+                        dropdown = new DropDown(item.x, item.y + bg.height, 0, 0, items);
                         dropdown.topBar = this;
                         dropdown.setPosition(
                             FlxMath.bound(dropdown.x, 0, FlxG.width - dropdown.bg.width),
@@ -200,7 +200,7 @@ class TopBar extends UIComponent {
                         if(dropdown != null)
                             dropdown = FlxDestroyUtil.destroy(dropdown);
 
-                        dropdown = new DropDown(item.x, item.y + bg.height, items);
+                        dropdown = new DropDown(item.x, item.y + bg.height, 0, 0, items);
                         dropdown.topBar = this;
                         dropdown.setPosition(
                             FlxMath.bound(dropdown.x, 0, FlxG.width - dropdown.bg.width),

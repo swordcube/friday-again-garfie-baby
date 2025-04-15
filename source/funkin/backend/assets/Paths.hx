@@ -195,11 +195,20 @@ class Paths {
         }
         Paths.registerAssetLoader("default", new DefaultAssetLoader());
 
+        final metaPath:String = Paths.json("metadata", "default", false);
+        if(FlxG.assets.exists(metaPath)) {
+            final parser:JsonParser<ContentMetadata> = new JsonParser<ContentMetadata>();
+            parser.ignoreUnknownVariables = true;
+
+            final meta:ContentMetadata = parser.fromJson(FlxG.assets.getText(metaPath));
+            meta.folder = "assets";
+            contentMetadata.set("assets", meta);
+        }
         for(i in 0...contentFolders.length) {
             final folder:String = contentFolders[i];
             Paths.registerAssetLoader(folder, new ContentAssetLoader(folder));
 
-            final metaPath:String = Paths.json("metadata", folder);
+            final metaPath:String = Paths.json("metadata", folder, false);
             if(FlxG.assets.exists(metaPath)) {
                 final parser:JsonParser<ContentMetadata> = new JsonParser<ContentMetadata>();
                 parser.ignoreUnknownVariables = true;
@@ -334,6 +343,18 @@ class Paths {
                     callback(itemPath);
             }
         }
+    }
+
+    public static function getContentPackFromPath(path:String):String {
+        final contentDir:String = getContentDirectory();
+        path = path.replace("\\", "/"); // go fuck yourself windows
+
+        if(path.startsWith('${contentDir}/')) {
+            final split:Array<String> = path.split("/");
+            if(split.length > 1)
+                return split[1];
+        }
+        return "assets";
     }
 
     //----------- [ Private API ] -----------//
