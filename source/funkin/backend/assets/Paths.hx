@@ -37,7 +37,7 @@ class Paths {
     ];
     public static final CONTENT_DIRECTORY:String = "content";
 
-    public static var forceMod:String = null;
+    public static var forceContentPack:String = null;
 
     public static var contentFolders:Array<String> = [];
     public static var contentMetadata:Map<String, ContentMetadata> = [];
@@ -202,7 +202,7 @@ class Paths {
 
             final meta:ContentMetadata = parser.fromJson(FlxG.assets.getText(metaPath));
             meta.folder = "assets";
-            contentMetadata.set("assets", meta);
+            contentMetadata.set("default", meta);
         }
         for(i in 0...contentFolders.length) {
             final folder:String = contentFolders[i];
@@ -222,7 +222,7 @@ class Paths {
 
     public static function getAsset(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
         if(loaderID == null || loaderID.length == 0)
-            loaderID = Paths.forceMod;
+            loaderID = Paths.forceContentPack;
 
         if(loaderID == null || loaderID.length == 0) {
             final loaders:Array<AssetLoader> = _registeredAssetLoaders;
@@ -232,13 +232,33 @@ class Paths {
                     return path;
             }
         } else {
+            // try to load from specified loader id (usually the name of a content pack)
             final loader:AssetLoader = _registeredAssetLoadersMap.get(loaderID);
             final path:String = loader.getPath(name);
 
             if(FlxG.assets.exists(path))
                 return path;
+
+            // load from loaders that have runGlobally set as true
+            // inside of their metadata as fallback
+            final loaders:Array<AssetLoader> = _registeredAssetLoaders;
+            for(i in 0...loaders.length) {
+                final contentMetadata:ContentMetadata = contentMetadata.get(loaders[i].id);
+                if(contentMetadata != null && !contentMetadata.runGlobally)
+                    continue;
+
+                final path:String = loaders[i].getPath(name);
+                if(FlxG.assets.exists(path))
+                    return path;
+            }
         }
-        return (useFallback) ? 'assets/${name}' : null;
+        // either use assets as emergency fallback (usually enabled)
+        // or return null
+        if(useFallback) {
+            final liveReload:Bool = #if TEST_BUILD true #else Sys.args().contains("-livereload") #end;
+            return '${(liveReload) ? "../../../../" : ""}assets/${name}';
+        }
+        return null;
     }
 
     public static function image(name:String, ?loaderID:String, ?useFallback:Bool = true):String {

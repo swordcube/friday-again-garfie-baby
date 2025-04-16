@@ -54,7 +54,7 @@ class DropDownItem extends UIComponent {
 
     override function checkMouseOverlap():Bool {
         _checkingMouseOverlap = true;
-        final ret:Bool = FlxG.mouse.overlaps(bg, getDefaultCamera()) && !UIUtil.isHoveringAnyComponent([this, dropdown, dropdown.bg, bg]);
+        final ret:Bool = FlxG.mouse.overlaps(bg, getDefaultCamera()) && UIUtil.allDropDowns.last() == dropdown;
         _checkingMouseOverlap = false;
         return ret;
     }

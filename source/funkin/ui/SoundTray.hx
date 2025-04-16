@@ -89,6 +89,8 @@ class SoundTray extends FlxSoundTray {
     }
 
     override function update(MS:Float):Void {
+        MS = Math.min(MS, FlxG.maxElapsed * 1000);
+
         y = FlxMath.lerp(y, lerpYPos, Math.min(FlxMath.getElapsedLerp(0.1, MS / 1000), 1));
         if(Math.abs(88 - y) < 0.01)
             y = -88;

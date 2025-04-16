@@ -1,0 +1,12 @@
+{
+    "apiVersion": "0.1.0",
+    "runGlobally": true,
+    "weeks": [],
+    "freeplayCategories": [
+        {
+            "id": "main",
+            "name": "Main"
+        }
+    ],
+    "defaultCategory": "main"
+}

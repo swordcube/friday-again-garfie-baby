@@ -36,6 +36,11 @@ class Constants {
     public static final GAME_HEIGHT:Int = 720;
 
     /**
+     * The maximum FPS allowed to be set in the options menu.
+     */
+    public static final MAX_FPS:Int = 360;
+
+    /**
      * The number of keys per strumline.
      */
     public static final KEY_COUNT:Int = 4;

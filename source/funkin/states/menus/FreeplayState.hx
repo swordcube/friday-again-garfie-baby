@@ -229,6 +229,9 @@ class FreeplayState extends FunkinState {
         if(by == 0 && !force)
             return;
 
+        final contentPack:String = categories[curCategory].id.split(":").first();
+        Paths.forceContentPack = (contentPack.length > 0 && contentPack != "default") ? contentPack : null;
+
         final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
         final defaultMeta:SongMetadata = song.metadata.get("default");
 
@@ -285,20 +288,31 @@ class FreeplayState extends FunkinState {
     }
 
     public function loadIntoCharter():Void {
-        final songData:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+        final categoryID:String = categories[curCategory].id;
+        final songData:FreeplaySongData = songs.get(categoryID)[curSelected];
+
         FlxG.switchState(ChartEditor.new.bind({
             song: songData.id,
             difficulty: curDifficulty,
-            mix: curMix
+            mix: curMix,
+            mod: categoryID.split(":").first()
         }));
     }
 
     public function loadIntoSong():Void {
-        final songData:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+        final categoryID:String = categories[curCategory].id;
+        final songData:FreeplaySongData = songs.get(categoryID)[curSelected];
+
         FlxG.switchState(PlayState.new.bind({
             song: songData.id,
             difficulty: curDifficulty,
-            mix: curMix
+            mix: curMix,
+            mod: categoryID.split(":").first()
         }));
+    }
+
+    override function destroy():Void {
+        Paths.forceContentPack = null;
+        super.destroy();
     }
 }

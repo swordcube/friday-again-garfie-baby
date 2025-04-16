@@ -3,7 +3,8 @@ package funkin.gameplay.character;
 import flixel.math.FlxPoint;
 import flixel.util.FlxDestroyUtil;
 
-import funkin.backend.Conductor.IBeatReceiver;
+import funkin.backend.ContentMetadata;
+import funkin.backend.assets.loaders.AssetLoader;
 
 import funkin.graphics.AtlasType;
 import funkin.graphics.SkinnableSprite;
@@ -15,6 +16,7 @@ import funkin.backend.events.Events;
 import funkin.backend.events.ActionEvent;
 
 import funkin.scripting.FunkinScript;
+import funkin.scripting.FunkinScriptGroup;
 #end
 
 enum abstract AnimationContext(String) from String to String {
@@ -60,7 +62,7 @@ class Character extends FlxSprite implements IBeatReceiver {
     public var footOffset:FlxPoint = FlxPoint.get(0, 0);
 
     #if SCRIPTING_ALLOWED
-    public var script:FunkinScript;
+    public var scripts:FunkinScriptGroup;
     #end
 
     public function new(characterID:String, ?isPlayer:Bool = false, ?debugMode:Bool = false) {
@@ -76,34 +78,42 @@ class Character extends FlxSprite implements IBeatReceiver {
         this.debugMode = debugMode;
 
         #if SCRIPTING_ALLOWED
-        if(!debugMode) {
-            final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script');
-            if(FlxG.assets.exists(scriptPath)) {
-                final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
-                script = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+        scripts = new FunkinScriptGroup();
+        scripts.setParent(this);
 
-                script.setParent(this);
-                script.set("this", this);
-                
-                script.execute();
-                script.call("onLoad", [data]);
+        if(!debugMode) {
+            @:privateAccess
+            final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
+            for(i in 0...loaders.length) {
+                final loader:AssetLoader = loaders[i];
+                final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+
+                if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
+                    continue;
+
+                final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script', loader.id, false);
+                if(FlxG.assets.exists(scriptPath)) {
+                    final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+                    script.set("this", this);
+                    script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
+                    scripts.add(script);
+                }
             }
         }
+        scripts.execute();
+        scripts.call("onLoad", [data]);
         #end
         applyData(data);
 
         #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onLoadPost", [data]);
+        scripts.call("onLoadPost", [data]);
         #end
     }
 
     override function update(elapsed:Float):Void {
         #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onUpdate", [elapsed]);
+        scripts.call("onUpdate", [elapsed]);
         #end
-
         if(!debugMode && curAnimContext == SING) {
             holdTimer -= elapsed * 1000;
             if(holdTimer <= 0)
@@ -112,8 +122,7 @@ class Character extends FlxSprite implements IBeatReceiver {
         super.update(elapsed);
 
         #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onUpdatePost", [elapsed]);
+        scripts.call("onUpdatePost", [elapsed]);
         #end
     }
 
@@ -224,11 +233,10 @@ class Character extends FlxSprite implements IBeatReceiver {
     public function dance():Void {
         #if SCRIPTING_ALLOWED
         final event:ActionEvent = Events.get(UNKNOWN).flagAsPre();
-        if(script != null) {
-            script.call("onDance", [event]);
-            if(event.cancelled)
-                return;
-        }
+        scripts.call("onDance", [event]);
+        
+        if(event.cancelled)
+            return;
         #end
         if(data.danceSteps.length != 0) {
             curDanceStep = (curDanceStep + 1) % data.danceSteps.length;
@@ -238,8 +246,7 @@ class Character extends FlxSprite implements IBeatReceiver {
             playAnim(data.danceSteps[curDanceStep], DANCE);
         }
         #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onDancePost", [event.flagAsPost()]);
+        scripts.call("onDancePost", [event.flagAsPost()]);
         #end
     }
 
@@ -262,8 +269,7 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     public function stepHit(step:Int):Void {
         #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onStepHit", [step]);
+        scripts.call("onStepHit", [step]);
         #end
     }
 
@@ -281,15 +287,13 @@ class Character extends FlxSprite implements IBeatReceiver {
             }
         }
         #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onBeatHit", [beat]);
+        scripts.call("onBeatHit", [beat]);
         #end
     }
 
     public function measureHit(measure:Int):Void {
         #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onMeasureHit", [measure]);
+        scripts.call("onMeasureHit", [measure]);
         #end
     }
 
@@ -309,11 +313,9 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     override function destroy():Void {
         #if SCRIPTING_ALLOWED
-        if(script != null) {
-            script.call("onDestroy");
-            script.close();
-            script = null;
-        }
+        scripts.call("onDestroy");
+        scripts.close();
+        scripts = null;
         #end
         footOffset = FlxDestroyUtil.put(footOffset);
         super.destroy();

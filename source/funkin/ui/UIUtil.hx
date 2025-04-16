@@ -1,6 +1,7 @@
 package funkin.ui;
 
 import flixel.input.keyboard.FlxKey;
+import funkin.ui.dropdown.DropDown;
 
 enum abstract ModifierKey(String) from String to String {
     final CTRL = "CTRL";
@@ -12,6 +13,7 @@ enum abstract ModifierKey(String) from String to String {
 class UIUtil {
     public static var allComponents:Array<IUIComponent> = [];
     public static var focusedComponents:Array<IUIComponent> = [];
+    public static var allDropDowns:Array<DropDown> = [];
 
     public static function isHoveringAnyComponent(?ignoreList:Array<IUIComponent>):Bool {
         var c:IUIComponent = null;

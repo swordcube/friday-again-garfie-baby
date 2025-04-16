@@ -83,6 +83,7 @@ class GlobalScript {
 
                 // if global script for this asset loader exists, load it
                 final script:FunkinScript = FunkinScript.fromFile(globalScriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+				script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
                 scripts.add(script);
             }
         }

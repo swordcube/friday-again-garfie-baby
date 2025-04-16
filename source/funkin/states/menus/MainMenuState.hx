@@ -170,7 +170,7 @@ class MainMenuState extends FunkinState {
 		var bgScroll = bg.scrollFactor.y;
 
 		FlxTween.num(0.0, 1.0, 0.25, {ease: FlxEase.backOut}, (progress:Float) -> {
-			progress /= 1.125;
+			progress /= 1.175;
 
 			var scale = FlxMath.lerp(bgScale, bgTargetScale, progress);
 			magenta.scale.x = magenta.scale.y = bg.scale.x = bg.scale.y = scale;

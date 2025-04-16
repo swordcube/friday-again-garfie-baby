@@ -15,6 +15,12 @@ class NoteSpawner extends FlxBasic {
         visible = false;
     }
 
+    public function skipToTime(time:Float):Void {
+        curNoteIndex = 0;
+        while(curNoteIndex < pendingNotes.length && pendingNotes[curNoteIndex].time < time)
+            ++curNoteIndex;
+    }
+
     override function update(elapsed:Float) {
         if(pendingNotes.length == 0)
             return;

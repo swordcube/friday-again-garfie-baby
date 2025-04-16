@@ -69,7 +69,7 @@ class CharterTopBar extends TopBar {
             ]),
             DropDown("Chart", [
                 Button("Playtest", [[ENTER]], charter.playTest),
-                Button("Playtest here", [[SHIFT, ENTER]], () -> {trace("playtest here NOT IMPLEMENTED!!");}),
+                Button("Playtest here", [[SHIFT, ENTER]], charter.playTestHere),
 
                 Separator,
 

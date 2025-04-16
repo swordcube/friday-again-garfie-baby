@@ -3,7 +3,7 @@ package funkin.states;
 import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
 
-import funkin.backend.Conductor.IBeatReceiver;
+import funkin.backend.ContentMetadata;
 import funkin.backend.assets.loaders.AssetLoader;
 
 import funkin.gameplay.Countdown;
@@ -146,20 +146,23 @@ class PlayState extends FunkinState {
 		if(FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
-		final instPath:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/inst');
+		final rawInstPath:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/inst');
 		if(lastParams.mod != null && lastParams.mod.length > 0)
-			Paths.forceMod = lastParams.mod;
+			Paths.forceContentPack = lastParams.mod;
 		else {
-			Paths.forceMod = null;
-			if(instPath.startsWith('${Paths.CONTENT_DIRECTORY}/'))
-				Paths.forceMod = instPath.split("/")[1];
+			final parentDir:String = '${Paths.getContentDirectory()}/';
+			Paths.forceContentPack = null;
+
+			if(rawInstPath.startsWith(parentDir))
+				Paths.forceContentPack = rawInstPath.substr(parentDir.length);
 		}
 		if(lastParams._chart != null) {
 			currentChart = lastParams._chart;
 			lastParams._chart = null; // this is only useful for changing difficulties mid song, so we don't need to keep this value
 		} else
-			currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
-
+		currentChart = ChartData.load(currentSong, currentMix, Paths.forceContentPack);
+		
+		final instPath:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/inst');
 		chartingMode = lastParams.chartingMode ?? false;
 		
 		FlxG.sound.playMusic(instPath, 0, false);
@@ -214,6 +217,10 @@ class PlayState extends FunkinState {
 		camGame.zoom = stage.data.zoom;
 		add(stage);
 
+		spectator = stage.characters.spectator;
+		opponent = stage.characters.opponent;
+		player = stage.characters.player;
+
 		#if SCRIPTING_ALLOWED
 		scripts = new FunkinScriptGroup();
 		scripts.setParent(this);
@@ -223,19 +230,25 @@ class PlayState extends FunkinState {
 
 		inline function addScripts(loader:AssetLoader, dir:String) {
 			final items:Array<String> = loader.readDirectory(dir);
+			final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+
 			for(i in 0...items.length) {
 				final path:String = loader.getPath('${dir}/${items[i]}');
 				if(FlxG.assets.exists(path)) {
-					final contentMetadata = Paths.contentMetadata.get(loader.id);
-					scripts.add(FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false));
+					final script:FunkinScript = FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false);
+					script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
+					scripts.add(script);
 				}
 			}
 		}
 		inline function addSingleScript(loader:AssetLoader, path:String) {
 			final scriptPath:String = Paths.script(path, loader.id);
+			final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+
 			if(FlxG.assets.exists(scriptPath)) {
-				final contentMetadata = Paths.contentMetadata.get(loader.id);
-				scripts.add(FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false));
+				final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+				script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
+				scripts.add(script);
 			}
 		}
 		final rawNoteSkin:String = currentChart.meta.game.noteSkin;
@@ -250,16 +263,22 @@ class PlayState extends FunkinState {
 			currentChart.meta.game.uiSkin = uiSkin = Constants.DEFAULT_UI_SKIN;
 
 		for(i in 0...loaders.length) {
+			final loader:AssetLoader = loaders[i];
+			final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+
+			if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
+				continue;
+
 			// gameplay scripts
-			addScripts(loaders[i], "gameplay/scripts"); // load any gameplay script first
-			addScripts(loaders[i], 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
-			addScripts(loaders[i], 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // then load from specific song and specific mix
+			addScripts(loader, "gameplay/scripts"); // load any gameplay script first
+			addScripts(loader, 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
+			addScripts(loader, 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // then load from specific song and specific mix
 		
 			// noteskin script
-			addSingleScript(loaders[i], 'gameplay/noteskins/${noteSkin}/script');
+			addSingleScript(loader, 'gameplay/noteskins/${noteSkin}/script');
 
 			// uiskin script
-			addSingleScript(loaders[i], 'gameplay/uiskins/${uiSkin}/script');
+			addSingleScript(loader, 'gameplay/uiskins/${uiSkin}/script');
 		}
 		if(stage.script != null) {
 			scripts.add(stage.script);
@@ -273,7 +292,7 @@ class PlayState extends FunkinState {
 			if(!FlxG.assets.exists(scriptPath))
 				continue;
 
-			final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
+			final contentMetadata:ContentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
 			final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
 			script.set("NOTE_TYPE_ID", note.type);
 			scripts.add(script);
@@ -293,11 +312,11 @@ class PlayState extends FunkinState {
 			eventRunner.execute(e);
 		}
 		for(b in eventRunner.behaviors) {
-			if(b.script != null) {
-				scripts.add(b.script);
-
-				eventScripts.set(b.eventType, b.script);
-				eventScriptsArray.push(b.script);
+			for(script in b.scripts.members) {
+				scripts.add(script);
+	
+				eventScripts.set(b.eventType, script);
+				eventScriptsArray.push(script);
 			}
 		}
 		final leScripts:Array<FunkinScript> = scripts.members.copy();
@@ -306,10 +325,6 @@ class PlayState extends FunkinState {
 			leScripts[i].call("onCreate");
 		}
 		#end
-
-		spectator = stage.characters.spectator;
-		opponent = stage.characters.opponent;
-		player = stage.characters.player;
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		add(camFollow);
@@ -418,6 +433,8 @@ class PlayState extends FunkinState {
 				mix: currentMix,
 				mod: lastParams.mod,
 
+				startTime: (lastParams.startTime != null && lastParams.startTime > 0) ? lastParams.startTime : null,
+
 				_chart: currentChart,
 				_unsaved: lastParams._unsaved
 			}));
@@ -479,13 +496,18 @@ class PlayState extends FunkinState {
 		scripts.call("onSongStart");
 		#end
 
-		FlxG.sound.music.time = 0;
+		if(lastParams.startTime != null && lastParams.startTime > 0)
+			Conductor.instance.time = lastParams.startTime;
+		else
+			Conductor.instance.time = -Conductor.instance.offset;
+		
+		FlxG.sound.music.time = Conductor.instance.rawTime;
 		FlxG.sound.music.resume();
 
-		vocals.seek(0);
+		vocals.seek(Conductor.instance.rawTime);
 		vocals.play();
-
-		Conductor.instance.time = -Conductor.instance.offset;
+		
+		playField.noteSpawner.skipToTime(Conductor.instance.rawTime);
 		Conductor.instance.music = FlxG.sound.music;
 
 		#if SCRIPTING_ALLOWED
@@ -527,7 +549,7 @@ class PlayState extends FunkinState {
 					FlxG.sound.music.volume = 0;
 					FlxG.sound.music.looped = true;
 					FlxG.sound.music.play();
-					FlxG.sound.music.fadeIn(2, 0, 1);
+					FlxG.sound.music.fadeIn(0.16, 0, 1);
 				});
 			});
 		}
@@ -802,7 +824,7 @@ class PlayState extends FunkinState {
 		scripts.close();
 		#end
 		PlayState.instance = null;
-		Paths.forceMod = null;
+		Paths.forceContentPack = null;
 
 		Conductor.instance.music = null;
 		Conductor.instance.autoIncrement = true;
@@ -827,6 +849,8 @@ typedef PlayStateParams = {
 	var ?mod:String;
 
 	var ?chartingMode:Bool;
+
+	var ?startTime:Float;
 
 	@:noCompletion
 	var ?_chart:ChartData;

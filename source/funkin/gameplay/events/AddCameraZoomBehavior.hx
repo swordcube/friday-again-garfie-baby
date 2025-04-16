@@ -19,8 +19,7 @@ class AddCameraZoomBehavior extends EventBehavior {
             game.camGame.extraZoom += params.zoom;
 
         #if SCRIPTING_ALLOWED
-        if(script != null)
-            script.call("onExecutePost", [e.flagAsPost()]);
+        scripts.call("onExecutePost", [e.flagAsPost()]);
         #end
     }
 }

@@ -224,6 +224,8 @@ class PauseSubState extends FunkinSubState {
                 difficulty: game.currentDifficulty,
                 mix: game.currentMix,
                 mod: PlayState.lastParams.mod,
+
+                startTime: PlayState.lastParams.startTime,
     
                 _chart: game.currentChart,
                 _unsaved: PlayState.lastParams._unsaved

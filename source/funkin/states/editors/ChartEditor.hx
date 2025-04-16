@@ -139,17 +139,17 @@ class ChartEditor extends UIState {
 
         final instPath:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/inst');
 		if(lastParams.mod != null && lastParams.mod.length > 0)
-			Paths.forceMod = lastParams.mod;
+			Paths.forceContentPack = lastParams.mod;
 		else {
             if(instPath.startsWith('${Paths.CONTENT_DIRECTORY}/'))
-				Paths.forceMod = instPath.split("/")[1];
+				Paths.forceContentPack = instPath.split("/")[1];
             else
-                Paths.forceMod = lastParams.mod;
+                Paths.forceContentPack = lastParams.mod;
 		}
 		if(lastParams._chart != null)
 			currentChart = lastParams._chart;
 		else
-            currentChart = ChartData.load(currentSong, currentMix, Paths.forceMod);
+            currentChart = ChartData.load(currentSong, currentMix, Paths.forceContentPack);
 
         undos = new UndoList<ChartEditorChange>();
         undos.unsaved = lastParams._unsaved ?? false;
@@ -186,6 +186,9 @@ class ChartEditor extends UIState {
         inst.pause();
         inst.time = 0;
         inst.volume = 1;
+
+        if(lastParams.startTime != null && lastParams.startTime > 0)
+            Conductor.instance.time = lastParams.startTime;
 
         final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
 		if(FlxG.assets.exists(playerVocals)) {
@@ -535,7 +538,7 @@ class ChartEditor extends UIState {
             }
         }
 		if (!objectGroup._movingObjects) {
-            if(FlxG.mouse.pressed && FlxG.mouse.justMoved && !isUIActive)
+            if(FlxG.mouse.justPressed && !isUIActive)
                 _selectingObjects = true;
 
             if(_selectingObjects) {
@@ -635,7 +638,7 @@ class ChartEditor extends UIState {
         Conductor.instance.hasMetronome = false;
         
         FlxG.sound.acceptInputs = true;
-        Paths.forceMod = null;
+        Paths.forceContentPack = null;
 
         WindowUtil.preventClosing = false;
         WindowUtil.onClose = null;
@@ -740,7 +743,7 @@ class ChartEditor extends UIState {
             difficulty: currentDifficulty,
 
             mix: currentMix,
-            mod: Paths.forceMod,
+            mod: Paths.forceContentPack,
 
             chartingMode: true,
 
@@ -754,6 +757,31 @@ class ChartEditor extends UIState {
             return;
 
         unsafePlayTest();
+    }
+
+    public function unsafePlayTestHere():Void {
+        lastParams = null;
+        Conductor.instance.music = null;
+        FlxG.switchState(PlayState.new.bind({
+            song: currentSong,
+            difficulty: currentDifficulty,
+
+            mix: currentMix,
+            mod: Paths.forceContentPack,
+
+            startTime: Conductor.instance.time,
+            chartingMode: true,
+
+            _chart: currentChart,
+            _unsaved: undos.unsaved
+        }));
+    }
+
+    public function playTestHere():Void {
+        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
+            return;
+
+        unsafePlayTestHere();
     }
 
     public function zoomIn():Void {
@@ -1100,12 +1128,17 @@ class ChartEditor extends UIState {
     }
 
     public function unsafeExit():Void {
-        FlxG.sound.music.looped = true;
         FlxG.sound.music.onComplete = null;
+        
+        FlxG.sound.music.volume = 0;
+        FlxG.sound.music.looped = true;
         FlxG.sound.music.play();
+        FlxG.sound.music.fadeIn(0.16, 0, 1);
 
         Conductor.instance.music = null;
-        FlxG.switchState(MainMenuState.new);
+        FlxTimer.wait(0.05, () -> {
+            FlxG.switchState(MainMenuState.new);
+        });
     }
 
     public function exit():Void {
@@ -1114,7 +1147,10 @@ class ChartEditor extends UIState {
                 playPause();
 
             final warning = new UnsavedWarningSubState();
-            warning.onAccept.add(unsafeExit);
+            warning.onAccept.add(() -> {
+                warning.close();
+                unsafeExit();
+            });
             warning.onCancel.add(warning.close);
             openSubState(warning);
             return;
@@ -1229,6 +1265,8 @@ typedef ChartEditorParams = {
 	var ?mix:String;
 
 	var ?mod:String;
+
+    var ?startTime:Float;
 
 	@:noCompletion
 	var ?_chart:ChartData;

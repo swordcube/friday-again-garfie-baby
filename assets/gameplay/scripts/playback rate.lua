@@ -50,6 +50,9 @@ function onUpdate(dt)
     if FlxG.keys.justPressed.PAGEDOWN then
         setRate(rate - (FlxG.keys.pressed.SHIFT and 0.25 or 0.01))
     end
+    if FlxG.keys.justPressed.F8 then
+        setRate(10)
+    end
     -- if sex then
     --     setRate(rate - (dt * 0.25))
     -- end

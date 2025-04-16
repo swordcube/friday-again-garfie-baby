@@ -98,7 +98,7 @@ class PlayField extends FlxContainer {
     }
 
     public function hitNote(note:Note):Void {
-        final event:NoteHitEvent = cast Events.get(NOTE_HIT);
+        final event:NoteHitEvent = new NoteHitEvent(); // issues are occuring from reusing the same event so we have to make a new one 
 
         final timestamp:Float = (note.strumLine.botplay) ? note.time : attachedConductor.time;
         final judgement:String = Scoring.judgeNote(note, timestamp);
@@ -188,7 +188,7 @@ class PlayField extends FlxContainer {
     }
 
     public function missNote(note:Note):Void {
-        final event:NoteMissEvent = cast Events.get(NOTE_MISS);
+        final event:NoteMissEvent = new NoteMissEvent(); // issues are occuring from reusing the same event so we have to make a new one
         onNoteMiss.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
             true, true, note.strumLine == playerStrumLine, note.strumLine == playerStrumLine,

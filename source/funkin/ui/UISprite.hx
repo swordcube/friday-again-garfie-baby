@@ -24,7 +24,7 @@ class UISprite extends FlxSprite implements IUIComponent {
 
     public function checkMouseOverlap():Bool {
         _checkingMouseOverlap = true;
-        final ret:Bool = FlxG.mouse.overlaps(this, getDefaultCamera()) && !UIUtil.isHoveringAnyComponent([this]);
+        final ret:Bool = FlxG.mouse.overlaps(this, getDefaultCamera()) && UIUtil.allDropDowns.length == 0;
         _checkingMouseOverlap = false;
         return ret;
     }

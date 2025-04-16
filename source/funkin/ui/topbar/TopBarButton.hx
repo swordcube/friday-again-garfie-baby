@@ -29,7 +29,7 @@ class TopBarButton extends UIComponent {
     }
 
     override function update(elapsed:Float):Void {
-        final isHovered:Bool = FlxG.mouse.overlaps(bg, bg.getDefaultCamera()) && !UIUtil.isHoveringAnyComponent([this]);
+        final isHovered:Bool = checkMouseOverlap();
         final offset:Float = (isHovered) ? (FlxG.mouse.pressed ? -15 : 15) : 0;
         
         bg.colorTransform.redOffset = FlxMath.lerp(bg.colorTransform.redOffset, offset, FlxMath.getElapsedLerp(0.32, elapsed));

@@ -13,6 +13,10 @@ class ContentMetadata {
     @:default(false)
     @:unreflective
     public var allowUnsafeScripts:Bool;
+
+    @:optional
+    @:default(false)
+    public var runGlobally:Bool;
     
     @:optional
     @:default([])

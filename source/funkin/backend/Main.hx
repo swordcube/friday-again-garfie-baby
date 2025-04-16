@@ -23,7 +23,7 @@ class Main extends Sprite {
 
 	public function new() {
 		super();
-		addChild(new FunkinGame(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, InitState.new, 0, 0, true));
+		addChild(new FunkinGame(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, InitState.new, Constants.MAX_FPS, Constants.MAX_FPS, true));
 		
 		sideBars = new SideBars();
 		FlxG.game.addChildAt(sideBars, FlxG.game.getChildIndex(FlxG.game._inputContainer));

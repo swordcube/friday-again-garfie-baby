@@ -17,7 +17,7 @@ class ScriptCallBehavior extends EventBehavior {
         super.execute(e);
         
         final params:ScriptCallParams = cast e.params;
-        final scriptGroups:Array<FunkinScriptGroup> = [game.scripts];
+        final scriptGroups:Array<FunkinScriptGroup> = [game.scripts, scripts];
 
         final args:Array<String> = params.args.split(',');
         for(group in scriptGroups) {
@@ -35,14 +35,10 @@ class ScriptCallBehavior extends EventBehavior {
         }
         final chars:Array<Character> = [game.spectator, game.opponent, game.player];
         for(char in chars) {
-            if(char.script != null) {
-                final func:Dynamic = char.script.get(params.method);
-                if(func != null && Reflect.isFunction(func))
-                    Reflect.callMethod(null, func, args);
-            }
+            if(char != null)
+                char.scripts.call(params.method, args);
         }
-        if(script != null)
-            script.call("onExecutePost", [e.flagAsPost()]);
+        scripts.call("onExecutePost", [e.flagAsPost()]);
     }
 }
 

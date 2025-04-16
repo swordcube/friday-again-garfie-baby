@@ -241,16 +241,15 @@ class RuntimeShader extends FlxShader implements IHScriptCustomBehaviour {
 
 			var id = vertex + fragment;
 
+			// TODO: find a cleaner way to handle repeat errors
+			// than just recompiling the same shader code again
 			if (__context.__programs.exists(id))
 			{
-				program = __context.__programs.get(id);
+				__context.__programs.get(id).dispose();
 			}
-			else
-			{
-				program = __context.createProgram(GLSL);
-				program.__glProgram = __createGLProgram(vertex, fragment);
-				__context.__programs.set(id, program);
-			}
+			program = __context.createProgram(GLSL);
+			program.__glProgram = __createGLProgram(vertex, fragment);
+			__context.__programs.set(id, program);
 
 			if (program != null)
 			{

@@ -30,18 +30,11 @@ class HorizontalSlider extends Slider {
         this.width = width;
     }
 
-    override function checkMouseOverlap():Bool {
-        // force dragging to be allowed to keep the cursor
-        // on the POINTER type the whole way thru
-        // should be fine???
-        return dragging || super.checkMouseOverlap();
-    }
-
     override function update(elapsed:Float) {
         final thumbHovered:Bool = FlxG.mouse.overlaps(thumb);
         thumb.frame = thumb.frames.frames[(thumbHovered || dragging) ? 1 : 0];
 
-        if(FlxG.mouse.overlaps(this) && !UIUtil.isHoveringAnyComponent([this, thumb]) && FlxG.mouse.pressed && !dragging) {
+        if(checkMouseOverlap() && FlxG.mouse.pressed && !dragging) {
             dragging = true;
 
             final thumbPosCap = width - (thumb.width - 1);
