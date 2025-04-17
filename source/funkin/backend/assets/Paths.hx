@@ -335,18 +335,19 @@ class Paths {
     }
 
     public static function getSparrowAtlas(name:String, ?loaderID:String, ?useFallback:Bool = true):FlxAtlasFrames {
-        if(Cache.atlasCache.get(name) == null) {
-            final atlas:FlxAtlasFrames = FlxAtlasFrames.fromSparrow(
-                image(name, loaderID, useFallback),
-                xml(name, loaderID, useFallback)
-            );
+        final imgPath:String = image(name, loaderID, useFallback);
+        final xmlPath:String = xml(name, loaderID, useFallback);
+
+        final key:String = '${imgPath}:${xmlPath}';
+        if(Cache.atlasCache.get(key) == null) {
+            final atlas:FlxAtlasFrames = FlxAtlasFrames.fromSparrow(imgPath, xmlPath);
             if(atlas.parent != null) {
                 atlas.parent.persist = true;
                 atlas.parent.incrementUseCount();
             }
-            Cache.atlasCache.set(name, atlas);
+            Cache.atlasCache.set(key, atlas);
         }
-        return cast Cache.atlasCache.get(name);
+        return cast Cache.atlasCache.get(key);
     }
 
     public static function iterateDirectory(dir:String, callback:String->Void, ?recursive:Bool = false):Void {
@@ -370,11 +371,11 @@ class Paths {
         path = path.replace("\\", "/"); // go fuck yourself windows
 
         if(path.startsWith('${contentDir}/')) {
-            final split:Array<String> = path.split("/");
-            if(split.length > 1)
-                return split[1];
+            final split:Array<String> = path.substr(contentDir.length + 1).split("/");
+            if(split.length > 0)
+                return split.first();
         }
-        return "assets";
+        return "default";
     }
 
     //----------- [ Private API ] -----------//

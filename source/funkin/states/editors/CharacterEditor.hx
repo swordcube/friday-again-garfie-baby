@@ -75,7 +75,7 @@ class CharacterEditor extends UIState {
         grpAnims.cameras = [camUI];
         add(grpAnims);
         
-        changeCharacter(Constants.DEFAULT_CHARACTER);
+        changeCharacter(Constants.DEFAULT_CHARACTER, Paths.contentFolders.first() ?? "default");
         FlxG.camera.follow(camFollow, LOCKON, 1);
 
         selectCharacterButton = new Button(FlxG.width - 5, 5, "Select Character", 0, 0, showSelectCharacterMenu);
@@ -231,7 +231,8 @@ class CharacterEditor extends UIState {
             if(characters.contains(character))
                 return;
 
-            items.push(Button(character, null, () -> changeCharacter(character)));
+            final contentPack:String = Paths.getContentPackFromPath(path);
+            items.push(Button((contentPack != "default") ? '${contentPack}:${character}' : character, null, () -> changeCharacter(character, contentPack)));
         });
         final dropdown:DropDown = new DropDown(selectCharacterButton.x, selectCharacterButton.y + selectCharacterButton.height, 0, 0, items);
         dropdown.cameras = selectCharacterButton.cameras;
@@ -242,7 +243,9 @@ class CharacterEditor extends UIState {
         add(dropdown);
     }
 
-    public function changeCharacter(characterID:String):Void {
+    public function changeCharacter(characterID:String, ?loaderID:String):Void {
+        Paths.forceContentPack = loaderID;
+
         if(ghostCharacter != null) {
             remove(ghostCharacter, true);
             ghostCharacter.destroy();
@@ -342,6 +345,8 @@ class CharacterEditor extends UIState {
     }
 
     override function destroy():Void {
+        Paths.forceContentPack = null;
+
         FlxG.camera.bgColor = FlxColor.BLACK;
         Main.statsDisplay.visible = true;
 

@@ -467,6 +467,10 @@ class ChartEditor extends UIState {
             if(!WindowUtil.preventClosing)
                 return;
 
+            for(dropdown in UIUtil.allDropDowns.copy()) {
+                if(dropdown != null)
+                    dropdown.destroy();
+            }
             if(inst.playing)
                 playPause();
 
@@ -590,7 +594,7 @@ class ChartEditor extends UIState {
                         selectObjects([]);
                 }
             }
-            if(FlxG.mouse.justReleasedRight && !isUIActive) {
+            if(FlxG.mouse.justReleasedRight && !isUIActive && !objectGroup.isHoveringNote && !objectGroup.isHoveringEvent) {
                 final direction:Int = Math.floor((_mousePos.x - objectGroup.x) / CELL_SIZE);
                 if(direction < 0 || direction >= (Constants.KEY_COUNT * 2)) {
                     if(rightClickMenu != null)
@@ -952,28 +956,31 @@ class ChartEditor extends UIState {
         if(UIUtil.isModifierKeyPressed(CTRL))
             deleteObjects([object]);
         else {
+            if(rightClickMenu != null)
+                rightClickMenu.destroy();
+
             switch(object) {
                 case CNote(note):
-                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
+                    rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
                         Button("Edit", null, () -> trace("edit note NOT IMPLEMENTED!!")),
 
                         Separator,
 
                         Button("Delete", [[DELETE]], () -> deleteObjects([object])),
                     ]);
-                    dropdown.cameras = [uiCam];
-                    add(dropdown);
+                    rightClickMenu.cameras = [uiCam];
+                    add(rightClickMenu);
 
                 case CEvent(event):
-                    final dropdown:DropDown = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
+                    rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
                         Button("Edit", null, () -> trace("edit event NOT IMPLEMENTED!!")),
 
                         Separator,
 
                         Button("Delete", [[DELETE]], () -> deleteObjects([object])),
                     ]);
-                    dropdown.cameras = [uiCam];
-                    add(dropdown);
+                    rightClickMenu.cameras = [uiCam];
+                    add(rightClickMenu);
             }
         }
     }
@@ -1146,6 +1153,10 @@ class ChartEditor extends UIState {
     }
 
     public function exit():Void {
+        for(dropdown in UIUtil.allDropDowns.copy()) {
+            if(dropdown != null)
+                dropdown.destroy();
+        }
         if(undos.unsaved) {
             if(inst.playing)
                 playPause();
