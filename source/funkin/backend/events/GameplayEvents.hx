@@ -1,7 +1,9 @@
 package funkin.backend.events;
 
 import flixel.math.FlxPoint;
+
 import funkin.gameplay.ComboDisplay;
+import funkin.gameplay.character.Character;
 
 @:dce(full)
 class GameplayEvents {} // needs to be here otherwise haxe will shit it's pants
@@ -99,5 +101,55 @@ class SongEvent extends ActionEvent {
      */
     public function new() {
         super(SONG_EVENT);
+    }
+}
+
+class GameOverEvent extends ActionEvent {
+    /**
+     * This is the constructor for this event, mainly
+     * used just to specify it's type.
+     */
+    public function new() {
+        super(GAME_OVER);
+    }
+}
+
+class GameOverCreateEvent extends ActionEvent {
+    /**
+     * The ID of the character to show up on
+     * the game over screen.
+     */
+    public var characterID:String;
+
+    /**
+     * The character showing up on the game over
+     * screen (only available on post).
+     */
+    public var character:Character;
+
+    /**
+     * A path to the sound to play on
+     * the game over screen when dying.
+     */
+    public var deathSFX:String;
+
+    /**
+     * A path to the music to play on
+     * the game over screen.
+     */
+    public var music:String;
+
+    /**
+     * A path to the sound to play on
+     * the game over screen when retrying.
+     */
+    public var retrySFX:String;
+
+    /**
+     * This is the constructor for this event, mainly
+     * used just to specify it's type.
+     */
+    public function new() {
+        super(GAME_OVER_CREATE);
     }
 }

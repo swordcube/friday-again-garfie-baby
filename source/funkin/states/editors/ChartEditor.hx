@@ -738,6 +738,8 @@ class ChartEditor extends UIState {
     public function unsafePlayTest():Void {
         lastParams = null;
         Conductor.instance.music = null;
+
+        PlayState.deathCounter = 0;
         FlxG.switchState(PlayState.new.bind({
             song: currentSong,
             difficulty: currentDifficulty,
@@ -762,6 +764,8 @@ class ChartEditor extends UIState {
     public function unsafePlayTestHere():Void {
         lastParams = null;
         Conductor.instance.music = null;
+
+        PlayState.deathCounter = 0;
         FlxG.switchState(PlayState.new.bind({
             song: currentSong,
             difficulty: currentDifficulty,

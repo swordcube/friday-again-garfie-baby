@@ -310,7 +310,9 @@ class Conductor extends FlxBasic {
                 if(Conductor.instance == this) {
                     var state:FlxState = FlxG.state;
                     while(state != null) {
-                        recursiveStep(state, i + 1);
+                        if(state.persistentUpdate || state.subState == null)
+                            recursiveStep(state, i + 1);
+
                         state = state.subState;
                     }
                 }
@@ -329,7 +331,9 @@ class Conductor extends FlxBasic {
                 if(Conductor.instance == this) {
                     var state:FlxState = FlxG.state;
                     while(state != null) {
-                        recursiveBeat(state, i + 1);
+                        if(state.persistentUpdate || state.subState == null)
+                            recursiveBeat(state, i + 1);
+                        
                         state = state.subState;
                     }
                 }
@@ -344,7 +348,9 @@ class Conductor extends FlxBasic {
                 if(Conductor.instance == this) {
                     var state:FlxState = FlxG.state;
                     while(state != null) {
-                        recursiveMeasure(state, i + 1);
+                        if(state.persistentUpdate || state.subState == null)
+                            recursiveMeasure(state, i + 1);
+
                         state = state.subState;
                     }
                 }

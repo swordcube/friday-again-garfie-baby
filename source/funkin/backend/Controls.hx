@@ -14,6 +14,7 @@ enum Control {
 
     ACCEPT;
     BACK;
+    RESET;
     PAUSE;
 
     NOTE_LEFT;
@@ -69,6 +70,7 @@ class Controls extends FlxControls<Control> {
 
             ACCEPT => [FlxKey.ENTER, FlxKey.SPACE],
             BACK => [FlxKey.ESCAPE, FlxKey.BACKSPACE],
+            RESET => [FlxKey.R, FlxKey.NONE],
             PAUSE => [FlxKey.ENTER, FlxKey.ESCAPE],
 
             NOTE_LEFT => [FlxKey.A, FlxKey.LEFT],

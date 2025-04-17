@@ -61,6 +61,8 @@ class Character extends FlxSprite implements IBeatReceiver {
     public var healthColor:FlxColor = FlxColor.WHITE;
     public var footOffset:FlxPoint = FlxPoint.get(0, 0);
 
+    public var canDance:Bool = true;
+
     #if SCRIPTING_ALLOWED
     public var scripts:FunkinScriptGroup;
     #end
@@ -233,7 +235,7 @@ class Character extends FlxSprite implements IBeatReceiver {
     public function dance():Void {
         #if SCRIPTING_ALLOWED
         final event:ActionEvent = Events.get(UNKNOWN).flagAsPre();
-        scripts.call("onDance", [event]);
+        scripts.call("onDance", [event.flagAsPre()]);
         
         if(event.cancelled)
             return;
@@ -275,14 +277,15 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     public function beatHit(beat:Int):Void {
         if(!debugMode) {
-            final canDance:Bool = danceInterval > 0 && (beat % danceInterval == 0);
+            @:privateAccess
+            final danceAllowed:Bool = canDance && danceInterval > 0 && (Math.floor(Conductor.instance.curDecBeat - Conductor.instance._latestTimingPoint.beat) % danceInterval == 0);
             switch(curAnimContext) {
                 case SING:
-                    if(holdTimer <= 0 && canDance && !_holdingPose)
+                    if(holdTimer <= 0 && danceAllowed && !_holdingPose)
                         dance();
     
                 default:
-                    if(canDance)
+                    if(danceAllowed)
                         dance();
             }
         }

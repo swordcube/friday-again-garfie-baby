@@ -2,6 +2,7 @@ package funkin.states;
 
 import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
+import flixel.util.FlxSignal;
 
 import funkin.backend.ContentMetadata;
 import funkin.backend.assets.loaders.AssetLoader;
@@ -12,6 +13,8 @@ import funkin.gameplay.PlayField;
 import funkin.gameplay.character.Character;
 
 import funkin.backend.events.Events;
+import funkin.backend.events.ActionEvent;
+
 import funkin.backend.events.CountdownEvents;
 import funkin.backend.events.GameplayEvents;
 import funkin.backend.events.NoteEvents;
@@ -38,6 +41,7 @@ import funkin.states.editors.ChartEditor;
 import funkin.states.menus.FreeplayState;
 
 import funkin.substates.PauseSubState;
+import funkin.substates.GameOverSubState;
 
 // import scripting events anyways because i'm too lazy
 // to make it work on no scripting mode lol!!
@@ -58,6 +62,8 @@ class PlayState extends FunkinState {
 		difficulty: "hard"
 	};
 	public static var instance:PlayState;
+
+	public static var deathCounter:Int = 0;
 
 	public var currentSong:String;
 	public var currentDifficulty:String;
@@ -93,7 +99,9 @@ class PlayState extends FunkinState {
 	public var countdown:Countdown;
 	public var eventRunner:EventRunner;
 
+	public var startedCountdown:Bool = false;
 	public var startingSong:Bool = true;
+
 	public var endingSong:Bool = false;
 
 	/**
@@ -112,7 +120,11 @@ class PlayState extends FunkinState {
 	public var canPause:Bool = true;
 	public var chartingMode:Bool = false;
 
+	public var canDie:Bool = true;
 	public var worldCombo(default, set):Bool;
+
+	public var onGameOver:FlxTypedSignal<GameOverEvent->Void> = new FlxTypedSignal<GameOverEvent->Void>();
+	public var onGameOverPost:FlxTypedSignal<GameOverEvent->Void> = new FlxTypedSignal<GameOverEvent->Void>();
 
 	#if SCRIPTING_ALLOWED
 	public var scripts:FunkinScriptGroup;
@@ -396,7 +408,7 @@ class PlayState extends FunkinState {
 		add(countdown);
 		
 		if(!inCutscene)
-			countdown.start(uiSkin);
+			startCountdown();
 
 		worldCombo = false;
 		
@@ -419,6 +431,9 @@ class PlayState extends FunkinState {
 		}
 		if(canPause && controls.justPressed.PAUSE)
 			pause();
+
+		if(controls.justPressed.RESET || (canDie && playField.stats.health <= playField.stats.minHealth))
+			gameOver();
 		
 		if(controls.justPressed.DEBUG) {
 			persistentUpdate = false;
@@ -472,6 +487,35 @@ class PlayState extends FunkinState {
 		#end
 	}
 
+	public function gameOver():Void {
+		final event:GameOverEvent = cast Events.get(GAME_OVER);
+		onGameOver.dispatch(event.recycle());
+
+		#if SCRIPTING_ALLOWED
+		scripts.event("onGameOver", event);
+		#end
+		if(event.cancelled)
+			return;
+		
+		deathCounter++;
+		camGame.followEnabled = true;
+
+		Conductor.instance.music = null;
+		Conductor.instance.autoIncrement = false;
+
+		FlxG.sound.music.pause();
+		vocals.pause();
+		
+		persistentUpdate = false;
+		persistentDraw = false;
+		openSubState(new GameOverSubState());
+
+		onGameOverPost.dispatch(cast event.flagAsPost());
+		#if SCRIPTING_ALLOWED
+		scripts.event("onGameOverPost", event);
+		#end
+	}
+
 	public function pause():Void {
 		camGame.followEnabled = false;
 
@@ -483,6 +527,11 @@ class PlayState extends FunkinState {
 		
 		persistentUpdate = false;
 		openSubState(new PauseSubState());
+	}
+
+	public function startCountdown():Void {
+		if(countdown != null)
+			countdown.start(currentChart.meta.game.uiSkin);
 	}
 
 	public function startSong():Void {

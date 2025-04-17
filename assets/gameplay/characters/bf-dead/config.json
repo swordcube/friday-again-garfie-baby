@@ -1,0 +1,81 @@
+{
+	"healthIcon": {
+		"isPixel": false,
+		"scale": 1,
+		"flip": [
+			false,
+			false
+		],
+		"offset": [
+			0,
+			0
+		],
+		"color": "#31B0D1"
+	},
+	"atlas": {
+		"type": "sparrow",
+		"path": "sprite",
+		"gridSize": null
+	},
+	"gridSize": [
+		0,
+		0
+	],
+	"animations": {
+		"retry": {
+			"prefix": "BF Dead confirm0",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				64
+			]
+		},
+		"loop": {
+			"prefix": "BF Dead Loop",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				0
+			]
+		},
+		"death": {
+			"prefix": "BF dies",
+			"texture": null,
+			"indices": null,
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				6
+			]
+		}
+	},
+	"position": [
+		0,
+		0
+	],
+	"camera": [
+		100,
+		50
+	],
+	"scale": 1,
+	"flip": [
+		true,
+		false
+	],
+	"isPlayer": true,
+	"antialiasing": true,
+	"singDuration": 4,
+	"deathCharacter": "bf-dead",
+	"danceSteps": [
+		"loop"
+	],
+	"singSteps": [	],
+	"missSteps": [	]
+}

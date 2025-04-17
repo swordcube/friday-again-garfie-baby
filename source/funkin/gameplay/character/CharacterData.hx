@@ -49,6 +49,10 @@ class CharacterData {
     public var singDuration:Float = 4;
 
     @:optional
+    @:default("bf-dead")
+    public var deathCharacter:String = "bf-dead";
+
+    @:optional
     @:default(["idle"])
     public var danceSteps:Array<String> = ["idle"];
 

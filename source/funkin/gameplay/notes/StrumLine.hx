@@ -182,9 +182,9 @@ class StrumLine extends FlxSpriteGroup {
             note.holdTrail.height = calcHeight;
         }
         if(botplay) {
-            // have to add 20ms to the hit window for the botplay otherwise
+            // have to add 10ms to the hit window for the botplay otherwise
             // the notes will occasionally be hit slightly later than normal
-            if(!note.wasHit && !note.wasMissed && note.time <= (attachedConductor.time + (20 * FlxG.timeScale)))
+            if(!note.wasHit && !note.wasMissed && note.time <= (attachedConductor.time + (10 * FlxG.timeScale)))
                 playField.hitNote(note);
             
             if(note.wasHit && note.length > 0 && note.time <= attachedConductor.time - note.length) {

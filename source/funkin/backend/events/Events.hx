@@ -20,6 +20,8 @@ class Events {
                 case DISPLAY_COMBO: _events.set(type, new DisplayComboEvent());
                 case COUNTDOWN_START: _events.set(type, new CountdownStartEvent());
                 case COUNTDOWN_STEP: _events.set(type, new CountdownStepEvent());
+                case GAME_OVER: _events.set(type, new GameOverEvent());
+                case GAME_OVER_CREATE: _events.set(type, new GameOverCreateEvent());
                 default: _events.set(type, new ActionEvent(UNKNOWN));
             }
         }

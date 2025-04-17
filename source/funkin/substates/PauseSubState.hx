@@ -1,17 +1,25 @@
 package funkin.substates;
 
-import flixel.sound.FlxSound;
+import lime.app.Future;
+import lime.system.System;
+
+import openfl.media.Sound;
+
 import flixel.text.FlxText;
+import flixel.sound.FlxSound;
+
 import flixel.tweens.FlxTween;
-import flixel.util.FlxDestroyUtil;
+
 import flixel.util.FlxTimer;
+import flixel.util.FlxDestroyUtil;
+
 import funkin.states.PlayState;
 import funkin.states.menus.FreeplayState;
+
 import funkin.substates.transition.FadeTransition;
+
 import funkin.ui.AtlasText;
 import funkin.ui.AtlasTextList;
-import lime.app.Future;
-import openfl.media.Sound;
 
 #if SCRIPTING_ALLOWED
 import funkin.scripting.GlobalScript;
@@ -94,7 +102,7 @@ class PauseSubState extends FunkinSubState {
             {name: game.currentChart.meta.song.title},
             {name: 'Artist: ${game.currentChart.meta.song.artist}'},
             {name: 'Difficulty: ${game.currentDifficulty.toUpperCase()}'},
-            {name: 'N/A Blue Balls'}, // TODO: make this actually do something
+            {name: '${PlayState.deathCounter} Blue Ball${(PlayState.deathCounter != 1) ? "s" : ""}'}
         ];
         var yIndex:Int = 0;
         for(i => stat in stats) {
@@ -121,7 +129,7 @@ class PauseSubState extends FunkinSubState {
             warning.onAccept.add(() -> {
                 WindowUtil.preventClosing = false;
                 WindowUtil.resetClosing();
-                unsafeExitToMenu();
+                System.exit(0);
             });
             warning.onCancel.add(() -> {
                 WindowUtil.resetClosing();
@@ -235,7 +243,6 @@ class PauseSubState extends FunkinSubState {
     }
 
     public function unsafeExitToMenu():Void {
-        // TODO: story mode
         FlxTimer.wait(0.001, () -> {
             FlxG.sound.music.volume = 0;
             FlxG.sound.music.looped = true;
@@ -251,6 +258,8 @@ class PauseSubState extends FunkinSubState {
                 FlxG.cameras.remove(FadeTransition.nextCamera);
             });
             FlxG.sound.music.onComplete = null;
+
+            // TODO: story mode
             FlxG.switchState(FreeplayState.new);
         });
         close();

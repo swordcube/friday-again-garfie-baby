@@ -303,6 +303,7 @@ class FreeplayState extends FunkinState {
         final categoryID:String = categories[curCategory].id;
         final songData:FreeplaySongData = songs.get(categoryID)[curSelected];
 
+        PlayState.deathCounter = 0;
         FlxG.switchState(PlayState.new.bind({
             song: songData.id,
             difficulty: curDifficulty,

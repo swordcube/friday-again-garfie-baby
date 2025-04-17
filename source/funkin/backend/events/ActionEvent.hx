@@ -13,6 +13,8 @@ enum abstract ActionEventType(String) from String to String {
 	final DISPLAY_COMBO = "DISPLAY_COMBO";
 	final COUNTDOWN_START = "COUNTDOWN_START";
 	final COUNTDOWN_STEP = "COUNTDOWN_STEP";
+	final GAME_OVER = "GAME_OVER";
+	final GAME_OVER_CREATE = "GAME_OVER_CREATE";
 }
 
 /**
