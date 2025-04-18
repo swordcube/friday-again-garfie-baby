@@ -137,6 +137,7 @@ class PlayField extends FlxContainer {
         else if(isPlayer) {
             stats.accuracyScore += event.accuracyScore;
             stats.totalNotesHit++;
+            stats.judgements.set(event.rating, stats.judgements.get(event.rating) + 1);
         }
         if(event.showRating) {
             final e:DisplayRatingEvent = cast Events.get(DISPLAY_RATING);

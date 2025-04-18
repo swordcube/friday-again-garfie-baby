@@ -43,6 +43,8 @@ class MainMenuState extends FunkinState {
     }
 
     override function create():Void {
+        super.create();
+
         persistentUpdate = true;
         initOptions();
 
@@ -92,10 +94,9 @@ class MainMenuState extends FunkinState {
         add(camFollow);
 
         var versionString:String = 'Garfie Engine v${FlxG.stage.application.meta.get("version")}';
-
-        if(Constants.DEVELOPMENT_BUILD)
-            versionString += ' (${GitCommitMacro.getBranch()}/${GitCommitMacro.getCommitHash()})';
-
+        #if TEST_BUILD
+        versionString += ' (${GitCommitMacro.getBranch()}/${GitCommitMacro.getCommitHash()})';
+        #end
         versionString += "\nFriday Night Funkin' v0.6.0";
         
         versionText = new FlxText(5, FlxG.height - 2, 0, versionString);
@@ -106,11 +107,11 @@ class MainMenuState extends FunkinState {
         
         FlxG.camera.follow(camFollow, LOCKON, 0.06);
         changeSelection(0, true);
-
-        super.create();
     }
 
     override function update(elapsed:Float):Void {
+        super.update(elapsed);
+
         if(!transitioning) {
             final wheel:Float = -FlxG.mouse.wheel;
             if(controls.justPressed.UI_UP || wheel < 0)
@@ -132,7 +133,6 @@ class MainMenuState extends FunkinState {
             FlxG.switchState(new TitleState());
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
-        super.update(elapsed);
     }
 
     public function changeSelection(by:Int = 0, ?force:Bool = false):Void {

@@ -22,4 +22,8 @@ class StringUtil {
 		}
 		return FlxMath.roundDecimal(bytes, precision) + _byteUnits[curUnit];
 	}
+
+	public static function getDefaultString(str:String, defaultStr:String):String {
+		return (str != null && str.length != 0) ? str : defaultStr;
+	}
 }

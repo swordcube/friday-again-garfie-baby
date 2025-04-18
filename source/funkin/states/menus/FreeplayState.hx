@@ -8,10 +8,12 @@ import funkin.ui.AtlasTextList;
 import funkin.backend.WeekData;
 import funkin.backend.ContentMetadata;
 
+import funkin.gameplay.song.Highscore;
 import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.SongMetadata;
 
 import funkin.states.editors.ChartEditor;
+import funkin.substates.ResetScoreSubState;
 
 @:structInit
 class FreeplaySongData {
@@ -32,20 +34,29 @@ class FreeplayState extends FunkinState {
 
     public var grpSongs:AtlasTextList;
 
-    public var curDifficulty:String = "normal";
-    public var curMix:String = "default";
+    public var currentDifficulty:String = "normal";
+    public var currentMix:String = "default";
 
     public var scoreBG:FlxSprite;
 
     public var scoreText:FlxText;
     public var diffText:FlxText;
 
+    public var rankBadge:FlxSprite;
+    public var accuracyText:FlxText;
+
     public var hintBG:FlxSprite;
 
     public var hintText:FlxText;
     public var categoryText:FlxText;
+
+    public var lerpScore:Float = 0;
+    public var intendedScore:Int = 0;
+    public var curScoreRecord:ScoreRecord;
     
     override function create():Void {
+        super.create();
+
         if(FlxG.sound.music != null)
             FlxG.sound.music.looped = true;
 
@@ -111,7 +122,7 @@ class FreeplayState extends FunkinState {
             songs.remove(category.id);
             categories.remove(category);
         }
-		scoreBG = new FlxSprite((FlxG.width * 0.7) - 6, 0).makeGraphic(1, 66, 0x99000000);
+		scoreBG = new FlxSprite((FlxG.width * 0.7) - 6, 0).makeGraphic(1, 1, 0x99000000);
 		scoreBG.antialiasing = false;
 		add(scoreBG);
 
@@ -122,6 +133,21 @@ class FreeplayState extends FunkinState {
 		diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, "", 24);
 		diffText.setFormat(Paths.font("fonts/vcr"), 24, FlxColor.WHITE, CENTER);
 		add(diffText);
+
+        rankBadge = new FlxSprite(scoreBG.x + 6, scoreBG.y + 70);
+        rankBadge.frames = Paths.getSparrowAtlas("menus/freeplay/rank_badges");
+        
+        for(rank in Highscore.ALL_RANKS)
+            rankBadge.animation.addByPrefix(rank, '${Std.string(rank).toUpperCase()} rank', 24, false);
+
+        rankBadge.animation.play(Rank.LOSS);
+        rankBadge.setGraphicSize(24, 24);
+        rankBadge.updateHitbox();
+        add(rankBadge);
+
+        accuracyText = new FlxText(rankBadge.x + 30, rankBadge.y, 0, "• 93.57%", 20);
+		accuracyText.setFormat(Paths.font("fonts/vcr"), 20, FlxColor.WHITE, CENTER);
+		add(accuracyText);
 
         hintBG = new FlxSprite().makeSolid(FlxG.width, 26, FlxColor.BLACK);
 		hintBG.y = FlxG.height - hintBG.height;
@@ -142,12 +168,16 @@ class FreeplayState extends FunkinState {
 
         grpSongs.curSelected = lastSelected;
         grpSongs.changeSelection(0, true, false);
-
-        super.create();
     }
 
     override function update(elapsed:Float) {
-        scoreText.text = 'PERSONAL BEST:N/A';
+        super.update(elapsed);
+
+        lerpScore = FlxMath.lerp(lerpScore, intendedScore, FlxMath.getElapsedLerp(0.4, elapsed));
+        if(Math.abs(lerpScore - intendedScore) < 10)
+            lerpScore = intendedScore;
+
+        scoreText.text = 'PERSONAL BEST:${Math.floor(lerpScore)}';
         positionHighscore();
 
         if(FlxG.keys.justPressed.Q)
@@ -166,27 +196,69 @@ class FreeplayState extends FunkinState {
             FlxG.switchState(new MainMenuState());
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
+        if(controls.justPressed.RESET) {
+            final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+            
+            var meta:SongMetadata = song.metadata.get(currentMix);
+            if(meta == null)
+                meta = song.metadata.get("default");
+
+            final subState:ResetScoreSubState = new ResetScoreSubState(meta.song.title);
+            subState.onAccept.add(() -> {
+                final recordID:String = Highscore.getRecordID(song.id, currentDifficulty, currentMix);
+                Highscore.resetRecord(recordID);
+                updateHighscore();
+            });
+            openSubState(subState);
+        }
         var tryingToListen:Bool = false;
         if(FlxG.keys.justPressed.SPACE) {
             final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
-            final newListeningSong:String = '${categories[curCategory].id}:${song.id}:${curMix}';
+            final newListeningSong:String = '${categories[curCategory].id}:${song.id}:${currentMix}';
 
             if(newListeningSong != listeningSong) {
                 tryingToListen = true;
                 grpSongs.active = false;
                 
-                FlxG.sound.playMusic(Paths.sound('gameplay/songs/${song.id}/${curMix}/music/inst'), 0, false);
+                FlxG.sound.playMusic(Paths.sound('gameplay/songs/${song.id}/${currentMix}/music/inst'), 0, false);
                 FlxG.sound.music.fadeIn(2.0, 0.0, 1.0);
                 
-                final meta:SongMetadata = song.metadata.get(curMix);
+                final meta:SongMetadata = song.metadata.get(currentMix);
                 Conductor.instance.reset(meta.song.timingPoints.first()?.bpm ?? 100.0);
                 Conductor.instance.setupTimingPoints(meta.song.timingPoints);
 
                 listeningSong = newListeningSong;
             }
         }
-        super.update(elapsed);
+        #if TEST_BUILD
+        if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.G) {
+            final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+            final recordID:String = Highscore.getRecordID(song.id, currentDifficulty, currentMix);
+            Highscore.forceSaveRecord(recordID, {
+                score: FlxG.random.int(0, 999999),
+                misses: 0,
+                accuracy: 1,
+                rank: GOLD,
+                judges: [
+                    "killer" => 0,
+                    "sick" => 0,
+                    "good" => 0,
+                    "bad" => 0,
+                    "shit" => 0,
+                    "miss" => 0,
+                    "cb" => 0
+                ],
+                version: Highscore.RECORD_VERSION
+            });
+            updateHighscore();
 
+            var meta:SongMetadata = song.metadata.get(currentMix);
+            if(meta == null)
+                meta = song.metadata.get("default");
+
+            Logs.success('Congrats! You cheated on ${meta.song.title} [${currentDifficulty.toUpperCase()} - ${currentMix.toUpperCase()}]! Fuck you');
+        }
+        #end
         if(tryingToListen)
             grpSongs.active = true;
     }
@@ -207,14 +279,14 @@ class FreeplayState extends FunkinState {
         curSelected = 0;
         grpSongs.curSelected = 0;
 
-        curDifficulty = "normal";
-        curMix = "default";
+        currentDifficulty = "normal";
+        currentMix = "default";
 
         final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
-        final meta:SongMetadata = song.metadata.get(curMix);
+        final meta:SongMetadata = song.metadata.get(currentMix);
         
-        if(!meta.song.difficulties.contains(curDifficulty))
-            curDifficulty = meta.song.difficulties.first();
+        if(!meta.song.difficulties.contains(currentDifficulty))
+            currentDifficulty = meta.song.difficulties.first();
 
         categoryText.text = categories[curCategory].name;
         grpSongs.changeSelection(0, true);
@@ -235,47 +307,78 @@ class FreeplayState extends FunkinState {
         final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
         final defaultMeta:SongMetadata = song.metadata.get("default");
 
-        var meta:SongMetadata = song.metadata.get(curMix);
+        var meta:SongMetadata = song.metadata.get(currentMix);
         if(meta == null) {
-            curMix = "default"; // fallback to default mix
-            curDifficulty = "normal"; // attempt to fallback to normal diff, if this fails the code below should correct it
-            meta = song.metadata.get(curMix);
+            currentMix = "default"; // fallback to default mix
+            currentDifficulty = "normal"; // attempt to fallback to normal diff, if this fails the code below should correct it
+            meta = song.metadata.get(currentMix);
         }
-        var newDiffIndex:Int = meta.song.difficulties.indexOf(curDifficulty) + by;
+        var newDiffIndex:Int = meta.song.difficulties.indexOf(currentDifficulty) + by;
 
         if(newDiffIndex < 0) {
             // go back a mix
-            curMix = defaultMeta.song.mixes[FlxMath.wrap(defaultMeta.song.mixes.indexOf(curMix) - 1, 0, defaultMeta.song.mixes.length - 1)];
-            meta = song.metadata.get(curMix);
+            currentMix = defaultMeta.song.mixes[FlxMath.wrap(defaultMeta.song.mixes.indexOf(currentMix) - 1, 0, defaultMeta.song.mixes.length - 1)];
+            meta = song.metadata.get(currentMix);
 
             // reset difficulty to first of this mix
-            curDifficulty = meta.song.difficulties.last() ?? "normal";
+            currentDifficulty = meta.song.difficulties.last() ?? "normal";
         }
         else if(newDiffIndex > meta.song.difficulties.length - 1) {
             // go forward a mix
-            curMix = defaultMeta.song.mixes[FlxMath.wrap(defaultMeta.song.mixes.indexOf(curMix) + 1, 0, defaultMeta.song.mixes.length - 1)];
-            meta = song.metadata.get(curMix);
+            currentMix = defaultMeta.song.mixes[FlxMath.wrap(defaultMeta.song.mixes.indexOf(currentMix) + 1, 0, defaultMeta.song.mixes.length - 1)];
+            meta = song.metadata.get(currentMix);
 
             // reset difficulty to first of this mix
-            curDifficulty = meta.song.difficulties.first() ?? "normal";
+            currentDifficulty = meta.song.difficulties.first() ?? "normal";
         }
         else {
             // change difficulty but keep current mix
-            curDifficulty = meta.song.difficulties[newDiffIndex];
+            currentDifficulty = meta.song.difficulties[newDiffIndex];
         }
+        // update the score & rank display
+        updateHighscore();
+
+        // update the difficulty display
         final showArrows:Bool = (meta.song.difficulties.length > 1 || defaultMeta.song.mixes.length > 1);
-        diffText.text = '${(showArrows) ? "< " : ""}${curDifficulty.toUpperCase()}${(showArrows) ? " >" : ""}';
+        diffText.text = '${(showArrows) ? "< " : ""}${currentDifficulty.toUpperCase()}${(showArrows) ? " >" : ""}';
         positionHighscore();
+    }
+
+    public function updateHighscore():Void {
+        final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+        final recordID:String = Highscore.getRecordID(song.id, currentDifficulty, currentMix);
+
+        curScoreRecord = Highscore.getRecord(recordID);
+        intendedScore = curScoreRecord.score;
+
+        // update the rank display
+        if(curScoreRecord.rank != UNKNOWN) {
+            rankBadge.animation.play(curScoreRecord.rank, !rankBadge.visible);
+            rankBadge.visible = true;
+
+            final ceilAcc:Int = Math.ceil(curScoreRecord.accuracy * 100);
+            accuracyText.text = '• ${(ceilAcc >= 100) ? ceilAcc : FlxMath.roundDecimal(curScoreRecord.accuracy * 100, 2)}%';
+            accuracyText.visible = true;
+        } else {
+            rankBadge.visible = false;
+            accuracyText.visible = false;
+        }
     }
 
     public function positionHighscore():Void {
 		scoreText.x = FlxG.width - scoreText.width - 6;
 
 		scoreBG.scale.x = FlxG.width - scoreText.x + 6;
-		scoreBG.x = FlxG.width - scoreBG.scale.x / 2;
+		scoreBG.x = FlxG.width - scoreBG.scale.x * 0.5;
 
-		diffText.x = Std.int(scoreBG.x + scoreBG.width / 2);
-		diffText.x -= (diffText.width / 2);
+        scoreBG.scale.y = (curScoreRecord.rank != UNKNOWN) ? 96 : 66;
+        scoreBG.y = scoreBG.scale.y * 0.5;
+
+		diffText.x = Std.int(scoreBG.x + scoreBG.width * 0.5);
+		diffText.x -= (diffText.width * 0.5);
+        
+        rankBadge.x = scoreBG.x - ((accuracyText.width + 28) * 0.5);
+        accuracyText.x = rankBadge.x + 28;
 	}
 
     public function onAccept(index:Int, item:AtlasText):Void {
@@ -293,8 +396,8 @@ class FreeplayState extends FunkinState {
 
         FlxG.switchState(ChartEditor.new.bind({
             song: songData.id,
-            difficulty: curDifficulty,
-            mix: curMix,
+            difficulty: currentDifficulty,
+            mix: currentMix,
             mod: categoryID.split(":").first()
         }));
     }
@@ -306,8 +409,8 @@ class FreeplayState extends FunkinState {
         PlayState.deathCounter = 0;
         FlxG.switchState(PlayState.new.bind({
             song: songData.id,
-            difficulty: curDifficulty,
-            mix: curMix,
+            difficulty: currentDifficulty,
+            mix: currentMix,
             mod: categoryID.split(":").first()
         }));
     }

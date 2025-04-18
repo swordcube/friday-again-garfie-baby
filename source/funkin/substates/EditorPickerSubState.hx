@@ -13,6 +13,8 @@ class EditorPickerSubState extends FunkinSubState {
     public var callbacks:Map<String, Void->Void> = [];
 
     override function create():Void {
+        super.create();
+        
         camera = new FlxCamera();
         camera.bgColor = 0;
         FlxG.cameras.add(camera, false);
@@ -35,7 +37,6 @@ class EditorPickerSubState extends FunkinSubState {
         addItem("Character Editor", () -> FlxG.switchState(new CharacterEditor()));
         
         changeSelection(0, true);
-        super.create();
     }
 
     override function update(elapsed:Float):Void {
@@ -51,7 +52,7 @@ class EditorPickerSubState extends FunkinSubState {
         if(controls.justPressed.ACCEPT) {
             final callback:Void->Void = callbacks.get(grpItems.members[curSelected].text);
             if(callback != null) {
-                FlxTimer.wait(0.001, callback);
+                FlxTimer.wait(0.1, callback);
                 close();
             }
         }

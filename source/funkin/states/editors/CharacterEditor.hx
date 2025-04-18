@@ -55,6 +55,8 @@ class CharacterEditor extends UIState {
     public var setGhostButton:Button;
 
     override function create():Void {
+        super.create();
+        
         FlxG.camera.bgColor = FlxColor.GRAY;
         lastMouseVisible = FlxG.mouse.visible;
 
@@ -93,8 +95,6 @@ class CharacterEditor extends UIState {
         setGhostButton.x -= setGhostButton.width;
         setGhostButton.cameras = [camUI];
         add(setGhostButton);
-
-        super.create();
     }
 
     override function update(elapsed:Float):Void {

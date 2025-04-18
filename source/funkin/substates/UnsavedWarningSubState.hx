@@ -18,6 +18,8 @@ class UnsavedWarningSubState extends UISubState {
     public var lastMouseVisible:Bool = false;
 
     override function create():Void {
+        super.create();
+        
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
 
@@ -32,8 +34,6 @@ class UnsavedWarningSubState extends UISubState {
         });
         window.screenCenter();
         add(window);
-
-        super.create();
     }
 
     override function update(elapsed:Float):Void {

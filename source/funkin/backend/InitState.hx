@@ -10,6 +10,8 @@ import funkin.graphics.RatioScaleModeEx;
 import funkin.utilities.FlxUtil;
 import funkin.utilities.AudioSwitchFix;
 
+import funkin.gameplay.song.Highscore;
+
 import funkin.states.PlayState;
 import funkin.states.menus.TitleState;
 
@@ -56,12 +58,15 @@ class InitState extends FlxState {
         Logs.init();
         Paths.initAssetSystem();
 
-        // init controls and mod manager
+        // init controls and global script
         Controls.init();
 
         #if SCRIPTING_ALLOWED
         GlobalScript.init();
         #end
+
+        // init highscore
+        Highscore.init();
 
         // init some flixel stuff
         FlxUtil.init();

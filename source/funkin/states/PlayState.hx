@@ -31,6 +31,7 @@ import funkin.gameplay.scoring.system.*;
 import funkin.gameplay.song.NoteData;
 import funkin.gameplay.song.EventData;
 import funkin.gameplay.song.ChartData;
+import funkin.gameplay.song.Highscore;
 
 import funkin.gameplay.song.VocalGroup;
 
@@ -153,6 +154,7 @@ class PlayState extends FunkinState {
 	}
 
 	override function create():Void {
+		super.create();
 		persistentUpdate = true;
 
 		if(FlxG.sound.music != null)
@@ -411,14 +413,16 @@ class PlayState extends FunkinState {
 			startCountdown();
 
 		worldCombo = false;
+		_saveScore = !(lastParams.chartingMode ?? false);
 		
 		#if SCRIPTING_ALLOWED
 		scripts.call("onCreatePost");
 		#end
-		super.create();
 	}
 
 	override function update(elapsed:Float) {
+		super.update(elapsed);
+
 		#if SCRIPTING_ALLOWED
 		scripts.call("onUpdate", [elapsed]);
 		#end
@@ -480,7 +484,6 @@ class PlayState extends FunkinState {
 			camFollow.setPosition(event.position.x, event.position.y);
 		
 		cameraPos.put();
-		super.update(elapsed);
 
 		#if SCRIPTING_ALLOWED
 		scripts.call("onUpdatePost", [elapsed]);
@@ -583,6 +586,17 @@ class PlayState extends FunkinState {
 		scripts.call("onEndSong");
 		scripts.call("onSongEnd");
 		#end
+		if(_saveScore) {
+			final recordID:String = Highscore.getRecordID(currentSong, currentDifficulty, currentMix);
+			Highscore.saveRecord(recordID, {
+				score: playField.stats.score,
+				misses: playField.stats.misses,
+				accuracy: playField.stats.accuracy,
+				rank: Highscore.getRankFromStats(playField.stats),
+				judges: playField.stats.judgements,
+				version: Highscore.RECORD_VERSION
+			});
+		}
 		FlxG.sound.music.looped = true;
 		FlxG.sound.music.onComplete = null;
 

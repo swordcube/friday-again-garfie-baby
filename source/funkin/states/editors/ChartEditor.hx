@@ -134,6 +134,8 @@ class ChartEditor extends UIState {
     }
 
     override function create() {
+        super.create();
+        
         if(FlxG.sound.music != null)
             FlxG.sound.music.stop();
 
@@ -486,7 +488,6 @@ class ChartEditor extends UIState {
             });
             openSubState(warning);
         };
-        super.create();
     }
 
     override function update(elapsed:Float) {

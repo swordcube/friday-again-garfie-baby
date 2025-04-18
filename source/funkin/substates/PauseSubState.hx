@@ -46,6 +46,8 @@ class PauseSubState extends FunkinSubState {
     public var lastTimeScale:Float = 1;
 
     override function create():Void {
+        super.create();
+        
         lastTimeScale = FlxG.timeScale;
         FlxG.timeScale = 1;
 
@@ -137,7 +139,6 @@ class PauseSubState extends FunkinSubState {
             });
             openSubState(warning);
         };
-        super.create();
     }
 
     override function update(elapsed:Float):Void {

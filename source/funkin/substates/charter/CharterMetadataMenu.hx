@@ -13,6 +13,8 @@ class CharterMetadataMenu extends UISubState {
     public var window:CharterMetadataWindow;
 
     override function create():Void {
+        super.create();
+        
         camera = new FlxCamera();
         camera.bgColor = 0x80000000;
         FlxG.cameras.add(camera, false);
@@ -21,8 +23,6 @@ class CharterMetadataMenu extends UISubState {
         window.onClose.add(close);
         window.screenCenter();
         add(window);
-
-        super.create();
     }
 
     override function update(elapsed:Float):Void {

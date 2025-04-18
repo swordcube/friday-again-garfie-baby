@@ -70,6 +70,8 @@ class TitleState extends FunkinState {
     }
     
     override function create():Void {
+        super.create();
+        
         persistentUpdate = true;
         initQuotes();
 
@@ -137,10 +139,11 @@ class TitleState extends FunkinState {
             skipIntro();
         
         initialized = true;
-        super.create();
     }
     
     override function update(elapsed:Float):Void {
+        super.update(elapsed);
+
         if(controls.pressed.UI_LEFT)
             swagShader.setFloat("OFFSET", swagShader.getFloat("OFFSET") + (elapsed * -0.1));
 
@@ -169,7 +172,6 @@ class TitleState extends FunkinState {
             if (controls.justPressed.NOTE_LEFT || controls.justPressed.UI_LEFT) cheatCodePress(FlxDirectionFlags.LEFT);
             if (controls.justPressed.NOTE_RIGHT || controls.justPressed.UI_RIGHT) cheatCodePress(FlxDirectionFlags.RIGHT);
         }
-        super.update(elapsed);
     }
 
     override function beatHit(beat:Int) {
