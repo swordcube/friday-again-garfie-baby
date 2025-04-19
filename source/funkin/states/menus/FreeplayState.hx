@@ -171,6 +171,25 @@ class FreeplayState extends FunkinState {
     }
 
     override function update(elapsed:Float) {
+        var tryingToListen:Bool = false;
+        if(FlxG.keys.justPressed.SPACE) {
+            final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+            final newListeningSong:String = '${categories[curCategory].id}:${song.id}:${currentMix}';
+
+            if(newListeningSong != listeningSong) {
+                tryingToListen = true;
+                grpSongs.active = false;
+                
+                FlxG.sound.playMusic(Paths.sound('gameplay/songs/${song.id}/${currentMix}/music/inst'), 0, false);
+                FlxG.sound.music.fadeIn(2.0, 0.0, 1.0);
+                
+                final meta:SongMetadata = song.metadata.get(currentMix);
+                Conductor.instance.reset(meta.song.timingPoints.first()?.bpm ?? 100.0);
+                Conductor.instance.setupTimingPoints(meta.song.timingPoints);
+
+                listeningSong = newListeningSong;
+            }
+        }
         super.update(elapsed);
 
         lerpScore = FlxMath.lerp(lerpScore, intendedScore, FlxMath.getElapsedLerp(0.4, elapsed));
@@ -210,25 +229,6 @@ class FreeplayState extends FunkinState {
                 updateHighscore();
             });
             openSubState(subState);
-        }
-        var tryingToListen:Bool = false;
-        if(FlxG.keys.justPressed.SPACE) {
-            final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
-            final newListeningSong:String = '${categories[curCategory].id}:${song.id}:${currentMix}';
-
-            if(newListeningSong != listeningSong) {
-                tryingToListen = true;
-                grpSongs.active = false;
-                
-                FlxG.sound.playMusic(Paths.sound('gameplay/songs/${song.id}/${currentMix}/music/inst'), 0, false);
-                FlxG.sound.music.fadeIn(2.0, 0.0, 1.0);
-                
-                final meta:SongMetadata = song.metadata.get(currentMix);
-                Conductor.instance.reset(meta.song.timingPoints.first()?.bpm ?? 100.0);
-                Conductor.instance.setupTimingPoints(meta.song.timingPoints);
-
-                listeningSong = newListeningSong;
-            }
         }
         #if TEST_BUILD
         if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.G) {
