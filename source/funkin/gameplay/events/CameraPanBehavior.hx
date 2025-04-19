@@ -14,7 +14,8 @@ class CameraPanBehavior extends EventBehavior {
         game.curCameraTarget = params.char;
 
         #if SCRIPTING_ALLOWED
-        scripts.call("onExecutePost", [e.flagAsPost()]);
+        if(game.scriptsAllowed)
+            scripts.call("onExecutePost", [e.flagAsPost()]);
         #end
     }
 }

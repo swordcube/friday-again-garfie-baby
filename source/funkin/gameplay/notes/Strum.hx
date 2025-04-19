@@ -32,7 +32,8 @@ class Strum extends SkinnableSprite {
     override function update(elapsed:Float) {
         holdTime -= elapsed * 1000;
         if(holdTime <= 0) {
-            if(!(strumLine?.botplay ?? true) && animation.name.endsWith("confirm"))
+            final strumsPressed:Array<Bool> = strumLine?.playField?.strumsPressed;
+            if(!(strumLine?.botplay ?? true) && animation.name.endsWith("confirm") && (strumsPressed != null && strumsPressed.contains(true)))
                 animation.play('${Constants.NOTE_DIRECTIONS[direction]} press');
             else
                 animation.play('${Constants.NOTE_DIRECTIONS[direction]} static');

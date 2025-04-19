@@ -345,6 +345,7 @@ class FreeplayState extends FunkinState {
     }
 
     public function updateHighscore():Void {
+        // update the score display
         final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
         final recordID:String = Highscore.getRecordID(song.id, currentDifficulty, currentMix);
 
@@ -377,8 +378,8 @@ class FreeplayState extends FunkinState {
 		diffText.x = Std.int(scoreBG.x + scoreBG.width * 0.5);
 		diffText.x -= (diffText.width * 0.5);
         
-        rankBadge.x = scoreBG.x - ((accuracyText.width + 28) * 0.5);
-        accuracyText.x = rankBadge.x + 28;
+        rankBadge.x = scoreBG.x - ((accuracyText.width + 32) * 0.5);
+        accuracyText.x = rankBadge.x + 32;
 	}
 
     public function onAccept(index:Int, item:AtlasText):Void {

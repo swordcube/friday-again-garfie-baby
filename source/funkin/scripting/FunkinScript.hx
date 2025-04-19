@@ -120,6 +120,12 @@ class FunkinScript {
         setClass(funkin.graphics.shader.RuntimeShader);
         setClass(funkin.graphics.shader.CustomShader);
 
+        setClass(funkin.states.menus.TitleState);
+        setClass(funkin.states.menus.MainMenuState);
+        setClass(funkin.states.menus.FreeplayState);
+        
+        setClass(funkin.states.PlayState);
+
         set("BlendMode", funkin.scripting.helpers.BlendModeHelper);
         set("FlxAxes", funkin.scripting.helpers.FlxAxesHelper);
         set("FlxCameraFollowStyle", funkin.scripting.helpers.FlxCameraFollowStyleHelper);

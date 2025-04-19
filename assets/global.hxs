@@ -6,6 +6,10 @@ function reloadAssets(_) {
 
 function onUpdate(dt) {
     if(Controls.instance.justPressed.check(Control.DEBUG_RELOAD)) {
+        if(FlxG.keys.pressed.M && PlayState.lastParams != null) {
+            PlayState.lastParams.minimalMode = true;
+            PlayState.lastParams.scriptsAllowed = true;
+        }
         if(FlxG.keys.pressed.SHIFT) {
             FlxG.inputs.onStateSwitch();
             FlxG.signals.preStateCreate.addOnce(reloadAssets);

@@ -19,23 +19,25 @@ class EventBehavior {
         this.eventType = eventType;
 
         #if SCRIPTING_ALLOWED
-        scripts = new FunkinScriptGroup();
-        scripts.setParent(game);
-
-        @:privateAccess
-        final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
-        for(i in 0...loaders.length) {
-            final loader:AssetLoader = loaders[i];
-            final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-
-            if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
-                continue;
-
-            final scriptPath:String = Paths.script('gameplay/events/${eventType}', loader.id, false);
-            if(FlxG.assets.exists(scriptPath)) {
-                final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
-                script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
-                scripts.add(script);
+        if(game.scriptsAllowed) {
+            scripts = new FunkinScriptGroup();
+            scripts.setParent(game);
+    
+            @:privateAccess
+            final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
+            for(i in 0...loaders.length) {
+                final loader:AssetLoader = loaders[i];
+                final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+    
+                if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
+                    continue;
+    
+                final scriptPath:String = Paths.script('gameplay/events/${eventType}', loader.id, false);
+                if(FlxG.assets.exists(scriptPath)) {
+                    final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+                    script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
+                    scripts.add(script);
+                }
             }
         }
         #end
@@ -43,15 +45,18 @@ class EventBehavior {
 
     public function execute(e:SongEvent):Void {
         #if SCRIPTING_ALLOWED
-        scripts.call("onExecute", [e]);
+        if(game.scriptsAllowed)
+            scripts.call("onExecute", [e]);
         #end
     }
 
     public function destroy():Void {
         #if SCRIPTING_ALLOWED
-        scripts.call("onDestroy");
-        scripts.close();
-        scripts = null;
+        if(game.scriptsAllowed) {
+            scripts.call("onDestroy");
+            scripts.close();
+            scripts = null;
+        }
         #end
     }
 }

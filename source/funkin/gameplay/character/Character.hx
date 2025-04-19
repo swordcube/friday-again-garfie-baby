@@ -9,6 +9,7 @@ import funkin.backend.assets.loaders.AssetLoader;
 import funkin.graphics.AtlasType;
 import funkin.graphics.SkinnableSprite;
 
+import funkin.states.PlayState;
 import funkin.utilities.SpriteUtil;
 
 #if SCRIPTING_ALLOWED
@@ -46,6 +47,8 @@ enum abstract AnimationContext(String) from String to String {
 
 @:allow(funkin.states.PlayState)
 class Character extends FlxSprite implements IBeatReceiver {
+    public var game:PlayState = PlayState.instance;
+
     public var data(default, null):CharacterData;
     public var debugMode:Bool = false;
 
@@ -80,41 +83,45 @@ class Character extends FlxSprite implements IBeatReceiver {
         this.debugMode = debugMode;
 
         #if SCRIPTING_ALLOWED
-        scripts = new FunkinScriptGroup();
-        scripts.setParent(this);
-
-        if(!debugMode) {
-            @:privateAccess
-            final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
-            for(i in 0...loaders.length) {
-                final loader:AssetLoader = loaders[i];
-                final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-
-                if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
-                    continue;
-
-                final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script', loader.id, false);
-                if(FlxG.assets.exists(scriptPath)) {
-                    final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
-                    script.set("this", this);
-                    script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
-                    scripts.add(script);
+        if(game != null && game.scriptsAllowed) {
+            scripts = new FunkinScriptGroup();
+            scripts.setParent(this);
+    
+            if(!debugMode) {
+                @:privateAccess
+                final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
+                for(i in 0...loaders.length) {
+                    final loader:AssetLoader = loaders[i];
+                    final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+    
+                    if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
+                        continue;
+    
+                    final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script', loader.id, false);
+                    if(FlxG.assets.exists(scriptPath)) {
+                        final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+                        script.set("this", this);
+                        script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
+                        scripts.add(script);
+                    }
                 }
             }
+            scripts.execute();
+            scripts.call("onLoad", [data]);
         }
-        scripts.execute();
-        scripts.call("onLoad", [data]);
         #end
         applyData(data);
 
         #if SCRIPTING_ALLOWED
-        scripts.call("onLoadPost", [data]);
+        if(game != null && game.scriptsAllowed)
+            scripts.call("onLoadPost", [data]);
         #end
     }
 
     override function update(elapsed:Float):Void {
         #if SCRIPTING_ALLOWED
-        scripts.call("onUpdate", [elapsed]);
+        if(game != null && game.scriptsAllowed)
+            scripts.call("onUpdate", [elapsed]);
         #end
         if(!debugMode && curAnimContext == SING) {
             holdTimer -= elapsed * 1000;
@@ -124,7 +131,8 @@ class Character extends FlxSprite implements IBeatReceiver {
         super.update(elapsed);
 
         #if SCRIPTING_ALLOWED
-        scripts.call("onUpdatePost", [elapsed]);
+        if(game != null && game.scriptsAllowed)
+            scripts.call("onUpdatePost", [elapsed]);
         #end
     }
 
@@ -235,7 +243,8 @@ class Character extends FlxSprite implements IBeatReceiver {
     public function dance():Void {
         #if SCRIPTING_ALLOWED
         final event:ActionEvent = Events.get(UNKNOWN).flagAsPre();
-        scripts.call("onDance", [event.flagAsPre()]);
+        if(game != null && game.scriptsAllowed)
+            scripts.call("onDance", [event.flagAsPre()]);
         
         if(event.cancelled)
             return;
@@ -248,7 +257,8 @@ class Character extends FlxSprite implements IBeatReceiver {
             playAnim(data.danceSteps[curDanceStep], DANCE);
         }
         #if SCRIPTING_ALLOWED
-        scripts.call("onDancePost", [event.flagAsPost()]);
+        if(game != null && game.scriptsAllowed)
+            scripts.call("onDancePost", [event.flagAsPost()]);
         #end
     }
 
@@ -271,7 +281,8 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     public function stepHit(step:Int):Void {
         #if SCRIPTING_ALLOWED
-        scripts.call("onStepHit", [step]);
+        if(game != null && game.scriptsAllowed)
+            scripts.call("onStepHit", [step]);
         #end
     }
 
@@ -290,13 +301,15 @@ class Character extends FlxSprite implements IBeatReceiver {
             }
         }
         #if SCRIPTING_ALLOWED
-        scripts.call("onBeatHit", [beat]);
+        if(game != null && game.scriptsAllowed)
+            scripts.call("onBeatHit", [beat]);
         #end
     }
 
     public function measureHit(measure:Int):Void {
         #if SCRIPTING_ALLOWED
-        scripts.call("onMeasureHit", [measure]);
+        if(game != null && game.scriptsAllowed)
+            scripts.call("onMeasureHit", [measure]);
         #end
     }
 
@@ -316,9 +329,11 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     override function destroy():Void {
         #if SCRIPTING_ALLOWED
-        scripts.call("onDestroy");
-        scripts.close();
-        scripts = null;
+        if(game != null && game.scriptsAllowed) {
+            scripts.call("onDestroy");
+            scripts.close();
+            scripts = null;
+        }
         #end
         footOffset = FlxDestroyUtil.put(footOffset);
         super.destroy();

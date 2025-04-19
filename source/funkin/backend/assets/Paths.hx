@@ -53,6 +53,9 @@ class Paths {
     public static function initAssetSystem():Void {
         @:privateAccess
         FlxG.assets.exists = (id:String, ?type:FlxAssetType) -> {
+            if (id == null) // no clue what's being sent null, but fixes hl shit so idc???
+                return false;
+
             #if FLX_DEFAULT_SOUND_EXT
             // add file extension
             if (type == SOUND)
@@ -239,17 +242,19 @@ class Paths {
             if(FlxG.assets.exists(path))
                 return path;
 
-            // load from loaders that have runGlobally set as true
-            // inside of their metadata as fallback
-            final loaders:Array<AssetLoader> = _registeredAssetLoaders;
-            for(i in 0...loaders.length) {
-                final contentMetadata:ContentMetadata = contentMetadata.get(loaders[i].id);
-                if(contentMetadata != null && !contentMetadata.runGlobally)
-                    continue;
-
-                final path:String = loaders[i].getPath(name);
-                if(FlxG.assets.exists(path))
-                    return path;
+            if(useFallback) {
+                // load from loaders that have runGlobally set as true
+                // inside of their metadata as fallback
+                final loaders:Array<AssetLoader> = _registeredAssetLoaders;
+                for(i in 0...loaders.length) {
+                    final contentMetadata:ContentMetadata = contentMetadata.get(loaders[i].id);
+                    if(contentMetadata != null && !contentMetadata.runGlobally)
+                        continue;
+    
+                    final path:String = loaders[i].getPath(name);
+                    if(FlxG.assets.exists(path))
+                        return path;
+                }
             }
         }
         // either use assets as emergency fallback (usually enabled)

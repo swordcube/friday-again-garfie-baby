@@ -37,7 +37,7 @@ class MainMenuState extends FunkinState {
             },
             {
                 name: "options",
-                callback: () -> trace("options menu TODO"),
+                callback: () -> FlxG.switchState(new OptionsState()),
             },
         ];
     }

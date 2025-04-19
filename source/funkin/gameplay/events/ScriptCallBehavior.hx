@@ -21,6 +21,9 @@ class ScriptCallBehavior extends EventBehavior {
 
         final args:Array<String> = params.args.split(',');
         for(group in scriptGroups) {
+            if(group == null)
+                continue;
+            
             group.call(params.method, args);
             if(group.publicVariables.exists(params.method)) {
                 final func:Dynamic = group.publicVariables.get(params.method);
@@ -38,7 +41,8 @@ class ScriptCallBehavior extends EventBehavior {
             if(char != null)
                 char.scripts.call(params.method, args);
         }
-        scripts.call("onExecutePost", [e.flagAsPost()]);
+        if(game.scriptsAllowed)
+            scripts.call("onExecutePost", [e.flagAsPost()]);
     }
 }
 

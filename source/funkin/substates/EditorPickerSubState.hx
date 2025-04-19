@@ -2,7 +2,9 @@ package funkin.substates;
 
 import flixel.util.FlxTimer;
 import funkin.ui.AtlasText;
+
 import funkin.states.editors.*;
+import funkin.substates.transition.FadeTransition;
 
 class EditorPickerSubState extends FunkinSubState {
     public var bg:FlxSprite;
@@ -29,13 +31,24 @@ class EditorPickerSubState extends FunkinSubState {
         add(grpItems);
 
         addItem("Chart Editor", () -> {
+            final transitionCam:FlxCamera = new FlxCamera();
+            transitionCam.bgColor = 0;
+            FlxG.cameras.add(transitionCam, false);
+
+            FadeTransition.nextCamera = transitionCam;
             FlxG.switchState(new ChartEditor({
                 song: null,
                 difficulty: null
             }));
         });
-        addItem("Character Editor", () -> FlxG.switchState(new CharacterEditor()));
-        
+        addItem("Character Editor", () -> {
+            final transitionCam:FlxCamera = new FlxCamera();
+            transitionCam.bgColor = 0;
+            FlxG.cameras.add(transitionCam, false);
+
+            FadeTransition.nextCamera = transitionCam;
+            FlxG.switchState(new CharacterEditor());
+        });
         changeSelection(0, true);
     }
 
@@ -52,7 +65,7 @@ class EditorPickerSubState extends FunkinSubState {
         if(controls.justPressed.ACCEPT) {
             final callback:Void->Void = callbacks.get(grpItems.members[curSelected].text);
             if(callback != null) {
-                FlxTimer.wait(0.1, callback);
+                FlxTimer.wait(0.001, callback);
                 close();
             }
         }

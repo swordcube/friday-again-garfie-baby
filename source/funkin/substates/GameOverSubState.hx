@@ -60,8 +60,8 @@ class GameOverSubState extends FunkinSubState {
         if(_createEvent.cancelled)
             return;
 
-        character = new Character(_createEvent.characterID, game.player.isPlayer);
-        character.setPosition(game.player.x, game.player.y);
+        character = new Character(_createEvent.characterID, game.player?.isPlayer ?? true);
+        character.setPosition(game.player?.x ?? 800, game.player?.y ?? 700);
         character.playAnim("death");
         add(character);
 
@@ -189,7 +189,7 @@ class GameOverSubState extends FunkinSubState {
 
     override function _callCreate():Void {
         _createEvent = cast Events.get(GAME_OVER_CREATE);
-        call("onCreate", [_createEvent.recycle(game.player.data.deathCharacter ?? "bf-dead", null, "gameplay/death/sfx/default/death", "gameplay/death/music/default", "gameplay/death/sfx/default/retry")]);
+        call("onCreate", [_createEvent.recycle(game.player?.data?.deathCharacter ?? "bf-dead", null, "gameplay/death/sfx/default/death", "gameplay/death/music/default", "gameplay/death/sfx/default/retry")]);
     }
 
     override function _callCreatePost():Void {

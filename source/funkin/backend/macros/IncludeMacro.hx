@@ -35,10 +35,20 @@ class IncludeMacro {
         final ignores:Array<String> = [
             // HAXEUI
             "haxe.ui.macros",
-
+            
             // FLIXEL
             "flixel.system.macros"
         ];
+        final isHashlink:Bool = Context.defined("hl");
+        if(isHashlink) {
+            // fixes FATAL ERROR : Failed to load function std@socket_set_broadcast
+            ignores.push("sys.net.UdpSocket");
+            ignores.push("openfl.net.DatagramSocket");
+
+            // FATAL ERROR : Failed to load library sqlite.hdll
+            ignores.push("sys.db");
+            ignores.push("sys.ssl");
+        }
         for(inc in includes)
 			Compiler.include(inc, true, ignores);
         #end

@@ -78,6 +78,11 @@ class PlayState extends FunkinState {
 	public var camFollow:FlxObject;
 
 	public var inCutscene:Bool = false;
+	public var minimalMode:Bool = false;
+
+	#if SCRIPTING_ALLOWED
+	public var scriptsAllowed:Bool = true;
+	#end
 
 	/**
 	 * The current character that is being followed by the camera.
@@ -148,6 +153,11 @@ class PlayState extends FunkinState {
 		currentMix = params.mix;
 		if(currentMix == null || currentMix.length == 0)
 			currentMix = "default";
+
+		minimalMode = params.minimalMode ?? false;
+		#if SCRIPTING_ALLOWED
+		scriptsAllowed = params.scriptsAllowed ?? (!minimalMode);
+		#end
 		
 		lastParams = params;
 		instance = this;
@@ -223,48 +233,6 @@ class PlayState extends FunkinState {
 		WindowUtil.titlePrefix = (lastParams._unsaved) ? "* " : "";
 		WindowUtil.titleSuffix = (chartingMode) ? " - Chart Playtesting" : "";
 
-		stage = new Stage(currentChart.meta.game.stage, {
-			spectator: new Character(currentChart.meta.game.getCharacter("spectator"), false),
-			opponent: new Character(currentChart.meta.game.getCharacter("opponent"), false),
-			player: new Character(currentChart.meta.game.getCharacter("player"), true)
-		});
-		camGame.zoom = stage.data.zoom;
-		add(stage);
-
-		spectator = stage.characters.spectator;
-		opponent = stage.characters.opponent;
-		player = stage.characters.player;
-
-		#if SCRIPTING_ALLOWED
-		scripts = new FunkinScriptGroup();
-		scripts.setParent(this);
-
-		@:privateAccess
-		final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
-
-		inline function addScripts(loader:AssetLoader, dir:String) {
-			final items:Array<String> = loader.readDirectory(dir);
-			final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-
-			for(i in 0...items.length) {
-				final path:String = loader.getPath('${dir}/${items[i]}');
-				if(FlxG.assets.exists(path)) {
-					final script:FunkinScript = FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false);
-					script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
-					scripts.add(script);
-				}
-			}
-		}
-		inline function addSingleScript(loader:AssetLoader, path:String) {
-			final scriptPath:String = Paths.script(path, loader.id);
-			final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-
-			if(FlxG.assets.exists(scriptPath)) {
-				final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
-				script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
-				scripts.add(script);
-			}
-		}
 		final rawNoteSkin:String = currentChart.meta.game.noteSkin;
 		final rawUISkin:String = currentChart.meta.game.uiSkin;
 		
@@ -276,48 +244,115 @@ class PlayState extends FunkinState {
 		if(uiSkin == "default")
 			currentChart.meta.game.uiSkin = uiSkin = Constants.DEFAULT_UI_SKIN;
 
-		for(i in 0...loaders.length) {
-			final loader:AssetLoader = loaders[i];
-			final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-
-			if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
-				continue;
-
-			// gameplay scripts
-			addScripts(loader, "gameplay/scripts"); // load any gameplay script first
-			addScripts(loader, 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
-			addScripts(loader, 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // then load from specific song and specific mix
-		
-			// noteskin script
-			addSingleScript(loader, 'gameplay/noteskins/${noteSkin}/script');
-
-			// uiskin script
-			addSingleScript(loader, 'gameplay/uiskins/${uiSkin}/script');
+		if(!minimalMode) {
+			stage = new Stage(currentChart.meta.game.stage, {
+				spectator: new Character(currentChart.meta.game.getCharacter("spectator"), false),
+				opponent: new Character(currentChart.meta.game.getCharacter("opponent"), false),
+				player: new Character(currentChart.meta.game.getCharacter("player"), true)
+			});
+			camGame.zoom = stage.data.zoom;
+			add(stage);
+	
+			spectator = stage.characters.spectator;
+			opponent = stage.characters.opponent;
+			player = stage.characters.player;
 		}
-		if(stage.script != null) {
-			scripts.add(stage.script);
-			stage.script.setParent(stage);
-		}
-		for(note in currentChart.notes.get(currentDifficulty)) {
-			if(noteTypeScripts.exists(note.type))
-				continue;
-
-			final scriptPath:String = Paths.script('gameplay/notetypes/${note.type}');
-			if(!FlxG.assets.exists(scriptPath))
-				continue;
-
-			final contentMetadata:ContentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
-			final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
-			script.set("NOTE_TYPE_ID", note.type);
-			scripts.add(script);
-
-			noteTypeScripts.set(note.type, script);
-			noteTypeScriptsArray.push(script);
+		else {
+			final bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menus/bg_desat"));
+			bg.color = 0xFF4CAF50;
+			bg.screenCenter();
+			bg.scrollFactor.set();
+			add(bg);
 		}
 		eventRunner = new EventRunner(currentChart.events);
 		eventRunner.onExecute.add(onEvent);
 		eventRunner.onExecutePost.add(onEventPost);
 		add(eventRunner);
+
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed) {
+			scripts = new FunkinScriptGroup();
+			scripts.setParent(this);
+	
+			@:privateAccess
+			final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
+	
+			inline function addScripts(loader:AssetLoader, dir:String) {
+				final items:Array<String> = loader.readDirectory(dir);
+				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+	
+				for(i in 0...items.length) {
+					final path:String = loader.getPath('${dir}/${items[i]}');
+					if(FlxG.assets.exists(path)) {
+						final script:FunkinScript = FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false);
+						script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
+						scripts.add(script);
+					}
+				}
+			}
+			inline function addSingleScript(loader:AssetLoader, path:String) {
+				final scriptPath:String = Paths.script(path, loader.id);
+				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+	
+				if(FlxG.assets.exists(scriptPath)) {
+					final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+					script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
+					scripts.add(script);
+				}
+			}
+			for(i in 0...loaders.length) {
+				final loader:AssetLoader = loaders[i];
+				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+	
+				if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
+					continue;
+	
+				// gameplay scripts
+				addScripts(loader, "gameplay/scripts"); // load any gameplay script first
+				addScripts(loader, 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
+				addScripts(loader, 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // then load from specific song and specific mix
+			
+				// noteskin script
+				addSingleScript(loader, 'gameplay/noteskins/${noteSkin}/script');
+	
+				// uiskin script
+				addSingleScript(loader, 'gameplay/uiskins/${uiSkin}/script');
+			}
+			if(stage?.script != null) {
+				scripts.add(stage.script);
+				stage.script.setParent(stage);
+			}
+			for(note in currentChart.notes.get(currentDifficulty)) {
+				if(noteTypeScripts.exists(note.type))
+					continue;
+	
+				final scriptPath:String = Paths.script('gameplay/notetypes/${note.type}');
+				if(!FlxG.assets.exists(scriptPath))
+					continue;
+	
+				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
+				final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+				script.set("NOTE_TYPE_ID", note.type);
+				scripts.add(script);
+	
+				noteTypeScripts.set(note.type, script);
+				noteTypeScriptsArray.push(script);
+			}
+			for(b in eventRunner.behaviors) {
+				for(script in b.scripts.members) {
+					scripts.add(script);
+		
+					eventScripts.set(b.eventType, script);
+					eventScriptsArray.push(script);
+				}
+			}
+			final leScripts:Array<FunkinScript> = scripts.members.copy();
+			for(i in 0...leScripts.length) {
+				leScripts[i].execute();
+				leScripts[i].call("onCreate");
+			}
+		}
+		#end
 
 		for(e in eventRunner.events.filter((i) -> i.type == "Camera Pan")) {
 			if(e.time > 10)
@@ -325,21 +360,6 @@ class PlayState extends FunkinState {
 
 			eventRunner.execute(e);
 		}
-		for(b in eventRunner.behaviors) {
-			for(script in b.scripts.members) {
-				scripts.add(script);
-	
-				eventScripts.set(b.eventType, script);
-				eventScriptsArray.push(script);
-			}
-		}
-		final leScripts:Array<FunkinScript> = scripts.members.copy();
-		for(i in 0...leScripts.length) {
-			leScripts[i].execute();
-			leScripts[i].call("onCreate");
-		}
-		#end
-
 		camFollow = new FlxObject(0, 0, 1, 1);
 		add(camFollow);
 
@@ -367,9 +387,10 @@ class PlayState extends FunkinState {
 		event.recycle(uiSkin);
 
 		#if SCRIPTING_ALLOWED
-		scripts.event("onHUDGeneration", event);
+		if(scriptsAllowed)
+			scripts.event("onHUDGeneration", event);
 		#end
-		inline function loadDefaultHUD() {
+		function loadDefaultHUD() {
 			switch(Options.hudType) {
 				case "Classic":
 					playField.hud = new ClassicHUD(playField);
@@ -379,7 +400,7 @@ class PlayState extends FunkinState {
 			}
 		}
 		#if SCRIPTING_ALLOWED
-		if(FlxG.assets.exists(Paths.script('gameplay/hudskins/${event.hudType}/script')))
+		if(scriptsAllowed && FlxG.assets.exists(Paths.script('gameplay/hudskins/${event.hudType}/script')))
 			playField.hud = new ScriptedHUD(playField, event.hudType);
 		else
 			loadDefaultHUD();
@@ -391,7 +412,7 @@ class PlayState extends FunkinState {
 		add(playField.hud);
 		
 		#if SCRIPTING_ALLOWED
-		if(playField.hud is ScriptedHUD) {
+		if(scriptsAllowed && playField.hud is ScriptedHUD) {
 			final hud:ScriptedHUD = cast playField.hud;
 			scripts.add(hud.script);
 			
@@ -414,9 +435,13 @@ class PlayState extends FunkinState {
 
 		worldCombo = false;
 		_saveScore = !(lastParams.chartingMode ?? false);
-		
+	}
+
+	override function createPost():Void {
+		super.createPost();
 		#if SCRIPTING_ALLOWED
-		scripts.call("onCreatePost");
+		if(scriptsAllowed)
+			scripts.call("onCreatePost");
 		#end
 	}
 
@@ -424,7 +449,8 @@ class PlayState extends FunkinState {
 		super.update(elapsed);
 
 		#if SCRIPTING_ALLOWED
-		scripts.call("onUpdate", [elapsed]);
+		if(scriptsAllowed)
+			scripts.call("onUpdate", [elapsed]);
 		#end
 		if(startingSong && Conductor.instance.time >= -Conductor.instance.offset)
 			startSong();
@@ -461,32 +487,35 @@ class PlayState extends FunkinState {
 		camGame.extraZoom = FlxMath.lerp(camGame.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
 		camHUD.extraZoom = FlxMath.lerp(camHUD.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
 
-		if(player._holdingPose && player.holdTimer <= 0 && !playField.strumsPressed.contains(true))
-			player._holdingPose = false;
-		
-		final cameraPos:FlxPoint = FlxPoint.get();
-		switch(curCameraTarget) {
-			case OPPONENT:
-				opponent.getCameraPosition(cameraPos);
-
-			case PLAYER:
-				player.getCameraPosition(cameraPos);
-
-			case SPECTATOR:
-				spectator.getCameraPosition(cameraPos);
+		if(!minimalMode) {
+			if(player._holdingPose && player.holdTimer <= 0 && !playField.strumsPressed.contains(true))
+				player._holdingPose = false;
+			
+			final cameraPos:FlxPoint = FlxPoint.get();
+			switch(curCameraTarget) {
+				case OPPONENT:
+					opponent.getCameraPosition(cameraPos);
+	
+				case PLAYER:
+					player.getCameraPosition(cameraPos);
+	
+				case SPECTATOR:
+					spectator.getCameraPosition(cameraPos);
+			}
+			var event:CameraMoveEvent = cast Events.get(CAMERA_MOVE);
+			event.recycle(cameraPos);
+			#if SCRIPTING_ALLOWED
+			if(scriptsAllowed)
+				scripts.event("onCameraMove", event);
+			#end
+			if(!event.cancelled)
+				camFollow.setPosition(event.position.x, event.position.y);
+			
+			cameraPos.put();
 		}
-		var event:CameraMoveEvent = cast Events.get(CAMERA_MOVE);
-		event.recycle(cameraPos);
 		#if SCRIPTING_ALLOWED
-		event = scripts.event("onCameraMove", event);
-		#end
-		if(!event.cancelled)
-			camFollow.setPosition(event.position.x, event.position.y);
-		
-		cameraPos.put();
-
-		#if SCRIPTING_ALLOWED
-		scripts.call("onUpdatePost", [elapsed]);
+		if(scriptsAllowed)
+			scripts.call("onUpdatePost", [elapsed]);
 		#end
 	}
 
@@ -495,7 +524,8 @@ class PlayState extends FunkinState {
 		onGameOver.dispatch(event.recycle());
 
 		#if SCRIPTING_ALLOWED
-		scripts.event("onGameOver", event);
+		if(scriptsAllowed)
+			scripts.event("onGameOver", event);
 		#end
 		if(event.cancelled)
 			return;
@@ -515,7 +545,8 @@ class PlayState extends FunkinState {
 
 		onGameOverPost.dispatch(cast event.flagAsPost());
 		#if SCRIPTING_ALLOWED
-		scripts.event("onGameOverPost", event);
+		if(scriptsAllowed)
+			scripts.event("onGameOverPost", event);
 		#end
 	}
 
@@ -544,8 +575,10 @@ class PlayState extends FunkinState {
 		startingSong = false;
 
 		#if SCRIPTING_ALLOWED
-		scripts.call("onStartSong");
-		scripts.call("onSongStart");
+		if(scriptsAllowed) {
+			scripts.call("onStartSong");
+			scripts.call("onSongStart");
+		}
 		#end
 
 		if(lastParams.startTime != null && lastParams.startTime > 0)
@@ -563,8 +596,10 @@ class PlayState extends FunkinState {
 		Conductor.instance.music = FlxG.sound.music;
 
 		#if SCRIPTING_ALLOWED
-		scripts.call("onStartSongPost");
-		scripts.call("onSongStartPost");
+		if(scriptsAllowed) {
+			scripts.call("onStartSongPost");
+			scripts.call("onSongStartPost");
+		}
 		#end
 	}
 
@@ -583,8 +618,10 @@ class PlayState extends FunkinState {
 		});
 
 		#if SCRIPTING_ALLOWED
-		scripts.call("onEndSong");
-		scripts.call("onSongEnd");
+		if(scriptsAllowed) {
+			scripts.call("onEndSong");
+			scripts.call("onSongEnd");
+		}
 		#end
 		if(_saveScore) {
 			final recordID:String = Highscore.getRecordID(currentSong, currentDifficulty, currentMix);
@@ -620,8 +657,10 @@ class PlayState extends FunkinState {
 		FlxG.switchState(FreeplayState.new);
 
 		#if SCRIPTING_ALLOWED
-		scripts.call("onEndSongPost");
-		scripts.call("onSongEndPost");
+		if(scriptsAllowed) {
+			scripts.call("onEndSongPost");
+			scripts.call("onSongEndPost");
+		}
 		#end
 	}
 
@@ -642,24 +681,29 @@ class PlayState extends FunkinState {
 
 	private function onNoteHit(event:NoteHitEvent):Void {
 		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
-		if(isPlayer)
-			event.characters = [player];
-		else
-			event.characters = [opponent];
+		if(!minimalMode) {
+			if(isPlayer)
+				event.characters = [player];
+			else
+				event.characters = [opponent];
+		} else
+			event.characters = [];
 		
 		#if SCRIPTING_ALLOWED
-		final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray.concat(eventScriptsArray);
-		scripts.event("onNoteHit", event, excludedScripts);
-		scripts.event((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", event, excludedScripts);
-		scripts.event((isPlayer) ? "onPlayerHit" : "onOpponentHit", event, excludedScripts);
-		scripts.event((isPlayer) ? "goodNoteHit" : "dadNoteHit", event, excludedScripts);
-
-		final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
-		if(noteTypeScript != null) {
-			noteTypeScript.call("onNoteHit", [event]);
-			noteTypeScript.call((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", [event]);
-			noteTypeScript.call((isPlayer) ? "onPlayerHit" : "onOpponentHit", [event]);
-			noteTypeScript.call((isPlayer) ? "goodNoteHit" : "dadNoteHit", [event]);
+		if(scriptsAllowed) {
+			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
+			scripts.event("onNoteHit", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerHit" : "onOpponentHit", event, excludedScripts);
+			scripts.event((isPlayer) ? "goodNoteHit" : "dadNoteHit", event, excludedScripts);
+	
+			final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
+			if(noteTypeScript != null) {
+				noteTypeScript.call("onNoteHit", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerHit" : "onOpponentHit", [event]);
+				noteTypeScript.call((isPlayer) ? "goodNoteHit" : "dadNoteHit", [event]);
+			}
 		}
 		#end
 		if(event.cancelled)
@@ -684,44 +728,55 @@ class PlayState extends FunkinState {
 	}
 
 	private function onNoteHitPost(event:NoteHitEvent):Void {
-		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
 		#if SCRIPTING_ALLOWED
-		final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray.concat(eventScriptsArray);
-		scripts.event("onNoteHitPost", event, excludedScripts);
-		scripts.event((isPlayer) ? "onPlayerNoteHitPost" : "onOpponentNoteHitPost", event, excludedScripts);
-		scripts.event((isPlayer) ? "onPlayerHitPost" : "onOpponentHitPost", event, excludedScripts);
-		scripts.event((isPlayer) ? "goodNoteHitPost" : "dadNoteHitPost", event, excludedScripts);
-
-		final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
-		if(noteTypeScript != null) {
-			noteTypeScript.call("onNoteHit", [event]);
-			noteTypeScript.call((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", [event]);
-			noteTypeScript.call((isPlayer) ? "onPlayerHit" : "onOpponentHit", [event]);
-			noteTypeScript.call((isPlayer) ? "goodNoteHit" : "dadNoteHit", [event]);
+		if(scriptsAllowed) {
+			final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
+			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
+			scripts.event("onNoteHitPost", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerNoteHitPost" : "onOpponentNoteHitPost", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerHitPost" : "onOpponentHitPost", event, excludedScripts);
+			scripts.event((isPlayer) ? "goodNoteHitPost" : "dadNoteHitPost", event, excludedScripts);
+	
+			final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
+			if(noteTypeScript != null) {
+				noteTypeScript.call("onNoteHit", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerHit" : "onOpponentHit", [event]);
+				noteTypeScript.call((isPlayer) ? "goodNoteHit" : "dadNoteHit", [event]);
+			}
 		}
 		#end
 	}
 	
 	private function onNoteMiss(event:NoteMissEvent):Void {
 		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
-		if(isPlayer)
-			event.characters = [player];
-		else
-			event.characters = [opponent];
+		if(!minimalMode) {
+			if(isPlayer)
+				event.characters = [player];
+			else
+				event.characters = [opponent];
+		} else
+			event.characters = [];
 
 		#if SCRIPTING_ALLOWED
-		final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray.concat(eventScriptsArray);
-		scripts.event("onNoteMiss", event, excludedScripts);
-
-		if(!isPlayer)
-			scripts.event("onOpponentNoteMiss", event, excludedScripts);
-
-		final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
-		if(noteTypeScript != null) {
-			noteTypeScript.call("onNoteMiss", [event]);
-
+		if(scriptsAllowed) {
+			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
+			scripts.event("onNoteMiss", event, excludedScripts);
+	
 			if(!isPlayer)
-				noteTypeScript.call("onOpponentNoteMiss", [event]);
+				scripts.event("onOpponentNoteMiss", event, excludedScripts);
+			else
+				scripts.event("onPlayerNoteMiss", event, excludedScripts);
+	
+			final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
+			if(noteTypeScript != null) {
+				noteTypeScript.call("onNoteMiss", [event]);
+	
+				if(!isPlayer)
+					noteTypeScript.call("onOpponentNoteMiss", [event]);
+				else
+					noteTypeScript.call("onPlayerNoteMiss", [event]);
+			}
 		}
 		#end
 		if(event.cancelled)
@@ -747,64 +802,88 @@ class PlayState extends FunkinState {
 	private function onNoteMissPost(event:NoteMissEvent):Void {
 		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
 		#if SCRIPTING_ALLOWED
-		scripts.event("onNoteMissPost", event);
-		scripts.event((isPlayer) ? "onPlayerNoteMissPost" : "onOpponentNoteMissPost", event);
-		scripts.event((isPlayer) ? "onPlayerMissPost" : "onOpponentMissPost", event);
-		scripts.event((isPlayer) ? "goodNoteMissPost" : "dadNoteMissPost", event);
+		if(scriptsAllowed) {
+			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
+			scripts.event("onNoteMissPost", event, excludedScripts);
+	
+			if(!isPlayer)
+				scripts.event("onOpponentNoteMissPost", event, excludedScripts);
+			else
+				scripts.event("onPlayerNoteMissPost", event, excludedScripts);
+	
+			final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
+			if(noteTypeScript != null) {
+				noteTypeScript.call("onNoteMissPost", [event]);
+	
+				if(!isPlayer)
+					noteTypeScript.call("onOpponentNoteMissPost", [event]);
+				else
+					noteTypeScript.call("onPlayerNoteMissPost", [event]);
+			}
+		}
 		#end
 	}
 
 	private function onEvent(event:SongEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onEvent", [event]);
+		if(scriptsAllowed)
+			scripts.call("onEvent", [event]);
 		#end
 	}
 
 	private function onEventPost(event:SongEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onEventPost", [event]);
+		if(scriptsAllowed)
+			scripts.call("onEventPost", [event]);
 		#end
 	}
 
 	private function onDisplayRating(event:DisplayRatingEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onDisplayRating", [event]);
+		if(scriptsAllowed)
+			scripts.call("onDisplayRating", [event]);
 		#end
 	}
 
 	private function onDisplayRatingPost(event:DisplayRatingEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onDisplayRatingPost", [event]);
+		if(scriptsAllowed)
+			scripts.call("onDisplayRatingPost", [event]);
 		#end
 	}
 
 	private function onDisplayCombo(event:DisplayComboEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onDisplayCombo", [event]);
+		if(scriptsAllowed)
+			scripts.call("onDisplayCombo", [event]);
 		#end
 	}
 
 	private function onDisplayComboPost(event:DisplayComboEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onDisplayComboPost", [event]);
+		if(scriptsAllowed)
+			scripts.call("onDisplayComboPost", [event]);
 		#end
 	}
 
 	private function onCountdownStart(event:CountdownStartEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onCountdownStart", [event]);
+		if(scriptsAllowed)
+			scripts.call("onCountdownStart", [event]);
 		#end
 	}
 
 	private function onCountdownStartPost(event:CountdownStartEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onCountdownStartPost", [event]);
+		if(scriptsAllowed)
+			scripts.call("onCountdownStartPost", [event]);
 		#end
 	}
 
 	private function onCountdownStep(event:CountdownStepEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onCountdownStep", [event]);
+		if(scriptsAllowed)
+			scripts.call("onCountdownStep", [event]);
 		#end
 		if(event.cancelled)
 			return;
@@ -815,7 +894,8 @@ class PlayState extends FunkinState {
 
 	private function onCountdownStepPost(event:CountdownStepEvent):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onCountdownStepPost", [event]);
+		if(scriptsAllowed)
+			scripts.call("onCountdownStepPost", [event]);
 		#end
 	}
 
@@ -826,7 +906,8 @@ class PlayState extends FunkinState {
 
 	override function stepHit(step:Int):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onStepHit", [step]);
+		if(scriptsAllowed)
+			scripts.call("onStepHit", [step]);
 		#end
 	}
 
@@ -843,13 +924,15 @@ class PlayState extends FunkinState {
 			camHUD.extraZoom += 0.03 * camZoomingIntensity;
 		}
 		#if SCRIPTING_ALLOWED
-		scripts.call("onBeatHit", [beat]);
+		if(scriptsAllowed)
+			scripts.call("onBeatHit", [beat]);
 		#end
 	}
 
 	override function measureHit(measure:Int):Void {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onMeasureHit", [measure]);
+		if(scriptsAllowed)
+			scripts.call("onMeasureHit", [measure]);
 		#end
 	}
 
@@ -883,8 +966,10 @@ class PlayState extends FunkinState {
 
 	override function destroy() {
 		#if SCRIPTING_ALLOWED
-		scripts.call("onDestroy");
-		scripts.close();
+		if(scriptsAllowed) {
+			scripts.call("onDestroy");
+			scripts.close();
+		}
 		#end
 		PlayState.instance = null;
 		Paths.forceContentPack = null;
@@ -914,6 +999,10 @@ typedef PlayStateParams = {
 	var ?chartingMode:Bool;
 
 	var ?startTime:Float;
+
+	var ?minimalMode:Bool;
+
+	var ?scriptsAllowed:Bool;
 
 	@:noCompletion
 	var ?_chart:ChartData;

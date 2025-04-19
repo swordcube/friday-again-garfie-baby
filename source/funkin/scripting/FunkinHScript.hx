@@ -105,6 +105,9 @@ class FunkinHScript extends FunkinScript {
         if(!Reflect.isFunction(func))
             return null;
 
+        if(args == null || args.length == 0)
+            args = [];
+        
         var ret:Dynamic = Reflect.callMethod(null, func, args);
         if(closed) {// if the script was closed DURING a func call, wait till after the call to close it
             _interp = null;

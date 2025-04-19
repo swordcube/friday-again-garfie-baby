@@ -53,8 +53,8 @@ class TransitionableState extends FlxState {
 		super();
 	}
 
-	override function create():Void {
-		super.create();
+	override function createPost():Void {
+		super.createPost();
 		transitionIn();
 	}
 

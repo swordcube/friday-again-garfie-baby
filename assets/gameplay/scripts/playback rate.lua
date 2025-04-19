@@ -53,14 +53,8 @@ function onUpdate(dt)
     if FlxG.keys.justPressed.F8 then
         setRate(10)
     end
-    -- if sex then
-    --     setRate(rate - (dt * 0.25))
-    -- end
-end
-
-function onStepHit()
     if sex then
-        setRate(FlxG.random.float(0.5, 2.0)) 
+        setRate(rate - (dt * 0.25))
     end
 end
 

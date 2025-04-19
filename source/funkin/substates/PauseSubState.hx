@@ -235,6 +235,8 @@ class PauseSubState extends FunkinSubState {
                 mod: PlayState.lastParams.mod,
 
                 startTime: PlayState.lastParams.startTime,
+                minimalMode: PlayState.lastParams.minimalMode,
+                scriptsAllowed: PlayState.lastParams.scriptsAllowed,
     
                 _chart: game.currentChart,
                 _unsaved: PlayState.lastParams._unsaved
