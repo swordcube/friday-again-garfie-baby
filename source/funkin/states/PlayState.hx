@@ -219,13 +219,20 @@ class PlayState extends FunkinState {
 
 		Conductor.instance.music = null;
 		Conductor.instance.offset = Options.songOffset + inst.latency;
-		Conductor.instance.autoIncrement = true;
+		Conductor.instance.autoIncrement = (lastParams.startTime == null || lastParams.startTime <= 0);
 		
 		Conductor.instance.reset(currentChart.meta.song.timingPoints.first()?.bpm ?? 100.0);
 		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
 		
 		Conductor.instance.time = -(Conductor.instance.beatLength * 5);
 
+		if(lastParams.startTime != null && lastParams.startTime > 0) {
+			FlxTimer.wait((Conductor.instance.beatLength * 5) / 1000, () -> {
+				Conductor.instance.time = -Conductor.instance.offset;
+				Conductor.instance.autoIncrement = true;
+				startSong();
+			});
+		}
 		inst.pause();
 		inst.volume = 1;
 		inst.onComplete = finishSong;
@@ -367,6 +374,10 @@ class PlayState extends FunkinState {
 		camGame.snapToTarget();
 
 		playField = new PlayField(currentChart, currentDifficulty);
+		
+		playField.noteSpawner.onNoteSpawn.add(onNoteSpawn);
+		playField.noteSpawner.onNoteSpawnPost.add(onNoteSpawnPost);
+		
 		playField.onNoteHit.add(onNoteHit);
 		playField.onNoteHitPost.add(onNoteHitPost);
 
@@ -581,7 +592,8 @@ class PlayState extends FunkinState {
 		}
 		#end
 
-		if(lastParams.startTime != null && lastParams.startTime > 0)
+		final hasStartTime:Bool = lastParams.startTime != null && lastParams.startTime > 0;
+		if(hasStartTime)
 			Conductor.instance.time = lastParams.startTime;
 		else
 			Conductor.instance.time = -Conductor.instance.offset;
@@ -592,7 +604,9 @@ class PlayState extends FunkinState {
 		vocals.seek(Conductor.instance.rawTime);
 		vocals.play();
 		
-		playField.noteSpawner.skipToTime(Conductor.instance.rawTime);
+		if(hasStartTime)
+			playField.noteSpawner.skipToTime(Conductor.instance.rawTime);
+		
 		Conductor.instance.music = FlxG.sound.music;
 
 		#if SCRIPTING_ALLOWED
@@ -679,6 +693,44 @@ class PlayState extends FunkinState {
 			endSong();
 	}
 
+	private function onNoteSpawn(event:NoteSpawnEvent):Void {
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed) {
+			final isPlayer:Bool = event.noteData.direction > Constants.KEY_COUNT - 1;
+			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
+			scripts.event("onNoteSpawn", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerNoteSpawn" : "onOpponentNoteSpawn", event, excludedScripts);
+			scripts.event((isPlayer) ? "goodNoteSpawn" : "dadNoteSpawn", event, excludedScripts);
+	
+			final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
+			if(noteTypeScript != null) {
+				noteTypeScript.call("onNoteSpawn", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerNoteSpawn" : "onOpponentNoteSpawn", [event]);
+				noteTypeScript.call((isPlayer) ? "goodNoteSpawn" : "dadNoteSpawn", [event]);
+			}
+		}
+		#end
+	}
+
+	private function onNoteSpawnPost(event:NoteSpawnEvent):Void {
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed) {
+			final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
+			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
+			scripts.event("onNoteSpawnPost", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerNoteSpawnPost" : "onOpponentNoteSpawnPost", event, excludedScripts);
+			scripts.event((isPlayer) ? "goodNoteSpawnPost" : "dadNoteSpawnPost", event, excludedScripts);
+	
+			final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
+			if(noteTypeScript != null) {
+				noteTypeScript.call("onNoteSpawnPost", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerNoteSpawnPost" : "onOpponentNoteSpawnPost", [event]);
+				noteTypeScript.call((isPlayer) ? "goodNoteSpawnPost" : "dadNoteSpawnPost", [event]);
+			}
+		}
+		#end
+	}
+
 	private function onNoteHit(event:NoteHitEvent):Void {
 		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
 		if(!minimalMode) {
@@ -739,10 +791,10 @@ class PlayState extends FunkinState {
 	
 			final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
 			if(noteTypeScript != null) {
-				noteTypeScript.call("onNoteHit", [event]);
-				noteTypeScript.call((isPlayer) ? "onPlayerNoteHit" : "onOpponentNoteHit", [event]);
-				noteTypeScript.call((isPlayer) ? "onPlayerHit" : "onOpponentHit", [event]);
-				noteTypeScript.call((isPlayer) ? "goodNoteHit" : "dadNoteHit", [event]);
+				noteTypeScript.call("onNoteHitPost", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerNoteHitPost" : "onOpponentNoteHitPost", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerHitPost" : "onOpponentHitPost", [event]);
+				noteTypeScript.call((isPlayer) ? "goodNoteHitPost" : "dadNoteHitPost", [event]);
 			}
 		}
 		#end
@@ -762,20 +814,16 @@ class PlayState extends FunkinState {
 		if(scriptsAllowed) {
 			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
 			scripts.event("onNoteMiss", event, excludedScripts);
-	
-			if(!isPlayer)
-				scripts.event("onOpponentNoteMiss", event, excludedScripts);
-			else
-				scripts.event("onPlayerNoteMiss", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerNoteMiss" : "onOpponentNoteMiss", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerMiss" : "onOpponentMiss", event, excludedScripts);
+			scripts.event((isPlayer) ? "goodNoteMiss" : "dadNoteMiss", event, excludedScripts);
 	
 			final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
 			if(noteTypeScript != null) {
 				noteTypeScript.call("onNoteMiss", [event]);
-	
-				if(!isPlayer)
-					noteTypeScript.call("onOpponentNoteMiss", [event]);
-				else
-					noteTypeScript.call("onPlayerNoteMiss", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerNoteMiss" : "onOpponentNoteMiss", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerMiss" : "onOpponentMiss", [event]);
+				noteTypeScript.call((isPlayer) ? "goodNoteMiss" : "dadNoteMiss", [event]);
 			}
 		}
 		#end
@@ -805,20 +853,16 @@ class PlayState extends FunkinState {
 		if(scriptsAllowed) {
 			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
 			scripts.event("onNoteMissPost", event, excludedScripts);
-	
-			if(!isPlayer)
-				scripts.event("onOpponentNoteMissPost", event, excludedScripts);
-			else
-				scripts.event("onPlayerNoteMissPost", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerNoteMissPost" : "onOpponentNoteMissPost", event, excludedScripts);
+			scripts.event((isPlayer) ? "onPlayerMissPost" : "onOpponentMissPost", event, excludedScripts);
+			scripts.event((isPlayer) ? "goodNoteMissPost" : "dadNoteMissPost", event, excludedScripts);
 	
 			final noteTypeScript:FunkinScript = noteTypeScripts.get(event.noteType);
 			if(noteTypeScript != null) {
 				noteTypeScript.call("onNoteMissPost", [event]);
-	
-				if(!isPlayer)
-					noteTypeScript.call("onOpponentNoteMissPost", [event]);
-				else
-					noteTypeScript.call("onPlayerNoteMissPost", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerNoteMissPost" : "onOpponentNoteMissPost", [event]);
+				noteTypeScript.call((isPlayer) ? "onPlayerMissPost" : "onOpponentMissPost", [event]);
+				noteTypeScript.call((isPlayer) ? "goodNoteMissPost" : "dadNoteMissPost", [event]);
 			}
 		}
 		#end
@@ -888,7 +932,7 @@ class PlayState extends FunkinState {
 		if(event.cancelled)
 			return;
 
-		if(playField.hud != null)
+		if(startingSong && playField.hud != null)
 			playField.hud.bopIcons();
 	}
 

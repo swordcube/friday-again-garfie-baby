@@ -121,6 +121,15 @@ class Conductor extends FlxBasic {
     public var hasMetronome:Bool = false;
     public var autoIncrement:Bool = true;
 
+    /**
+     * Whether or not to dispatch step, beat, and measure
+     * hits to the current state and substates (if applicable).
+     * 
+     * This is usually only enabled for the primary conductor, but
+     * can be enabled for custom ones for specific cases such as
+     * chart editor playtesting.
+     */
+    public var dispatchToStates:Bool = false;
     public var timingPoints:Array<TimingPoint>;
 
     public var onStepHit:FlxTypedSignal<Int->Void> = new FlxTypedSignal<Int->Void>();
@@ -307,7 +316,7 @@ class Conductor extends FlxBasic {
 
         if(curStep > lastStep) {
             for(i in lastStep...curStep) {
-                if(Conductor.instance == this) {
+                if(dispatchToStates) {
                     var state:FlxState = FlxG.state;
                     while(state != null) {
                         if(state.persistentUpdate || state.subState == null)
@@ -328,7 +337,7 @@ class Conductor extends FlxBasic {
                 sound.pitch = (Math.floor(curDecBeat - curTimingPoint.beat) % curTimingPoint.getTimeSignature().getNumerator() == 0) ? 1.5 : 1.12;
             }
             for(i in lastBeat...curBeat) {
-                if(Conductor.instance == this) {
+                if(dispatchToStates) {
                     var state:FlxState = FlxG.state;
                     while(state != null) {
                         if(state.persistentUpdate || state.subState == null)
@@ -345,7 +354,7 @@ class Conductor extends FlxBasic {
 
         if(curMeasure > lastMeasure) {
             for(i in lastMeasure...curMeasure) {
-                if(Conductor.instance == this) {
+                if(dispatchToStates) {
                     var state:FlxState = FlxG.state;
                     while(state != null) {
                         if(state.persistentUpdate || state.subState == null)

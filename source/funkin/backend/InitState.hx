@@ -89,6 +89,7 @@ class InitState extends FlxState {
         
         // init conductor
         Conductor.instance = new Conductor();
+        Conductor.instance.dispatchToStates = true;
         FlxG.plugins.addPlugin(Conductor.instance);
 
         // init extra plugins

@@ -5,6 +5,7 @@ import flixel.util.FlxDestroyUtil.IFlxDestroyable;
 enum abstract ActionEventType(String) from String to String {
 	final UNKNOWN = "UNKNOWN";
     final HUD_GENERATION = "HUD_GENERATION";
+	final NOTE_SPAWN = "NOTE_SPAWN";
 	final NOTE_HIT = "NOTE_HIT";
 	final NOTE_MISS = "NOTE_MISS";
 	final CAMERA_MOVE = "CAMERA_MOVE";

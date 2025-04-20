@@ -116,6 +116,7 @@ class SkinnableUISprite extends FlxSprite {
             
             animation.setOffset(animName, data.offset[0] ?? 0.0, data.offset[1] ?? 0.0);
         }
+        alpha = _skinData.alpha ?? 1.0;
         antialiasing = _skinData.antialiasing ?? FlxSprite.defaultAntialiasing;
         
         scale.set(_skinData.scale, _skinData.scale);

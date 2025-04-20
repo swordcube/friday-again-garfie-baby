@@ -23,7 +23,6 @@ class ChartData {
 	
 		final result:ChartData = parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/songs/${song}/${mix}/chart', loaderID)));
 		result.meta = SongMetadata.load(song, mix, loaderID);
-		
 		return result;
 	}
 

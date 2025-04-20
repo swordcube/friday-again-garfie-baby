@@ -124,11 +124,10 @@ class StrumLine extends FlxSpriteGroup {
         final gradient:HoldGradient = holdGradients.members[note.direction];
         final attachedConductor:Conductor = playField?.attachedConductor ?? Conductor.instance;
         
-        final absSpeed:Float = Math.abs(scrollSpeed);
+        final absSpeed:Float = Math.abs(scrollSpeed / FlxG.timeScale);
         final scrollMult:Float = ((downscroll) ? -1 : 1) * ((scrollSpeed < 0) ? -1 : 1);
 
         note.x = strum.x + note.offsetX;
-        
         note.holdTrail.x = note.x + note.holdTrail.offsetX + ((note.width - note.holdTrail.width) * 0.5);
         
         note.holdTrail.strip.x = note.holdTrail.x;
@@ -196,7 +195,7 @@ class StrumLine extends FlxSpriteGroup {
                 // held the entire way through
                 playField.killNote(note);
             }
-            if(note.time <= attachedConductor.time - ((350 / scrollSpeed) + note.length)) {
+            if(note.time <= attachedConductor.time - ((350 / absSpeed) + note.length)) {
                 // kill the note if it goes off-screen, regardless of if it was missed or not
                 // nobody will know trust 🤫
                 playField.killNote(note);
@@ -209,7 +208,10 @@ class StrumLine extends FlxSpriteGroup {
             if(note.wasHit && note.length > 0 && note.time <= attachedConductor.time - note.length) {
                 // end the hold cover if it is a hold note and
                 // it was held the entire way through
-                note.strumLine.holdCovers.members[note.direction].end();
+                if(note.hitEvent.showHoldCovers)
+                    note.strumLine.holdCovers.members[note.direction].end();
+                else
+                    note.strumLine.holdCovers.members[note.direction].kill();
 
                 // kill the note if it is a hold note and it was
                 // held the entire way through

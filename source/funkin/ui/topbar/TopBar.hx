@@ -120,9 +120,10 @@ class TopBar extends UIComponent {
                     final item:TopBarDropDownButton = new TopBarDropDownButton(totalWidth, 0, name, null);
                     item.topBar = this;
                     item.callback = () -> {
-                        if(dropdown != null)
+                        if(dropdown != null) {
+                            remove(dropdown, true);
                             dropdown = FlxDestroyUtil.destroy(dropdown);
-
+                        }
                         dropdown = new DropDown(item.x, item.y + bg.height, 0, 0, items);
                         dropdown.topBar = this;
                         dropdown.setPosition(
@@ -197,9 +198,10 @@ class TopBar extends UIComponent {
                     final item:TopBarDropDownButton = new TopBarDropDownButton(0, 0, name, null);
                     item.topBar = this;
                     item.callback = () -> {
-                        if(dropdown != null)
+                        if(dropdown != null) {
+                            remove(dropdown, true);
                             dropdown = FlxDestroyUtil.destroy(dropdown);
-
+                        }
                         dropdown = new DropDown(item.x, item.y + bg.height, 0, 0, items);
                         dropdown.topBar = this;
                         dropdown.setPosition(

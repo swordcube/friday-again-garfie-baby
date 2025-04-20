@@ -237,23 +237,25 @@ class Paths {
         } else {
             // try to load from specified loader id (usually the name of a content pack)
             final loader:AssetLoader = _registeredAssetLoadersMap.get(loaderID);
-            final path:String = loader.getPath(name);
-
-            if(FlxG.assets.exists(path))
-                return path;
-
-            if(useFallback) {
-                // load from loaders that have runGlobally set as true
-                // inside of their metadata as fallback
-                final loaders:Array<AssetLoader> = _registeredAssetLoaders;
-                for(i in 0...loaders.length) {
-                    final contentMetadata:ContentMetadata = contentMetadata.get(loaders[i].id);
-                    if(contentMetadata != null && !contentMetadata.runGlobally)
-                        continue;
+            if(loader != null) {
+                final path:String = loader.getPath(name);
     
-                    final path:String = loaders[i].getPath(name);
-                    if(FlxG.assets.exists(path))
-                        return path;
+                if(FlxG.assets.exists(path))
+                    return path;
+    
+                if(useFallback) {
+                    // load from loaders that have runGlobally set as true
+                    // inside of their metadata as fallback
+                    final loaders:Array<AssetLoader> = _registeredAssetLoaders;
+                    for(i in 0...loaders.length) {
+                        final contentMetadata:ContentMetadata = contentMetadata.get(loaders[i].id);
+                        if(contentMetadata != null && !contentMetadata.runGlobally)
+                            continue;
+        
+                        final path:String = loaders[i].getPath(name);
+                        if(FlxG.assets.exists(path))
+                            return path;
+                    }
                 }
             }
         }

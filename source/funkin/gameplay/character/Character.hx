@@ -61,7 +61,7 @@ class Character extends FlxSprite implements IBeatReceiver {
     public var holdTimer:Float = 0;
     public var curAnimContext:AnimationContext = DANCE;
 
-    public var healthColor:FlxColor = FlxColor.WHITE;
+    public var healthColor:Null<FlxColor> = null;
     public var footOffset:FlxPoint = FlxPoint.get(0, 0);
 
     public var canDance:Bool = true;
@@ -171,7 +171,8 @@ class Character extends FlxSprite implements IBeatReceiver {
         scale.set(data.scale, data.scale);
         antialiasing = data.antialiasing ?? FlxSprite.defaultAntialiasing;
 
-        healthColor = FlxColor.fromString(data.healthIcon?.color ?? "#FFFFFF");
+        final color:String = data.healthIcon?.color;
+        healthColor = (color != null && color.length != 0) ? FlxColor.fromString(color) : null;
 
         if(!debugMode)
             correctAnimations();

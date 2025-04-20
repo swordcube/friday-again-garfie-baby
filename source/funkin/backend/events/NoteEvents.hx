@@ -1,7 +1,9 @@
 package funkin.backend.events;
 
-import funkin.gameplay.character.Character;
+import funkin.gameplay.song.NoteData;
+
 import funkin.gameplay.notes.Note;
+import funkin.gameplay.character.Character;
 
 class NoteHitEvent extends ActionEvent {
     /**
@@ -233,5 +235,46 @@ class NoteMissEvent extends ActionEvent {
      */
     public function new() {
         super(NOTE_MISS);
+    }
+}
+
+class NoteSpawnEvent extends ActionEvent {
+    /**
+     * The data from the chart of the note
+     * that is about to be spawned.
+     */
+    public var noteData:NoteData;
+
+    /**
+     * The note that was spawned (only available on post).
+     */
+    public var note:Note;
+
+    /**
+     * The time at which the note was spawned (in milliseconds).
+     */
+    public var time:Float;
+
+    /**
+     * The direction of the note that was spawned.
+     */
+    public var direction:Int;
+
+    /**
+     * The length of the note that was spawned (in milliseconds).
+     */
+    public var length:Float;
+
+    /**
+     * The type of the note that was spawned.
+     */
+    public var noteType:String;
+
+    /**
+     * This is the constructor for this event, mainly
+     * used just to specify it's type.
+     */
+    public function new() {
+        super(NOTE_SPAWN);
     }
 }

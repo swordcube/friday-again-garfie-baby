@@ -156,9 +156,12 @@ class PauseSubState extends FunkinSubState {
                 final game:PlayState = PlayState.instance;
                 grpItems.addItem("Resume", {onAccept: (_, _) -> resume()});
                 grpItems.addItem("Restart Song", {onAccept: (_, _) -> restartSong()});
-
+                
                 if(game.currentChart.meta.song.difficulties.length > 1)
                     grpItems.addItem("Change Difficulty", {onAccept: (_, _) -> regenerateItems(CHANGE_DIFF)});
+
+                if(game.chartingMode)
+                    grpItems.addItem("Leave Charting Mode", {onAccept: (_, _) -> restartSong(true)});
 
                 grpItems.addItem("Exit to Menu", {onAccept: (_, _) -> exitToMenu()});
                 
@@ -199,7 +202,7 @@ class PauseSubState extends FunkinSubState {
         close();
     }
 
-    public function restartSong():Void {
+    public function restartSong(leaveCharting:Bool = false):Void {
         FlxTimer.wait(0.001, () -> {
             final game:PlayState = PlayState.instance;
 
@@ -235,6 +238,8 @@ class PauseSubState extends FunkinSubState {
                 mod: PlayState.lastParams.mod,
 
                 startTime: PlayState.lastParams.startTime,
+                chartingMode: (!leaveCharting) ? PlayState.lastParams.chartingMode : false,
+
                 minimalMode: PlayState.lastParams.minimalMode,
                 scriptsAllowed: PlayState.lastParams.scriptsAllowed,
     
@@ -328,6 +333,9 @@ class PauseSubState extends FunkinSubState {
     }
 
     override function destroy():Void {
+        _charterFadeTween.cancel();
+        _charterFadeTween = null;
+
         if(pauseMusic != null)
             pauseMusic = FlxDestroyUtil.destroy(pauseMusic);
         

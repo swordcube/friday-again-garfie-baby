@@ -32,7 +32,7 @@ class Judge4System extends ScoringSystem {
     override function getAccuracyScore(judgement:String):Float {
         switch(judgement) {
             case "killer": return 1.0;
-            case "sick":   return 1.0;
+            case "sick":   return (useKillers) ? 0.9 : 1.0;
             case "good":   return 0.7;
             case "bad":    return 0.3;
             case "shit":   return 0.0;

@@ -41,14 +41,13 @@ import funkin.substates.UnsavedWarningSubState;
 
 import funkin.utilities.UndoList;
 
-// TODO: chart metadata window
-
 // TODO: allow the user to edit events (along with a popup when placing a new one)
 // TODO: have some way to place & select timing points (put them on the right side of the grid, make them purple to indicate them being apart of song metadata)
 
 // TODO: waveforms for inst and each vocal track
 // TODO: rework how zooming works (aka don't zoom the camera)
 
+// TODO: i know i'm going to forget this so DO THE THINGS MARKED AS NOT IMPLEMENTED!!! (ctrl + f)
 // TODO: if given song or difficulty are null, pull up a window to select a song to chart
 
 @:allow(funkin.ui.charter.CharterObjectGroup)
@@ -743,19 +742,17 @@ class ChartEditor extends UIState {
     public function unsafePlayTest():Void {
         lastParams = null;
         Conductor.instance.music = null;
-
         PlayState.deathCounter = 0;
-        FlxG.switchState(PlayState.new.bind({
+
+        persistentUpdate = false;
+        persistentDraw = false;
+
+        openSubState(new CharterPlaytest({
+            chart: currentChart,
+
             song: currentSong,
             difficulty: currentDifficulty,
-
-            mix: currentMix,
-            mod: Paths.forceContentPack,
-
-            chartingMode: true,
-
-            _chart: currentChart,
-            _unsaved: undos.unsaved
+            mix: currentMix
         }));
     }
 
@@ -769,20 +766,19 @@ class ChartEditor extends UIState {
     public function unsafePlayTestHere():Void {
         lastParams = null;
         Conductor.instance.music = null;
-
         PlayState.deathCounter = 0;
-        FlxG.switchState(PlayState.new.bind({
+
+        persistentUpdate = false;
+        persistentDraw = false;
+
+        openSubState(new CharterPlaytest({
+            chart: currentChart,
+
             song: currentSong,
             difficulty: currentDifficulty,
-
             mix: currentMix,
-            mod: Paths.forceContentPack,
 
-            startTime: Conductor.instance.time,
-            chartingMode: true,
-
-            _chart: currentChart,
-            _unsaved: undos.unsaved
+            startTime: Conductor.instance.time
         }));
     }
 
@@ -1149,6 +1145,7 @@ class ChartEditor extends UIState {
 
         Conductor.instance.music = null;
         FlxTimer.wait(0.05, () -> {
+            persistentDraw = true;
             FlxG.switchState(MainMenuState.new);
         });
     }

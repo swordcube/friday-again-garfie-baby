@@ -51,7 +51,7 @@ class PlayField extends FlxContainer {
     public var strumsPressed:Array<Bool> = [false, false, false, false];
     public var controls:Array<Control> = [NOTE_LEFT, NOTE_DOWN, NOTE_UP, NOTE_RIGHT];
 
-    public function new(chart:ChartData, difficulty:String) {
+    public function new(chart:ChartData, difficulty:String, ?noteSkin:String, ?uiSkin:String) {
         super();
         currentChart = chart;
         currentDifficulty = difficulty;
@@ -68,15 +68,15 @@ class PlayField extends FlxContainer {
                 strumLine.playField = null;
             }
         });
-        opponentStrumLine = new StrumLine(FlxG.width * 0.25, 50, Options.downscroll, true, currentChart.meta.game.noteSkin);
+        opponentStrumLine = new StrumLine(FlxG.width * 0.25, 50, Options.downscroll, true, noteSkin ?? currentChart.meta.game.noteSkin);
         opponentStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         add(opponentStrumLine);
 
-        playerStrumLine = new StrumLine(FlxG.width * 0.75, 50, Options.downscroll, false, currentChart.meta.game.noteSkin);
+        playerStrumLine = new StrumLine(FlxG.width * 0.75, 50, Options.downscroll, false, noteSkin ?? currentChart.meta.game.noteSkin);
         playerStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         add(playerStrumLine);
 
-        comboDisplay = new ComboDisplay(FlxG.width * 0.474, (FlxG.height * 0.45) - 60, currentChart.meta.game.uiSkin);
+        comboDisplay = new ComboDisplay(FlxG.width * 0.474, (FlxG.height * 0.45) - 60, uiSkin ?? currentChart.meta.game.uiSkin);
         add(comboDisplay);
 
         for(strumLine in [opponentStrumLine, playerStrumLine]) {

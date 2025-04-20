@@ -12,6 +12,7 @@ class Events {
         if(_events.get(type) == null) {
             switch(type) {
                 case HUD_GENERATION: _events.set(type, new HUDGenerationEvent());
+                case NOTE_SPAWN: _events.set(type, new NoteSpawnEvent());
                 case NOTE_HIT: _events.set(type, new NoteHitEvent());
                 case NOTE_MISS: _events.set(type, new NoteMissEvent());
                 case CAMERA_MOVE: _events.set(type, new CameraMoveEvent());

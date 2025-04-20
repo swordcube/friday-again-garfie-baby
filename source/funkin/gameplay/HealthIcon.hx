@@ -376,6 +376,10 @@ class HealthIcon extends TrackingSprite {
     }
 
     override function destroy():Void {
+        if(bopTween != null) {
+            bopTween.cancel();
+            bopTween = null;
+        }
         size = FlxDestroyUtil.put(size);
         super.destroy();
     }
