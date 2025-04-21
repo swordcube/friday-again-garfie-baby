@@ -114,6 +114,8 @@ class CharterPlaytest extends FunkinSubState {
         countdown = new Countdown();
         countdown.start(Constants.DEFAULT_UI_SKIN, conductor);
 		add(countdown);
+
+        WindowUtil.titleSuffix = " - Chart Playtesting";
     }
 
     override function update(elapsed:Float):Void {
@@ -148,6 +150,8 @@ class CharterPlaytest extends FunkinSubState {
     
     override function destroy():Void {
         FlxG.mouse.visible = lastMouseVisible;
+        WindowUtil.titleSuffix = " - Chart Editor";
+
         FlxG.cameras.remove(camera);
         inst = FlxDestroyUtil.destroy(inst);
         super.destroy();

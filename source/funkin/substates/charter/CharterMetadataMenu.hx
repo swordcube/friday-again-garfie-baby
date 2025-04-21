@@ -122,9 +122,14 @@ class CharterMetadataWindow extends Window {
             if(Math.isNaN(bpm))
                 bpm = 100;
 
-            meta.song.bpm = bpm;
-            Conductor.instance.reset(meta.song.timingPoints.first()?.bpm ?? 100.0);
+            final firstTimingPoint:TimingPoint = meta.song.timingPoints.first();
+            if(firstTimingPoint != null)
+                firstTimingPoint.bpm = bpm;
+
+            Conductor.instance.reset(firstTimingPoint?.bpm ?? 100.0);
 		    Conductor.instance.setupTimingPoints(meta.song.timingPoints);
+
+            // TODO: ensure the charter is updated to match the new bpm correctly
         };
         bpmTextbox.restrictChars = "0-9.";
         addToContents(bpmTextbox);

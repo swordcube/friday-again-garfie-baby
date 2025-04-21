@@ -105,9 +105,11 @@ class PlayState extends FunkinState {
 	public var countdown:Countdown;
 	public var eventRunner:EventRunner;
 
+	public var songLength:Float = 0;
+	public var songPercent(get, never):Float;
+	
 	public var startedCountdown:Bool = false;
 	public var startingSong:Bool = true;
-
 	public var endingSong:Bool = false;
 
 	/**
@@ -214,8 +216,6 @@ class PlayState extends FunkinState {
 		camHUD = new FunkinCamera();
 		camHUD.bgColor = 0;
 		FlxG.cameras.add(camHUD, false);
-
-		Scoring.currentSystem = new PBotSystem(); // reset the scoring system, cuz you can change it thru scripting n shit, and that shouldn't persist
 
 		Conductor.instance.music = null;
 		Conductor.instance.offset = Options.songOffset + inst.latency;
@@ -583,6 +583,7 @@ class PlayState extends FunkinState {
 		if(!startingSong)
 			return;
 
+		songLength = FlxG.sound.music.length;
 		startingSong = false;
 
 		#if SCRIPTING_ALLOWED
@@ -983,6 +984,11 @@ class PlayState extends FunkinState {
 	//----------- [ Private API ] -----------//
 
 	@:noCompletion
+	private inline function get_songPercent():Float {
+		return FlxMath.bound(Conductor.instance.rawTime / songLength, 0, 1);
+	}
+
+	@:noCompletion
 	private function set_worldCombo(newValue:Bool):Bool {
 		worldCombo = newValue;
 
@@ -1025,6 +1031,7 @@ class PlayState extends FunkinState {
 		WindowUtil.resetTitle();
 		WindowUtil.resetTitleAffixes();
 
+		Scoring.currentSystem = new PBotSystem(); // reset the scoring system, cuz you can change it thru scripting n shit, and that shouldn't persist
 		super.destroy();
 	}
 }

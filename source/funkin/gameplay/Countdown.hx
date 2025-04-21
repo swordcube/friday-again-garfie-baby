@@ -67,8 +67,15 @@ class Countdown extends FlxContainer {
     }
 
     public function stop():Void {
-        if(timer != null)
+        if(timer != null) {
             timer.cancel();
+            timer = null;
+        }
+    }
+
+    override function destroy():Void {
+        stop();
+        super.destroy();
     }
 }
 

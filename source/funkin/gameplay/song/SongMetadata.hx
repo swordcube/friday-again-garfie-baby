@@ -6,8 +6,7 @@ class SongData {
 
 	public var mixes:Array<String>;
 	public var difficulties:Array<String>;
-
-	public var bpm:Float;
+	
 	public var timingPoints:Array<TimingPoint>;
 
 	public var artist:String;

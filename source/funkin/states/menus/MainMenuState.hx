@@ -136,6 +136,9 @@ class MainMenuState extends FunkinState {
     }
 
     public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
+        if(by == 0 && !force)
+            return;
+        
         curSelected = FlxMath.wrap(curSelected + by, 0, options.length - 1);
 
         for(i => item in menuItems) {

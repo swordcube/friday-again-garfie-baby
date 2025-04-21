@@ -73,6 +73,10 @@ class CharterTopBar extends TopBar {
 
                 Separator,
 
+                Checkbox("Minimal playtesting", (value:Bool) -> charter.toggleMinimalPlaytest(value), () -> return ChartEditor.editorSettings.minimalPlaytest),
+
+                Separator,
+
                 Button("Edit chart metadata", null, charter.openMetadataWindow)
             ]),
             DropDown("View", [

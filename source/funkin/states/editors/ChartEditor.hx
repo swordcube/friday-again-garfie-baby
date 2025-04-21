@@ -468,10 +468,6 @@ class ChartEditor extends UIState {
             if(!WindowUtil.preventClosing)
                 return;
 
-            for(dropdown in UIUtil.allDropDowns.copy()) {
-                if(dropdown != null)
-                    dropdown.destroy();
-            }
             if(inst.playing)
                 playPause();
 
@@ -485,7 +481,16 @@ class ChartEditor extends UIState {
                 WindowUtil.resetClosing();
                 warning.close();
             });
-            openSubState(warning);
+            FlxTimer.wait(0.001, () -> {
+                for(dropdown in UIUtil.allDropDowns.copy()) {
+                    if(dropdown != null) {
+                        dropdown.container.remove(dropdown, true);
+                        dropdown.destroy();
+                    }
+                }
+                persistentDraw = true;
+                openSubState(warning);
+            });
         };
     }
 
@@ -745,15 +750,31 @@ class ChartEditor extends UIState {
         PlayState.deathCounter = 0;
 
         persistentUpdate = false;
-        persistentDraw = false;
+        if(editorSettings.minimalPlaytest) {
+            persistentDraw = false;
+            openSubState(new CharterPlaytest({
+                chart: currentChart,
+    
+                song: currentSong,
+                difficulty: currentDifficulty,
+                mix: currentMix
+            }));
+        } else {
+            persistentDraw = true;
+            PlayState.deathCounter = 0;
+            FlxG.switchState(PlayState.new.bind({
+                song: currentSong,
+                difficulty: currentDifficulty,
 
-        openSubState(new CharterPlaytest({
-            chart: currentChart,
+                mix: currentMix,
+                mod: Paths.forceContentPack,
 
-            song: currentSong,
-            difficulty: currentDifficulty,
-            mix: currentMix
-        }));
+                chartingMode: true,
+
+                _chart: currentChart,
+                _unsaved: undos.unsaved
+            }));
+        }
     }
 
     public function playTest():Void {
@@ -769,17 +790,34 @@ class ChartEditor extends UIState {
         PlayState.deathCounter = 0;
 
         persistentUpdate = false;
-        persistentDraw = false;
+        if(editorSettings.minimalPlaytest) {
+            persistentDraw = false;
+            openSubState(new CharterPlaytest({
+                chart: currentChart,
+    
+                song: currentSong,
+                difficulty: currentDifficulty,
+                mix: currentMix,
 
-        openSubState(new CharterPlaytest({
-            chart: currentChart,
+                startTime: Conductor.instance.time
+            }));
+        } else {
+            persistentDraw = true;
+            PlayState.deathCounter = 0;
+            FlxG.switchState(PlayState.new.bind({
+                song: currentSong,
+                difficulty: currentDifficulty,
 
-            song: currentSong,
-            difficulty: currentDifficulty,
-            mix: currentMix,
+                mix: currentMix,
+                mod: Paths.forceContentPack,
 
-            startTime: Conductor.instance.time
-        }));
+                startTime: Conductor.instance.time,
+                chartingMode: true,
+
+                _chart: currentChart,
+                _unsaved: undos.unsaved
+            }));
+        }
     }
 
     public function playTestHere():Void {
@@ -953,9 +991,10 @@ class ChartEditor extends UIState {
         if(UIUtil.isModifierKeyPressed(CTRL))
             deleteObjects([object]);
         else {
-            if(rightClickMenu != null)
+            if(rightClickMenu != null) {
+                remove(rightClickMenu, true);
                 rightClickMenu.destroy();
-
+            }
             switch(object) {
                 case CNote(note):
                     rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
@@ -1079,10 +1118,15 @@ class ChartEditor extends UIState {
             vocals.player.muted = editorSettings.muteAllVocals || editorSettings.mutePlayerVocals;
     }
 
+    public function toggleMinimalPlaytest(value:Bool):Void {
+        editorSettings.minimalPlaytest = value;
+    }
+
     public function openMetadataWindow():Void {
         if(inst.playing)
             playPause();
 
+        persistentDraw = true;
         openSubState(new CharterMetadataMenu());
     }
 
@@ -1151,10 +1195,6 @@ class ChartEditor extends UIState {
     }
 
     public function exit():Void {
-        for(dropdown in UIUtil.allDropDowns.copy()) {
-            if(dropdown != null)
-                dropdown.destroy();
-        }
         if(undos.unsaved) {
             if(inst.playing)
                 playPause();
@@ -1165,7 +1205,16 @@ class ChartEditor extends UIState {
                 unsafeExit();
             });
             warning.onCancel.add(warning.close);
-            openSubState(warning);
+            FlxTimer.wait(0.001, () -> {
+                for(dropdown in UIUtil.allDropDowns.copy()) {
+                    if(dropdown != null) {
+                        dropdown.container.remove(dropdown, true);
+                        dropdown.destroy();
+                    }
+                }
+                persistentDraw = true;
+                openSubState(warning);
+            });
             return;
         }
         unsafeExit();
@@ -1304,6 +1353,8 @@ class ChartEditorSettings {
     public var muteSpectatorVocals:Bool = false;
     public var muteOpponentVocals:Bool = false;
     public var mutePlayerVocals:Bool = false;
+
+    public var minimalPlaytest:Bool = true;
 
     public var gridZoom:Float = 1;
     public var playbackRate:Float = 1;
