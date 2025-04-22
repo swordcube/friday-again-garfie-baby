@@ -65,7 +65,8 @@ class InitState extends FlxState {
         GlobalScript.init();
         #end
 
-        // init highscore
+        // init options & highscore
+        Options.init();
         Highscore.init();
 
         // init some flixel stuff
@@ -97,9 +98,6 @@ class InitState extends FlxState {
 
         // hide cursor, we probably don't need it rn
         FlxG.mouse.visible = false;
-
-        // enable antialiasing by default
-        FlxSprite.defaultAntialiasing = true;
 
         final args = Sys.args();
         if(args.contains("--song")) {

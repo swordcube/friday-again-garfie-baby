@@ -2,6 +2,7 @@ package funkin.gameplay.hud;
 
 #if SCRIPTING_ALLOWED
 import funkin.scripting.FunkinScript;
+import funkin.states.PlayState;
 
 class ScriptedHUD extends BaseHUD {
     public var skin(default, null):String;
@@ -23,6 +24,14 @@ class ScriptedHUD extends BaseHUD {
         
         super(playField);
         script.call("onLoadPost");
+    }
+
+    override function call(method:String, ?args:Array<Dynamic>):Void {
+        super.call(method, args);
+
+        final game:PlayState = PlayState.instance;
+        if(game == null) // script will be called onto by PlayState already, so skip if we're in PlayState
+            script.call(method, args);
     }
 
     override function generateHealthBar():Void {

@@ -19,6 +19,15 @@ class BaseHUD extends FlxGroup implements IBeatReceiver {
         updatePlayerStats();
     }
 
+    public function call(method:String, ?args:Array<Dynamic>):Void {
+        if(args == null)
+            args = [];
+
+        final func:Dynamic = Reflect.field(this, method);
+        if(func != null && Reflect.isFunction(func))
+            func(args);
+    }
+
     public function generateHealthBar():Void {}
     public function generatePlayerStats():Void {}
     

@@ -1,5 +1,6 @@
 package funkin.states.menus.options;
 
+import flixel.util.FlxTimer;
 import funkin.ui.AtlasText;
 
 class MainPage extends Page {
@@ -42,12 +43,12 @@ class MainPage extends Page {
             menuItems.add(item);
         }
         menuItems.screenCenter();
-        menuItems.x -= 50 + iconSpacing;
+        menuItems.x -= 50 + (iconSpacing * 2);
 
         for(i => page in pages) {
             final item:AtlasText = menuItems.members[i];
             final icon:FlxSprite = new FlxSprite(item.x + menuItems.width + iconSpacing, item.y - 10);
-            icon.loadGraphic(Paths.image('menus/options/${page.name.toLowerCase()}'));
+            icon.loadGraphic(Paths.image('menus/options/category/${page.name.toLowerCase()}'));
             icon.setGraphicSize(100, 100);
             icon.updateHitbox();
             icon.alpha = 0.6;
@@ -66,7 +67,11 @@ class MainPage extends Page {
         if(controls.justPressed.UI_DOWN || wheel > 0)
             changeSelection(1);
 
+        if(controls.justPressed.ACCEPT)
+            FlxTimer.wait(0.001, () -> menu.loadPage(Type.createInstance(pages[curSelected].menu, [])));
+
         if(controls.justPressed.BACK) {
+            Options.save();
             FlxG.switchState(MainMenuState.new);
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }

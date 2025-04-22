@@ -125,6 +125,7 @@ class CharacterData {
             data = getDefaultData();
             Logs.error('Failed to load default character config: ${e}');
         }
+        data.healthIcon.color = null;
         return data;
     }
 

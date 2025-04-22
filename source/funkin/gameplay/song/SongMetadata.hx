@@ -42,6 +42,10 @@ class GameplayData {
 	@:default("default")
 	public var uiSkin:String;
 
+	@:optional
+	@:default("default")
+	public var hudSkin:String;
+
     public function getCharacter(type:String):String {
         return characters.get(type);
     }

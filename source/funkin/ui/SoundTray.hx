@@ -63,36 +63,25 @@ class SoundTray extends FlxSoundTray {
         volumeDownSound = Paths.sound("ui/sfx/volume/down");
         volumeMaxSound = Paths.sound("ui/sfx/volume/max");
 
-        FlxG.sound.changeVolume = changeVolume;
+        FlxG.sound.applySoundCurve = applySoundCurve;
+        FlxG.sound.reverseSoundCurve = reverseSoundCurve;
     }
 
-    public function linearToLog(x:Float, minValue:Float = 0.001):Float {
-        if(x <= 0)
-            return 0;
-
-        x = Math.min(1, x);
-        return Math.exp(Math.log(minValue) * (1 - x));
+    public function applySoundCurve(x:Float):Float {
+        x = Math.max(0, Math.min(1, x));
+        return Math.exp(Math.log(0.001) * (1 - x));
     }
 
-    public function logToLinear(x:Float, minValue:Float = 0.001):Float {
-        if(x <= 0)
-            return 0;
-
-        x = Math.min(1, x);
-        return 1 - (Math.log(Math.max(x, minValue)) / Math.log(minValue));
-    }
-
-    public function changeVolume(Amount:Float):Void {
-        FlxG.sound.muted = false;
-        FlxG.sound.volume = linearToLog(logToLinear(FlxG.sound.volume) + Amount);
-        FlxG.sound.showSoundTray(Amount > 0);
+    public function reverseSoundCurve(x:Float):Float {
+        x = Math.max(0, Math.min(1, x));
+        return 1 - (Math.log(Math.max(x, 0.001)) / Math.log(0.001));
     }
 
     override function update(MS:Float):Void {
         MS = Math.min(MS, FlxG.maxElapsed * 1000);
 
         y = FlxMath.lerp(y, lerpYPos, Math.min(FlxMath.getElapsedLerp(0.1, MS / 1000), 1));
-        if(Math.abs(88 - y) < 0.01)
+        if(Math.abs(y + -88) < 0.01)
             y = -88;
 
         alpha = FlxMath.lerp(alpha, alphaTarget, Math.min(FlxMath.getElapsedLerp(0.25, MS / 1000), 1));
@@ -122,7 +111,9 @@ class SoundTray extends FlxSoundTray {
             alphaTarget = 0;
             trayContainer.x = trayContainer.y = 0;
         }
-        if(y <= -88) {
+        if(Math.floor(y) <= -88) {
+            y = -88;
+
             visible = false;
             active = false;
     
@@ -149,7 +140,7 @@ class SoundTray extends FlxSoundTray {
         visible = true;
         active = true;
         
-        var globalVolume:Int = Math.round(logToLinear(FlxG.sound.volume) * 10);
+        var globalVolume:Int = Math.round(FlxG.sound.volume * 10);
         if(FlxG.sound.muted || FlxG.sound.volume == 0)
             globalVolume = 0;
     

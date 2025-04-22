@@ -81,10 +81,10 @@
             "visible": false
         },
         "y": {
-            "offset": [0, 10]
+            "offset": [0, -10]
         },
         "p": {
-            "offset": [0, 10]
+            "offset": [0, -10]
         }
     }
 }

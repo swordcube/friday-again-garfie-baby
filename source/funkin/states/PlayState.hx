@@ -131,6 +131,12 @@ class PlayState extends FunkinState {
 	public var canDie:Bool = true;
 	public var worldCombo(default, set):Bool;
 
+	public var onSongStart:FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>();
+	public var onSongStartPost:FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>();
+
+	public var onSongEnd:FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>();
+	public var onSongEndPost:FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>();
+
 	public var onGameOver:FlxTypedSignal<GameOverEvent->Void> = new FlxTypedSignal<GameOverEvent->Void>();
 	public var onGameOverPost:FlxTypedSignal<GameOverEvent->Void> = new FlxTypedSignal<GameOverEvent->Void>();
 
@@ -186,7 +192,7 @@ class PlayState extends FunkinState {
 			currentChart = lastParams._chart;
 			lastParams._chart = null; // this is only useful for changing difficulties mid song, so we don't need to keep this value
 		} else
-		currentChart = ChartData.load(currentSong, currentMix, Paths.forceContentPack);
+			currentChart = ChartData.load(currentSong, currentMix, Paths.forceContentPack);
 		
 		final instPath:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/inst');
 		chartingMode = lastParams.chartingMode ?? false;
@@ -216,6 +222,8 @@ class PlayState extends FunkinState {
 		camHUD = new FunkinCamera();
 		camHUD.bgColor = 0;
 		FlxG.cameras.add(camHUD, false);
+		
+		Scoring.currentSystem = new PBotSystem(); // reset the scoring system, cuz you can change it thru scripting n shit, and that shouldn't persist
 
 		Conductor.instance.music = null;
 		Conductor.instance.offset = Options.songOffset + inst.latency;
@@ -225,7 +233,7 @@ class PlayState extends FunkinState {
 		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
 		
 		Conductor.instance.time = -(Conductor.instance.beatLength * 5);
-
+		
 		if(lastParams.startTime != null && lastParams.startTime > 0) {
 			FlxTimer.wait((Conductor.instance.beatLength * 5) / 1000, () -> {
 				Conductor.instance.time = -Conductor.instance.offset;
@@ -242,6 +250,7 @@ class PlayState extends FunkinState {
 
 		final rawNoteSkin:String = currentChart.meta.game.noteSkin;
 		final rawUISkin:String = currentChart.meta.game.uiSkin;
+		final rawHUDSkin:String = currentChart.meta.game.hudSkin;
 		
 		var noteSkin:String = rawNoteSkin ?? "default";
 		if(noteSkin == "default")
@@ -250,6 +259,10 @@ class PlayState extends FunkinState {
 		var uiSkin:String = rawUISkin ?? "default";
 		if(uiSkin == "default")
 			currentChart.meta.game.uiSkin = uiSkin = Constants.DEFAULT_UI_SKIN;
+
+		var hudSkin:String = rawHUDSkin ?? "default";
+		if(hudSkin == "default")
+			currentChart.meta.game.hudSkin = hudSkin = Options.hudType;
 
 		if(!minimalMode) {
 			stage = new Stage(currentChart.meta.game.stage, {
@@ -395,30 +408,26 @@ class PlayState extends FunkinState {
 		add(playField);
 		
 		final event:HUDGenerationEvent = cast Events.get(HUD_GENERATION);
-		event.recycle(uiSkin);
+		event.recycle(hudSkin);
 
 		#if SCRIPTING_ALLOWED
-		if(scriptsAllowed)
+		if(scriptsAllowed) {
 			scripts.event("onHUDGeneration", event);
+			if(FlxG.assets.exists(Paths.script('gameplay/hudskins/${event.hudType}/script')))
+				playField.hud = new ScriptedHUD(playField, event.hudType);
+		}
 		#end
-		function loadDefaultHUD() {
-			switch(Options.hudType) {
-				case "Classic":
-					playField.hud = new ClassicHUD(playField);
-
+		// check if it's null because it might've
+		// already been initialized by the code directly above this
+		if(playField.hud == null) {
+			switch(event.hudType) {
+				case "Psych":
+					playField.hud = new PsychHUD(playField);
+	
 				default:
-					playField.hud = new ClassicHUD(playField); // for now
+					playField.hud = new ClassicHUD(playField);
 			}
 		}
-		#if SCRIPTING_ALLOWED
-		if(scriptsAllowed && FlxG.assets.exists(Paths.script('gameplay/hudskins/${event.hudType}/script')))
-			playField.hud = new ScriptedHUD(playField, event.hudType);
-		else
-			loadDefaultHUD();
-		#else
-		loadDefaultHUD();
-		#end
-
 		playField.hud.cameras = [camHUD];
 		add(playField.hud);
 		
@@ -454,6 +463,7 @@ class PlayState extends FunkinState {
 		if(scriptsAllowed)
 			scripts.call("onCreatePost");
 		#end
+		playField.hud.call("onCreatePost");
 	}
 
 	override function update(elapsed:Float) {
@@ -585,13 +595,16 @@ class PlayState extends FunkinState {
 
 		songLength = FlxG.sound.music.length;
 		startingSong = false;
-
+		
+		onSongStart.dispatch();
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
 			scripts.call("onStartSong");
 			scripts.call("onSongStart");
 		}
 		#end
+		playField.hud.call("onStartSong");
+		playField.hud.call("onSongStart");
 
 		final hasStartTime:Bool = lastParams.startTime != null && lastParams.startTime > 0;
 		if(hasStartTime)
@@ -610,12 +623,15 @@ class PlayState extends FunkinState {
 		
 		Conductor.instance.music = FlxG.sound.music;
 
+		onSongStartPost.dispatch();
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
 			scripts.call("onStartSongPost");
 			scripts.call("onSongStartPost");
 		}
 		#end
+		playField.hud.call("onStartSongPost");
+		playField.hud.call("onSongStartPost");
 	}
 
 	public function endSong():Void {
@@ -632,12 +648,16 @@ class PlayState extends FunkinState {
 			timer.cancel();
 		});
 
+		onSongEnd.dispatch();
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
 			scripts.call("onEndSong");
 			scripts.call("onSongEnd");
 		}
 		#end
+		playField.hud.call("onEndSong");
+		playField.hud.call("onSongEnd");
+
 		if(_saveScore) {
 			final recordID:String = Highscore.getRecordID(currentSong, currentDifficulty, currentMix);
 			Highscore.saveRecord(recordID, {
@@ -671,12 +691,15 @@ class PlayState extends FunkinState {
 		// TODO: story mode
 		FlxG.switchState(FreeplayState.new);
 
+		onSongEndPost.dispatch();
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
 			scripts.call("onEndSongPost");
 			scripts.call("onSongEndPost");
 		}
 		#end
+		playField.hud.call("onEndSongPost");
+		playField.hud.call("onSongEndPost");
 	}
 
 	//----------- [ Private API ] -----------//

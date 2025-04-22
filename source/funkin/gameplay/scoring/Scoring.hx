@@ -11,7 +11,7 @@ class Scoring {
     /**
      * The current scoring system being used.
      */
-    public static var currentSystem:ScoringSystem = new PBotSystem();
+    public static var currentSystem:ScoringSystem;
 
     /**
      * Whether or not killers are enabled.

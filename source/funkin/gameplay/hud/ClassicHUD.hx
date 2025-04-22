@@ -1,8 +1,9 @@
 package funkin.gameplay.hud;
 
-import flixel.util.FlxStringUtil;
 import flixel.ui.FlxBar;
 import flixel.text.FlxText;
+import flixel.util.FlxStringUtil;
+
 import funkin.states.PlayState;
 
 class ClassicHUD extends BaseHUD {
