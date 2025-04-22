@@ -16,7 +16,7 @@ class BaseHUD extends FlxGroup implements IBeatReceiver {
         updateHealthBar();
 
         generatePlayerStats();
-        updatePlayerStats();
+        updatePlayerStats(playField.stats);
     }
 
     public function call(method:String, ?args:Array<Dynamic>):Void {
@@ -36,7 +36,7 @@ class BaseHUD extends FlxGroup implements IBeatReceiver {
     public function bopIcons():Void {}
     public function positionIcons():Void {}
 
-    public function updatePlayerStats():Void {}
+    public function updatePlayerStats(stats:PlayerStats):Void {}
 
     public function stepHit(step:Int) {}
     public function beatHit(beat:Int) {}

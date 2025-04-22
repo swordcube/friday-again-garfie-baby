@@ -62,11 +62,11 @@ class ClassicHUD extends BaseHUD {
         positionIcons();
     }
 
-    override function updatePlayerStats():Void {
+    override function updatePlayerStats(stats:PlayerStats):Void {
         if(playField.playerStrumLine.botplay)
             scoreText.text = "Botplay Enabled";
         else
-            scoreText.text = "Score: " + FlxStringUtil.formatMoney(playField.stats.score, false, true);
+            scoreText.text = "Score: " + FlxStringUtil.formatMoney(stats.score, false, true);
     }
     
     override function positionIcons():Void {

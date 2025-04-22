@@ -46,8 +46,8 @@ class ScriptedHUD extends BaseHUD {
         script.call("updateHealthBar");
     }
 
-    override function updatePlayerStats():Void {
-        script.call("updatePlayerStats");
+    override function updatePlayerStats(stats:PlayerStats):Void {
+        script.call("updatePlayerStats", [stats]);
     }
 
     override function bopIcons():Void {

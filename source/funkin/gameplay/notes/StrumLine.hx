@@ -156,7 +156,7 @@ class StrumLine extends FlxSpriteGroup {
     
                         if(playField.hud != null) {
                             playField.hud.updateHealthBar();
-                            playField.hud.updatePlayerStats();
+                            playField.hud.updatePlayerStats(playField.stats);
                         }
                     }
                     if(note.hitEvent.playConfirmAnim && note.hitEvent.strumHoldJitter) {

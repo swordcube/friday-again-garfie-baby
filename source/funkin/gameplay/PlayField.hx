@@ -177,7 +177,7 @@ class PlayField extends FlxContainer {
         }
         if(event.note.strumLine == playerStrumLine && hud != null) {
             hud.updateHealthBar();
-            hud.updatePlayerStats();
+            hud.updatePlayerStats(stats);
         }
         onNoteHitPost.dispatch(cast event.flagAsPost());
     }
@@ -249,7 +249,7 @@ class PlayField extends FlxContainer {
 
         if(event.note.strumLine == playerStrumLine && hud != null) {
             hud.updateHealthBar();
-            hud.updatePlayerStats();
+            hud.updatePlayerStats(stats);
         }
         onNoteMissPost.dispatch(cast event.flagAsPost());
     }

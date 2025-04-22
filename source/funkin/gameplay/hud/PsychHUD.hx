@@ -133,12 +133,12 @@ class PsychHUD extends BaseHUD {
         positionIcons();
     }
 
-    override function updatePlayerStats():Void {
-        if(playField.stats.accuracy != 0) {
+    override function updatePlayerStats(stats:PlayerStats):Void {
+        if(stats.accuracy != 0) {
             ratingName = ratingStuff[ratingStuff.length - 1][0]; //Uses last string
-            if(playField.stats.accuracy < 1) {
+            if(stats.accuracy < 1) {
                 for(i in 0...ratingStuff.length - 1) {
-                    if(playField.stats.accuracy < ratingStuff[i][1]) {
+                    if(stats.accuracy < ratingStuff[i][1]) {
                         ratingName = ratingStuff[i][0];
                         break;
                     }
@@ -146,31 +146,31 @@ class PsychHUD extends BaseHUD {
             }
         }
         ratingFC = "";
-        if(playField.stats.judgements.get("killer") > 0)
+        if(stats.judgements.get("killer") > 0)
             ratingFC = "KFC";  //heheg   kentucky fried chicken
 
-        if(playField.stats.judgements.get("sick") > 0)
+        if(stats.judgements.get("sick") > 0)
             ratingFC = "SFC";
 
-        if(playField.stats.judgements.get("good") > 0)
+        if(stats.judgements.get("good") > 0)
             ratingFC = "GFC";
 
-        if(playField.stats.judgements.get("bad") > 0 || playField.stats.judgements.get("shit") > 0)
+        if(stats.judgements.get("bad") > 0 || stats.judgements.get("shit") > 0)
             ratingFC = "FC";
 
-        if(playField.stats.misses > 0 && playField.stats.misses < 10)
+        if(stats.misses > 0 && stats.misses < 10)
             ratingFC = "SDCB";
 
-        else if(playField.stats.misses >= 10)
+        else if(stats.misses >= 10)
             ratingFC = "Clear";
 
         var ratingStr:String = ratingName;
-        if(playField.stats.accuracy != 0)
-            ratingStr += ' (${FlxMath.roundDecimal(playField.stats.accuracy * 100, 2)}%) - ${ratingFC}';
+        if(stats.accuracy != 0)
+            ratingStr += ' (${FlxMath.roundDecimal(stats.accuracy * 100, 2)}%) - ${ratingFC}';
 
         scoreText.text = (
-            "Score: " + playField.stats.score +
-            " | Misses: " + playField.stats.misses +
+            "Score: " + stats.score +
+            " | Misses: " + stats.misses +
             " | Rating: " + ratingStr
         );
         scoreText.screenCenter(X);
