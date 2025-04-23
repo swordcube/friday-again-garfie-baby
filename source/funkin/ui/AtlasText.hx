@@ -7,7 +7,7 @@ import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 
 import flixel.util.FlxColor;
-import flixel.group.FlxSpriteGroup;
+import flixel.group.FlxSpriteContainer;
 
 import funkin.ui.AtlasFont.AtlasFontGlyph;
 
@@ -17,19 +17,21 @@ enum abstract AtlasTextAlignment(String) from String to String {
     final RIGHT = "RIGHT";
 }
 
-class AtlasText extends FlxTypedSpriteGroup<FlxSpriteGroup> {
+class AtlasText extends FlxTypedSpriteContainer<FlxSpriteContainer> {
 	public var font(default, set):String;
 	public var fontData:AtlasFont;
 
 	public var text(default, set):String;
 	public var alignment(default, set):AtlasTextAlignment;
+	public var size(default, set):Float = 1;
 
 	public var isMenuItem:Bool = false;
 	public var targetY:Int = 0;
 
-	public function new(x:Float, y:Float, font:String, alignment:AtlasTextAlignment, text:String) {
+	public function new(x:Float, y:Float, font:String, alignment:AtlasTextAlignment, text:String, ?size:Float = 1) {
 		super(x, y);
 
+		@:bypassAccessor this.size = size;
 		this.font = font;
 		this.text = text;
 		this.alignment = alignment;
@@ -95,6 +97,19 @@ class AtlasText extends FlxTypedSpriteGroup<FlxSpriteGroup> {
         return alignment;
 	}
 
+	private function set_size(size:Float):Float {
+		var lastSize:Float = this.size;
+		this.size = size;
+
+		if (this.size == lastSize)
+			return size;
+
+		_regenGlyphs();
+		_updateAlignment(alignment);
+
+        return size;
+	}
+
 	override function set_color(color:FlxColor):FlxColor {
         for (line in members) {
             for (glyph in line.members)
@@ -105,9 +120,9 @@ class AtlasText extends FlxTypedSpriteGroup<FlxSpriteGroup> {
 
 	private function _regenGlyphs():Void {
 		while (members.length > 0) {
-			var actor:FlxSpriteGroup = members[0];
-            actor.destroy();
+			var actor:FlxSpriteContainer = members[0];
 			remove(actor, true);
+            actor.destroy();
 		}
 
 		var textLength:Int = text.length;
@@ -117,22 +132,22 @@ class AtlasText extends FlxTypedSpriteGroup<FlxSpriteGroup> {
 		var glyphX:Float = 0.0;
 		var glyphY:Float = 0.0;
 
-		var line:FlxSpriteGroup = new FlxSpriteGroup();
+		var line:FlxSpriteContainer = new FlxSpriteContainer();
 		line.directAlpha = true;
 
 		for (i in 0...textLength) {
 			var char:String = text.charAt(i);
 			if (char == "\n") {
 				add(line);
-				line = new FlxSpriteGroup();
+				line = new FlxSpriteContainer();
 
 				glyphX = 0.0;
-				glyphY += fontData.lineHeight * fontData.scale;
+				glyphY += fontData.lineHeight * fontData.scale * size;
 				continue;
 			}
 
 			var glyph:Glyph = new Glyph(glyphX, glyphY, this, char);
-			glyph.scale.set(fontData.scale, fontData.scale);
+			glyph.scale.set(fontData.scale * size, fontData.scale * size);
             glyph.updateHitbox();
 			glyph.updateOffset();
 			glyph.color = color;
@@ -141,7 +156,7 @@ class AtlasText extends FlxTypedSpriteGroup<FlxSpriteGroup> {
 
 			var glyphData:AtlasFontGlyph = fontData.glyphs[char];
 			if (glyphData != null && glyphData.visible == false)
-				glyphX += glyphData.width * fontData.scale;
+				glyphX += glyphData.width * fontData.scale * size;
 			else
 				glyphX += glyph.width;
 		}

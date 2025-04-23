@@ -1,8 +1,10 @@
 package funkin.states.menus.options;
 
-import funkin.ui.AtlasText;
-
 class AppearancePage extends OptionPage {
+    public function new() {
+        super("Appearance");
+    }
+
     override function initOptions():Void {
         addOption({
             name: "Antialiasing",
@@ -15,7 +17,7 @@ class AppearancePage extends OptionPage {
         });
         addOption({
             name: "HUD Type",
-            description: "Changes how the HUD looks during gameplay.\nThis only works if the song has the default UI skin!",
+            description: "Changes how the HUD looks during gameplay.\nThis only works if the song has the default HUD skin!",
 
             id: "hudType",
             type: TList(["Classic", "Psych"])

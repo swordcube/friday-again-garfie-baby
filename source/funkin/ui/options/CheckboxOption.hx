@@ -3,8 +3,8 @@ package funkin.ui.options;
 class CheckboxOption extends Option {
     public var checkbox:Checkbox;
 
-    public function new(id:String, name:String, callback:Dynamic->Void) {
-        super(id, name, callback);
+    public function new(id:String, name:String, description:String, callback:Dynamic->Void) {
+        super(id, name, description, callback);
 
         checkbox = new Checkbox(10, 0);
         add(checkbox);

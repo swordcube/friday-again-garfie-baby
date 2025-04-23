@@ -1,14 +1,23 @@
 package funkin.states.menus.options;
 
-import funkin.ui.AtlasText;
-
 class GameplayPage extends OptionPage {
+    public function new() {
+        super("Gameplay");
+    }
+
     override function initOptions():Void {
         addOption({
             name: "Downscroll",
             description: "Scrolls the notes downwards instead of upwards.",
 
             id: "downscroll",
+            type: TCheckbox
+        });
+        addOption({
+            name: "Centered Notes",
+            description: "Puts the player notes in the center of the screen\nand hides the opponent notes.",
+
+            id: "centeredNotes",
             type: TCheckbox
         });
         addOption({
@@ -20,7 +29,7 @@ class GameplayPage extends OptionPage {
         });
         addOption({
             name: "Auto Pause",
-            description: "Changes whether or not the game will automatically pause when the window is unfocused.",
+            description: "Changes whether or not the game will automatically\npause when the window is unfocused.",
 
             id: "autoPause",
             type: TCheckbox,

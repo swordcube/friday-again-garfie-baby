@@ -2,14 +2,16 @@ package funkin.ui.options;
 
 class Option extends FlxSpriteContainer {
     public var id:String;
+    public var description:String;
     public var callback:Dynamic->Void;
 
     public var text:AtlasText;
     public var controls(default, never):Controls = Controls.instance;
 
-    public function new(id:String, name:String, callback:Dynamic->Void) {
+    public function new(id:String, name:String, description:String, callback:Dynamic->Void) {
         super();
         this.id = id;
+        this.description = description;
         this.callback = callback;
 
         text = new AtlasText(100, 0, "bold", LEFT, name);

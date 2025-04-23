@@ -13,8 +13,8 @@ class NumberOption extends Option {
     public var valueText:AtlasText;
     public var holdTimer:Float = 0;
 
-    public function new(id:String, name:String, callback:Dynamic->Void, ?isInteger:Bool) {
-        super(id, '${name}:', callback);
+    public function new(id:String, name:String, description:String, callback:Dynamic->Void, ?isInteger:Bool) {
+        super(id, '${name}:', description, callback);
         
         this.isInteger = isInteger;
         value = getValue();

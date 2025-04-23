@@ -1,8 +1,10 @@
 package funkin.states.menus.options;
 
-import funkin.ui.AtlasText;
-
 class AccessibilityPage extends OptionPage {
+    public function new() {
+        super("Accessibility");
+    }
+
     override function initOptions():Void {
         addOption({
             name: "Flashing Lights",

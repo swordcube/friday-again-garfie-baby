@@ -75,7 +75,11 @@ class PlayField extends FlxContainer {
         playerStrumLine = new StrumLine(FlxG.width * 0.75, 50, Options.downscroll, false, noteSkin ?? currentChart.meta.game.noteSkin);
         playerStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         add(playerStrumLine);
-
+        
+        if(Options.centeredNotes) {
+            opponentStrumLine.visible = false;
+            playerStrumLine.x = FlxG.width * 0.5;
+        }
         comboDisplay = new ComboDisplay(FlxG.width * 0.474, (FlxG.height * 0.45) - 60, uiSkin ?? currentChart.meta.game.uiSkin);
         add(comboDisplay);
 

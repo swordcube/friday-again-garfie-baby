@@ -12,6 +12,9 @@ import funkin.gameplay.PlayField;
 import funkin.gameplay.Countdown;
 import funkin.gameplay.hud.ClassicHUD;
 
+import funkin.gameplay.scoring.Scoring;
+import funkin.gameplay.scoring.system.*;
+
 class CharterPlaytest extends FunkinSubState {
     public static var lastParams:CharterPlaytestParams;
 
@@ -51,6 +54,7 @@ class CharterPlaytest extends FunkinSubState {
     
     override function create():Void {
         super.create();
+        Scoring.currentSystem = new PBotSystem();
 
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = false;

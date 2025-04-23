@@ -4,10 +4,11 @@ import flixel.util.FlxSave;
 
 @:build(funkin.backend.macros.OptionsMacro.build())
 class Options {
-    public static var downscroll:Bool = true;
+    public static var downscroll:Bool = false;
+    public static var centeredNotes:Bool = false;
     public static var useKillers:Bool = true;
     public static var autoPause:Bool = true;
-    public static var songOffset:Float = 50;
+    public static var songOffset:Float = 0;
     public static var hitWindow:Float = 180;
 
     public static var antialiasing:Bool = true;

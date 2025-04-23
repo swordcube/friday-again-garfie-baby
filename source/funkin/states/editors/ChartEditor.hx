@@ -749,6 +749,9 @@ class ChartEditor extends UIState {
         Conductor.instance.music = null;
         PlayState.deathCounter = 0;
 
+        if(inst.playing)
+            playPause();
+
         persistentUpdate = false;
         if(editorSettings.minimalPlaytest) {
             persistentDraw = false;
@@ -788,6 +791,9 @@ class ChartEditor extends UIState {
         lastParams = null;
         Conductor.instance.music = null;
         PlayState.deathCounter = 0;
+
+        if(inst.playing)
+            playPause();
 
         persistentUpdate = false;
         if(editorSettings.minimalPlaytest) {

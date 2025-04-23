@@ -6,8 +6,8 @@ class ListOption extends Option {
 
     public var valueText:AtlasText;
 
-    public function new(id:String, name:String, callback:Dynamic->Void, possibleValues:Array<String>) {
-        super(id, '${name}:', callback);
+    public function new(id:String, name:String, description:String, callback:Dynamic->Void, possibleValues:Array<String>) {
+        super(id, '${name}:', description, callback);
         
         this.possibleValues = possibleValues;
         value = getValue();
