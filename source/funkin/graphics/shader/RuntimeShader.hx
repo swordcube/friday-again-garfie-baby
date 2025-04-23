@@ -822,7 +822,7 @@ vec4 applyFlixelEffects(vec4 color) {
 }
 
 vec4 flixel_texture2D(sampler2D bitmap, vec2 coord) {
-	vec4 color = texture2D(bitmap, coord);
+	vec4 color = texture(bitmap, coord);
 	return applyFlixelEffects(color);
 }
 
