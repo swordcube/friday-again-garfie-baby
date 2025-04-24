@@ -152,7 +152,7 @@ class GameOverSubState extends FunkinSubState {
             return;
 
         FlxTimer.wait(0.001, () -> {
-            CoolUtil.playMenuMusic(0);
+            CoolUtil.playMenuMusic(0.0);
             FlxG.sound.music.fadeIn(0.16, 0, 1);
 
             final transitionCam:FlxCamera = new FlxCamera();

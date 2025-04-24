@@ -662,17 +662,22 @@ class PlayState extends FunkinState {
 			vocals.pause();
 
 		if(!lastParams.chartingMode) {
-			if(!FlxG.sound.music.playing) {
-				FlxG.signals.postStateSwitch.addOnce(() -> {
-					FlxTimer.wait(0.001, () -> {
-						FlxG.sound.music.time = 0;
-						FlxG.sound.music.volume = 0;
-						FlxG.sound.music.looped = true;
-						FlxG.sound.music.play();
-						FlxG.sound.music.fadeIn(0.16, 0, 1);
+			if(!Constants.PLAY_MENU_MUSIC_AFTER_EXIT) {
+				if(!FlxG.sound.music.playing) {
+					FlxG.signals.postStateSwitch.addOnce(() -> {
+						FlxTimer.wait(0.001, () -> {
+							FlxG.sound.music.time = 0;
+							FlxG.sound.music.volume = 0;
+							FlxG.sound.music.looped = true;
+							FlxG.sound.music.play();
+							FlxG.sound.music.fadeIn(0.16, 0, 1);
+						});
 					});
-				});
-			}
+				}
+			} else {
+                Paths.forceContentPack = null;
+                CoolUtil.playMenuMusic();
+            }
 			// TODO: story mode
 			FlxG.switchState(FreeplayState.new);
 		} else

@@ -89,4 +89,10 @@ class Constants {
      * A list of every possible note direction in order.
      */
     public static final NOTE_DIRECTIONS:Array<String> = ["left", "down", "up", "right"];
+
+    /**
+     * Whether or not to play menu music after exiting
+     * gameplay or some menus.
+     */
+    public static final PLAY_MENU_MUSIC_AFTER_EXIT:Bool = false;
 }

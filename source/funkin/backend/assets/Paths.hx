@@ -239,7 +239,6 @@ class Paths {
             final loader:AssetLoader = _registeredAssetLoadersMap.get(loaderID);
             if(loader != null) {
                 final path:String = loader.getPath(name);
-    
                 if(FlxG.assets.exists(path))
                     return path;
     

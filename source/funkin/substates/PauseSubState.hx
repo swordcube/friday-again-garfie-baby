@@ -252,11 +252,17 @@ class PauseSubState extends FunkinSubState {
 
     public function unsafeExitToMenu():Void {
         FlxTimer.wait(0.001, () -> {
-            FlxG.sound.music.volume = 0;
-            FlxG.sound.music.looped = true;
-            FlxG.sound.music.play();
-            FlxG.sound.music.fadeIn(0.16, 0, 1);
+            FlxG.sound.music.onComplete = null;
 
+            if(!Constants.PLAY_MENU_MUSIC_AFTER_EXIT) {
+                FlxG.sound.music.volume = 0;
+                FlxG.sound.music.looped = true;
+                FlxG.sound.music.play();
+                FlxG.sound.music.fadeIn(0.16, 0, 1);
+            } else {
+                Paths.forceContentPack = null;
+                CoolUtil.playMenuMusic();
+            }
             final transitionCam:FlxCamera = new FlxCamera();
             transitionCam.bgColor = 0;
             FlxG.cameras.add(transitionCam, false);
@@ -265,7 +271,6 @@ class PauseSubState extends FunkinSubState {
             FlxG.signals.postStateSwitch.addOnce(() -> {
                 FlxG.cameras.remove(FadeTransition.nextCamera);
             });
-            FlxG.sound.music.onComplete = null;
 
             // TODO: story mode
             FlxG.switchState(FreeplayState.new);

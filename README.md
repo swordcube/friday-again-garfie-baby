@@ -35,6 +35,14 @@ replace `<platform>` with whatever OS you're running on, such as
 `windows`, `mac`, `linux`, etc
 
 ### **step 4:** actually compiling the thing
+if you wanna compile a build WITHOUT the assets in it, instead
+pointing to the source assets folder (for quicker testing):
+```sh
+haxelib run lime test <platform> -DTEST_BUILD
+```
+
+if you wanna compile a build WITH the assets in it, instead of
+pointing to the source assets folder (for quicker testing):
 ```sh
 haxelib run lime test <platform>
 ```

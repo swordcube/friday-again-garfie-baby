@@ -214,11 +214,14 @@ class TitleState extends FunkinState {
             // hold shift to keep currently playing music, incase
             // you exit from freeplay and wanna listen to the (hopefully) fire music!!
             CoolUtil.playMusic("menus/music/girlfriendsRingtone");
-            FlxG.signals.postStateSwitch.addOnce(() -> {
-                CoolUtil.playMenuMusic();
+
+            if(Constants.PLAY_MENU_MUSIC_AFTER_EXIT) {
+                FlxG.signals.postStateSwitch.addOnce(() -> {
+                    CoolUtil.playMenuMusic(0.0);
+                    FlxG.sound.music.fadeIn(4.0, 0.0, 1.0);
+                });
                 FlxG.sound.music.fadeIn(4.0, 0.0, 1.0);
-            });
-            FlxG.sound.music.fadeIn(4.0, 0.0, 1.0);
+            }
         }
         FlxG.sound.play(Paths.sound("menus/sfx/select"));
         FlxG.camera.flash(FlxColor.WHITE, 1);

@@ -1,5 +1,6 @@
 package funkin.utilities;
 
+import sys.FileSystem;
 import lime.app.Future;
 
 class CoolUtil {
@@ -38,9 +39,12 @@ class CoolUtil {
      * This function works correctly on linux, and should be
      * preferred over `FlxG.openURL()`.
      * 
-     * @param  url  The URL to open. 
+     * @param  url  The URL to open.
      */
     public static function openURL(url:String):Void {
+        if(FileSystem.exists(url) && !FileSystem.isDirectory(url))
+            throw 'Invalid URL: ${url}';
+
         #if linux
         Sys.command('/usr/bin/xdg-open', [url]);
         #else
