@@ -188,9 +188,6 @@ class ChartEditor extends UIState {
         inst.time = 0;
         inst.volume = 1;
 
-        if(lastParams.startTime != null && lastParams.startTime > 0)
-            Conductor.instance.time = lastParams.startTime;
-
         final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
 		if(FlxG.assets.exists(playerVocals)) {
 			vocals = new VocalGroup({
@@ -459,6 +456,10 @@ class ChartEditor extends UIState {
         FlxG.mouse.visible = true;
         Main.statsDisplay.visible = false; // it gets in the way
         
+        if(lastParams.startTime != null && lastParams.startTime > 0) {
+            Conductor.instance.time = lastParams.startTime;
+            noteCam.scroll.y = CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.playhead);
+        }
         noteCam.zoom = editorSettings.gridZoom;
         noteCam.scroll.y -= FlxG.height * 0.5;
         setPlaybackRate(editorSettings.playbackRate);

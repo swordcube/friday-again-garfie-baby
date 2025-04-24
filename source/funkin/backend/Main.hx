@@ -14,6 +14,8 @@ import funkin.backend.StatsDisplay;
 #end
 @:access(flixel.FlxGame)
 class Main extends Sprite {
+	public static var instance(default, null):Main;
+
 	public static var changeID:Int = 0;
     public static var audioDisconnected:Bool = false;
 	public static var allowTerminalColor:Bool = true;
@@ -23,6 +25,8 @@ class Main extends Sprite {
 
 	public function new() {
 		super();
+
+		instance = this;
 		addChild(new FunkinGame(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, InitState.new, Constants.MAX_FPS, Constants.MAX_FPS, true));
 		
 		sideBars = new SideBars();

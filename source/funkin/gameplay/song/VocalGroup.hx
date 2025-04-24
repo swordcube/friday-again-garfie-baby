@@ -133,6 +133,18 @@ class VocalGroup extends FlxBasic {
             player.volume = volume;
     }
 
+    public function setPitch(pitch:Float):Void {
+        if(!isSingleTrack) {
+            if(spectator != null)
+                spectator.pitch = pitch;
+            
+            if(opponent != null)
+                opponent.pitch = pitch;
+        }
+        if(player != null)
+            player.pitch = pitch;
+    }
+
     public function setMuted(muted:Bool):Void {
         if(!isSingleTrack) {
             if(spectator != null)

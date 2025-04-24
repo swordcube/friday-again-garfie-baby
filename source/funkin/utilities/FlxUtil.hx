@@ -1,9 +1,13 @@
 package funkin.utilities;
 
+import openfl.display.Sprite;
+
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
+
 import flixel.input.keyboard.FlxKey;
 
+import funkin.backend.Main;
 import funkin.graphics.RatioScaleModeEx;
 
 /**
@@ -54,36 +58,16 @@ class FlxUtil {
             // Force GC to run after switching states
             // to clear excess memory
 			MemoryUtil.clearAll();
+
+            // Fixes shader coord problems that typically
+            // occur when the window is resized
+            applyShaderResizeFix();
         });
 
         // Fixes shader coord problems that typically
         // occur when the window is resized
         FlxG.signals.gameResized.add((width:Int, height:Int) -> {
-            for(camera in FlxG.cameras.list) {
-                if(camera == null || camera.flashSprite == null || camera.filters == null || camera.filters.length == 0)
-                    continue;
-
-                for(cache in [camera.flashSprite.__cacheBitmapData, camera.flashSprite.__cacheBitmapData2, camera.flashSprite.__cacheBitmapData3]) {
-                    if(cache != null) {
-                        cache.disposeImage();
-                        cache.dispose();
-                    }
-                }
-                camera.flashSprite.__cacheBitmap = null;
-                camera.flashSprite.__cacheBitmapData = null;
-                camera.flashSprite.__cacheBitmapData2 = null;
-                camera.flashSprite.__cacheBitmapData3 = null;
-            }
-            for(cache in [FlxG.game.__cacheBitmapData, FlxG.game.__cacheBitmapData2, FlxG.game.__cacheBitmapData3]) {
-                if(cache != null) {
-                    cache.disposeImage();
-                    cache.dispose();
-                }
-            }
-            FlxG.game.__cacheBitmap = null;
-            FlxG.game.__cacheBitmapData = null;
-            FlxG.game.__cacheBitmapData2 = null;
-            FlxG.game.__cacheBitmapData3 = null;
+            applyShaderResizeFix();
         });
 
         // Add some key event hooks
@@ -100,5 +84,39 @@ class FlxUtil {
             if (Controls.instance.justPressed.FULLSCREEN)
                 FlxG.fullscreen = !FlxG.fullscreen;
         });
+    }
+
+    public static function fixSpriteShaderSize(sprite:Sprite):Void {
+        if(sprite == null)
+            return;
+
+		@:privateAccess {
+            for(cache in [sprite.__cacheBitmapData, sprite.__cacheBitmapData2, sprite.__cacheBitmapData3]) {
+                if(cache != null) {
+                    if(cache.__texture != null)
+                        cache.__texture.dispose();
+                    
+                    cache.disposeImage();
+                    cache.dispose();
+                }
+            }
+			sprite.__cacheBitmap = null;
+			sprite.__cacheBitmapData = null;
+			sprite.__cacheBitmapData2 = null;
+			sprite.__cacheBitmapData3 = null;
+			sprite.__cacheBitmapColorTransform = null;
+		}
+    }
+
+    public static function applyShaderResizeFix():Void {
+        fixSpriteShaderSize(Main.instance);
+        fixSpriteShaderSize(FlxG.game);
+
+        for(camera in FlxG.cameras.list) {
+            if(camera == null || camera.filters == null || camera.filters.length == 0)
+                continue;
+
+            fixSpriteShaderSize(camera.flashSprite);
+        }
     }
 }

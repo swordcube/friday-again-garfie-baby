@@ -454,7 +454,7 @@ class PlayState extends FunkinState {
 			startCountdown();
 
 		worldCombo = false;
-		_saveScore = !(lastParams.chartingMode ?? false);
+		_saveScore = !(chartingMode ?? false);
 	}
 
 	override function createPost():Void {
@@ -486,25 +486,9 @@ class PlayState extends FunkinState {
 		if(controls.justPressed.RESET || (canDie && playField.stats.health <= playField.stats.minHealth))
 			gameOver();
 		
-		if(controls.justPressed.DEBUG) {
-			persistentUpdate = false;
-			
-			FlxG.sound.music.pause();
-			vocals.pause();
-			
-			FlxG.sound.music.onComplete = null;
-			FlxG.switchState(ChartEditor.new.bind({
-				song: currentSong,
-				difficulty: currentDifficulty,
-				mix: currentMix,
-				mod: lastParams.mod,
+		if(controls.justPressed.DEBUG)
+			goToCharter();
 
-				startTime: (lastParams.startTime != null && lastParams.startTime > 0) ? lastParams.startTime : null,
-
-				_chart: currentChart,
-				_unsaved: lastParams._unsaved
-			}));
-		}
 		camGame.extraZoom = FlxMath.lerp(camGame.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
 		camHUD.extraZoom = FlxMath.lerp(camHUD.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
 
@@ -669,7 +653,6 @@ class PlayState extends FunkinState {
 				version: Highscore.RECORD_VERSION
 			});
 		}
-		FlxG.sound.music.looped = true;
 		FlxG.sound.music.onComplete = null;
 
 		Conductor.instance.music = null;
@@ -677,20 +660,24 @@ class PlayState extends FunkinState {
 		
 		if(FlxG.sound.music.playing)
 			vocals.pause();
-		else {
-			FlxG.signals.postStateSwitch.addOnce(() -> {
-				FlxTimer.wait(0.001, () -> {
-					FlxG.sound.music.time = 0;
-					FlxG.sound.music.volume = 0;
-					FlxG.sound.music.looped = true;
-					FlxG.sound.music.play();
-					FlxG.sound.music.fadeIn(0.16, 0, 1);
-				});
-			});
-		}
-		// TODO: story mode
-		FlxG.switchState(FreeplayState.new);
 
+		if(!lastParams.chartingMode) {
+			if(!FlxG.sound.music.playing) {
+				FlxG.signals.postStateSwitch.addOnce(() -> {
+					FlxTimer.wait(0.001, () -> {
+						FlxG.sound.music.time = 0;
+						FlxG.sound.music.volume = 0;
+						FlxG.sound.music.looped = true;
+						FlxG.sound.music.play();
+						FlxG.sound.music.fadeIn(0.16, 0, 1);
+					});
+				});
+			}
+			// TODO: story mode
+			FlxG.switchState(FreeplayState.new);
+		} else
+			goToCharter();
+		
 		onSongEndPost.dispatch();
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
@@ -700,6 +687,27 @@ class PlayState extends FunkinState {
 		#end
 		playField.hud.call("onEndSongPost");
 		playField.hud.call("onSongEndPost");
+	}
+
+	public function goToCharter():Void {
+		persistentUpdate = false;
+		camGame.followEnabled = false;
+		
+		FlxG.sound.music.pause();
+		vocals.pause();
+		
+		FlxG.sound.music.onComplete = null;
+		FlxG.switchState(ChartEditor.new.bind({
+			song: currentSong,
+			difficulty: currentDifficulty,
+			mix: currentMix,
+			mod: lastParams.mod,
+
+			startTime: (lastParams.startTime != null && lastParams.startTime > 0) ? lastParams.startTime : null,
+
+			_chart: currentChart,
+			_unsaved: lastParams._unsaved
+		}));
 	}
 
 	//----------- [ Private API ] -----------//
@@ -988,8 +996,11 @@ class PlayState extends FunkinState {
 		final timingPoint:TimingPoint = Conductor.instance._latestTimingPoint;
 		
 		if(interval > 0 && beat > 0 && Math.floor(Conductor.instance.curDecBeat - timingPoint.beat) % interval == 0) {
-			camGame.extraZoom += 0.015 * camZoomingIntensity;
-			camHUD.extraZoom += 0.03 * camZoomingIntensity;
+			if(camGame.extraZoom < 0.25 * camZoomingIntensity) // stop camGame from zooming too much
+				camGame.extraZoom += 0.015 * camZoomingIntensity;
+
+			if(camHUD.extraZoom < 0.25 * camZoomingIntensity) // stop camHUD from zooming too much
+				camHUD.extraZoom += 0.03 * camZoomingIntensity;
 		}
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed)

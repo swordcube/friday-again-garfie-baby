@@ -15,6 +15,8 @@ import funkin.gameplay.hud.ClassicHUD;
 import funkin.gameplay.scoring.Scoring;
 import funkin.gameplay.scoring.system.*;
 
+import funkin.states.editors.ChartEditor;
+
 class CharterPlaytest extends FunkinSubState {
     public static var lastParams:CharterPlaytestParams;
 
@@ -60,6 +62,8 @@ class CharterPlaytest extends FunkinSubState {
         FlxG.mouse.visible = false;
 
         FlxG.sound.acceptInputs = true;
+        FlxG.timeScale = ChartEditor.editorSettings.playbackRate;
+        
         currentChart = lastParams.chart;
 
         final instPath:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/inst');
@@ -78,6 +82,7 @@ class CharterPlaytest extends FunkinSubState {
 				isSingleTrack: true
 			});
 		}
+        vocals.setPitch(FlxG.timeScale);
 		add(vocals);
         
         conductor = new Conductor();
@@ -141,10 +146,12 @@ class CharterPlaytest extends FunkinSubState {
         else
             conductor.time = -conductor.offset;
 
+        inst.pitch = FlxG.timeScale;
         inst.time = conductor.rawTime;
         inst.volume = 1;
         inst.resume();
         
+        vocals.setPitch(FlxG.timeScale);
         vocals.seek(inst.time);
         vocals.play();
         
@@ -153,10 +160,12 @@ class CharterPlaytest extends FunkinSubState {
     }
     
     override function destroy():Void {
+        FlxG.timeScale = 1;
         FlxG.mouse.visible = lastMouseVisible;
+        
         WindowUtil.titleSuffix = " - Chart Editor";
-
         FlxG.cameras.remove(camera);
+
         inst = FlxDestroyUtil.destroy(inst);
         super.destroy();
     }
