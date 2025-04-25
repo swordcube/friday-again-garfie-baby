@@ -243,9 +243,9 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     public function dance():Void {
         #if SCRIPTING_ALLOWED
-        final event:ActionEvent = Events.get(UNKNOWN).flagAsPre();
+        final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
         if(game != null && game.scriptsAllowed)
-            scripts.call("onDance", [event.flagAsPre()]);
+            scripts.call("onDance", [event]);
         
         if(event.cancelled)
             return;

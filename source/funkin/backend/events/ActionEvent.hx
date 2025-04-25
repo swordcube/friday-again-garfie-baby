@@ -88,12 +88,14 @@ class ActionEvent implements IFlxDestroyable {
 
 	@:noDoc
 	@:noCompletion
-	public function recycleBase():Void {
+	public function recycleBase():ActionEvent {
 		data = {};
 		cancelled = false;
 
 		_canPropagate = true;
 		flagAsPre();
+
+		return this;
 	}
 
 	public function new(type:ActionEventType) {

@@ -3,6 +3,9 @@ package funkin.states.menus;
 import flixel.util.FlxTimer;
 import flixel.util.FlxDirectionFlags;
 
+import funkin.backend.events.Events;
+import funkin.backend.events.ActionEvent;
+
 import funkin.ui.AtlasText;
 import funkin.graphics.shader.CustomShader;
 
@@ -15,7 +18,9 @@ class TitleState extends FunkinState {
     public var introLength:Int;
 
     public var quoteText:AtlasText;
+
     public var ngSpr:FlxSprite;
+    public var allowNgEasterEggs:Bool = true;
 
     public var logoBl:FlxSprite;
     public var gfDance:FlxSprite;
@@ -50,24 +55,6 @@ class TitleState extends FunkinState {
         ];
         introLength = 16;
     }
-
-    public function showNewgrounds():Void {
-        ngSpr.revive();
-    }
-
-    public function hideNewgrounds():Void {
-        ngSpr.kill();
-    }
-
-    public function skipIntro():Void {
-        hideNewgrounds();
-
-        quoteText.kill();
-        titleGroup.revive();
-
-        skippedIntro = true;
-        FlxG.camera.flash(FlxColor.WHITE, (initialized) ? 1 : 4);
-    }
     
     override function create():Void {
         super.create();
@@ -86,10 +73,10 @@ class TitleState extends FunkinState {
 
         ngSpr = new FlxSprite(0, FlxG.height * 0.52);
 
-        if(FlxG.random.bool(1))
+        if(allowNgEasterEggs && FlxG.random.bool(1))
             ngSpr.loadGraphic(Paths.image('menus/title/newgrounds_classic'));
         
-        else if(FlxG.random.bool(30)) {
+        else if(allowNgEasterEggs && FlxG.random.bool(30)) {
             ngSpr.loadGraphic(Paths.image('menus/title/newgrounds_animated'), true, 600);
             ngSpr.animation.add('idle', [0, 1], 4);
             ngSpr.animation.play('idle');
@@ -112,33 +99,37 @@ class TitleState extends FunkinState {
         swagShader = new CustomShader("hue_offset");
         swagShader.setFloat("OFFSET", 0);
 
-        logoBl = new FlxSprite(-150, -100);
-        logoBl.frames = Paths.getSparrowAtlas('menus/title/logo');
-        logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
-        logoBl.animation.play('bump');
-        logoBl.shader = swagShader;
-        titleGroup.add(logoBl);
+        final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
+        call("onTitleGroupCreation", [event]);
 
-        gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
-        gfDance.frames = Paths.getSparrowAtlas('menus/title/gf');
-        gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-        gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-        gfDance.animation.play('danceRight');
-        gfDance.shader = swagShader;
-        titleGroup.add(gfDance);
+        if(!event.cancelled) {
+            logoBl = new FlxSprite(-150, -100);
+            logoBl.frames = Paths.getSparrowAtlas('menus/title/logo');
+            logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
+            logoBl.animation.play('bump');
+            logoBl.shader = swagShader;
+            titleGroup.add(logoBl);
+    
+            gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
+            gfDance.frames = Paths.getSparrowAtlas('menus/title/gf');
+            gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
+            gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
+            gfDance.animation.play('danceRight');
+            gfDance.shader = swagShader;
+            titleGroup.add(gfDance);
+    
+            titleText = new FlxSprite(100, FlxG.height * 0.8);
+            titleText.frames = Paths.getSparrowAtlas('menus/title/enter');
+            titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
+            titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
+            titleText.animation.play('idle');
+            titleText.shader = swagShader;
+            titleGroup.add(titleText);
 
-        titleText = new FlxSprite(100, FlxG.height * 0.8);
-        titleText.frames = Paths.getSparrowAtlas('menus/title/enter');
-        titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
-        titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
-        titleText.animation.play('idle');
-        titleText.shader = swagShader;
-        titleGroup.add(titleText);
-
+            call("onTitleGroupCreationPost", [event.flagAsPost()]);
+        }
         if(initialized)
             skipIntro();
-        
-        initialized = true;
     }
     
     override function update(elapsed:Float):Void {
@@ -157,14 +148,22 @@ class TitleState extends FunkinState {
             else if(!transitioning) {
                 transitioning = true;
 
-                FlxG.camera.flash(FlxColor.WHITE, 1);
-                FlxG.sound.play(Paths.sound("menus/sfx/select"));
-
-                titleText.animation.play('press');
-                FlxTimer.wait(2, () -> FlxG.switchState(new MainMenuState()));
+                final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
+                call("onTransitionToMenu", [event]);
+                
+                if(!event.cancelled) {
+                    FlxG.camera.flash(FlxColor.WHITE, 1);
+                    FlxG.sound.play(Paths.sound("menus/sfx/select"));
+                    
+                    if(titleText != null)
+                        titleText.animation.play('press');
+                    
+                    FlxTimer.wait(2, () -> switchToMenu());
+                    call("onTransitionToMenuPost", [event.flagAsPost()]);
+                }
             }
             else if(subState == null)
-                FlxG.switchState(new MainMenuState());
+                switchToMenu();
         }
         if(!cheatActivated && FlxG.keys.justPressed.ANY) {
             if (controls.justPressed.NOTE_UP || controls.justPressed.UI_UP) cheatCodePress(FlxDirectionFlags.UP);
@@ -174,7 +173,44 @@ class TitleState extends FunkinState {
         }
     }
 
-    override function beatHit(beat:Int) {
+    public function showNewgrounds():Void {
+        ngSpr.revive();
+    }
+
+    public function hideNewgrounds():Void {
+        ngSpr.kill();
+    }
+
+    public function skipIntro():Void {
+        initialized = true;
+
+        final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
+        call("onSkipIntro", [event]);
+        
+        if(event.cancelled)
+            return;
+
+        skippedIntro = true;
+        hideNewgrounds();
+
+        quoteText.kill();
+        titleGroup.revive();
+        
+        FlxG.camera.flash(FlxColor.WHITE, (initialized) ? 1 : 4);
+        call("onSkipIntroPost", [event.flagAsPost()]);
+    }
+
+    public function switchToMenu():Void {
+        final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
+        call("onSwitchToMenu", [event]);
+        
+        if(!event.cancelled) {
+            FlxG.switchState(new MainMenuState());
+            call("onSwitchToMenuPost", [event.flagAsPost()]);
+        }
+    }
+
+    override function beatHit(beat:Int):Void {
         if(!skippedIntro) {
             if(beat >= introLength)
                 skipIntro();
@@ -189,11 +225,16 @@ class TitleState extends FunkinState {
                 }
             }
         }
-        logoBl.animation.play('bump', true);
-        gfDance.animation.play((beat % 2 == 0) ? 'danceLeft' : 'danceRight', true);
-
+        if(logoBl != null)
+            logoBl.animation.play('bump', true);
+        
+        if(gfDance != null)
+            gfDance.animation.play((beat % 2 == 0) ? 'danceLeft' : 'danceRight', true);
+        
         if(cheatActivated && beat % 2 == 0)
             swagShader.setFloat("OFFSET", swagShader.getFloat("OFFSET") + 0.125);
+
+        super.beatHit(beat);
     }
 
     private function cheatCodePress(input:Int):Void {
@@ -209,6 +250,14 @@ class TitleState extends FunkinState {
     private function startCheat():Void {
         if(cheatActivated)
             return;
+        
+        final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
+        call("onStartCheat", [event]);
+        
+        if(event.cancelled)
+            return;
+
+        cheatActivated = true;
 
         if(!FlxG.keys.pressed.SHIFT) {
             // hold shift to keep currently playing music, incase
@@ -226,7 +275,7 @@ class TitleState extends FunkinState {
         FlxG.sound.play(Paths.sound("menus/sfx/select"));
         FlxG.camera.flash(FlxColor.WHITE, 1);
 
-        cheatActivated = true;
+        call("onStartCheatPost", [event.flagAsPost()]);
     }
 }
 

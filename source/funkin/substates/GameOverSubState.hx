@@ -100,8 +100,8 @@ class GameOverSubState extends FunkinSubState {
 
 		isEnding = true;
 
-		final event:ActionEvent = cast Events.get(UNKNOWN);
-        call("onRetry", [event.flagAsPre()]);
+		final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
+        call("onRetry", [event]);
 
 		if(event.cancelled)
 			return;
@@ -145,8 +145,8 @@ class GameOverSubState extends FunkinSubState {
     }
 
     public function unsafeExit():Void {
-        final event:ActionEvent = cast Events.get(UNKNOWN);
-        call("onExit", [event.flagAsPre()]);
+        final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
+        call("onExit", [event]);
 
         if(event.cancelled)
             return;
