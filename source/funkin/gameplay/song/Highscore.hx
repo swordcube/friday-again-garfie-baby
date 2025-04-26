@@ -5,7 +5,7 @@ import flixel.util.FlxSave;
 
 class Highscore {
     public static final RECORD_VERSION:Version = "1.0.0";
-    public static final ALL_RANKS:Array<Rank> = [GOLD, PERFECT, EXCELLENT, GREAT, GOOD, LOSS];
+    public static final ALL_RANKS:Array<Rank> = [GOLD, PERFECT, EXCELLENT, GREAT, GOOD, LOSS, UNKNOWN];
 
     public static function init():Void {
         _save = new FlxSave();
@@ -130,12 +130,12 @@ enum abstract Rank(String) from String to String {
     @:op(A < B)
     public static function lessThan(a:Rank, b:Rank):Bool {
         final ranksInOrder:Array<Rank> = Highscore.ALL_RANKS;
-        return ranksInOrder.indexOf(a) < ranksInOrder.indexOf(b);
+        return ranksInOrder.indexOf(a) > ranksInOrder.indexOf(b);
     }
 
     @:op(A > B)
     public static function greaterThan(a:Rank, b:Rank):Bool {
         final ranksInOrder:Array<Rank> = Highscore.ALL_RANKS;
-        return ranksInOrder.indexOf(a) > ranksInOrder.indexOf(b);
+        return ranksInOrder.indexOf(a) < ranksInOrder.indexOf(b);
     }
 }
