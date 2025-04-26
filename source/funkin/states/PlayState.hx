@@ -1,6 +1,8 @@
 package funkin.states;
 
+import flixel.text.FlxText;
 import flixel.math.FlxPoint;
+
 import flixel.util.FlxTimer;
 import flixel.util.FlxSignal;
 
@@ -95,6 +97,7 @@ class PlayState extends FunkinState {
 
 	public var camGame:FunkinCamera;
 	public var camHUD:FunkinCamera;
+	public var camOther:FunkinCamera;
 	
 	public var inst:FlxSound;
 	public var vocals:VocalGroup;
@@ -130,6 +133,8 @@ class PlayState extends FunkinState {
 
 	public var canDie:Bool = true;
 	public var worldCombo(default, set):Bool;
+
+	public var scoreWarningText:FlxText;
 
 	public var onSongStart:FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>();
 	public var onSongStartPost:FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>();
@@ -222,6 +227,10 @@ class PlayState extends FunkinState {
 		camHUD = new FunkinCamera();
 		camHUD.bgColor = 0;
 		FlxG.cameras.add(camHUD, false);
+
+		camOther = new FunkinCamera();
+		camOther.bgColor = 0;
+		FlxG.cameras.add(camOther, false);
 		
 		Scoring.currentSystem = new PBotSystem(); // reset the scoring system, cuz you can change it thru scripting n shit, and that shouldn't persist
 
@@ -324,14 +333,12 @@ class PlayState extends FunkinState {
 				final loader:AssetLoader = loaders[i];
 				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
 	
-				if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
-					continue;
-	
-				// gameplay scripts
-				addScripts(loader, "gameplay/scripts"); // load any gameplay script first
-				addScripts(loader, 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
-				addScripts(loader, 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // then load from specific song and specific mix
-			
+				if(contentMetadata == null || contentMetadata.runGlobally || Paths.forceContentPack == loader.id) {
+					// gameplay scripts
+					addScripts(loader, "gameplay/scripts"); // load any gameplay script first
+					addScripts(loader, 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
+					addScripts(loader, 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // then load from specific song and specific mix
+				}
 				// noteskin script
 				addSingleScript(loader, 'gameplay/noteskins/${noteSkin}/script');
 	
@@ -455,6 +462,13 @@ class PlayState extends FunkinState {
 
 		worldCombo = false;
 		_saveScore = !(chartingMode ?? false);
+
+		scoreWarningText = new FlxText(5, FlxG.height - 2, 0, "/!\\ - Player went into charting mode, score will not be saved", 16);
+		scoreWarningText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.RED, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		scoreWarningText.cameras = [camOther];
+		scoreWarningText.visible = !_saveScore;
+		scoreWarningText.y -= scoreWarningText.height;
+		add(scoreWarningText);
 	}
 
 	override function createPost():Void {
@@ -981,8 +995,11 @@ class PlayState extends FunkinState {
 	}
 
 	private function onBotplayToggle(value:Bool):Void {
-		if(value)
+		if(value && _saveScore) {
 			_saveScore = false;
+			scoreWarningText.text = "/!\\ - Player activated botplay, score will not be saved";
+			scoreWarningText.visible = true;
+		}
 	}
 
 	override function stepHit(step:Int):Void {

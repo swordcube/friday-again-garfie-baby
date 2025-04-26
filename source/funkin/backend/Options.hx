@@ -7,14 +7,14 @@ class Options {
     public static var downscroll:Bool = false;
     public static var centeredNotes:Bool = false;
     public static var useKillers:Bool = true;
-    public static var autoPause:Bool = true;
     public static var songOffset:Float = 0;
     public static var hitWindow:Float = 180;
-
+    
     public static var antialiasing:Bool = true;
+    public static var flashingLights:Bool = true;
     public static var hudType:String = "Classic";
     
-    public static var flashingLights:Bool = true;
+    public static var autoPause:Bool = true;
     public static var verboseLogging:Bool = true;
 
     @:ignore
@@ -41,7 +41,7 @@ class Options {
                 if(_musicVolTween != null)
                     _musicVolTween.cancel();
 
-                _musicVolTween = FlxTween.tween(FlxG.sound, {volume: _lastVolume * 0.3}, 0.5);
+                _musicVolTween = FlxTween.tween(FlxG.sound, {volume: _lastVolume * 0.5}, 0.5);
             }
         });
         FlxG.signals.focusGained.add(() -> {

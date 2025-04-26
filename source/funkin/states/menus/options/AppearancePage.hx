@@ -8,12 +8,19 @@ class AppearancePage extends OptionPage {
     override function initOptions():Void {
         addOption({
             name: "Antialiasing",
-            description: "Provides a very tiny performance boost, at the cost of\nworser and more pixelated looking graphics.",
+            description: "Provides a very tiny performance boost when disabled\nat the cost of worser looking graphics.",
         
             id: "antialiasing",
             type: TCheckbox,
 
             callback: (value:Dynamic) -> FlxG.allowAntialiasing = value
+        });
+        addOption({
+            name: "Flashing Lights",
+            description: "Whether or not flashing lights can appear in the menus or during gameplay.\nThis may not work for all mods, be warned!",
+        
+            id: "flashingLights",
+            type: TCheckbox
         });
         addOption({
             name: "HUD Type",

@@ -248,7 +248,7 @@ class Paths {
                     final loaders:Array<AssetLoader> = _registeredAssetLoaders;
                     for(i in 0...loaders.length) {
                         final contentMetadata:ContentMetadata = contentMetadata.get(loaders[i].id);
-                        if(contentMetadata != null && !contentMetadata.runGlobally)
+                        if(contentMetadata == null && !contentMetadata.runGlobally)
                             continue;
         
                         final path:String = loaders[i].getPath(name);

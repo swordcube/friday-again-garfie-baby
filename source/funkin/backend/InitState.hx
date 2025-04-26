@@ -4,6 +4,7 @@ import flixel.util.FlxTimer;
 
 import funkin.backend.native.NativeAPI;
 import funkin.backend.plugins.ForceCrashPlugin;
+import funkin.backend.plugins.ScreenShotPlugin;
 
 import funkin.graphics.RatioScaleModeEx;
 
@@ -95,6 +96,7 @@ class InitState extends FlxState {
 
         // init extra plugins
         FlxG.plugins.addPlugin(new ForceCrashPlugin());
+        FlxG.plugins.addPlugin(new ScreenShotPlugin());
 
         // hide cursor, we probably don't need it rn
         FlxG.mouse.visible = false;

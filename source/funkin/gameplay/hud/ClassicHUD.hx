@@ -32,7 +32,7 @@ class ClassicHUD extends BaseHUD {
         );
         healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33); // using direct 0xFF codes doesn't work in lua, must use FlxColor.fromString there instead
         healthBar.value = playField.stats.health;
-        healthBar.numDivisions = Std.int(healthBar.width * 4);
+        healthBar.numDivisions = 0;
         add(healthBar);
 
         var opponentIcon = "face";

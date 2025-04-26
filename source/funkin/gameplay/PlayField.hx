@@ -102,7 +102,7 @@ class PlayField extends FlxContainer {
     }
 
     public function hitNote(note:Note):Void {
-        final event:NoteHitEvent = new NoteHitEvent(); // issues are occuring from reusing the same event so we have to make a new one 
+        final event:NoteHitEvent = note.hitEvent; 
 
         final timestamp:Float = (note.strumLine.botplay) ? note.time : attachedConductor.time;
         final judgement:String = Scoring.judgeNote(note, timestamp);
@@ -119,7 +119,6 @@ class PlayField extends FlxContainer {
         
         event.note.wasHit = true;
         event.note.wasMissed = false;
-        event.note.hitEvent = event;
         
         final isPlayer:Bool = event.note.strumLine == playerStrumLine;
         if(event.note.length <= 0)
@@ -193,7 +192,7 @@ class PlayField extends FlxContainer {
     }
 
     public function missNote(note:Note):Void {
-        final event:NoteMissEvent = new NoteMissEvent(); // issues are occuring from reusing the same event so we have to make a new one
+        final event:NoteMissEvent = note.missEvent;
         onNoteMiss.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
             true, true, note.strumLine == playerStrumLine, note.strumLine == playerStrumLine,
@@ -204,7 +203,6 @@ class PlayField extends FlxContainer {
 
         event.note.wasHit = false;
         event.note.wasMissed = true;
-        event.note.missEvent = event;
 
         final isPlayer:Bool = event.note.strumLine == playerStrumLine;
         if(isPlayer) {

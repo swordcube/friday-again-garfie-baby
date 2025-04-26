@@ -28,15 +28,6 @@ class GameplayPage extends OptionPage {
             type: TCheckbox
         });
         addOption({
-            name: "Auto Pause",
-            description: "Changes whether or not the game will automatically\npause when the window is unfocused.",
-
-            id: "autoPause",
-            type: TCheckbox,
-
-            callback: (value:Dynamic) -> FlxG.autoPause = value
-        });
-        addOption({
             name: "Song Offset",
             description: "Changes how offset the music is from notes (in MS).\nMainly useful for headphones with lots of latency.",
 

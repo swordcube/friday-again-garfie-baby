@@ -1,6 +1,7 @@
 package funkin.backend;
 
 import flixel.util.FlxSave;
+import flixel.util.FlxTimer;
 import flixel.input.keyboard.FlxKey;
 
 import flixel.addons.input.FlxControls;
@@ -22,7 +23,13 @@ enum Control {
     NOTE_UP;
     NOTE_RIGHT;
 
+    SCREENSHOT;
     FULLSCREEN;
+
+    VOLUME_UP;
+    VOLUME_DOWN;
+    VOLUME_MUTE;
+
     DEBUG;
     DEBUG_RELOAD;
 }
@@ -42,7 +49,7 @@ class Controls extends FlxControls<Control> {
 
     public function new() {
         super();
-
+        
         save = new FlxSave();
         save.bind("controls", Constants.SAVE_DIR);
 
@@ -58,7 +65,44 @@ class Controls extends FlxControls<Control> {
             flush();
 
         resetMappings(getCurrentMappings());
-        FlxG.stage.window.onClose.add(flush);
+        FlxG.stage.window.onClose.add(flush); 
+        
+        FlxTimer.wait(0.001, () -> {
+            if(Controls.instance == this)
+                apply();
+        });
+    }
+
+    public static function getKeyFromInputType(shit:FlxControlInputType):FlxKey {
+        var key:FlxKey = NONE;
+        if(shit != null) {
+            switch(shit.simplify()) {
+                case Keyboard(Lone(k)):
+                    key = k;
+    
+                default:
+            }
+        }
+        return key;
+    }
+
+    public function apply():Void {
+        final mappings:ActionMap<Control> = getCurrentMappings();
+        FlxG.sound.volumeUpKeys = [for(input in mappings.get(VOLUME_UP)) {
+            final key:FlxKey = getKeyFromInputType(input);
+            if(key != NONE)
+                key;
+        }];
+        FlxG.sound.volumeDownKeys = [for(input in mappings.get(VOLUME_DOWN)) {
+            final key:FlxKey = getKeyFromInputType(input);
+            if(key != NONE)
+                key;
+        }];
+        FlxG.sound.muteKeys = [for(input in mappings.get(VOLUME_MUTE)) {
+            final key:FlxKey = getKeyFromInputType(input);
+            if(key != NONE)
+                key;
+        }];
     }
 
     public function getDefaultMappings():ActionMap<Control> {
@@ -78,9 +122,15 @@ class Controls extends FlxControls<Control> {
             NOTE_UP => [FlxKey.W, FlxKey.UP],
             NOTE_RIGHT => [FlxKey.D, FlxKey.RIGHT],
 
-            FULLSCREEN => [FlxKey.F11],
-            DEBUG => [FlxKey.SEVEN],
-            DEBUG_RELOAD => [FlxKey.F5]
+            SCREENSHOT => [FlxKey.F3, FlxKey.NONE],
+            FULLSCREEN => [FlxKey.F11, FlxKey.NONE],
+
+            VOLUME_UP => [FlxKey.PLUS, FlxKey.NUMPADPLUS],
+            VOLUME_DOWN => [FlxKey.MINUS, FlxKey.NUMPADMINUS],
+            VOLUME_MUTE => [FlxKey.ZERO, FlxKey.NUMPADZERO],
+
+            DEBUG => [FlxKey.SEVEN, FlxKey.NONE],
+            DEBUG_RELOAD => [FlxKey.F5, FlxKey.NONE]
         ];
     }
 

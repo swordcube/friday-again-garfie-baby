@@ -29,4 +29,8 @@ class AssetLoader {
         final path:String = getPath(path);
         return (FileSystem.exists(path)) ? FileSystem.readDirectory(path) : [];
     }
+
+    public function toString():String {
+        return 'AssetLoader(${id} - ${root})';
+    }
 }

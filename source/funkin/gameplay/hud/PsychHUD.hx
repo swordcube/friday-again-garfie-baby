@@ -57,7 +57,7 @@ class PsychHUD extends BaseHUD {
             (game.player?.healthColor != null) ? game.player.healthColor : 0xFF66FF33
         );
         healthBar.value = playField.stats.health;
-        healthBar.numDivisions = Std.int(healthBar.width * 4);
+        healthBar.numDivisions = 0;
         add(healthBar);
 
         var opponentIcon = "face";
@@ -103,7 +103,7 @@ class PsychHUD extends BaseHUD {
             game, "songPercent", 0, 1
         );
         timeBar.createFilledBar(0xFF000000, 0xFFFFFFFF);
-        timeBar.numDivisions = 800; // btw shadowmario from psych 0.5.2h era this won't cause any lag it's just division and multiplication math
+        timeBar.numDivisions = 0; // btw shadowmario from psych 0.5.2h era this won't cause any lag it's just basic math
         timeBar.alpha = 0;
         add(timeBar);
 

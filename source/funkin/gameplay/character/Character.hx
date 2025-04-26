@@ -94,7 +94,7 @@ class Character extends FlxSprite implements IBeatReceiver {
                     final loader:AssetLoader = loaders[i];
                     final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
     
-                    if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loader.id)
+                    if(contentMetadata == null)
                         continue;
     
                     final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script', loader.id, false);

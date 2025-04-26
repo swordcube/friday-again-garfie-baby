@@ -14,8 +14,8 @@ class MainPage extends Page {
             menu: AppearancePage
         },
         {
-            name: "Accessibility",
-            menu: AccessibilityPage
+            name: "Miscellanous",
+            menu: MiscellanousPage
         },
         {
             name: "Controls",

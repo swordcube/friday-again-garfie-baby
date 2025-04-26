@@ -48,6 +48,8 @@ class Note extends SkinnableSprite {
 
     public function new(x:Float = 0, y:Float = 0) {
         super(x, y);
+        hitEvent = new NoteHitEvent();
+        missEvent = new NoteMissEvent();
         holdTrail = new HoldTrail(-999999, -999999);
     }
 

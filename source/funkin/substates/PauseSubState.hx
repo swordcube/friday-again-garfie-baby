@@ -91,7 +91,7 @@ class PauseSubState extends FunkinSubState {
                 pauseMusic.volume = 0;
                 
                 pauseMusic.play();
-                pauseMusic.fadeIn(20, 0, 0.5);
+                pauseMusic.fadeIn(10, 0, 0.5);
             }
         });
         musicThread.onError((e:Dynamic) -> {});
