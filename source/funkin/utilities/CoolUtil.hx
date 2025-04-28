@@ -42,8 +42,13 @@ class CoolUtil {
      * @param  url  The URL to open.
      */
     public static function openURL(url:String):Void {
-        if(FileSystem.exists(url) && !FileSystem.isDirectory(url))
-            throw 'Invalid URL: ${url}';
+        // Ensure you can't open protocols such as steam://, file://, etc
+        var protocol:Array<String> = url.split("://");
+        if(protocol.length == 1)
+            url = 'https://${url}';
+        
+        else if (protocol[0] != 'http' && protocol[0] != 'https')
+            throw "openURL can only open http and https links.";
 
         #if linux
         Sys.command('/usr/bin/xdg-open', [url]);
