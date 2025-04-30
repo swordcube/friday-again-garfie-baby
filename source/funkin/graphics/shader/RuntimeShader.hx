@@ -23,6 +23,8 @@ import flixel.graphics.FlxGraphic;
 @:access(openfl.display.ShaderParameter)
 class RuntimeShader extends FlxShader implements IHScriptCustomBehaviour {
 	private static var __instanceFields = Type.getInstanceFields(RuntimeShader);
+	private static var __programErrors:Map<String, String> = [];
+	private static var __linkErrors:Map<String, String> = [];
 
 	public var glslVer:String = "320 es";
 	public var fragFileName:String;
@@ -123,8 +125,13 @@ class RuntimeShader extends FlxShader implements IHScriptCustomBehaviour {
 			messageBuf.add(source);
 
 			var message = messageBuf.toString();
-			if (compileStatus == 0) Logs.error(message);
-			// else if (hasInfoLog) Logs.trace(message);
+			if (compileStatus == 0)
+			{
+				__programErrors.set(source, message);
+				Logs.error(message);
+			}
+			else
+				__programErrors.remove(source);
 		}
 
 		return shader;
@@ -133,6 +140,7 @@ class RuntimeShader extends FlxShader implements IHScriptCustomBehaviour {
 	@:noCompletion private override function __createGLProgram(vertexSource:String, fragmentSource:String):GLProgram
 	{
 		var gl = __context.gl;
+		var rawID:String = vertexSource + fragmentSource;
 
 		var vertexShader = __createGLShader(vertexSource, gl.VERTEX_SHADER);
 		var fragmentShader = __createGLShader(fragmentSource, gl.FRAGMENT_SHADER);
@@ -158,10 +166,15 @@ class RuntimeShader extends FlxShader implements IHScriptCustomBehaviour {
 			messageBuf.add("Unable to initialize the shader program");
 			messageBuf.add("\n");
 			messageBuf.add(gl.getProgramInfoLog(program));
+			
 			var message = messageBuf.toString();
 			Logs.error(message);
-		}
 
+			__linkErrors.set(rawID, message);
+		}
+		else
+			__linkErrors.remove(rawID);
+		
 		return program;
 	}
 
@@ -203,7 +216,7 @@ class RuntimeShader extends FlxShader implements IHScriptCustomBehaviour {
 	@:noCompletion private override function __initGL():Void
 	{
 		if (__glSourceDirty || __paramBool == null)
-		{
+			{
 			__glSourceDirty = false;
 			program = null;
 
@@ -216,7 +229,6 @@ class RuntimeShader extends FlxShader implements IHScriptCustomBehaviour {
 			__processGLData(glVertexSource, "uniform");
 			__processGLData(glFragmentSource, "uniform");
 		}
-
 		if (__context != null && program == null)
 		{
 			var prefixBuf = new StringBuf();
@@ -241,17 +253,29 @@ class RuntimeShader extends FlxShader implements IHScriptCustomBehaviour {
 			var vertex = prefix + glVertexSource;
 			var fragment = prefix + glFragmentSource;
 
-			var id = vertex + fragment;
-
-			// TODO: find a cleaner way to handle repeat errors
-			// than just recompiling the same shader code again
-			if (__context.__programs.exists(id))
+			var rawID:String = vertex + fragment;
+			if (__context.__programs.exists(rawID))
 			{
-				__context.__programs.get(id).dispose();
+				program = __context.__programs.get(rawID);
+
+				var programError = __programErrors.get(vertex);
+				if (programError != null)
+					Logs.error(programError);
+
+				var programError = __programErrors.get(fragment);
+				if (programError != null)
+					Logs.error(programError);
+
+				var linkError = __linkErrors.get(rawID);
+				if (linkError != null)
+					Logs.error(linkError);
 			}
-			program = __context.createProgram(GLSL);
-			program.__glProgram = __createGLProgram(vertex, fragment);
-			__context.__programs.set(id, program);
+			else
+			{
+				program = __context.createProgram(GLSL);
+				program.__glProgram = __createGLProgram(vertex, fragment);
+				__context.__programs.set(rawID, program);
+			}
 
 			if (program != null)
 			{

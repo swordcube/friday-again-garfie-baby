@@ -1,0 +1,6 @@
+function onUpdate(dt) {
+    if(FlxG.keys.justPressed.F6) {
+        playField.playerStrumLine.botplay = !playField.playerStrumLine.botplay;
+        playField.hud.updatePlayerStats(playField.stats);
+    }
+}
