@@ -66,8 +66,9 @@ class Note extends SkinnableSprite {
         curScoreStep = 0;
         scoreSteps.resize(0);
 
+        final playbackRate:Float = Options.gameplayModifiers.get("playbackRate");
         for(i in 0...Std.int(this.length / stepLength))
-            scoreSteps.push({time: time + ((i + 1) * stepLength), score: 145});
+            scoreSteps.push({time: time + ((i + 1) * stepLength), score: Std.int(145 * playbackRate)});
         
         holdTrail.setup(this, skin);
 

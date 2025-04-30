@@ -20,6 +20,9 @@ class FunkinState extends TransitionableState implements IBeatReceiver {
     #end
 
     override function create():Void {
+        subStateOpened.add(onSubStateOpen);
+        subStateClosed.add(onSubStateClose);
+        
         #if SCRIPTING_ALLOWED
         if(scriptName == null) {
             final fullClName:String = Type.getClassName(Type.getClass(this));
@@ -88,6 +91,16 @@ class FunkinState extends TransitionableState implements IBeatReceiver {
         #if SCRIPTING_ALLOWED
         stateScripts.call(method, args);
         #end
+    }
+
+    public function onSubStateOpen(substate:FlxSubState):Void {
+        call("onSubStateOpen", [substate]);
+        call("onSubStateOpened", [substate]);
+    }
+
+    public function onSubStateClose(substate:FlxSubState):Void {
+        call("onSubStateClose", [substate]);
+        call("onSubStateClosed", [substate]);
     }
 
     public function stepHit(step:Int):Void {

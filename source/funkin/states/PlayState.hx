@@ -79,6 +79,8 @@ class PlayState extends FunkinState {
 	public var stage:Stage;
 	public var camFollow:FlxObject;
 
+	public var paused:Bool = false;
+
 	public var inCutscene:Bool = false;
 	public var minimalMode:Bool = false;
 
@@ -547,7 +549,10 @@ class PlayState extends FunkinState {
 
 	override function onFocusLost():Void {
 		super.onFocusLost();
-		pause();
+
+		if(!paused)
+			pause();
+		
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed)
 			scripts.call("onFocusLost");
@@ -561,6 +566,30 @@ class PlayState extends FunkinState {
 			scripts.call("onFocus");
 			scripts.call("onFocusGain");
 			scripts.call("onFocusGained");
+		}
+		#end
+	}
+
+	override function onSubStateOpen(subState:FlxSubState):Void {
+		super.onSubStateOpen(subState);
+		paused = true;
+
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed) {
+			scripts.call("onSubStateOpen", [subState]);
+			scripts.call("onSubStateOpened", [subState]);
+		}
+		#end
+	}
+
+	override function onSubStateClose(subState:FlxSubState):Void {
+		super.onSubStateClose(subState);
+		paused = false;
+
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed) {
+			scripts.call("onSubStateClose", [subState]);
+			scripts.call("onSubStateClosed", [subState]);
 		}
 		#end
 	}

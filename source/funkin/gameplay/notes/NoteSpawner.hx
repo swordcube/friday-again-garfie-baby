@@ -49,7 +49,7 @@ class NoteSpawner extends FlxBasic {
                 continue;
             }
             final note:Note = strumLine.notes.recycle(_noteFactory);
-            note.stepLength = 100;//playField.attachedConductor.stepLength;
+            note.stepLength = playField.attachedConductor.stepLength;
             
             if(note.length <= 0)
                 note.holdTrail.kill();

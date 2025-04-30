@@ -199,7 +199,7 @@ class PlayField extends FlxContainer {
         onNoteMiss.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
             true, true, note.strumLine == playerStrumLine, note.strumLine == playerStrumLine,
-            10, 0.02375 + (Math.min(note.length * 0.001, 0.25) * 0.5), true, true, null, ""
+            100, 0.02375 + (Math.min(note.length * 0.001, 0.25) * 0.5), true, true, null, ""
         ));
         if(event.cancelled)
             return;
