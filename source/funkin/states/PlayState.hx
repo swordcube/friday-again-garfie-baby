@@ -1000,6 +1000,10 @@ class PlayState extends FunkinState {
 			scoreWarningText.text = "/!\\ - Player activated botplay, score will not be saved";
 			scoreWarningText.visible = true;
 		}
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed)
+			scripts.call("onBotplayToggle", [value]);
+		#end
 	}
 
 	override function stepHit(step:Int):Void {

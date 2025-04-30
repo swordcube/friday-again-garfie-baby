@@ -131,4 +131,11 @@ class HoldTrail extends FlxSpriteGroup {
         }
         return Value;
     }
+
+    @:noCompletion
+    override function set_shader(newShader:FlxShader):FlxShader {
+        strip.shader = newShader;
+        tail.shader = newShader;
+        return newShader;
+    }
 }
