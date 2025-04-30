@@ -46,7 +46,7 @@ jobs:
 
       - name: Building Lime
         run: |
-          haxelib --always run lime rebuild mac
+          haxelib --always run lime rebuild linux
 
       - name: Building the game
         run: |

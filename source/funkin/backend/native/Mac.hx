@@ -1,6 +1,6 @@
 package funkin.backend.native;
 
-#if mac
+#if (mac || macos)
 /**
  * @see https://github.com/FNF-CNE-Devs/CodenameEngine/blob/main/source/funkin/backend/utils/native/Mac.hx
  */

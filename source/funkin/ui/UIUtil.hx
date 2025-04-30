@@ -59,11 +59,15 @@ class UIUtil {
 
     public static function correctModifierKey(key:FlxKey):FlxKey {
         #if (mac || macos)
-        switch(key) {
+        return switch(key) {
             case CONTROL:
-                return WINDOWS;
+                WINDOWS;
+                
+            default:
+                key;
         }
-        #end
+        #else
         return key;
+        #end
     }
 }
