@@ -5,6 +5,8 @@ import flixel.math.FlxRect;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxTileFrames;
 
+import flixel.system.FlxAssets.FlxShader;
+
 class HoldTrail extends FlxSpriteGroup {
     /**
      * The note that this hold trail belongs to.
