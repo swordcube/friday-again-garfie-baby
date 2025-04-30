@@ -46,9 +46,8 @@ class FunkinHScript extends FunkinScript {
                 Logs.trace('${args.join(', ')}');
         }));
         _interp.importEnabled = unsafe;
-        _interp.errorHandler = (error:Error, ?pos:Null<PosInfos>) -> {
-            var fileName = error.origin;
-            var fn:String = '$fileName:${error.line}: ';
+        _interp.errorHandler = (error:Error) -> {
+            var fn:String = '${error.origin}:${error.line}: ';
 
             var err:String = error.toString();
             if(err.startsWith(fn))

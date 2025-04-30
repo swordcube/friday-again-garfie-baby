@@ -1,9 +1,11 @@
 package funkin.gameplay;
 
-import funkin.gameplay.UISkin;
 import funkin.graphics.SkinnableUISprite;
 
+import funkin.gameplay.UISkin;
 import funkin.gameplay.scoring.Scoring;
+
+import funkin.utilities.SpriteUtil;
 
 class ComboDisplay extends FlxSpriteGroup {
     public var skin:String;
@@ -108,7 +110,7 @@ class RatingSprite extends SkinnableUISprite {
 
     public function setup(x:Float, y:Float, rating:String, skin:String):RatingSprite {
         loadSkin(skin);
-        CoolUtil.resetSprite(this, x, y);
+        SpriteUtil.resetSprite(this, x, y);
         
         this.rating = rating;
         return this;
@@ -141,7 +143,7 @@ class ComboDigitSprite extends SkinnableUISprite {
 
     public function setup(x:Float, y:Float, digit:String, skin:String):ComboDigitSprite {
         loadSkin(skin);
-        CoolUtil.resetSprite(this, x, y);
+        SpriteUtil.resetSprite(this, x, y);
         
         this.digit = digit;
         return this;

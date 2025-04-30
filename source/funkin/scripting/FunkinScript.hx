@@ -37,6 +37,7 @@ class FunkinScript {
             parse: Json.parse,
             stringify: Json.stringify
         });
+        setClass(Type);
         setClass(FlxG);
 
         setClass(FlxBasic);
@@ -120,11 +121,16 @@ class FunkinScript {
         setClass(funkin.graphics.shader.RuntimeShader);
         setClass(funkin.graphics.shader.CustomShader);
 
+        setClass(funkin.states.PlayState);
+        setClass(funkin.states.FunkinState);
+        setClass(funkin.states.ScriptedState);
+
         setClass(funkin.states.menus.TitleState);
         setClass(funkin.states.menus.MainMenuState);
         setClass(funkin.states.menus.FreeplayState);
         
-        setClass(funkin.states.PlayState);
+        setClass(funkin.substates.FunkinSubState);
+        setClass(funkin.substates.ScriptedSubState);
 
         set("BlendMode", funkin.scripting.helpers.BlendModeHelper);
         set("FlxAxes", funkin.scripting.helpers.FlxAxesHelper);

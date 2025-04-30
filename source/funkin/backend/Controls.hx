@@ -32,6 +32,7 @@ enum Control {
 
     DEBUG;
     DEBUG_RELOAD;
+    EMERGENCY;
 }
 
 class Controls extends FlxControls<Control> {
@@ -130,7 +131,8 @@ class Controls extends FlxControls<Control> {
             VOLUME_MUTE => [FlxKey.ZERO, FlxKey.NUMPADZERO],
 
             DEBUG => [FlxKey.SEVEN, FlxKey.NONE],
-            DEBUG_RELOAD => [FlxKey.F5, FlxKey.NONE]
+            DEBUG_RELOAD => [FlxKey.F5, FlxKey.NONE],
+            EMERGENCY => [FlxKey.F7, FlxKey.NONE]
         ];
     }
 

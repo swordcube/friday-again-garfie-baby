@@ -13,13 +13,18 @@ import funkin.scripting.FunkinScriptGroup;
 
 class FunkinState extends TransitionableState implements IBeatReceiver {
     public var controls(get, never):Controls;
+    
+    #if SCRIPTING_ALLOWED
+    public var scriptName:String;
     public var stateScripts(default, null):FunkinScriptGroup;
+    #end
 
     override function create():Void {
         #if SCRIPTING_ALLOWED
-        final fullClName:String = Type.getClassName(Type.getClass(this));
-        final shortClName:String = fullClName.substring(fullClName.lastIndexOf(".") + 1);
-
+        if(scriptName == null) {
+            final fullClName:String = Type.getClassName(Type.getClass(this));
+            scriptName = fullClName.substring(fullClName.lastIndexOf(".") + 1);
+        }
         stateScripts = new FunkinScriptGroup();
         stateScripts.setParent(this);
 
@@ -32,7 +37,7 @@ class FunkinState extends TransitionableState implements IBeatReceiver {
             if(contentMetadata == null)
                 continue;
 
-            final scriptPath:String = Paths.script('states/${shortClName}', loader.id, false);
+            final scriptPath:String = Paths.script('states/${scriptName}', loader.id, false);
             if(FlxG.assets.exists(scriptPath)) {
                 final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
                 script.set("this", this);

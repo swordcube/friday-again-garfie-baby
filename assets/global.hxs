@@ -11,13 +11,33 @@ function onUpdate(dt) {
             PlayState.lastParams.scriptsAllowed = true;
         }
         if(FlxG.keys.pressed.SHIFT) {
+            trace("Reloading content and state...");
             FlxG.inputs.onStateSwitch();
             FlxG.signals.preStateCreate.addOnce(reloadAssets);
 
             final constructor = FlxG.state._constructor;
             FlxG.game._nextState = constructor;
             FlxG.game.switchState();
-        } else
+        } else {
+            trace("Reloading state normally...");
             FlxG.resetState();
+        }
+    }
+    if(Controls.instance.justPressed.check(Control.EMERGENCY)) {
+        // if(FlxG.game._state != null) {
+        //     try {
+        //         FlxG.game._state.destroy();
+        //         FlxG.game._state = null;
+        //     }
+        //     catch(e) {
+        //         FlxG.game._state = null;
+        //         trace("Failed to destroy state: " + e);
+        //     }
+        // }
+        // try catches are broken in hscript-improved! fun!
+        FlxG.game._state = new MainMenuState();
+        FlxG.game._state.create();
+        FlxG.game._state.createPost();
+        FlxG.game._nextState = null;
     }
 }

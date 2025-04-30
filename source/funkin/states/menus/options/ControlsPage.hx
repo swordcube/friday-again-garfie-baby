@@ -109,6 +109,10 @@ class ControlsPage extends Page {
                 {
                     name: "Debug Menu",
                     control: Control.DEBUG
+                },
+                {
+                    name: "Emergency",
+                    control: Control.EMERGENCY
                 }
             ]
         }

@@ -49,7 +49,7 @@ class GlobalScript {
 		FlxG.signals.preGameStart.add(() -> {
 			scripts.call("onGameStart");
 		});
-		FlxG.signals.preStateCreate.add(function(state:FlxState) {
+		FlxG.signals.preStateCreate.add((state:FlxState) -> {
 			scripts.call("onStateCreate", [state]);
 		});
 		FlxG.signals.preStateSwitch.add(() -> {
