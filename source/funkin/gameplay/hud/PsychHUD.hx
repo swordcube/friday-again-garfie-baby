@@ -92,7 +92,7 @@ class PsychHUD extends BaseHUD {
             timeY = FlxG.height - 44;
         
         var timeX:Float = 45 + (FlxG.width / 2) - 245;
-        timeBarBG = new FlxSprite(timeX, timeY + 4).loadGraphic(Paths.image("gameplay/hudskins/psych/images/timeBar"));
+        timeBarBG = new FlxSprite(timeX, timeY + 4).loadGraphic(Paths.image("gameplay/hudskins/Psych/images/timeBar"));
         timeBarBG.alpha = 0;
         timeBarBG.color = FlxColor.BLACK;
         add(timeBarBG);
