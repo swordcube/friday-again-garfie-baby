@@ -30,9 +30,14 @@ jobs:
           haxelib --global --always install hmm
           haxelib run hmm install
       
+      - name: Building Lime
+        run: |
+          haxelib --always run lime rebuild windows
+
       - name: Building the game
         run: |
-          haxelib run lime build windows
+          haxelib --always run lime build windows
+      
       - name: Uploading artifact (entire build)
         uses: actions/upload-artifact@v4
         with:

@@ -33,9 +33,14 @@ jobs:
           haxelib --global --always install hmm
           haxelib run hmm install
       
+      - name: Building Lime
+        run: |
+          haxelib --always run lime rebuild mac
+
       - name: Building the game
         run: |
-          haxelib run lime build linux
+          haxelib --always run lime build linux
+      
       - name: Tar files
         run: tar -zcvf GarfieEngine.tar.gz -C export/release/linux/bin .
       - name: Uploading artifact (entire build)
