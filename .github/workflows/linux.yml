@@ -33,6 +33,12 @@ jobs:
           haxelib --global --always install hmm
           haxelib run hmm install
       
+      - name: Building HXCPP
+        run: |
+          cd ./haxelib/hxcpp/git/tools/hxcpp
+          haxe compile.hxml
+          cd ../../../../../
+
       - name: Building Lime
         run: |
           haxelib --always run lime rebuild mac
