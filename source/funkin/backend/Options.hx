@@ -4,18 +4,32 @@ import flixel.util.FlxSave;
 
 @:build(funkin.backend.macros.OptionsMacro.build())
 class Options {
+    // GAMEPLAY //
     public static var downscroll:Bool = false;
     public static var centeredNotes:Bool = false;
     public static var useKillers:Bool = true;
     public static var songOffset:Float = 0;
     public static var hitWindow:Float = 180;
     
+    // APPEARANCE //
     public static var antialiasing:Bool = true;
     public static var flashingLights:Bool = true;
     public static var hudType:String = "Classic";
     
+    // MISCELLANOUS //
     public static var autoPause:Bool = true;
-    public static var verboseLogging:Bool = true;
+    public static var verboseLogging:Bool = false;
+
+    // GAMEPLAY MODIFIERS
+    @:ignore
+    public static var gameplayModifiers:Map<String, Dynamic> = [];
+
+    @:ignore
+    public static var defaultGameplayModifiers:Map<String, Dynamic> = [
+        "practiceMode" => false,
+        "botplay" => false,
+        "playbackRate" => 1
+    ];
 
     @:ignore
     public static function init():Void {
@@ -29,9 +43,19 @@ class Options {
                 Reflect.setField(_save.data, key, value);
             }
         }
-        if(doFlush)
-            _save.flush();
+        final savedMap:Map<String, Dynamic> = _save.data.gameplayModifiers ?? new Map<String, Dynamic>();
+        for (name => value in defaultGameplayModifiers) {
+            if(savedMap.get(name) == null) {
+                doFlush = true;
+                savedMap.set(name, value);
+            }
+        }
+        gameplayModifiers = savedMap;
         
+        if(doFlush) {
+            _save.data.gameplayModifiers = gameplayModifiers;
+            _save.flush();
+        }
         FlxG.autoPause = autoPause;
         _lastVolume = FlxG.save.data.volume;
         
@@ -52,10 +76,14 @@ class Options {
                 _musicVolTween = FlxTween.tween(FlxG.sound, {volume: _lastVolume}, 0.5);
             }
         });
-        FlxSprite.defaultAntialiasing = antialiasing;
+        FlxSprite.defaultAntialiasing = true;
+
+        FlxG.allowAntialiasing = antialiasing;
+        FlxG.stage.quality = (FlxG.allowAntialiasing) ? HIGH : LOW;
     }
     
     public static function save():Void {
+        _save.data.gameplayModifiers = gameplayModifiers;
         _save.flush();
     }
 

@@ -2,6 +2,7 @@ package funkin.states.menus;
 
 import flixel.text.FlxText;
 
+import funkin.ui.UIUtil;
 import funkin.ui.AtlasText;
 import funkin.ui.AtlasTextList;
 
@@ -13,7 +14,9 @@ import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.SongMetadata;
 
 import funkin.states.editors.ChartEditor;
+
 import funkin.substates.ResetScoreSubState;
+import funkin.substates.GameplayModifiersMenu;
 
 @:structInit
 class FreeplaySongData {
@@ -154,7 +157,7 @@ class FreeplayState extends FunkinState {
 		hintBG.alpha = 0.6;
 		add(hintBG);
 
-		hintText = new FlxText(hintBG.x, hintBG.y + 4, 0, "Q/E - Change Category | CTRL - Gameplay Modifiers | SPACE - Listen to Song");
+		hintText = new FlxText(hintBG.x, hintBG.y + 4, 0, 'Q/E - Change Category | ${(UIUtil.correctModifierKey(CONTROL) == WINDOWS) ? "CMD" : "CTRL"} - Gameplay Modifiers | SPACE - Listen to Song');
 		hintText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, RIGHT);
         hintText.x += FlxG.width - (hintText.width + 4);
 		add(hintText);
@@ -230,6 +233,10 @@ class FreeplayState extends FunkinState {
             });
             openSubState(subState);
         }
+        final pressedCtrl:Bool = #if (mac || macos) FlxG.keys.justPressed.WINDOWS #else FlxG.keys.justPressed.CONTROL #end;
+        if(pressedCtrl)
+            openSubState(new GameplayModifiersMenu());
+
         #if TEST_BUILD
         if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.G) {
             final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];

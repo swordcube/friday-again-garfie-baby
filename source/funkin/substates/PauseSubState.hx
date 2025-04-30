@@ -199,6 +199,7 @@ class PauseSubState extends FunkinSubState {
             game.vocals.seek(FlxG.sound.music.time);
             game.vocals.resume();
         }
+        FlxG.timeScale = lastTimeScale;
         close();
     }
 
@@ -230,7 +231,9 @@ class PauseSubState extends FunkinSubState {
             FlxG.signals.postStateSwitch.addOnce(() -> {
                 FlxG.cameras.remove(FadeTransition.nextCamera);
             });
+            FlxG.timeScale = 1;
             FlxG.sound.music.onComplete = null;
+
             FlxG.switchState(PlayState.new.bind({
                 song: game.currentSong,
                 difficulty: game.currentDifficulty,
@@ -267,7 +270,9 @@ class PauseSubState extends FunkinSubState {
             transitionCam.bgColor = 0;
             FlxG.cameras.add(transitionCam, false);
 
+            FlxG.timeScale = 1;
             FadeTransition.nextCamera = transitionCam;
+
             FlxG.signals.postStateSwitch.addOnce(() -> {
                 FlxG.cameras.remove(FadeTransition.nextCamera);
             });
@@ -344,10 +349,9 @@ class PauseSubState extends FunkinSubState {
         if(pauseMusic != null)
             pauseMusic = FlxDestroyUtil.destroy(pauseMusic);
         
-        FlxG.timeScale = lastTimeScale;
         FlxG.cameras.remove(camera);
-        
         WindowUtil.onClose = prevWindowOnClose;
+        
         super.destroy();
     }
 }

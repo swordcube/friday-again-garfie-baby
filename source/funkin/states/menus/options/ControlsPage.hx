@@ -1,5 +1,6 @@
 package funkin.states.menus.options;
 
+import flixel.util.FlxTimer;
 import flixel.effects.FlxFlicker;
 import flixel.addons.input.FlxControls;
 
@@ -239,11 +240,12 @@ class ControlsPage extends Page {
         FlxFlicker.stopFlickering(bindText);
         bindText.text = InputFormatter.formatFlixel(newKey);
         bindText.visible = true;
-
+        
+        FlxTimer.wait(0.001, () -> {
+            controls.bind(controlItems[curSelected], curBindIndex, newKey);
+            controls.apply();
+        });
         curMappings.get(controlItems[curSelected])[curBindIndex] = newKey;
-
-        controls.bind(controlItems[curSelected], curBindIndex, newKey);
-        controls.apply();
     }
 
     public function changeSelection(by:Int = 0, ?force:Bool = false):Void {

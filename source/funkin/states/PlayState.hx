@@ -131,6 +131,9 @@ class PlayState extends FunkinState {
 	public var canPause:Bool = true;
 	public var chartingMode:Bool = false;
 
+	public var practiceMode(default, set):Bool = false;
+	public var playbackRate(default, set):Float = 1;
+
 	public var canDie:Bool = true;
 	public var worldCombo(default, set):Bool;
 
@@ -469,6 +472,10 @@ class PlayState extends FunkinState {
 		scoreWarningText.visible = !_saveScore;
 		scoreWarningText.y -= scoreWarningText.height;
 		add(scoreWarningText);
+
+		practiceMode = Options.gameplayModifiers.get("practiceMode");
+		playbackRate = Options.gameplayModifiers.get("playbackRate");
+		playField.playerStrumLine.botplay = Options.gameplayModifiers.get("botplay");
 	}
 
 	override function createPost():Void {
@@ -497,7 +504,7 @@ class PlayState extends FunkinState {
 		if(canPause && controls.justPressed.PAUSE)
 			pause();
 
-		if(controls.justPressed.RESET || (canDie && playField.stats.health <= playField.stats.minHealth))
+		if(controls.justPressed.RESET || (!practiceMode && canDie && playField.stats.health <= playField.stats.minHealth))
 			gameOver();
 		
 		if(controls.justPressed.DEBUG)
@@ -535,6 +542,26 @@ class PlayState extends FunkinState {
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed)
 			scripts.call("onUpdatePost", [elapsed]);
+		#end
+	}
+
+	override function onFocusLost():Void {
+		super.onFocusLost();
+		pause();
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed)
+			scripts.call("onFocusLost");
+		#end
+	}
+
+	override function onFocus():Void {
+		super.onFocus();
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed) {
+			scripts.call("onFocus");
+			scripts.call("onFocusGain");
+			scripts.call("onFocusGained");
+		}
 		#end
 	}
 
@@ -1072,6 +1099,29 @@ class PlayState extends FunkinState {
 			playField.comboDisplay.setPosition(FlxG.width * 0.474, (FlxG.height * 0.45) - 60); 
 		}
 		return worldCombo;
+	}
+
+	@:noCompletion
+	private function set_practiceMode(newValue:Bool):Bool {
+		practiceMode = newValue;
+
+		if(practiceMode && _saveScore) {
+			_saveScore = false;
+			scoreWarningText.text = "/!\\ - Player activated practice mode, score will not be saved";
+			scoreWarningText.visible = true;
+		}
+		return practiceMode;
+	}
+
+	@:noCompletion
+	private function set_playbackRate(newValue:Float):Float {
+		playbackRate = Math.max(newValue, 0.01);
+
+		inst.pitch = playbackRate;
+		vocals.setPitch(playbackRate);
+
+		FlxG.timeScale = playbackRate;
+		return playbackRate;
 	}
 
 	override function destroy() {

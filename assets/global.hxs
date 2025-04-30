@@ -10,6 +10,8 @@ function onUpdate(dt) {
             PlayState.lastParams.minimalMode = true;
             PlayState.lastParams.scriptsAllowed = true;
         }
+        FlxG.timeScale = 1;
+        
         if(FlxG.keys.pressed.SHIFT) {
             trace("Reloading content and state...");
             FlxG.inputs.onStateSwitch();
@@ -24,20 +26,27 @@ function onUpdate(dt) {
         }
     }
     if(Controls.instance.justPressed.check(Control.EMERGENCY)) {
-        // if(FlxG.game._state != null) {
-        //     try {
-        //         FlxG.game._state.destroy();
-        //         FlxG.game._state = null;
-        //     }
-        //     catch(e) {
-        //         FlxG.game._state = null;
-        //         trace("Failed to destroy state: " + e);
-        //     }
-        // }
-        // try catches are broken in hscript-improved! fun!
-        FlxG.game._state = new MainMenuState();
+        trace("Forcefully loading main menu...");
+        FlxG.timeScale = 1;
+        FlxG.inputs.onStateSwitch();
+        
+        if(FlxG.game._state != null) {
+            try {
+                FlxG.game._state.destroy();
+                FlxG.game._state = null;
+            }
+            catch(e:Dynamic) { // for some reason you MUST specify a type for the error or it just dies???
+                FlxG.game._state = null;
+                trace("Failed to destroy state: " + e);
+            }
+        }
+        var constructor = () -> return new MainMenuState();
+        FlxG.game._state = constructor();
+        FlxG.game._state._constructor = constructor;
+
         FlxG.game._state.create();
         FlxG.game._state.createPost();
+        
         FlxG.game._nextState = null;
     }
 }

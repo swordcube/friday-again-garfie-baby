@@ -107,11 +107,14 @@ class PlayField extends FlxContainer {
         final timestamp:Float = (note.strumLine.botplay) ? note.time : attachedConductor.time;
         final judgement:String = Scoring.judgeNote(note, timestamp);
 
+        final score:Int = Scoring.scoreNote(note, timestamp);
+        final savedRate:Float = Options.gameplayModifiers.get("playbackRate");
+
         final isPlayer:Bool = note.strumLine == playerStrumLine;
         onNoteHit.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
             isPlayer, false, judgement, isPlayer && Scoring.splashAllowed(judgement), true, true, isPlayer, isPlayer,
-            Scoring.scoreNote(note, timestamp), Scoring.getAccuracyScore(judgement), 0.0115,
+            (savedRate >= 1) ? score : Std.int(score * savedRate), Scoring.getAccuracyScore(judgement), 0.0115,
             Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true, true, true, null, ""
         ));
         if(event.cancelled)

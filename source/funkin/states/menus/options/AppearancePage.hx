@@ -13,7 +13,10 @@ class AppearancePage extends OptionPage {
             id: "antialiasing",
             type: TCheckbox,
 
-            callback: (value:Dynamic) -> FlxG.allowAntialiasing = value
+            callback: (value:Dynamic) -> {
+                FlxG.allowAntialiasing = value;
+                FlxG.stage.quality = (FlxG.allowAntialiasing) ? HIGH : LOW;
+            }
         });
         addOption({
             name: "Flashing Lights",

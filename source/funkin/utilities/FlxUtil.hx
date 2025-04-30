@@ -23,7 +23,7 @@ class FlxUtil {
      * The package for the currently loaded state.
      * 
      * **Example:**
-     * `funkin.play.PlayState`
+     * `funkin.states.PlayState`
      */
     public static var statePackage:String;
 
