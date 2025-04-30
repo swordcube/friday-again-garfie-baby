@@ -8,10 +8,10 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: Pulling the source
-        uses: actions/checkout@v2
+      - name: Pulling the new commit
+        uses: actions/checkout@main
       - name: Setting up Haxe
-        uses: krdlab/setup-haxe@v1
+        uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
       - name: Restore existing build cache for faster compilation
@@ -25,9 +25,14 @@ jobs:
             export/release/linux/obj/
           restore-keys: |
             cache-build-linux
+      
       - name: Installing LibVLC and LuaJIT
         run: |
           sudo apt-get install libvlc-dev libvlccore-dev libluajit-5.1-dev
+
+      - name: Install lime dependencies
+        run: sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev g++ g++-multilib gcc-multilib libasound2-dev libx11-dev libxext-dev libxi-dev libxrandr-dev libxinerama-dev
+
       - name: Installing/Updating libraries
         run: |
           haxelib --global --always install hmm
