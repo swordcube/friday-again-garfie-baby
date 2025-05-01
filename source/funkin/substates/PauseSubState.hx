@@ -14,6 +14,7 @@ import flixel.util.FlxTimer;
 import flixel.util.FlxDestroyUtil;
 
 import funkin.states.PlayState;
+import funkin.states.menus.StoryMenuState;
 import funkin.states.menus.FreeplayState;
 
 import funkin.substates.transition.FadeTransition;
@@ -239,6 +240,7 @@ class PauseSubState extends FunkinSubState {
                 difficulty: game.currentDifficulty,
                 mix: game.currentMix,
                 mod: PlayState.lastParams.mod,
+                isStoryMode: PlayState.lastParams.isStoryMode,
 
                 startTime: PlayState.lastParams.startTime,
                 chartingMode: (!leaveCharting) ? PlayState.lastParams.chartingMode : false,
@@ -276,9 +278,10 @@ class PauseSubState extends FunkinSubState {
             FlxG.signals.postStateSwitch.addOnce(() -> {
                 FlxG.cameras.remove(FadeTransition.nextCamera);
             });
-
-            // TODO: story mode
-            FlxG.switchState(FreeplayState.new);
+            if(PlayState.instance.isStoryMode)
+                FlxG.switchState(StoryMenuState.new);
+            else
+                FlxG.switchState(FreeplayState.new);
         });
         close();
     }

@@ -1,18 +1,18 @@
 {
-    "scale": 1.1,
+    "scale": 0.7,
     
-    "position": [130, 10],
+    "position": [70, -45],
     "flipX": false,
     "flipY": false,
     
     "atlas": {
 		"type": "sparrow",
-		"path": "sprite",
+		"path": "../pico/sprite",
 		"gridSize": null
 	},
     "animations": {
         "idle": {
-            "prefix": "idle",
+            "prefix": "Pico Idle Dance",
             "indices": null,
             "fps": 24,
             "looped": false

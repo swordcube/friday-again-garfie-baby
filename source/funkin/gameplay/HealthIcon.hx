@@ -308,8 +308,8 @@ class HealthIcon extends TrackingSprite {
         
         updateHitbox();
 
-        flipX = charData?.healthIcon?.flip[0] ?? false;
-        flipY = charData?.healthIcon?.flip[1] ?? false;
+        flipX = charData?.healthIcon?.flipX ?? false;
+        flipY = charData?.healthIcon?.flipY ?? false;
 
         frameOffset.set(
             charData?.healthIcon?.offset[0] ?? 0,

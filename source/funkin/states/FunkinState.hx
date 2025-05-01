@@ -6,12 +6,15 @@ import funkin.backend.assets.loaders.AssetLoader;
 import funkin.backend.Controls;
 import funkin.backend.Conductor.IBeatReceiver;
 
+import funkin.graphics.GraphicCacheSprite;
+
 #if SCRIPTING_ALLOWED
 import funkin.scripting.FunkinScript;
 import funkin.scripting.FunkinScriptGroup;
 #end
 
 class FunkinState extends TransitionableState implements IBeatReceiver {
+    public var graphicCache(default, null):GraphicCacheSprite;
     public var controls(get, never):Controls;
     
     #if SCRIPTING_ALLOWED
@@ -20,6 +23,9 @@ class FunkinState extends TransitionableState implements IBeatReceiver {
     #end
 
     override function create():Void {
+        graphicCache = new GraphicCacheSprite();
+        add(graphicCache);
+
         subStateOpened.add(onSubStateOpen);
         subStateClosed.add(onSubStateClose);
         

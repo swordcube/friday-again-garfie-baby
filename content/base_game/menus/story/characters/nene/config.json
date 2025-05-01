@@ -1,9 +1,15 @@
 {
-    "scale": 0.5,
+    "scale": 0.85,
 
-    "position": [0, 0],
-    "flip": [false, false],
+    "position": [160, -40],
+    "flipX": false,
+    "flipY": false,
     
+    "atlas": {
+		"type": "sparrow",
+		"path": "sprite",
+		"gridSize": null
+	},
     "animations": {
         "danceLeft": {
             "prefix": "idle",

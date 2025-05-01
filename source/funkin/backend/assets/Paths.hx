@@ -243,7 +243,7 @@ class Paths {
         if(loaderID == null || loaderID.length == 0) {
             final loaders:Array<AssetLoader> = _registeredAssetLoaders;
             for(i in 0...loaders.length) {
-                final path:String = loaders[i].getPath(name);
+                final path:String = Path.normalize(loaders[i].getPath(name));
                 if(FlxG.assets.exists(path))
                     return path;
             }
@@ -251,7 +251,7 @@ class Paths {
             // try to load from specified loader id (usually the name of a content pack)
             final loader:AssetLoader = _registeredAssetLoadersMap.get(loaderID);
             if(loader != null) {
-                final path:String = loader.getPath(name);
+                final path:String = Path.normalize(loader.getPath(name));
                 if(FlxG.assets.exists(path))
                     return path;
     
@@ -264,7 +264,7 @@ class Paths {
                         if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loaders[i].id)
                             continue;
         
-                        final path:String = loaders[i].getPath(name);
+                        final path:String = Path.normalize(loaders[i].getPath(name));
                         if(FlxG.assets.exists(path))
                             return path;
                     }
@@ -371,7 +371,7 @@ class Paths {
 
     public static function iterateDirectory(dir:String, callback:String->Void, ?recursive:Bool = false):Void {
         for(loader in _registeredAssetLoaders) {
-            final dirPath:String = loader.getPath(dir);
+            final dirPath:String = Path.normalize(loader.getPath(dir));
             if(!FileSystem.exists(dirPath))
                 continue;
             

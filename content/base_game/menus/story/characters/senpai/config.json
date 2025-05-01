@@ -1,9 +1,15 @@
 {
     "scale": 1,
     
-    "position": [0, 0],
-    "flip": [false, false],
+    "position": [70, 0],
+    "flipX": false,
+    "flipY": false,
     
+    "atlas": {
+		"type": "sparrow",
+		"path": "sprite",
+		"gridSize": null
+	},
     "animations": {
         "idle": {
             "prefix": "SENPAI idle Black Lines",

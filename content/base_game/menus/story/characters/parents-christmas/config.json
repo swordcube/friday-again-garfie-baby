@@ -1,9 +1,15 @@
 {
-    "scale": 1,
+    "scale": 0.45,
     
-    "position": [0, 0],
-    "flip": [false, false],
+    "position": [-230, -190],
+    "flipX": false,
+    "flipY": false,
     
+    "atlas": {
+		"type": "sparrow",
+		"path": "sprite",
+		"gridSize": null
+	},
     "animations": {
         "idle": {
             "prefix": "Parent Christmas Idle Black Lines",

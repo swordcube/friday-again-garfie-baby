@@ -165,8 +165,8 @@ class Character extends FlxSprite implements IBeatReceiver {
 
             default:
         }
-        flipX = data.flip[0];
-        flipY = data.flip[1];
+        flipX = data.flipX;
+        flipY = data.flipY;
 
         scale.set(data.scale, data.scale);
         antialiasing = data.antialiasing ?? FlxSprite.defaultAntialiasing;

@@ -110,7 +110,7 @@
         },
         {
             "name": "week6",
-            "tagline": "16-BIT ROMANCE",
+            "tagline": "16-BIT ROMANCE (FT. MOAWLING)",
             "characters": ["senpai", "bf", "gf"],
 
             "hiddenSongs": {
@@ -147,7 +147,7 @@
         {
             "name": "weekend1",
             "tagline": "DUE DEBTS",
-            "characters": ["darnell", "pico", "nene"],
+            "characters": ["darnell", "pico-player", "nene"],
 
             "hiddenSongs": {
                 "story": ["blazin"],

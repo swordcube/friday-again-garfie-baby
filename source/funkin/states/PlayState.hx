@@ -1,5 +1,7 @@
 package funkin.states;
 
+import haxe.io.Path;
+
 import flixel.text.FlxText;
 import flixel.math.FlxPoint;
 
@@ -40,8 +42,10 @@ import funkin.gameplay.song.VocalGroup;
 import funkin.gameplay.stage.Stage;
 import funkin.gameplay.stage.props.ComboProp;
 
-import funkin.states.editors.ChartEditor;
+import funkin.states.menus.StoryMenuState;
 import funkin.states.menus.FreeplayState;
+
+import funkin.states.editors.ChartEditor;
 
 import funkin.substates.PauseSubState;
 import funkin.substates.GameOverSubState;
@@ -65,9 +69,11 @@ class PlayState extends FunkinState {
 		difficulty: "hard"
 	};
 	public static var instance:PlayState;
-
 	public static var deathCounter:Int = 0;
-
+	
+	public static var storyPlaylist:Array<String> = [];
+	public var isStoryMode(default, null):Bool = false;
+	
 	public var currentSong:String;
 	public var currentDifficulty:String;
 	public var currentMix:String;
@@ -176,6 +182,7 @@ class PlayState extends FunkinState {
 		#if SCRIPTING_ALLOWED
 		scriptsAllowed = params.scriptsAllowed ?? (!minimalMode);
 		#end
+		isStoryMode = params.isStoryMode ?? false;
 		
 		lastParams = params;
 		instance = this;
@@ -184,7 +191,7 @@ class PlayState extends FunkinState {
 	override function create():Void {
 		super.create();
 		persistentUpdate = true;
-
+		
 		if(FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
@@ -316,7 +323,7 @@ class PlayState extends FunkinState {
 				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
 	
 				for(i in 0...items.length) {
-					final path:String = loader.getPath('${dir}/${items[i]}');
+					final path:String = Path.normalize(loader.getPath('${dir}/${items[i]}'));
 					if(FlxG.assets.exists(path)) {
 						final script:FunkinScript = FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false);
 						script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
@@ -732,24 +739,21 @@ class PlayState extends FunkinState {
 			vocals.pause();
 
 		if(!lastParams.chartingMode) {
-			if(!Constants.PLAY_MENU_MUSIC_AFTER_EXIT) {
-				if(!FlxG.sound.music.playing) {
-					FlxG.signals.postStateSwitch.addOnce(() -> {
-						FlxTimer.wait(0.001, () -> {
-							FlxG.sound.music.time = 0;
-							FlxG.sound.music.volume = 0;
-							FlxG.sound.music.looped = true;
-							FlxG.sound.music.play();
-							FlxG.sound.music.fadeIn(0.16, 0, 1);
-						});
-					});
+			if(isStoryMode) {
+				if(storyPlaylist.length != 0) {
+					TransitionableState.skipNextTransIn = true;
+					TransitionableState.skipNextTransOut = true;
+					
+					PlayState.lastParams.song = storyPlaylist.shift();
+					FlxG.switchState(PlayState.new.bind(PlayState.lastParams));
+				} else {
+					playExitMusic();
+					FlxG.switchState(StoryMenuState.new);
 				}
 			} else {
-                Paths.forceContentPack = null;
-                CoolUtil.playMenuMusic();
-            }
-			// TODO: story mode
-			FlxG.switchState(FreeplayState.new);
+				playExitMusic();
+				FlxG.switchState(FreeplayState.new);
+			}
 		} else
 			goToCharter();
 		
@@ -762,6 +766,27 @@ class PlayState extends FunkinState {
 		#end
 		playField.hud.call("onEndSongPost");
 		playField.hud.call("onSongEndPost");
+	}
+
+	public function playExitMusic():Void {
+		if(!Constants.PLAY_MENU_MUSIC_AFTER_EXIT) {
+			if(!FlxG.sound.music.playing) {
+				FlxG.signals.postStateSwitch.addOnce(() -> {
+					FlxTimer.wait(0.001, () -> {
+						FlxG.sound.music.time = 0;
+						FlxG.sound.music.volume = 0;
+						FlxG.sound.music.looped = true;
+						FlxG.sound.music.play();
+						FlxG.sound.music.fadeIn(0.16, 0, 1);
+					});
+				});
+			}
+		} else {
+			final oldContentPack:String = Paths.forceContentPack;
+			Paths.forceContentPack = null;
+			CoolUtil.playMenuMusic();
+			Paths.forceContentPack = oldContentPack;
+		}
 	}
 
 	public function goToCharter():Void {
@@ -1185,6 +1210,8 @@ typedef PlayStateParams = {
 	var ?mix:String;
 
 	var ?mod:String;
+
+	var ?isStoryMode:Bool;
 
 	var ?chartingMode:Bool;
 

@@ -13,6 +13,7 @@ import funkin.backend.events.GameplayEvents;
 import funkin.gameplay.character.Character;
 
 import funkin.states.PlayState;
+import funkin.states.menus.StoryMenuState;
 import funkin.states.menus.FreeplayState;
 
 import funkin.substates.transition.FadeTransition;
@@ -165,8 +166,10 @@ class GameOverSubState extends FunkinSubState {
             });
             FlxG.sound.music.onComplete = null;
 
-            // TODO: story mode
-            FlxG.switchState(FreeplayState.new);
+            if(PlayState.instance.isStoryMode)
+                FlxG.switchState(StoryMenuState.new);
+            else
+                FlxG.switchState(FreeplayState.new);
         });
         FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         close();

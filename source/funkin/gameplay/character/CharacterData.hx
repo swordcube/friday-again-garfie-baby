@@ -33,8 +33,12 @@ class CharacterData {
     public var scale:Float = 1;
 
     @:optional
-    @:default([false, false])
-    public var flip:Array<Bool>;
+    @:default(false)
+    public var flipX:Bool;
+
+    @:optional
+    @:default(false)
+    public var flipY:Bool;
 
     @:optional
     @:default(false)
@@ -78,7 +82,8 @@ class CharacterData {
             healthIcon: {
                 isPixel: false,
                 scale: 1,
-                flip: [false, false],
+                flipX: false,
+                flipY: false,
                 offset: [0, 0],
                 color: "#FFFFFF"
             },
@@ -146,8 +151,12 @@ class HealthIconData {
 	public var scale:Float;
 
 	@:optional
-	@:default([false, false])
-	public var flip:Array<Bool>;
+	@:default(false)
+    public var flipX:Bool;
+
+    @:optional
+    @:default(false)
+    public var flipY:Bool;
 
 	@:optional
 	@:default([0, 0])

@@ -2,10 +2,6 @@
 	"healthIcon": {
 		"isPixel": false,
 		"scale": 1,
-		"flip": [
-			false,
-			false
-		],
 		"offset": [
 			0,
 			0
@@ -131,10 +127,7 @@
 		-120
 	],
 	"scale": 6,
-	"flip": [
-		true,
-		false
-	],
+	"flipX": true,
 	"isPlayer": true,
 	"antialiasing": false,
 	"singDuration": 4,

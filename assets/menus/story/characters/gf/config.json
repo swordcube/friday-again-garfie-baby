@@ -1,9 +1,15 @@
 {
     "scale": 0.5,
 
-    "position": [0, 0],
-    "flip": [false, false],
+    "position": [30, -150],
+    "flipX": false,
+    "flipY": false,
     
+    "atlas": {
+		"type": "sparrow",
+		"path": "sprite",
+		"gridSize": null
+	},
     "animations": {
         "danceLeft": {
             "prefix": "GF Dancing Beat WHITE",
