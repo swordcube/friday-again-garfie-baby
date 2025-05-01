@@ -50,7 +50,7 @@ jobs:
 
       - name: Building the game
         run: |
-          haxelib --always run lime build linux
+          haxelib --always run lime build linux -DDEV_BUILD
       
       - name: Tar files
         run: tar -zcvf GarfieEngine.tar.gz -C export/release/linux/bin .

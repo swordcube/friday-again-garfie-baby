@@ -25,7 +25,7 @@ class MainMenuState extends FunkinState {
         options = [
             {
                 name: "storymode",
-                callback: () -> trace("story menu TODO"),
+                callback: () -> FlxG.switchState(new StoryMenuState()),
             },
             {
                 name: "freeplay",
@@ -94,7 +94,7 @@ class MainMenuState extends FunkinState {
         add(camFollow);
 
         var versionString:String = 'Garfie Engine v${FlxG.stage.application.meta.get("version")}';
-        #if TEST_BUILD
+        #if DEV_BUILD
         versionString += ' (${GitCommitMacro.getBranch()}/${GitCommitMacro.getCommitHash()})';
         #end
         versionString += "\nFriday Night Funkin' v0.6.0";

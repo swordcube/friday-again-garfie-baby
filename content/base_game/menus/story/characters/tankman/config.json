@@ -1,0 +1,16 @@
+{
+    "scale": 1,
+    
+    "position": [0, 0],
+    "flip": [false, false],
+    
+    "animations": {
+        "idle": {
+            "prefix": "Tankman Menu BLACK",
+            "indices": null,
+            "fps": 24,
+            "looped": false
+        }
+    },
+    "danceSteps": ["idle"]
+}

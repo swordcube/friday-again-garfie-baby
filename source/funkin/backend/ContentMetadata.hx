@@ -20,7 +20,7 @@ class ContentMetadata {
     
     @:optional
     @:default([])
-    public var weeks:Array<WeekData>;
+    public var levels:Array<LevelData>;
 
     @:optional
     @:default([{id: "main", name: "Main"}])

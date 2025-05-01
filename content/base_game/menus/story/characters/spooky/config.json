@@ -1,0 +1,22 @@
+{
+    "scale": 0.5,
+
+    "position": [0, 0],
+    "flip": [false, false],
+    
+    "animations": {
+        "danceLeft": {
+            "prefix": "spooky dance idle BLACK LINES",
+            "indices": [0, 2, 6],
+            "fps": 12,
+            "looped": false
+        },
+        "danceRight": {
+            "prefix": "spooky dance idle BLACK LINES",
+            "indices": [8, 10, 12, 14],
+            "fps": 12,
+            "looped": false
+        }
+    },
+    "danceSteps": ["danceLeft", "danceRight"]
+}

@@ -27,6 +27,18 @@
 	<!-- ____________________________ Funkin Defines ____________________________ -->
 
 	<!--
+		If TEST_BUILD is defined, we're probably in a dev build lol
+
+		If you define DEV_BUILD without defining TEST_BUILD however,
+		assets will load from export folder but have commit watermark
+		in the main menu!
+
+		This is mainly for internal stuff, so just define TEST_BUILD
+		for your own dev builds and ignore this please <3
+	-->
+	<define name="DEV_BUILD" if="TEST_BUILD" />
+
+	<!--
 		Comment/delete this line below to disable all scripting
 		Or compile with the NO_SCRIPTING define, like so:
 		

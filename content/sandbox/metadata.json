@@ -1,6 +1,6 @@
 {
     "apiVersion": "0.1.0",
-    "weeks": [
+    "levels": [
         {
             "tagline": "TESTING GROUNDS",
             "characters": [null, "bf", null],

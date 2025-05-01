@@ -1,7 +1,7 @@
 {
     "apiVersion": "0.1.0",
     "runGlobally": true,
-    "weeks": [],
+    "levels": [],
     "freeplayCategories": [
         {
             "id": "main",

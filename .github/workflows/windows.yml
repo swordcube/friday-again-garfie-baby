@@ -43,7 +43,7 @@ jobs:
 
       - name: Building the game
         run: |
-          haxelib --always run lime build windows
+          haxelib --always run lime build windows -DDEV_BUILD
       
       - name: Uploading artifact (entire build)
         uses: actions/upload-artifact@v4

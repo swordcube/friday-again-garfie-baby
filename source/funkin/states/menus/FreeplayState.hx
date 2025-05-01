@@ -6,7 +6,7 @@ import funkin.ui.UIUtil;
 import funkin.ui.AtlasText;
 import funkin.ui.AtlasTextList;
 
-import funkin.backend.WeekData;
+import funkin.backend.LevelData;
 import funkin.backend.ContentMetadata;
 
 import funkin.gameplay.song.Highscore;
@@ -37,7 +37,7 @@ class FreeplayState extends FunkinState {
 
     public var grpSongs:AtlasTextList;
 
-    public var currentDifficulty:String = "normal";
+    public var currentDifficulty:String = Constants.DEFAULT_DIFFICULTY;
     public var currentMix:String = "default";
 
     public var scoreBG:FlxSprite;
@@ -81,14 +81,17 @@ class FreeplayState extends FunkinState {
                     name: category.name
                 });
             }
-            for(week in contentMetadata.weeks) {
-                final categoryID:String = '${contentFolder}:${week.freeplayCategory}';
+            for(level in contentMetadata.levels) {
+                if(!level.showInFreeplay)
+                    continue;
+
+                final categoryID:String = '${contentFolder}:${level.freeplayCategory}';
                 if(!songs.exists(categoryID))
                     songs.set(categoryID, []);
 
                 final category:Array<FreeplaySongData> = songs.get(categoryID);
-                for(song in week.songs) {
-                    if(week.hiddenSongs.freeplay.contains(song))
+                for(song in level.songs) {
+                    if(level.hiddenSongs.freeplay.contains(song))
                         continue;
 
                     if(!FlxG.assets.exists(Paths.json('gameplay/songs/${song}/default/metadata', contentFolder)))
@@ -317,7 +320,7 @@ class FreeplayState extends FunkinState {
         var meta:SongMetadata = song.metadata.get(currentMix);
         if(meta == null) {
             currentMix = "default"; // fallback to default mix
-            currentDifficulty = "normal"; // attempt to fallback to normal diff, if this fails the code below should correct it
+            currentDifficulty = Constants.DEFAULT_DIFFICULTY; // attempt to fallback to default diff, if this fails the code below should correct it
             meta = song.metadata.get(currentMix);
         }
         var newDiffIndex:Int = meta.song.difficulties.indexOf(currentDifficulty) + by;
@@ -328,7 +331,7 @@ class FreeplayState extends FunkinState {
             meta = song.metadata.get(currentMix);
 
             // reset difficulty to first of this mix
-            currentDifficulty = meta.song.difficulties.last() ?? "normal";
+            currentDifficulty = meta.song.difficulties.last() ?? Constants.DEFAULT_DIFFICULTY;
         }
         else if(newDiffIndex > meta.song.difficulties.length - 1) {
             // go forward a mix
@@ -336,7 +339,7 @@ class FreeplayState extends FunkinState {
             meta = song.metadata.get(currentMix);
 
             // reset difficulty to first of this mix
-            currentDifficulty = meta.song.difficulties.first() ?? "normal";
+            currentDifficulty = meta.song.difficulties.first() ?? Constants.DEFAULT_DIFFICULTY;
         }
         else {
             // change difficulty but keep current mix

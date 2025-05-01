@@ -1,19 +1,24 @@
 package funkin.backend.assets;
 
+import haxe.io.Path;
+import haxe.ds.ReadOnlyArray;
+
+import sys.io.File;
+import sys.FileSystem;
+
+import openfl.text.Font;
+import openfl.media.Sound;
+import openfl.display.BitmapData;
+
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.system.frontEnds.AssetFrontEnd;
+
+import funkin.backend.LevelData;
 import funkin.backend.ContentMetadata;
-import funkin.backend.WeekData;
+
 import funkin.backend.assets.loaders.AssetLoader;
 import funkin.backend.assets.loaders.ContentAssetLoader;
 import funkin.backend.assets.loaders.DefaultAssetLoader;
-import haxe.ds.ReadOnlyArray;
-import haxe.io.Path;
-import openfl.display.BitmapData;
-import openfl.media.Sound;
-import openfl.text.Font;
-import sys.FileSystem;
-import sys.io.File;
 
 enum AssetType {
     IMAGE;
@@ -27,7 +32,7 @@ enum AssetType {
 #if SCRIPTING_ALLOWED
 @:allow(funkin.scripting.GlobalScript)
 #end
-@:allow(funkin.backend.WeekData)
+@:allow(funkin.backend.LevelData)
 class Paths {
     public static final ASSET_EXTENSIONS:Map<AssetType, Array<String>> = [
         IMAGE => [".png", ".jpg", ".jpeg", ".bmp"],
@@ -205,6 +210,10 @@ class Paths {
 
             final meta:ContentMetadata = parser.fromJson(FlxG.assets.getText(metaPath));
             meta.folder = "assets";
+
+            for(level in meta.levels)
+                level.mixes.insert(0, "default");
+
             contentMetadata.set("default", meta);
         }
         for(i in 0...contentFolders.length) {
@@ -218,6 +227,10 @@ class Paths {
 
                 final meta:ContentMetadata = parser.fromJson(FlxG.assets.getText(metaPath));
                 meta.folder = folder;
+
+                for(level in meta.levels)
+                    level.mixes.insert(0, "default");
+
                 contentMetadata.set(folder, meta);
             }
         }

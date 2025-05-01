@@ -42,7 +42,7 @@ jobs:
 
       - name: Building the game
         run: |
-          haxelib --always run lime build mac
+          haxelib --always run lime build mac -DDEV_BUILD
       
       - name: Tar files
         run: tar -zcvf GarfieEngine.tar.gz -C export/release/macos/bin .

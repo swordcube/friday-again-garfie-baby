@@ -1,6 +1,6 @@
 package funkin.states.menus;
 
-import funkin.states.menus.options.*;
+import funkin.ui.options.pages.*;
 
 class OptionsState extends FunkinState {
     public var bg:FlxSprite;

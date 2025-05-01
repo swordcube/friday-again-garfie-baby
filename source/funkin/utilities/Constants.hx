@@ -86,6 +86,11 @@ class Constants {
     public static final DEFAULT_UI_SKIN:String = "funkin";
 
     /**
+     * The default difficulty for songs.
+     */
+    public static final DEFAULT_DIFFICULTY:String = "normal";
+
+    /**
      * A list of every possible note direction in order.
      */
     public static final NOTE_DIRECTIONS:Array<String> = ["left", "down", "up", "right"];

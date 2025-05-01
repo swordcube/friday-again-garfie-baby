@@ -1,6 +1,6 @@
 package funkin.substates;
 
-import funkin.states.menus.options.OptionPage;
+import funkin.ui.options.pages.OptionPage;
 
 class GameplayModifiersMenu extends FunkinSubState {
     public var bg:FlxSprite;

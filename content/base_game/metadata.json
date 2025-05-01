@@ -1,7 +1,8 @@
 {
     "apiVersion": "0.1.0",
-    "weeks": [
+    "levels": [
         {
+            "name": "tutorial",
             "tagline": "HITTIN' THE BADDIE",
             "characters": [null, "bf", "gf"],
 
@@ -18,7 +19,8 @@
             }
         },
         {
-            "tagline": "FATHER OF SOME",
+            "name": "week1",
+            "tagline": "DEVILISH FATHER",
             "characters": ["dad", "bf", "gf"],
 
             "hiddenSongs": {
@@ -35,6 +37,7 @@
             }
         },
         {
+            "name": "week2",
             "tagline": "THE SPOOKY MANSION",
             "characters": ["spooky-kids", "bf", "gf"],
 
@@ -52,6 +55,7 @@
             }
         },
         {
+            "name": "week3",
             "tagline": "SOUL FOR SOME CASH",
             "characters": ["pico", "bf", "gf"],
 
@@ -69,6 +73,7 @@
             }
         },
         {
+            "name": "week4",
             "tagline": "MA'S RUNNING CAR",
             "characters": ["mom", "bf", "gf"],
 
@@ -81,10 +86,12 @@
 
             "mixes": [],
             "difficulties": {
-                "default": ["easy", "normal", "hard"]
+                "default": ["easy", "normal", "hard"],
+                "erect": ["erect", "nightmare"]
             }
         },
         {
+            "name": "week5",
             "tagline": "UNDER THE MALL'S SNOWY ROOF",
             "characters": ["parents-christmas", "bf", "gf"],
 
@@ -102,7 +109,8 @@
             }
         },
         {
-            "tagline": "16-BIT ROMANCE DRAMA",
+            "name": "week6",
+            "tagline": "16-BIT ROMANCE",
             "characters": ["senpai", "bf", "gf"],
 
             "hiddenSongs": {
@@ -119,6 +127,7 @@
             }
         },
         {
+            "name": "week7",
             "tagline": "MUSICAL MILITARY",
             "characters": ["tankman", "bf", "gf"],
 
@@ -136,6 +145,7 @@
             }
         },
         {
+            "name": "weekend1",
             "tagline": "DUE DEBTS",
             "characters": ["darnell", "pico", "nene"],
 
@@ -149,7 +159,8 @@
             "mixes": [],
             "difficulties": {
                 "default": ["easy", "normal", "hard"]
-            }
+            },
+            "banner": "#413CAE"
         }
     ],
     "freeplayCategories": [

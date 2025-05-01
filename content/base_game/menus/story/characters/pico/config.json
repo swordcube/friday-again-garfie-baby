@@ -1,0 +1,16 @@
+{
+    "scale": 1,
+    
+    "position": [0, 0],
+    "flip": [false, false],
+    
+    "animations": {
+        "idle": {
+            "prefix": "Pico Idle Dance",
+            "indices": null,
+            "fps": 24,
+            "looped": false
+        }
+    },
+    "danceSteps": ["idle"]
+}

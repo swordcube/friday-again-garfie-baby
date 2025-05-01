@@ -1,0 +1,23 @@
+{
+    "scale": 1,
+
+    "position": [0, 0],
+    "flip": [false, false],
+    
+    "animations": {
+        "idle": {
+            "prefix": "BF idle dance white",
+            "indices": null,
+            "fps": 24,
+            "looped": false
+        },
+        "hey": {
+            "prefix": "BF HEY!!",
+            "indices": null,
+            "fps": 24,
+            "looped": false
+        }
+    },
+    "danceSteps": ["idle"],
+    "confirmAnim": "hey"
+}
