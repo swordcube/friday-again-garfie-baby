@@ -7,9 +7,11 @@ import flixel.graphics.frames.FlxFramesCollection;
 
 import funkin.gameplay.UISkin;
 import funkin.gameplay.notes.NoteSkin;
+import funkin.gameplay.character.CharacterData;
 
 class Cache {
     public static var atlasCache(default, never):Map<String, FlxFramesCollection> = [];
+    public static var characterCache(default, never):Map<String, CharacterData> = [];
     
     public static var uiSkinCache(default, never):Map<String, UISkinData> = [];
     public static var noteSkinCache(default, never):Map<String, NoteSkinData> = [];
@@ -62,8 +64,9 @@ class Cache {
                 }
             }
         }
-        // Clear note & UI skins
+        // Clear gameplay related caches
         uiSkinCache.clear();
         noteSkinCache.clear();
+        characterCache.clear();
     }
 }

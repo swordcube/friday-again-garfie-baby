@@ -225,8 +225,9 @@ class PauseSubState extends FunkinSubState {
                     #end
                 });
             }
-            Cache.noteSkinCache.clear();
             Cache.uiSkinCache.clear();
+            Cache.noteSkinCache.clear();
+            Cache.characterCache.clear();
 
             FadeTransition.nextCamera = transitionCam;
             FlxG.signals.postStateSwitch.addOnce(() -> {

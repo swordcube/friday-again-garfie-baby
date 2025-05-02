@@ -103,7 +103,7 @@
       "name": "hscript-improved",
       "type": "git",
       "dir": null,
-      "ref": "codename-dev-dev",
+      "ref": "master",
       "url": "https://github.com/CodenameCrew/hscript-improved"
     }
   ]

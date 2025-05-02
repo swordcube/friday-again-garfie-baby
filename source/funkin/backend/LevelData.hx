@@ -5,6 +5,9 @@ class LevelData {
     @:optional
     public var loaderID:String;
 
+    public var id:String;
+
+    @:optional
     public var name:String;
 
     @:optional

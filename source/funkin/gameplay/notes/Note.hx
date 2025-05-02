@@ -7,6 +7,8 @@ import funkin.backend.events.NoteEvents;
 import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
 
+import funkin.states.PlayState;
+
 /**
  * A class representing a step at which you
  * should be given score.
@@ -66,7 +68,7 @@ class Note extends SkinnableSprite {
         curScoreStep = 0;
         scoreSteps.resize(0);
 
-        final playbackRate:Float = Options.gameplayModifiers.get("playbackRate");
+        final playbackRate:Float = (!(PlayState.instance?.isStoryMode ?? false)) ? Options.gameplayModifiers.get("playbackRate") : 1;
         for(i in 0...Std.int(this.length / stepLength))
             scoreSteps.push({time: time + ((i + 1) * stepLength), score: Std.int(145 * playbackRate)});
         

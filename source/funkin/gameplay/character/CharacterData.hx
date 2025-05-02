@@ -97,41 +97,44 @@ class CharacterData {
      * @param  charID  The name of the character to fetch data from.
      */
     public static function load(charID:String):CharacterData {
-        var confPath:String = Paths.json('gameplay/characters/${charID}/config');
-        if(FlxG.assets.exists(confPath)) {
+        if(!Cache.characterCache.exists(charID)) {
+            var confPath:String = Paths.json('gameplay/characters/${charID}/config');
+            if(FlxG.assets.exists(confPath)) {
+                var data:CharacterData = null;
+                try {
+                    final parser:JsonParser<CharacterData> = new JsonParser<CharacterData>();
+                    parser.ignoreUnknownVariables = true;
+    
+                    data = parser.fromJson(FlxG.assets.getText(confPath));
+                    data.id = charID;
+                }
+                catch(e) {
+                    data = getDefaultData();
+                    Logs.error('Failed to load config for character "${charID}": ${e}');
+                }
+                return data;
+            }
+            Logs.error('Config for character "${charID}" doesn\'t exist!');
+            
+            charID = Constants.DEFAULT_CHARACTER;
+            confPath = Paths.json('gameplay/characters/${charID}/config');
+            
             var data:CharacterData = null;
             try {
                 final parser:JsonParser<CharacterData> = new JsonParser<CharacterData>();
                 parser.ignoreUnknownVariables = true;
-
+    
                 data = parser.fromJson(FlxG.assets.getText(confPath));
                 data.id = charID;
             }
             catch(e) {
                 data = getDefaultData();
-                Logs.error('Failed to load config for character "${charID}": ${e}');
+                Logs.error('Failed to load default character config: ${e}');
             }
-            return data;
+            data.healthIcon.color = null;
+            Cache.characterCache.set(charID, data);
         }
-        Logs.error('Config for character "${charID}" doesn\'t exist!');
-        
-        charID = Constants.DEFAULT_CHARACTER;
-        confPath = Paths.json('gameplay/characters/${charID}/config');
-        
-        var data:CharacterData = null;
-        try {
-            final parser:JsonParser<CharacterData> = new JsonParser<CharacterData>();
-            parser.ignoreUnknownVariables = true;
-
-            data = parser.fromJson(FlxG.assets.getText(confPath));
-            data.id = charID;
-        }
-        catch(e) {
-            data = getDefaultData();
-            Logs.error('Failed to load default character config: ${e}');
-        }
-        data.healthIcon.color = null;
-        return data;
+        return Cache.characterCache.get(charID);
     }
 
     public static function stringify(data:CharacterData):String {

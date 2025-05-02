@@ -490,9 +490,11 @@ class PlayState extends FunkinState {
 		scoreWarningText.y -= scoreWarningText.height;
 		add(scoreWarningText);
 
-		practiceMode = Options.gameplayModifiers.get("practiceMode");
-		playbackRate = Options.gameplayModifiers.get("playbackRate");
-		playField.playerStrumLine.botplay = Options.gameplayModifiers.get("botplay");
+		if(!isStoryMode) {
+			practiceMode = Options.gameplayModifiers.get("practiceMode");
+			playbackRate = Options.gameplayModifiers.get("playbackRate");
+			playField.playerStrumLine.botplay = Options.gameplayModifiers.get("botplay");
+		}
 	}
 
 	override function createPost():Void {

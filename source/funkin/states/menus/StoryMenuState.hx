@@ -14,7 +14,7 @@ import funkin.gameplay.song.SongMetadata;
 import funkin.ui.story.*;
 import funkin.ui.story.character.*;
 
-// TODO: level locking
+import funkin.substates.ResetScoreSubState;
 
 @:structInit
 class StorySongData {
@@ -75,8 +75,8 @@ class StoryMenuState extends FunkinState {
                 if(!level.showInStory)
                     continue;
 
-                if(songs.get(level.name) == null)
-                    songs.set(level.name, []);
+                if(songs.get(level.id) == null)
+                    songs.set(level.id, []);
                 
                 level.loaderID = contentFolder;
                 for(song in level.songs) {
@@ -100,14 +100,14 @@ class StoryMenuState extends FunkinState {
                                 difficultyMap.set(mix, metadataMap.get(mix).song.difficulties);
                         }
                     }
-                    final songList:Array<StorySongData> = songs.get(level.name);
+                    final songList:Array<StorySongData> = songs.get(level.id);
                     songList.push({
                         metadata: metadataMap,
                         id: song,
                         difficulties: difficultyMap
                     });
                 }
-                final songList:Array<StorySongData> = songs.get(level.name);
+                final songList:Array<StorySongData> = songs.get(level.id);
                 if(songList.length == 0)
                     continue;
 
@@ -136,9 +136,9 @@ class StoryMenuState extends FunkinState {
                     graphicCache.cache(character.graphic);
                     character.destroy();
                 }
-                levelMap.set(level.name, level);
+                levelMap.set(level.id, level);
                 
-                final title:LevelTitle = new LevelTitle(0, LevelTitle.Y_OFFSET + y, level.name, isLevelLocked(level.name), contentFolder);
+                final title:LevelTitle = new LevelTitle(0, LevelTitle.Y_OFFSET + y, level.id, isLevelLocked(level.id), contentFolder);
                 title.screenCenter(X);
                 grpLevelTitles.add(title);
                 y += title.height;
@@ -253,6 +253,15 @@ class StoryMenuState extends FunkinState {
             if(controls.justReleased.UI_RIGHT)
                 rightArrow.animation.play("idle");
             
+            if(controls.justPressed.RESET) {
+                final level:LevelData = levels[curSelected];
+                final subState:ResetScoreSubState = new ResetScoreSubState((level.name != null && level.name.length != 0) ? level.name : level.id);
+                subState.onAccept.add(() -> {
+                    final recordID:String = Highscore.getLevelRecordID(level.id, currentDifficulty);
+                    Highscore.resetLevelRecord(recordID);
+                });
+                openSubState(subState);
+            }
             if(controls.justPressed.ACCEPT)
                 onSelect();
 
@@ -340,7 +349,7 @@ class StoryMenuState extends FunkinState {
             title.alpha = (curSelected == i) ? 1.0 : 0.6;
         
         final tracks:Array<String> = [];
-        for(song in songs.get(levels[curSelected].name))
+        for(song in songs.get(levels[curSelected].id))
             tracks.push(song.metadata.get("default")?.song?.title ?? song.id);
 
         for(i => characterID in levels[curSelected].characters) {
@@ -409,7 +418,7 @@ class StoryMenuState extends FunkinState {
         }
         // update the score stuff
         final currentLevel:LevelData = levels[curSelected];
-        intendedScore = Highscore.getLevelRecord(Highscore.getLevelRecordID(currentLevel.name, currentDifficulty)).score;
+        intendedScore = Highscore.getLevelRecord(Highscore.getLevelRecordID(currentLevel.id, currentDifficulty)).score;
 
         // update the difficulty display
         if(currentDifficulty != prevDifficulty) {
@@ -430,7 +439,7 @@ class StoryMenuState extends FunkinState {
         if(transitioning)
             return;
 
-        if(isLevelLocked(levels[curSelected].name)) {
+        if(isLevelLocked(levels[curSelected].id)) {
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
             return;
         }
@@ -453,7 +462,7 @@ class StoryMenuState extends FunkinState {
             FlxTimer.wait(1, () -> {
                 PlayState.storyStats = new PlayerStats();
                 PlayState.storyPlaylist = pendingPlaylist;
-                PlayState.storyLevel = levels[curSelected].name;
+                PlayState.storyLevel = levels[curSelected].id;
                 
                 FlxG.switchState(PlayState.new.bind({
                     song: PlayState.storyPlaylist.shift(),

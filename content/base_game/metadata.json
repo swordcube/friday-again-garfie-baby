@@ -2,7 +2,9 @@
     "apiVersion": "0.1.0",
     "levels": [
         {
-            "name": "tutorial",
+            "id": "tutorial",
+            "name": "Tutorial",
+
             "tagline": "HITTIN' THE BADDIE",
             "characters": [null, "bf", "gf"],
 
@@ -19,7 +21,9 @@
             }
         },
         {
-            "name": "week1",
+            "id": "week1",
+            "name": "Week 1",
+
             "tagline": "DEVILISH FATHER",
             "characters": ["dad", "bf", "gf"],
 
@@ -37,7 +41,9 @@
             }
         },
         {
-            "name": "week2",
+            "id": "week2",
+            "name": "Week 2",
+            
             "tagline": "THE SPOOKY MANSION",
             "characters": ["spooky-kids", "bf", "gf"],
 
@@ -55,7 +61,9 @@
             }
         },
         {
-            "name": "week3",
+            "id": "week3",
+            "name": "Week 3",
+
             "tagline": "SOUL FOR SOME CASH",
             "characters": ["pico", "bf", "gf"],
 
@@ -73,7 +81,9 @@
             }
         },
         {
-            "name": "week4",
+            "id": "week4",
+            "name": "Week 4",
+
             "tagline": "MA'S RUNNING CAR",
             "characters": ["mom", "bf", "gf"],
 
@@ -91,7 +101,9 @@
             }
         },
         {
-            "name": "week5",
+            "id": "week5",
+            "name": "Week 5",
+
             "tagline": "UNDER THE MALL'S SNOWY ROOF",
             "characters": ["parents-christmas", "bf", "gf"],
 
@@ -109,7 +121,9 @@
             }
         },
         {
-            "name": "week6",
+            "id": "week6",
+            "name": "Week 6",
+
             "tagline": "16-BIT ROMANCE (FT. MOAWLING)",
             "characters": ["senpai", "bf", "gf"],
 
@@ -127,7 +141,9 @@
             }
         },
         {
-            "name": "week7",
+            "id": "week7",
+            "name": "Week 7",
+
             "tagline": "MUSICAL MILITARY",
             "characters": ["tankman", "bf", "gf"],
 
@@ -145,7 +161,9 @@
             }
         },
         {
-            "name": "weekend1",
+            "id": "weekend1",
+            "name": "Weekend 1",
+
             "tagline": "DUE DEBTS",
             "characters": ["darnell", "pico-player", "nene"],
 

@@ -19,6 +19,7 @@ import funkin.backend.events.Events;
 import funkin.backend.events.GameplayEvents;
 import funkin.backend.events.NoteEvents;
 
+import funkin.states.PlayState;
 import funkin.gameplay.scoring.Scoring;
 
 class PlayField extends FlxContainer {
@@ -108,7 +109,7 @@ class PlayField extends FlxContainer {
         final judgement:String = Scoring.judgeNote(note, timestamp);
 
         final score:Int = Scoring.scoreNote(note, timestamp);
-        final savedRate:Float = Options.gameplayModifiers.get("playbackRate");
+        final savedRate:Float = (!(PlayState.instance?.isStoryMode ?? false)) ? Options.gameplayModifiers.get("playbackRate") : 1;
 
         final isPlayer:Bool = note.strumLine == playerStrumLine;
         onNoteHit.dispatch(event.recycle(
