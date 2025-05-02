@@ -57,6 +57,9 @@ class StoryMenuState extends FunkinState {
     override function create():Void {
         super.create();
         persistentUpdate = true;
+
+        if(FlxG.sound.music == null || !FlxG.sound.music.playing)
+            CoolUtil.playMenuMusic();
         
         grpLevelTitles = new FlxTypedContainer<LevelTitle>();
         add(grpLevelTitles);
