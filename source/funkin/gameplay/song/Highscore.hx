@@ -15,11 +15,28 @@ class Highscore {
 
     public static function reload():Void {
         _scoreRecords.clear();
+        _levelRecords.clear();
 
+        final ignoreIDs:Array<String> = ["levelRecords"];
         for(id in Reflect.fields(_save.data)) {
+            if(ignoreIDs.contains(id))
+                continue;
+            
             final record:Dynamic = Reflect.field(_save.data, id);
             if(record != null)
-                _scoreRecords.set(id, migrateRecord(record));
+                _scoreRecords.set(id, migrateScoreRecord(record));
+        }
+        if(_save.data.levelRecords != null) {
+            _save.data.levelRecords = _levelRecords;
+            _save.flush();
+        }
+        for(id in Reflect.fields(_save.data.levelRecords)) {
+            if(ignoreIDs.contains(id))
+                continue;
+            
+            final record:Dynamic = Reflect.field(_save.data.levelRecords, id);
+            if(record != null)
+                _levelRecords.set(id, migrateLevelRecord(record));
         }
     }
 
@@ -46,19 +63,31 @@ class Highscore {
         }
     }
 
-    public static function migrateRecord(record:Dynamic):ScoreRecord {
+    public static function migrateScoreRecord(record:Dynamic):ScoreRecord {
         // not needed yet, but here for when it is needed
         return cast record;
     }
 
-    public static function getRecordID(song:String, difficulty:String, ?mix:String, ?contentPack:String):String {
+    public static function migrateLevelRecord(record:Dynamic):LevelRecord {
+        // not needed yet, but here for when it is needed
+        return cast record;
+    }
+
+    public static function getScoreRecordID(song:String, difficulty:String, ?mix:String, ?contentPack:String):String {
         if(contentPack == null || contentPack.length == 0)
             contentPack = Paths.forceContentPack;
 
         return '${song.toLowerCase()}:${difficulty.toLowerCase()}:${mix.getDefaultString("default")}:${contentPack.getDefaultString("default")}';
     }
 
-    public static function getDefaultRecord():ScoreRecord {
+    public static function getLevelRecordID(level:String, difficulty:String, ?contentPack:String):String {
+        if(contentPack == null || contentPack.length == 0)
+            contentPack = Paths.forceContentPack;
+
+        return '${level}:${difficulty}:${contentPack.getDefaultString("default")}';
+    }
+
+    public static function getDefaultScoreRecord():ScoreRecord {
         return {
             score: 0,
             misses: 0,
@@ -77,29 +106,74 @@ class Highscore {
         };
     }
 
-    public static function getRecord(id:String):ScoreRecord {
+    public static function getDefaultLevelRecord():LevelRecord {
+        return {
+            score: 0,
+            misses: 0,
+            accuracy: 0,
+            rank: Rank.UNKNOWN,
+            judges: [
+                "killer" => 0,
+                "sick" => 0,
+                "good" => 0,
+                "bad" => 0,
+                "shit" => 0,
+                "miss" => 0,
+                "cb" => 0
+            ],
+            version: RECORD_VERSION
+        };
+    }
+
+    public static function getScoreRecord(id:String):ScoreRecord {
         if(_scoreRecords.exists(id))
             return _scoreRecords.get(id);
 
-        return getDefaultRecord();
+        return getDefaultScoreRecord();
     }
 
-    public static function saveRecord(id:String, record:ScoreRecord, ?force:Bool = false):Void {
-        final prevRecord:ScoreRecord = _scoreRecords.get(id) ?? getDefaultRecord();
+    public static function saveScoreRecord(id:String, record:ScoreRecord, ?force:Bool = false):Void {
+        final prevRecord:ScoreRecord = _scoreRecords.get(id) ?? getDefaultScoreRecord();
         if(force || (record.score > prevRecord.score || record.accuracy > prevRecord.accuracy || record.rank > prevRecord.rank)) {
             _scoreRecords.set(id, record);
             Reflect.setField(_save.data, id, record);
             _save.flush();
         }
     }
+    
+    public static function forceSaveScoreRecord(id:String, record:ScoreRecord):Void {
+        saveScoreRecord(id, record, true);
+    }
+    
+    public static function getLevelRecord(id:String):LevelRecord {
+        if(_levelRecords.exists(id))
+            return _levelRecords.get(id);
 
-    public static function forceSaveRecord(id:String, record:ScoreRecord):Void {
-        saveRecord(id, record, true);
+        return getDefaultLevelRecord();
     }
 
-    public static function resetRecord(id:String):Void {
+    public static function saveLevelRecord(id:String, record:LevelRecord, ?force:Bool = false):Void {
+        final prevRecord:LevelRecord = _levelRecords.get(id) ?? getDefaultLevelRecord();
+        if(force || (record.score > prevRecord.score || record.accuracy > prevRecord.accuracy || record.rank > prevRecord.rank)) {
+            _levelRecords.set(id, record);
+            Reflect.setField(_save.data.levelRecords, id, record);
+            _save.flush();
+        }
+    }
+
+    public static function forceSaveLevelRecord(id:String, record:LevelRecord):Void {
+        saveLevelRecord(id, record, true);
+    }
+
+    public static function resetScoreRecord(id:String):Void {
         _scoreRecords.remove(id);
         Reflect.deleteField(_save.data, id);
+        _save.flush();
+    }
+
+    public static function resetLevelRecord(id:String):Void {
+        _levelRecords.remove(id);
+        Reflect.deleteField(_save.data.levelRecords, id);
         _save.flush();
     }
 
@@ -107,9 +181,19 @@ class Highscore {
 
     private static var _save:FlxSave;
     private static var _scoreRecords:Map<String, ScoreRecord> = [];
+    private static var _levelRecords:Map<String, LevelRecord> = [];
 }
 
 typedef ScoreRecord = {
+    var score:Int;
+    var misses:Int;
+    var accuracy:Float;
+    var rank:Rank;
+    var judges:Map<String, Int>;
+    var version:SemVer;
+}
+
+typedef LevelRecord = {
     var score:Int;
     var misses:Int;
     var accuracy:Float;

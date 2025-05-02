@@ -230,8 +230,8 @@ class FreeplayState extends FunkinState {
 
             final subState:ResetScoreSubState = new ResetScoreSubState(meta.song.title);
             subState.onAccept.add(() -> {
-                final recordID:String = Highscore.getRecordID(song.id, currentDifficulty, currentMix);
-                Highscore.resetRecord(recordID);
+                final recordID:String = Highscore.getScoreRecordID(song.id, currentDifficulty, currentMix);
+                Highscore.resetScoreRecord(recordID);
                 updateHighscore();
             });
             openSubState(subState);
@@ -243,8 +243,8 @@ class FreeplayState extends FunkinState {
         #if TEST_BUILD
         if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.G) {
             final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
-            final recordID:String = Highscore.getRecordID(song.id, currentDifficulty, currentMix);
-            Highscore.forceSaveRecord(recordID, {
+            final recordID:String = Highscore.getScoreRecordID(song.id, currentDifficulty, currentMix);
+            Highscore.forceSaveScoreRecord(recordID, {
                 score: FlxG.random.int(0, 999999),
                 misses: 0,
                 accuracy: 1,
@@ -357,9 +357,9 @@ class FreeplayState extends FunkinState {
     public function updateHighscore():Void {
         // update the score display
         final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
-        final recordID:String = Highscore.getRecordID(song.id, currentDifficulty, currentMix);
+        final recordID:String = Highscore.getScoreRecordID(song.id, currentDifficulty, currentMix);
 
-        curScoreRecord = Highscore.getRecord(recordID);
+        curScoreRecord = Highscore.getScoreRecord(recordID);
         intendedScore = curScoreRecord.score;
 
         // update the rank display

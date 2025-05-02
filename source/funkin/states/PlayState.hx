@@ -23,6 +23,8 @@ import funkin.backend.events.CountdownEvents;
 import funkin.backend.events.GameplayEvents;
 import funkin.backend.events.NoteEvents;
 
+import funkin.gameplay.PlayerStats;
+
 import funkin.gameplay.events.*;
 import funkin.gameplay.events.EventRunner;
 
@@ -71,7 +73,10 @@ class PlayState extends FunkinState {
 	public static var instance:PlayState;
 	public static var deathCounter:Int = 0;
 	
+	public static var storyLevel:String;
+	public static var storyStats:PlayerStats;
 	public static var storyPlaylist:Array<String> = [];
+
 	public var isStoryMode(default, null):Bool = false;
 	
 	public var currentSong:String;
@@ -720,8 +725,8 @@ class PlayState extends FunkinState {
 		playField.hud.call("onSongEnd");
 
 		if(_saveScore) {
-			final recordID:String = Highscore.getRecordID(currentSong, currentDifficulty, currentMix);
-			Highscore.saveRecord(recordID, {
+			final recordID:String = Highscore.getScoreRecordID(currentSong, currentDifficulty, currentMix);
+			Highscore.saveScoreRecord(recordID, {
 				score: playField.stats.score,
 				misses: playField.stats.misses,
 				accuracy: playField.stats.accuracy,
@@ -729,6 +734,17 @@ class PlayState extends FunkinState {
 				judges: playField.stats.judgements,
 				version: Highscore.RECORD_VERSION
 			});
+			if(isStoryMode) {
+				storyStats.score += playField.stats.score;
+				storyStats.accuracyScore += playField.stats.accuracyScore;
+				storyStats.totalNotesHit += playField.stats.totalNotesHit;
+				
+				for(judge => count in storyStats.judgements)
+					storyStats.judgements.set(judge, count + playField.stats.judgements.get(judge));
+				
+				@:bypassAccessor storyStats.misses += playField.stats.misses;
+				@:bypassAccessor storyStats.comboBreaks += playField.stats.comboBreaks;
+			}
 		}
 		FlxG.sound.music.onComplete = null;
 
@@ -747,6 +763,15 @@ class PlayState extends FunkinState {
 					PlayState.lastParams.song = storyPlaylist.shift();
 					FlxG.switchState(PlayState.new.bind(PlayState.lastParams));
 				} else {
+					final recordID:String = Highscore.getLevelRecordID(storyLevel, currentDifficulty);
+					Highscore.saveLevelRecord(recordID, {
+						score: storyStats.score,
+						misses: storyStats.misses,
+						accuracy: storyStats.accuracyScore,
+						rank: Highscore.getRankFromStats(storyStats),
+						judges: storyStats.judgements,
+						version: Highscore.RECORD_VERSION
+					});
 					playExitMusic();
 					FlxG.switchState(StoryMenuState.new);
 				}

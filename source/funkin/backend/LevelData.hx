@@ -32,6 +32,13 @@ class LevelData {
     public var showInFreeplay:Bool;
 
     @:optional
+    @:default(true)
+    public var startUnlocked:Bool;
+
+    @:optional
+    public var levelBefore:String;
+
+    @:optional
     @:default("main")
     public var freeplayCategory:String;
 

@@ -7,6 +7,7 @@ import flixel.util.FlxStringUtil;
 import funkin.backend.LevelData;
 import funkin.backend.ContentMetadata;
 
+import funkin.gameplay.PlayerStats;
 import funkin.gameplay.song.Highscore;
 import funkin.gameplay.song.SongMetadata;
 
@@ -24,6 +25,7 @@ class StorySongData {
 
 class StoryMenuState extends FunkinState {
     public var levels:Array<LevelData> = [];
+    public var levelMap:Map<String, LevelData> = [];
     public var songs:Map<String, Array<StorySongData>> = [];
 
     public var grpLevelTitles:FlxTypedContainer<LevelTitle>;
@@ -131,7 +133,9 @@ class StoryMenuState extends FunkinState {
                     graphicCache.cache(character.graphic);
                     character.destroy();
                 }
-                final title:LevelTitle = new LevelTitle(0, LevelTitle.Y_OFFSET + y, level.name, contentFolder);
+                levelMap.set(level.name, level);
+                
+                final title:LevelTitle = new LevelTitle(0, LevelTitle.Y_OFFSET + y, level.name, isLevelLocked(level.name), contentFolder);
                 title.screenCenter(X);
                 grpLevelTitles.add(title);
                 y += title.height;
@@ -271,6 +275,27 @@ class StoryMenuState extends FunkinState {
         }});
     }
 
+    public function isLevelLocked(name:String):Bool {
+        final level:LevelData = levelMap.get(name);
+        if(level == null)
+            return false;
+        
+        var levelBeforeCompleted:Bool = false;
+        var levelBefore:LevelData = (level.levelBefore != null && level.levelBefore.length != 0) ? levelMap.get(level.levelBefore) : null;
+        
+        if(levelBefore != null) {
+            for(diffs in levelBefore.difficulties) {
+                for(diff in diffs) {
+                    if(Highscore.getLevelRecord(Highscore.getLevelRecordID(level.levelBefore, diff)).score > 0) {
+                        levelBeforeCompleted = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return !level.startUnlocked && (level.levelBefore != null && level.levelBefore.length != 0 && !levelBeforeCompleted);
+    }
+
     public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
         if(by == 0 && !force)
             return;
@@ -381,12 +406,7 @@ class StoryMenuState extends FunkinState {
         }
         // update the score stuff
         final currentLevel:LevelData = levels[curSelected];
-        
-        var totalLevelScore:Int = 0;
-        for(song in currentLevel.songs)
-            totalLevelScore += Highscore.getRecord(Highscore.getRecordID(song, currentDifficulty, currentMix)).score;
-        
-        intendedScore = totalLevelScore;
+        intendedScore = Highscore.getLevelRecord(Highscore.getLevelRecordID(currentLevel.name, currentDifficulty)).score;
 
         // update the difficulty display
         if(currentDifficulty != prevDifficulty) {
@@ -406,7 +426,11 @@ class StoryMenuState extends FunkinState {
     public function onSelect():Void {
         if(transitioning)
             return;
-        
+
+        if(isLevelLocked(levels[curSelected].name)) {
+            FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
+            return;
+        }
         var excludedSome:Bool = false;
         var pendingPlaylist:Array<String> = [];
 
@@ -424,7 +448,10 @@ class StoryMenuState extends FunkinState {
                 }
             }
             FlxTimer.wait(1, () -> {
+                PlayState.storyStats = new PlayerStats();
                 PlayState.storyPlaylist = pendingPlaylist;
+                PlayState.storyLevel = levels[curSelected].name;
+                
                 FlxG.switchState(PlayState.new.bind({
                     song: PlayState.storyPlaylist.shift(),
                     difficulty: currentDifficulty,
@@ -432,6 +459,7 @@ class StoryMenuState extends FunkinState {
                     mod: Paths.forceContentPack,
                     isStoryMode: true
                 }));
+                FlxG.sound.music.fadeOut(0.16, 0);
                 grpLevelTitles.members[curSelected].stopFlashing();
             });
             grpLevelTitles.members[curSelected].startFlashing();
