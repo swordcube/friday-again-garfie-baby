@@ -1188,13 +1188,23 @@ class ChartEditor extends UIState {
 
     public function unsafeExit():Void {
         FlxG.sound.music.onComplete = null;
-        
-        FlxG.sound.music.volume = 0;
-        FlxG.sound.music.looped = true;
-        FlxG.sound.music.play();
-        FlxG.sound.music.fadeIn(0.16, 0, 1);
-
         Conductor.instance.music = null;
+
+        if(!Constants.PLAY_MENU_MUSIC_AFTER_EXIT) {
+			if(!FlxG.sound.music.playing) {
+                FlxTimer.wait(0.001, () -> {
+                    FlxG.sound.music.volume = 0;
+                    FlxG.sound.music.looped = true;
+                    FlxG.sound.music.play();
+                    FlxG.sound.music.fadeIn(0.16, 0, 1);
+                });
+			}
+		} else {
+			final oldContentPack:String = Paths.forceContentPack;
+			Paths.forceContentPack = null;
+			CoolUtil.playMenuMusic();
+			Paths.forceContentPack = oldContentPack;
+		}
         FlxTimer.wait(0.05, () -> {
             persistentDraw = true;
             FlxG.switchState(MainMenuState.new);

@@ -141,6 +141,9 @@ class PlayState extends FunkinState {
 	 */
 	public var camZoomingIntensity:Float = 1;
 
+	public var camGameZoomLerp:Float = 0.05;
+	public var camHUDZoomLerp:Float = 0.05;
+
 	public var canPause:Bool = true;
 	public var chartingMode:Bool = false;
 
@@ -524,8 +527,11 @@ class PlayState extends FunkinState {
 		if(controls.justPressed.DEBUG)
 			goToCharter();
 
-		camGame.extraZoom = FlxMath.lerp(camGame.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
-		camHUD.extraZoom = FlxMath.lerp(camHUD.extraZoom, 0.0, FlxMath.getElapsedLerp(0.05, elapsed));
+		if(camGameZoomLerp > 0)
+			camGame.extraZoom = FlxMath.lerp(camGame.extraZoom, 0.0, FlxMath.getElapsedLerp(camGameZoomLerp, elapsed));
+		
+		if(camHUDZoomLerp > 0)
+			camHUD.extraZoom = FlxMath.lerp(camHUD.extraZoom, 0.0, FlxMath.getElapsedLerp(camHUDZoomLerp, elapsed));
 
 		if(!minimalMode) {
 			if(player._holdingPose && player.holdTimer <= 0 && !playField.strumsPressed.contains(true))
