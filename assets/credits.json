@@ -20,7 +20,7 @@
             "items": [
                 {
                     "name": "The Funkin' Crew",
-                    "description": "Made the original game, please go check it out!",
+                    "description": "Made the original game, you should go check it out!",
                     
                     "icon": "funkincrew",
                     "color": "#26a6f8",
@@ -39,8 +39,18 @@
                     "url": "https://gamebanana.com/members/1739194"
                 },
                 {
+                    "name": "lufekaji",
+                    "description": "Made the app icon for the engine\nTheir URL might have 16+ content, be warned!",
+                    
+                    "icon": "lufekaji",
+                    "color": "#e3e3e3",
+                    
+                    "roles": ["Artist"],
+                    "url": "https://twitter.com/lufekaji"
+                },
+                {
                     "name": "You",
-                    "description": "Thank you for trying out funkin.lua!",
+                    "description": "Thank you for trying out Garfie Engine!",
                     
                     "icon": "you",
                     "color": "#bb8b68",

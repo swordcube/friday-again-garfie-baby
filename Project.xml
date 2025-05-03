@@ -109,6 +109,8 @@
 		<assets path="alsoft.ini" rename="plugins/alsoft.conf" type="text" unless="windows"/>
 	</section>
 
+	<assets path="art/icons/256x.png" rename="icon.png" if="linux || mac"/>
+
 	<!-- _______________________________ Libraries ______________________________ -->
 
 	<!-- HaxeFlixel -->

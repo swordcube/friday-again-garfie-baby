@@ -1,6 +1,6 @@
 package funkin.backend;
 
-import flixel.util.FlxTimer;
+import lime.graphics.Image;
 
 import funkin.backend.native.NativeAPI;
 import funkin.backend.plugins.ForceCrashPlugin;
@@ -54,6 +54,14 @@ class InitState extends FlxState {
         FlxG.stage.window.borderless = !FlxG.stage.window.borderless;
         FlxG.stage.window.borderless = !FlxG.stage.window.borderless;
         #end
+
+        #if (linux || mac || macos)
+        // Linux doesn't have executable icons, and apparently
+        // the icon doesn't show up on the macOS dock
+        //
+        // so we just set the icon ourselves to force it to work
+		FlxG.stage.window.setIcon(Image.fromFile("icon.png"));
+		#end
 
         // init logging & asset system
         Logs.init();
