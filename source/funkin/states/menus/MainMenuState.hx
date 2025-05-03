@@ -33,7 +33,7 @@ class MainMenuState extends FunkinState {
             },
             {
                 name: "credits",
-                callback: () -> trace("credits menu TODO"),
+                callback: () -> FlxG.switchState(new CreditsState()),
             },
             {
                 name: "options",
