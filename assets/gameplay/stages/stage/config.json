@@ -42,21 +42,21 @@
                 "type": "spectator",
                 "properties": {
                     "scroll": [0.95, 0.95],
-                    "position": [412, 738],
+                    "position": [412, 538],
                     "camera": [0, 0]
                 }
             },
             {
                 "type": "opponent",
                 "properties": {
-                    "position": [0, 812],
+                    "position": [0, 612],
                     "camera": [0, 0]
                 }
             },
             {
                 "type": "player",
                 "properties": {
-                    "position": [694, 812],
+                    "position": [694, 612],
                     "camera": [0, 0]
                 }
             }

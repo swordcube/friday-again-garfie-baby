@@ -70,11 +70,12 @@ class FreeplayState extends FunkinState {
         grpSongs = new AtlasTextList();
         add(grpSongs);
 
-        for(contentFolder in Paths.contentFolders) {
+        for(rawContentFolder in Paths.contentFolders) {
+            final contentFolder:String = rawContentFolder.substr(rawContentFolder.lastIndexOf("/") + 1);
             final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentFolder);
             if(contentMetadata == null)
                 continue; // if no metadata was found for this content pack, then don't bother
-
+            
             for(category in contentMetadata.freeplayCategories) {
                 categories.push({
                     id: '${contentFolder}:${category.id}',

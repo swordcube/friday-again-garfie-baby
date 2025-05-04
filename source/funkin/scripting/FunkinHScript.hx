@@ -24,7 +24,7 @@ class FunkinHScript extends FunkinScript {
         }
         catch(error:Error) {
             var fileName = error.origin;
-            var fn:String = '$fileName:${error.line}: ';
+            var fn:String = '${fileName}:${error.line}: ';
 
             var err:String = error.toString();
             if(err.startsWith(fn))
@@ -57,7 +57,11 @@ class FunkinHScript extends FunkinScript {
         };
         _interp.allowPublicVariables = _interp.allowStaticVariables = true;
         _interp.staticVariables = FunkinScript.staticVariables;
-        
+
+        if(filePath != null) {
+            set("parentContentPack", Paths.getContentPackFromPath(filePath));
+            set("parentContentPackFull", Paths.getContentPackFromPath(filePath, true));
+        }
         super(code, unsafe);
     }
 

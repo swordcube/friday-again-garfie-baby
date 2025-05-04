@@ -77,7 +77,7 @@ class Stage extends FlxContainer {
                     case SPECTATOR:
                         if(!spectatorAdded) {
                             characters.spectator.x = propData.properties?.position[0] ?? 412.0;
-                            characters.spectator.y = propData.properties?.position[1] ?? 738.0;
+                            characters.spectator.y = propData.properties?.position[1] ?? 538.0;
 
                             var scroll:Array<Float> = cast propData.properties?.scroll;
                             if(scroll == null)
@@ -92,7 +92,7 @@ class Stage extends FlxContainer {
                     case OPPONENT:
                         if(!opponentAdded) {
                             characters.opponent.x = propData.properties?.position[0] ?? 0.0;
-                            characters.opponent.y = propData.properties?.position[1] ?? 812.0;
+                            characters.opponent.y = propData.properties?.position[1] ?? 612.0;
 
                             var scroll:Array<Float> = cast propData.properties?.scroll;
                             if(scroll == null)
@@ -107,7 +107,7 @@ class Stage extends FlxContainer {
                     case PLAYER:
                         if(!playerAdded) {
                             characters.player.x = propData.properties?.position[0] ?? 694.0;
-                            characters.player.y = propData.properties?.position[1] ?? 812.0;
+                            characters.player.y = propData.properties?.position[1] ?? 612.0;
 
                             var scroll:Array<Float> = cast propData.properties?.scroll;
                             if(scroll == null)

@@ -37,7 +37,8 @@ class CreditsState extends FunkinState {
         final contentFolders:Array<String> = Paths.contentFolders.copy();
         contentFolders.push("default"); // engine credits always go last
 
-        for(contentFolder in contentFolders) {
+        for(rawContentFolder in contentFolders) {
+            final contentFolder:String = rawContentFolder.substr(rawContentFolder.lastIndexOf("/") + 1);
             if(!FlxG.assets.exists(Paths.json("credits", contentFolder, false)))
                 continue;
 

@@ -64,7 +64,8 @@ class StoryMenuState extends FunkinState {
         grpLevelTitles = new FlxTypedContainer<LevelTitle>();
         add(grpLevelTitles);
 
-        for(contentFolder in Paths.contentFolders) {
+        for(rawContentFolder in Paths.contentFolders) {
+            final contentFolder:String = rawContentFolder.substr(rawContentFolder.lastIndexOf("/") + 1);
             final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentFolder);
             if(contentMetadata == null)
                 continue; // if no metadata was found for this content pack, then don't bother
@@ -75,8 +76,9 @@ class StoryMenuState extends FunkinState {
                 if(!level.showInStory)
                     continue;
 
-                if(songs.get(level.id) == null)
-                    songs.set(level.id, []);
+                final levelID:String = '${contentFolder}:${level.id}';
+                if(songs.get(levelID) == null)
+                    songs.set(levelID, []);
                 
                 level.loaderID = contentFolder;
                 for(song in level.songs) {
@@ -100,14 +102,14 @@ class StoryMenuState extends FunkinState {
                                 difficultyMap.set(mix, metadataMap.get(mix).song.difficulties);
                         }
                     }
-                    final songList:Array<StorySongData> = songs.get(level.id);
+                    final songList:Array<StorySongData> = songs.get(levelID);
                     songList.push({
                         metadata: metadataMap,
                         id: song,
                         difficulties: difficultyMap
                     });
                 }
-                final songList:Array<StorySongData> = songs.get(level.id);
+                final songList:Array<StorySongData> = songs.get(levelID);
                 if(songList.length == 0)
                     continue;
 
@@ -136,9 +138,9 @@ class StoryMenuState extends FunkinState {
                     graphicCache.cache(character.graphic);
                     character.destroy();
                 }
-                levelMap.set(level.id, level);
+                levelMap.set(levelID, level);
                 
-                final title:LevelTitle = new LevelTitle(0, LevelTitle.Y_OFFSET + y, level.id, isLevelLocked(level.id), contentFolder);
+                final title:LevelTitle = new LevelTitle(0, LevelTitle.Y_OFFSET + y, level.id, isLevelLocked(levelID), contentFolder);
                 title.screenCenter(X);
                 grpLevelTitles.add(title);
                 y += title.height;
@@ -257,7 +259,7 @@ class StoryMenuState extends FunkinState {
                 final level:LevelData = levels[curSelected];
                 final subState:ResetScoreSubState = new ResetScoreSubState((level.name != null && level.name.length != 0) ? level.name : level.id);
                 subState.onAccept.add(() -> {
-                    final recordID:String = Highscore.getLevelRecordID(level.id, currentDifficulty);
+                    final recordID:String = Highscore.getLevelRecordID('${Paths.forceContentPack}:${level.id}', currentDifficulty);
                     Highscore.resetLevelRecord(recordID);
                 });
                 openSubState(subState);
@@ -293,12 +295,13 @@ class StoryMenuState extends FunkinState {
             return false;
         
         var levelBeforeCompleted:Bool = false;
-        var levelBefore:LevelData = (level.levelBefore != null && level.levelBefore.length != 0) ? levelMap.get(level.levelBefore) : null;
+        var levelBeforeID:String = '${Paths.forceContentPack}:${level.levelBefore}';
+        var levelBefore:LevelData = (level.levelBefore != null && level.levelBefore.length != 0) ? levelMap.get(levelBeforeID) : null;
         
         if(levelBefore != null) {
             for(diffs in levelBefore.difficulties) {
                 for(diff in diffs) {
-                    if(Highscore.getLevelRecord(Highscore.getLevelRecordID(level.levelBefore, diff)).score > 0) {
+                    if(Highscore.getLevelRecord(Highscore.getLevelRecordID(levelBeforeID, diff)).score > 0) {
                         levelBeforeCompleted = true;
                         break;
                     }
@@ -349,7 +352,8 @@ class StoryMenuState extends FunkinState {
             title.alpha = (curSelected == i) ? 1.0 : 0.6;
         
         final tracks:Array<String> = [];
-        for(song in songs.get(levels[curSelected].id))
+        final levelID:String = '${Paths.forceContentPack}:${levels[curSelected].id}';
+        for(song in songs.get(levelID))
             tracks.push(song.metadata.get("default")?.song?.title ?? song.id);
 
         for(i => characterID in levels[curSelected].characters) {
@@ -367,7 +371,7 @@ class StoryMenuState extends FunkinState {
                     oldCharacter.destroy();
                 }
                 final newCharacter:StoryCharacter = new StoryCharacter(characterID);
-                newCharacter.setPosition(FlxG.width * 0.25 * i, 400);
+                newCharacter.setPosition(FlxG.width * 0.25 * i, 230);
                 grpCharacters.insert(i, newCharacter);
             }
         }
@@ -417,8 +421,8 @@ class StoryMenuState extends FunkinState {
             currentDifficulty = difficulties[newDiffIndex];
         }
         // update the score stuff
-        final currentLevel:LevelData = levels[curSelected];
-        intendedScore = Highscore.getLevelRecord(Highscore.getLevelRecordID(currentLevel.id, currentDifficulty)).score;
+        final levelID:String = '${Paths.forceContentPack}:${levels[curSelected].id}';
+        intendedScore = Highscore.getLevelRecord(Highscore.getLevelRecordID(levelID, currentDifficulty)).score;
 
         // update the difficulty display
         if(currentDifficulty != prevDifficulty) {
@@ -439,7 +443,8 @@ class StoryMenuState extends FunkinState {
         if(transitioning)
             return;
 
-        if(isLevelLocked(levels[curSelected].id)) {
+        final levelID:String = '${Paths.forceContentPack}:${levels[curSelected].id}';
+        if(isLevelLocked(levelID)) {
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
             return;
         }
@@ -462,7 +467,7 @@ class StoryMenuState extends FunkinState {
             FlxTimer.wait(1, () -> {
                 PlayState.storyStats = new PlayerStats();
                 PlayState.storyPlaylist = pendingPlaylist;
-                PlayState.storyLevel = levels[curSelected].id;
+                PlayState.storyLevel = '${Paths.forceContentPack}:${levels[curSelected].id}';
                 
                 FlxG.switchState(PlayState.new.bind({
                     song: PlayState.storyPlaylist.shift(),

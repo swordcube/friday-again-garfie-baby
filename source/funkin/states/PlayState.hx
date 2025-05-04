@@ -89,6 +89,7 @@ class PlayState extends FunkinState {
 
 	public var stage:Stage;
 	public var camFollow:FlxObject;
+	public var isCameraOnForcedPos:Bool = false;
 
 	public var paused:Bool = false;
 
@@ -369,6 +370,15 @@ class PlayState extends FunkinState {
 				scripts.add(stage.script);
 				stage.script.setParent(stage);
 			}
+			for(character in [spectator, opponent, player]) {
+				if(character == null)
+					continue;
+
+				for(script in character.scripts.members) {
+                    scripts.add(script);
+					script.setParent(character);
+				}
+			}
 			for(note in currentChart.notes.get(currentDifficulty)) {
 				if(noteTypeScripts.exists(note.type))
 					continue;
@@ -536,30 +546,32 @@ class PlayState extends FunkinState {
 			camHUD.extraZoom = FlxMath.lerp(camHUD.extraZoom, 0.0, FlxMath.getElapsedLerp(camHUDZoomLerp, elapsed));
 
 		if(!minimalMode) {
-			if(player._holdingPose && player.holdTimer <= 0 && !playField.strumsPressed.contains(true))
-				player._holdingPose = false;
+			if(player.holdingPose && player.holdTimer <= 0 && !playField.strumsPressed.contains(true))
+				player.holdingPose = false;
 			
-			final cameraPos:FlxPoint = FlxPoint.get();
-			switch(curCameraTarget) {
-				case OPPONENT:
-					opponent.getCameraPosition(cameraPos);
-	
-				case PLAYER:
-					player.getCameraPosition(cameraPos);
-	
-				case SPECTATOR:
-					spectator.getCameraPosition(cameraPos);
+			if(!isCameraOnForcedPos) {
+				final cameraPos:FlxPoint = FlxPoint.get();
+				switch(curCameraTarget) {
+					case OPPONENT:
+						opponent.getCameraPosition(cameraPos);
+		
+					case PLAYER:
+						player.getCameraPosition(cameraPos);
+		
+					case SPECTATOR:
+						spectator.getCameraPosition(cameraPos);
+				}
+				var event:CameraMoveEvent = cast Events.get(CAMERA_MOVE);
+				event.recycle(cameraPos);
+				#if SCRIPTING_ALLOWED
+				if(scriptsAllowed)
+					scripts.event("onCameraMove", event);
+				#end
+				if(!event.cancelled)
+					camFollow.setPosition(event.position.x, event.position.y);
+
+				cameraPos.put();
 			}
-			var event:CameraMoveEvent = cast Events.get(CAMERA_MOVE);
-			event.recycle(cameraPos);
-			#if SCRIPTING_ALLOWED
-			if(scriptsAllowed)
-				scripts.event("onCameraMove", event);
-			#end
-			if(!event.cancelled)
-				camFollow.setPosition(event.position.x, event.position.y);
-			
-			cameraPos.put();
 		}
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed)
@@ -843,6 +855,11 @@ class PlayState extends FunkinState {
 		}));
 	}
 
+	public function snapCamFollowToPos(x:Float = 0, y:Float = 0):Void {
+		camFollow.setPosition(x, y);
+		camGame.snapToTarget();
+	}
+
 	//----------- [ Private API ] -----------//
 
 	@:unreflective
@@ -939,7 +956,7 @@ class PlayState extends FunkinState {
 			for(character in event.characters) {
 				character.playSingAnim(event.direction, event.singAnimSuffix, true);
 				character.holdTimer += event.length;
-				character._holdingPose = isPlayer;
+				character.holdingPose = isPlayer && !event.note.strumLine.botplay;
 			}
 		}
 	}
@@ -1007,7 +1024,7 @@ class PlayState extends FunkinState {
 		if(event.playMissAnim) {
 			for(character in event.characters) {
 				character.playMissAnim(event.direction, event.missAnimSuffix, true);
-				character._holdingPose = isPlayer;
+				character.holdingPose = isPlayer;
 			}
 		}
 	}

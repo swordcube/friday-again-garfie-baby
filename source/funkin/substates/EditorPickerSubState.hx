@@ -49,6 +49,7 @@ class EditorPickerSubState extends FunkinSubState {
             FadeTransition.nextCamera = transitionCam;
             FlxG.switchState(new CharacterEditor());
         });
+        call("onAddItems");
         changeSelection(0, true);
     }
 

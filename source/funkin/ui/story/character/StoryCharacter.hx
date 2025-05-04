@@ -123,7 +123,7 @@ class StoryCharacter extends FlxSprite implements IBeatReceiver {
         dance();
         updateHitbox();
         
-        footOffset.set(0, height);
+        footOffset.set(0, height * 0.5);
         offset.set(footOffset.x - data.position[0], footOffset.y - data.position[1]);
     }
 

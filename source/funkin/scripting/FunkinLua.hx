@@ -54,6 +54,10 @@ class FunkinLua extends FunkinScript {
         _lua.print = (line:Int, s:String) -> {
             Logs.trace('${_lua.tracePrefix}:${line}: ${s}');
         };
+        if(filePath != null) {
+            set("parentContentPack", Paths.getContentPackFromPath(filePath));
+            set("parentContentPackFull", Paths.getContentPackFromPath(filePath, true));
+        }
         super(code, unsafe);
     }
 

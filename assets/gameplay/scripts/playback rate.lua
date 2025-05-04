@@ -37,7 +37,7 @@ function onUpdate(dt)
         setRate(game.playbackRate - (FlxG.keys.pressed.SHIFT and 0.25 or 0.01))
     end
     if FlxG.keys.justPressed.F8 then
-        setRate(10)
+        setRate((FlxG.keys.pressed.SHIFT and 20 or 10))
     end
     if sex then
         setRate(game.playbackRate - (dt * 0.25))

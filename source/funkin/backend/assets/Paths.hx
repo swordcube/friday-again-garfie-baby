@@ -187,15 +187,27 @@ class Paths {
         contentMetadata.clear();
 
         final contentDir:String = getContentDirectory();
-        final dirItems:Array<String> = FileSystem.readDirectory(contentDir);
-
-        for(i in 0...dirItems.length) {
-            final item:String = dirItems[i];
-            if(!FileSystem.isDirectory('${contentDir}/${item}'))
-                continue;
-            
-            contentFolders.push(item);
+        function iterateThruContent(items:Array<String>):Void {
+            for(i in 0...items.length) {
+                final item:String = items[i];
+                if(!FileSystem.isDirectory('${contentDir}/${item}'))
+                    continue;
+                
+                if(FileSystem.exists('${contentDir}/${item}/metadata.json'))
+                    contentFolders.push(item); // assume a content pack
+                
+                else if(FileSystem.isDirectory('${contentDir}/${item}')) {
+                    final dirItems:Array<String> = FileSystem.readDirectory('${contentDir}/${item}');
+                    for(j in 0...dirItems.length)
+                        dirItems[j] = '${item}/${dirItems[j]}';
+                    
+                    iterateThruContent(dirItems); // assume a container of content packs
+                }
+            }
         }
+        final dirItems:Array<String> = FileSystem.readDirectory(contentDir);
+        iterateThruContent(dirItems);
+
         final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders.copy();
         for(i in 0...loaders.length) {
             final loader:AssetLoader = loaders[i];
@@ -218,9 +230,11 @@ class Paths {
         }
         for(i in 0...contentFolders.length) {
             final folder:String = contentFolders[i];
-            Paths.registerAssetLoader(folder, new ContentAssetLoader(folder));
 
-            final metaPath:String = Paths.json("metadata", folder, false);
+            final shortFolder:String = folder.substr(folder.lastIndexOf("/") + 1);
+            Paths.registerAssetLoader(shortFolder, new ContentAssetLoader(folder));
+
+            final metaPath:String = Paths.json("metadata", shortFolder, false);
             if(FlxG.assets.exists(metaPath)) {
                 final parser:JsonParser<ContentMetadata> = new JsonParser<ContentMetadata>();
                 parser.ignoreUnknownVariables = true;
@@ -231,7 +245,7 @@ class Paths {
                 for(level in meta.levels)
                     level.mixes.insert(0, "default");
 
-                contentMetadata.set(folder, meta);
+                contentMetadata.set(shortFolder, meta);
             }
         }
     }
@@ -385,14 +399,13 @@ class Paths {
         }
     }
 
-    public static function getContentPackFromPath(path:String):String {
+    public static function getContentPackFromPath(path:String, ?includeContainerFolders:Bool = false):String {
         final contentDir:String = getContentDirectory();
         path = path.replace("\\", "/"); // go fuck yourself windows
 
-        if(path.startsWith('${contentDir}/')) {
-            final split:Array<String> = path.substr(contentDir.length + 1).split("/");
-            if(split.length > 0)
-                return split.first();
+        for(rawContentFolder in Paths.contentFolders) {
+            if(path.startsWith('${contentDir}/${rawContentFolder}/'))
+                return (!includeContainerFolders) ? rawContentFolder.substr(rawContentFolder.lastIndexOf("/") + 1) : rawContentFolder;
         }
         return "default";
     }

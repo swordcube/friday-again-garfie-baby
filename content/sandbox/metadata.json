@@ -2,6 +2,8 @@
     "apiVersion": "0.1.0",
     "levels": [
         {
+            "id": "sandbox1",
+            
             "tagline": "TESTING GROUNDS",
             "characters": [null, "bf", null],
 

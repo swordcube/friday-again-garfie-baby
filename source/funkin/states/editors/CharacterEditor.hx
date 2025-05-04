@@ -77,7 +77,11 @@ class CharacterEditor extends UIState {
         grpAnims.cameras = [camUI];
         add(grpAnims);
         
-        changeCharacter(Constants.DEFAULT_CHARACTER, Paths.contentFolders.first() ?? "default");
+        var contentFolder:String = Paths.contentFolders.first();
+        if(contentFolder == null || contentFolder.length == 0)
+            contentFolder = "default";
+
+        changeCharacter(Constants.DEFAULT_CHARACTER, contentFolder.substr(contentFolder.lastIndexOf("/") + 1));
         FlxG.camera.follow(camFollow, LOCKON, 1);
 
         selectCharacterButton = new Button(FlxG.width - 5, 5, "Select Character", 0, 0, showSelectCharacterMenu);

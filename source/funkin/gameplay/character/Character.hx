@@ -65,6 +65,7 @@ class Character extends FlxSprite implements IBeatReceiver {
     public var footOffset:FlxPoint = FlxPoint.get(0, 0);
 
     public var canDance:Bool = true;
+    public var holdingPose:Bool = false;
 
     #if SCRIPTING_ALLOWED
     public var scripts:FunkinScriptGroup;
@@ -83,7 +84,7 @@ class Character extends FlxSprite implements IBeatReceiver {
         this.debugMode = debugMode;
 
         #if SCRIPTING_ALLOWED
-        if(game != null && game.scriptsAllowed) {
+        if(game == null || (game != null && game.scriptsAllowed)) {
             scripts = new FunkinScriptGroup();
             scripts.setParent(this);
     
@@ -106,6 +107,10 @@ class Character extends FlxSprite implements IBeatReceiver {
                     }
                 }
             }
+            if(game != null && game.scriptsAllowed && game.scripts != null) {
+                for(script in scripts.members)
+                    game.scripts.add(script);
+            }
             scripts.execute();
             scripts.call("onLoad", [data]);
         }
@@ -113,14 +118,14 @@ class Character extends FlxSprite implements IBeatReceiver {
         applyData(data);
 
         #if SCRIPTING_ALLOWED
-        if(game != null && game.scriptsAllowed)
+        if(game == null || (game != null && game.scriptsAllowed))
             scripts.call("onLoadPost", [data]);
         #end
     }
 
     override function update(elapsed:Float):Void {
         #if SCRIPTING_ALLOWED
-        if(game != null && game.scriptsAllowed)
+        if(game == null)
             scripts.call("onUpdate", [elapsed]);
         #end
         if(!debugMode && curAnimContext == SING) {
@@ -128,10 +133,13 @@ class Character extends FlxSprite implements IBeatReceiver {
             if(holdTimer <= 0)
                 holdTimer = 0;
         }
+        if(animation.finished && animation.exists('${animation.name}-loop'))
+            animation.play('${animation.name}-loop');
+
         super.update(elapsed);
 
         #if SCRIPTING_ALLOWED
-        if(game != null && game.scriptsAllowed)
+        if(game == null)
             scripts.call("onUpdatePost", [elapsed]);
         #end
     }
@@ -180,7 +188,7 @@ class Character extends FlxSprite implements IBeatReceiver {
         dance();
         updateHitbox();
         
-        footOffset.set(0, height);
+        footOffset.set(0, height * 0.5);
         offset.set(footOffset.x - data.position[0], footOffset.y - data.position[1]);
     }
 
@@ -244,7 +252,7 @@ class Character extends FlxSprite implements IBeatReceiver {
     public function dance():Void {
         #if SCRIPTING_ALLOWED
         final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
-        if(game != null && game.scriptsAllowed)
+        if(game == null || (game != null && game.scriptsAllowed))
             scripts.call("onDance", [event]);
         
         if(event.cancelled)
@@ -258,7 +266,7 @@ class Character extends FlxSprite implements IBeatReceiver {
             playAnim(data.danceSteps[curDanceStep], DANCE);
         }
         #if SCRIPTING_ALLOWED
-        if(game != null && game.scriptsAllowed)
+        if(game == null || (game != null && game.scriptsAllowed))
             scripts.call("onDancePost", [event.flagAsPost()]);
         #end
     }
@@ -282,7 +290,7 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     public function stepHit(step:Int):Void {
         #if SCRIPTING_ALLOWED
-        if(game != null && game.scriptsAllowed)
+        if(game == null)
             scripts.call("onStepHit", [step]);
         #end
     }
@@ -293,7 +301,7 @@ class Character extends FlxSprite implements IBeatReceiver {
             final danceAllowed:Bool = canDance && danceInterval > 0 && (Math.floor(Conductor.instance.curDecBeat - Conductor.instance._latestTimingPoint.beat) % danceInterval == 0);
             switch(curAnimContext) {
                 case SING:
-                    if(holdTimer <= 0 && danceAllowed && !_holdingPose)
+                    if(holdTimer <= 0 && danceAllowed && !holdingPose)
                         dance();
     
                 default:
@@ -302,14 +310,14 @@ class Character extends FlxSprite implements IBeatReceiver {
             }
         }
         #if SCRIPTING_ALLOWED
-        if(game != null && game.scriptsAllowed)
+        if(game == null)
             scripts.call("onBeatHit", [beat]);
         #end
     }
 
     public function measureHit(measure:Int):Void {
         #if SCRIPTING_ALLOWED
-        if(game != null && game.scriptsAllowed)
+        if(game == null)
             scripts.call("onMeasureHit", [measure]);
         #end
     }
@@ -330,11 +338,11 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     override function destroy():Void {
         #if SCRIPTING_ALLOWED
-        if(game != null && game.scriptsAllowed) {
+        if(game == null) {
             scripts.call("onDestroy");
             scripts.close();
-            scripts = null;
         }
+        scripts = null;
         #end
         footOffset = FlxDestroyUtil.put(footOffset);
         super.destroy();
@@ -344,9 +352,6 @@ class Character extends FlxSprite implements IBeatReceiver {
 
     @:noCompletion
     private var _baseFlipped:Bool = false;
-
-    @:noCompletion
-    private var _holdingPose:Bool = false;
 
     @:noCompletion
     private function set_isPlayer(value:Bool):Bool {

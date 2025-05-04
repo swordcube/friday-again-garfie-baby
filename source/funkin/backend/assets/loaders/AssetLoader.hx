@@ -1,7 +1,9 @@
 package funkin.backend.assets.loaders;
 
-import haxe.ds.ReadOnlyArray;
 import sys.FileSystem;
+
+import haxe.io.Path;
+import haxe.ds.ReadOnlyArray;
 
 class AssetLoader {
     /**
@@ -15,6 +17,9 @@ class AssetLoader {
     public var root:String;
 
     public function new(root:String) {
+        if(root != null)
+            root = Path.normalize(root);
+        
         this.root = root;
     }
 
