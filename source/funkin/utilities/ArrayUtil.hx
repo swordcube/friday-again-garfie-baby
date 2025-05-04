@@ -45,7 +45,7 @@ class ArrayUtil {
         #if cpp
         return cpp.NativeArray.unsafeGet(arr, index);
         #else
-        return arr[0];
+        return arr[index];
         #end
     }
 
