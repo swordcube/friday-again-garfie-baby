@@ -1,7 +1,6 @@
 package funkin.graphics.shader;
 
 import haxe.Exception;
-import hscript.IHScriptCustomBehaviour;
 import flixel.system.FlxAssets.FlxShader;
 
 import openfl.display3D._internal.GLProgram;
@@ -21,7 +20,7 @@ import flixel.graphics.FlxGraphic;
 @:access(openfl.display3D.Program3D)
 @:access(openfl.display.ShaderInput)
 @:access(openfl.display.ShaderParameter)
-class RuntimeShader extends FlxShader implements IHScriptCustomBehaviour {
+class RuntimeShader extends FlxShader {
 	private static var __instanceFields = Type.getInstanceFields(RuntimeShader);
 	private static var __programErrors:Map<String, String> = [];
 	private static var __linkErrors:Map<String, String> = [];
