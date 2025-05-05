@@ -132,6 +132,23 @@ class FunkinScript {
         setClass(funkin.substates.FunkinSubState);
         setClass(funkin.substates.ScriptedSubState);
 
+        setClass(funkin.ui.ImageBar);
+        setClass(funkin.ui.AtlasFont);
+        setClass(funkin.ui.AtlasText);
+        setClass(funkin.ui.AtlasTextList);
+
+        set("UIButton", funkin.ui.Button);
+        set("UICheckbox", funkin.ui.Checkbox);
+        set("UICursor", funkin.ui.Cursor);
+        setClass(funkin.ui.ImageBar);
+        set("UILabel", funkin.ui.Label);
+        set("UISliceSprite", funkin.ui.SliceSprite);
+        set("UITextbox", funkin.ui.Textbox);
+        setClass(funkin.ui.UIComponent);
+        setClass(funkin.ui.UISprite);
+        setClass(funkin.ui.UIUtil);
+        set("UIWindow", funkin.ui.Window);
+
         set("BlendMode", funkin.scripting.helpers.BlendModeHelper);
         set("FlxAxes", funkin.scripting.helpers.FlxAxesHelper);
         set("FlxCameraFollowStyle", funkin.scripting.helpers.FlxCameraFollowStyleHelper);

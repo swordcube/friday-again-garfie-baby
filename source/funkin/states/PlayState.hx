@@ -546,9 +546,6 @@ class PlayState extends FunkinState {
 			camHUD.extraZoom = FlxMath.lerp(camHUD.extraZoom, 0.0, FlxMath.getElapsedLerp(camHUDZoomLerp, elapsed));
 
 		if(!minimalMode) {
-			if(player.holdingPose && player.holdTimer <= 0 && !playField.strumsPressed.contains(true))
-				player.holdingPose = false;
-			
 			if(!isCameraOnForcedPos) {
 				final cameraPos:FlxPoint = FlxPoint.get();
 				switch(curCameraTarget) {
@@ -1024,7 +1021,7 @@ class PlayState extends FunkinState {
 		if(event.playMissAnim) {
 			for(character in event.characters) {
 				character.playMissAnim(event.direction, event.missAnimSuffix, true);
-				character.holdingPose = isPlayer;
+				character.holdingPose = isPlayer && !event.note.strumLine.botplay;
 			}
 		}
 	}

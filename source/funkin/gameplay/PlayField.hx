@@ -8,6 +8,7 @@ import funkin.gameplay.hud.BaseHUD;
 
 import funkin.gameplay.notes.Strum;
 import funkin.gameplay.notes.Note;
+import funkin.gameplay.notes.NoteSkin;
 import funkin.gameplay.notes.StrumLine;
 import funkin.gameplay.notes.NoteSpawner;
 
@@ -69,11 +70,13 @@ class PlayField extends FlxContainer {
                 strumLine.playField = null;
             }
         });
-        opponentStrumLine = new StrumLine(FlxG.width * 0.25, 50, Options.downscroll, true, noteSkin ?? currentChart.meta.game.noteSkin);
+        final noteSkinData:NoteSkinData = NoteSkin.get(noteSkin ?? currentChart.meta.game.noteSkin);
+
+        opponentStrumLine = new StrumLine(FlxG.width * 0.25, noteSkinData.baseStrumY, Options.downscroll, true, noteSkin ?? currentChart.meta.game.noteSkin);
         opponentStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         add(opponentStrumLine);
 
-        playerStrumLine = new StrumLine(FlxG.width * 0.75, 50, Options.downscroll, false, noteSkin ?? currentChart.meta.game.noteSkin);
+        playerStrumLine = new StrumLine(FlxG.width * 0.75, noteSkinData.baseStrumY, Options.downscroll, false, noteSkin ?? currentChart.meta.game.noteSkin);
         playerStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         add(playerStrumLine);
         

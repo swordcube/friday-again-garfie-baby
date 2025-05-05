@@ -35,6 +35,7 @@ class StatsDisplay extends Sprite {
         subFPSText.setupTextField(Paths.font("fonts/montserrat/semibold"), 12, FlxColor.WHITE, LEFT, "FPS");
         addChild(subFPSText);
 
+        visible = Options.fpsCounter;
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 

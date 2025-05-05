@@ -94,21 +94,23 @@ class SkinnableSprite extends FlxSprite {
 
             default:
         }
-        for(key => data in _skinData.animation) {
-            for(key2 => data2 in data) {
-                final animName:String = '${key2} ${key}';
-                if(data2.prefix != null) {
-                    if(!data2.indices.isEmpty())
-                        animation.addByIndices(animName, data2.prefix, data2.indices, "", data2.fps ?? 24, data2.looped ?? false);
-                    else
-                        animation.addByPrefix(animName, data2.prefix, data2.fps ?? 24, data2.looped ?? false);
-                } else 
-                    animation.add(animName, data2.indices, data2.fps ?? 24, data2.looped ?? false);
-                
-                animation.setOffset(animName, data2.offset[0] ?? 0.0, data2.offset[1] ?? 0.0);
+        alpha = _skinData.alpha ?? 1.0;
+        if(alpha > 0.0) {
+            for(key => data in _skinData.animation) {
+                for(key2 => data2 in data) {
+                    final animName:String = '${key2} ${key}';
+                    if(data2.prefix != null) {
+                        if(!data2.indices.isEmpty())
+                            animation.addByIndices(animName, data2.prefix, data2.indices, "", data2.fps ?? 24, data2.looped ?? false);
+                        else
+                            animation.addByPrefix(animName, data2.prefix, data2.fps ?? 24, data2.looped ?? false);
+                    } else 
+                        animation.add(animName, data2.indices, data2.fps ?? 24, data2.looped ?? false);
+                    
+                    animation.setOffset(animName, data2.offset[0] ?? 0.0, data2.offset[1] ?? 0.0);
+                }
             }
         }
-        alpha = _skinData.alpha ?? 1.0;
         antialiasing = _skinData.antialiasing ?? FlxSprite.defaultAntialiasing;
         
         scale.set(_skinData.scale, _skinData.scale);

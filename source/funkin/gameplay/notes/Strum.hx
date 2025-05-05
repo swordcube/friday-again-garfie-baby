@@ -63,7 +63,10 @@ class Strum extends SkinnableSprite {
     @:noCompletion
     private function set_direction(newDirection:Int):Int {
         direction = newDirection;
-        animation.play('${Constants.NOTE_DIRECTIONS[direction]} static');
+        
+        final animName:String = '${Constants.NOTE_DIRECTIONS[direction]} static';
+        if(animation.exists(animName))
+            animation.play(animName);
 
         return direction;
     }

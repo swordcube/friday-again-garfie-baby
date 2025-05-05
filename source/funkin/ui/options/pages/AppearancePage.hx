@@ -1,5 +1,7 @@
 package funkin.ui.options.pages;
 
+import funkin.backend.Main;
+
 class AppearancePage extends OptionPage {
     public function new() {
         super("Appearance");
@@ -24,6 +26,15 @@ class AppearancePage extends OptionPage {
         
             id: "flashingLights",
             type: TCheckbox
+        });
+        addOption({
+            name: "FPS Counter",
+            description: "Whether or not your FPS will be shown in\nthe top left corner of the screen.",
+        
+            id: "fpsCounter",
+            type: TCheckbox,
+
+            callback: (value:Dynamic) -> Main.statsDisplay.visible = value
         });
         addOption({
             name: "HUD Type",

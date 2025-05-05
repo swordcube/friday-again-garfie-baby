@@ -19,6 +19,9 @@ class ScriptedHUD extends BaseHUD {
         script.set("getHUDImage", (name:String) -> {
             return Paths.image('gameplay/hudskins/${skin}/images/${name}');
         });
+        script.set("getHUDAtlas", (name:String) -> {
+            return Paths.getSparrowAtlas('gameplay/hudskins/${skin}/images/${name}');
+        });
         script.execute();
         script.call("onLoad");
         

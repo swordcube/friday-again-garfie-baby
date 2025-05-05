@@ -61,8 +61,11 @@ class HoldCover extends SkinnableSprite {
     @:noCompletion
     private function set_direction(newDirection:Int):Int {
         direction = newDirection;
-        animation.play('${Constants.NOTE_DIRECTIONS[direction]} start');
-        
+
+        final animName:String = '${Constants.NOTE_DIRECTIONS[direction]} start';
+        if(animation.exists(animName))
+            animation.play(animName);
+
         updateHitbox();
         centerOrigin();
     

@@ -44,7 +44,10 @@ class HoldTail extends SkinnableSprite {
     @:noCompletion
     private function set_direction(newDirection:Int):Int {
         direction = newDirection;
-        animation.play('${Constants.NOTE_DIRECTIONS[direction]} tail');
+
+        final animName:String = '${Constants.NOTE_DIRECTIONS[direction]} tail';
+        if(animation.exists(animName))
+            animation.play(animName);
 
         centerOrigin();        
         updateHitbox();

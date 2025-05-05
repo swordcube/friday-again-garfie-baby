@@ -14,6 +14,7 @@ class Options {
     // APPEARANCE //
     public static var antialiasing:Bool = true;
     public static var flashingLights:Bool = true;
+    public static var fpsCounter:Bool = true;
     public static var hudType:String = "Classic";
     
     // MISCELLANOUS //

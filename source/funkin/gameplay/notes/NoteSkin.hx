@@ -4,6 +4,10 @@ import funkin.graphics.SkinnableSprite;
 
 @:structInit
 class NoteSkinData {
+	@:optional
+	@:default(50)
+	public var baseStrumY:Float; // i don't think i can extend SkinnableSpriteData so i have to put this here instead
+
 	public var strum:SkinnableSpriteData;
 	public var note:SkinnableSpriteData;
 	public var splash:SkinnableSpriteData;

@@ -1,5 +1,6 @@
 package funkin.gameplay.notes;
 
+import flixel.util.FlxSort;
 import flixel.util.FlxSignal;
 import flixel.tweens.FlxTween;
 
@@ -21,10 +22,12 @@ class StrumLine extends FlxSpriteGroup {
     public var scrollSpeed:Float = 1;
     public var playField:PlayField;
 
+    public var skin(default, set):String;
     public var onBotplayToggle:FlxTypedSignal<Bool->Void> = new FlxTypedSignal<Bool->Void>();
     
     public function new(x:Float = 0, y:Float = 0, downscroll:Bool, botplay:Bool, skin:String) {
         super(x, y);
+        @:bypassAccessor this.skin = skin;
 
         this.downscroll = downscroll;
         this.botplay = botplay;
@@ -83,6 +86,10 @@ class StrumLine extends FlxSpriteGroup {
             cacheSplash.alpha = 0.001;
             cacheSplash.drawComplex(FlxG.camera);
         }
+    }
+
+    public function sortVisualNotes(_):Void {
+        notes.sort(FlxSort.byY, (downscroll) ? FlxSort.ASCENDING : FlxSort.DESCENDING);
     }
 
     public function showSplash(direction:Int):Void {
@@ -145,7 +152,7 @@ class StrumLine extends FlxSpriteGroup {
             
             gradient.holding = (note.holdTrail.strip.height > gradient.height * 0.85);
             
-            if(playField != null &&  note.scoreSteps.length != 0) {
+            if(playField != null && note.scoreSteps.length != 0) {
                 while(note.curScoreStep < note.scoreSteps.length && attachedConductor.time >= note.scoreSteps[note.curScoreStep].time) {
                     if(playField.playerStrumLine == this) {
                         if(note.hitEvent.gainHealthFromHolds)
@@ -225,10 +232,19 @@ class StrumLine extends FlxSpriteGroup {
     }
 
     override function update(elapsed:Float) {
+        if(!_initializedPlayFieldShit) {
+            if(playField != null)
+                playField.attachedConductor.onBeatHit.add(sortVisualNotes);
+
+            _initializedPlayFieldShit = true;
+        }
         notes.forEachAlive(processNote);
         super.update(elapsed);
     }
 
+    private var _initializedPlayFieldShit:Bool = false;
+
+    @:noCompletion
     private function _splashFactory():NoteSplash {
         return new NoteSplash();
     }
@@ -238,5 +254,34 @@ class StrumLine extends FlxSpriteGroup {
         botplay = newValue;
         onBotplayToggle.dispatch(botplay);
         return botplay;
+    }
+
+    @:noCompletion
+    private function set_skin(newSkin:String):String {
+        skin = newSkin;
+
+        for(strum in strums)
+            strum.loadSkin(newSkin);
+
+        for(note in notes)
+            note.loadSkin(newSkin);
+
+        for(splash in splashes)
+            splash.loadSkin(newSkin);
+
+        for(cover in holdCovers)
+            cover.loadSkin(newSkin);
+
+        for(gradient in holdGradients)
+            gradient.loadSkin(newSkin);
+
+        return skin;
+    }
+
+    override function destroy():Void {
+        if(playField != null)
+            playField.attachedConductor.onBeatHit.remove(sortVisualNotes);
+
+        super.destroy();
     }
 }

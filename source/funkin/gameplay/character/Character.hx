@@ -133,8 +133,11 @@ class Character extends FlxSprite implements IBeatReceiver {
             if(holdTimer <= 0)
                 holdTimer = 0;
         }
-        if(animation.finished && animation.exists('${animation.name}-loop'))
+        if(!debugMode && animation.finished && animation.exists('${animation.name}-loop'))
             animation.play('${animation.name}-loop');
+
+        if(holdingPose && holdTimer <= 0 && (game == null || !game.playField.strumsPressed.contains(true)))
+            holdingPose = false;
 
         super.update(elapsed);
 
