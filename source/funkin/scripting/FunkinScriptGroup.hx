@@ -53,6 +53,7 @@ class FunkinScriptGroup {
     }
 
     public function call(method:String, ?args:Array<Dynamic>, ?exclude:Array<FunkinScript>, ?defaultValue:Dynamic):Dynamic {
+        _busy = true;
         var member:FunkinScript = null;
         var value:Dynamic = defaultValue;
         
@@ -65,10 +66,16 @@ class FunkinScriptGroup {
             if(ret != defaultValue)
                 value = ret;
         }
+        for(i in 0..._scriptsToClose.length)
+            remove(_scriptsToClose[i]);
+
+        _busy = false;
+        _scriptsToClose.clear();
         return value;
     }
     
     public function event<T:ActionEvent>(method:String, event:T, ?exclude:Array<FunkinScript>):T {
+        _busy = true;
         var member:FunkinScript = null;
         for(i in 0...members.length) {
             if(!event._canPropagate)
@@ -80,11 +87,17 @@ class FunkinScriptGroup {
 
             member.call(method, [event]);
         }
+        for(i in 0..._scriptsToClose.length)
+            remove(_scriptsToClose[i]);
+        
+        _busy = false;
+        _scriptsToClose.clear();
         return event;
     }
 
     public function setParent(parent:Dynamic):Void {
         this.parent = parent;
+        
         for(i in 0...members.length)
             members[i].setParent(parent);
     }
@@ -93,15 +106,19 @@ class FunkinScriptGroup {
         final members:Array<FunkinScript> = members.copy();
         for(i in 0...members.length)
             members[i].close();
-
+        
         this.members.clear();
     }
 
     public function preAdd(script:FunkinScript):Void {
         script.setParent(parent);
         script.setPublicMap(publicVariables);
-        script.onClose.add(() -> remove(script));
-
+        script.onClose.add(() -> {
+            if(_busy)
+                _scriptsToClose.push(script);
+            else
+                remove(script);
+        });
         for(k => v in additionalDefaults)
             script.set(k, v);
     }
@@ -119,5 +136,8 @@ class FunkinScriptGroup {
     public function remove(script:FunkinScript):Void {
         members.remove(script);
     }
+
+    private var _busy:Bool = false;
+    private var _scriptsToClose:Array<FunkinScript> = [];
 }
 #end
