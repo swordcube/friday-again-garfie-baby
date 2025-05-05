@@ -37,6 +37,9 @@ class GlobalScript {
 		FlxG.signals.postStateSwitch.add(() -> {
 			scripts.call("onStateSwitchPost");
 		});
+		FlxG.signals.preUpdate.add(() -> {
+			scripts.call("onUpdate", [FlxG.elapsed]);
+		});
 		FlxG.signals.postUpdate.add(() -> {
 			scripts.call("onUpdatePost", [FlxG.elapsed]);
         });
@@ -54,9 +57,6 @@ class GlobalScript {
 		});
 		FlxG.signals.preStateSwitch.add(() -> {
 			scripts.call("onStateSwitch", []);
-		});
-		FlxG.signals.preUpdate.add(() -> {
-			scripts.call("onUpdate", [FlxG.elapsed]);
 		});
 		reloadScripts();
     }
