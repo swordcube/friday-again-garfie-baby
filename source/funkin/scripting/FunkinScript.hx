@@ -17,6 +17,7 @@ class FunkinScript {
     public var onClose(default, null):FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>();
 
     public function new(code:String, unsafe:Bool = false) {
+        this.code = code; // I'M A DUMBASS HOW DID I FORGET THIS PART?!!?!
         this.unsafe = unsafe;
         preset();
     }

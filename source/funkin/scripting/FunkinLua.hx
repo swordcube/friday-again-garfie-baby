@@ -8,6 +8,8 @@ import lscript.LScript;
 
 class FunkinLua extends FunkinScript {
     public function new(code:String, unsafe:Bool = false) {
+        var filePath:String = null;
+		var fileName:String = null;
         if(FlxG.assets.exists(code)) {
             filePath = code;
             fileName = Path.withoutDirectory(filePath);
@@ -59,6 +61,8 @@ class FunkinLua extends FunkinScript {
             set("parentContentPackFull", Paths.getContentPackFromPath(filePath, true));
         }
         super(code, unsafe);
+        this.filePath = filePath;
+        this.fileName = fileName;
     }
 
     override function execute():Void {

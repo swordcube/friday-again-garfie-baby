@@ -100,11 +100,11 @@
       "url": "https://github.com/swordcube/flxanimate"
     },
     {
-      "name": "hscript-improved",
+      "name": "rulescript",
       "type": "git",
       "dir": null,
-      "ref": "master",
-      "url": "https://github.com/CodenameCrew/hscript-improved"
+      "ref": "dev",
+      "url": "https://github.com/Kriptel/RuleScript.git"
     }
   ]
 }

@@ -136,8 +136,9 @@
 		<!-- The wrapper library for OOP Lua -->
 		<haxelib name="lscript" if="LUA_ALLOWED" />
 
-		<!-- The core library for Haxe scripting -->
-		<haxelib name="hscript-improved" if="HSCRIPT_ALLOWED" />
+		<!-- The core libraries for Haxe scripting -->
+		<haxelib name="hscript" if="HSCRIPT_ALLOWED" />
+		<haxelib name="rulescript" if="HSCRIPT_ALLOWED" />
 	</section>
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
