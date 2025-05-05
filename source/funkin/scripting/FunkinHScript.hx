@@ -312,6 +312,9 @@ class FunkinInterp extends RuleScriptInterp {
 
 				return null;
 
+			case EIdent(id):
+				return resolve(id);
+
             case EFunction(params, fexpr, name, _, isPublic, isStatic):
 				if (name == 'new')
 					__constructor = expr;
@@ -495,15 +498,15 @@ class FunkinInterp extends RuleScriptInterp {
 		if (id == 'super' && superInstance != null)
 			return superInstance;
 
-		var l:Dynamic = locals.get(id);
-		if (l != null)
-			return getScriptProp(l.r);
-
 		if(staticVariables.exists(id))
 			return staticVariables[id];
 		
 		if(publicVariables.exists(id))
 			return publicVariables[id];
+
+		var l:Dynamic = locals.get(id);
+		if (l != null)
+			return getScriptProp(l.r);
 		
         var v:Dynamic = getScriptProp(variables.get(id));
 		if (v == null && !variables.exists(id))
