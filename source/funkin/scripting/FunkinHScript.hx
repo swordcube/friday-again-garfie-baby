@@ -10,8 +10,8 @@ import hscript.Expr;
 import rulescript.Tools;
 
 import rulescript.RuleScript;
-import rulescript.RuleScriptInterp;
-import rulescript.RuleScriptProperty;
+import rulescript.interps.RuleScriptInterp;
+import rulescript.types.Property as RuleScriptProperty;
 
 import rulescript.parsers.HxParser;
 import rulescript.parsers.HxParser.HScriptParserPlus;
