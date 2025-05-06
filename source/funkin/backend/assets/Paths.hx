@@ -44,7 +44,29 @@ class Paths {
 
     public static var forceContentPack:String = null;
 
+    /**
+     * A list of every registered content pack (raw folder paths).
+     * 
+     * This is mainly for internal stuff, if you want to search
+     * through all content packs and retrieve their metadata, use the `contentPacks` list instead.
+     */
     public static var contentFolders:Array<String> = [];
+
+    /**
+     * A map of metadata ids to raw folder paths.
+     */
+    public static var contentPacksToFolders:Map<String, String> = [];
+
+    /**
+     * A map of raw folder paths to metadata ids.
+     */
+    public static var contentFoldersToPacks:Map<String, String> = [];
+
+    /**
+     * A list of every registered content pack (metadata ids, folder name as fallback).
+     */
+    public static var contentPacks:Array<String> = [];
+
     public static var contentMetadata:Map<String, ContentMetadata> = [];
 
     /**
@@ -184,7 +206,11 @@ class Paths {
      */
     public static function reloadContent():Void {
         contentFolders.clear();
+        contentPacks.clear();
         contentMetadata.clear();
+
+        contentPacksToFolders.clear();
+        contentFoldersToPacks.clear();
 
         final contentDir:String = getContentDirectory();
         function iterateThruContent(items:Array<String>):Void {
@@ -226,15 +252,20 @@ class Paths {
             for(level in meta.levels)
                 level.mixes.insert(0, "default");
 
-            contentMetadata.set("default", meta);
+            meta.id = "default";
+
+            contentPacksToFolders.set(meta.id, meta.folder);
+            contentFoldersToPacks.set(meta.folder, meta.id);
+
+            contentMetadata.set(meta.id, meta);
         }
         for(i in 0...contentFolders.length) {
             final folder:String = contentFolders[i];
 
             final shortFolder:String = folder.substr(folder.lastIndexOf("/") + 1);
-            Paths.registerAssetLoader(shortFolder, new ContentAssetLoader(folder));
+            Paths.registerAssetLoader('#TEMP_CONTENT_${shortFolder}', new ContentAssetLoader(folder));
 
-            final metaPath:String = Paths.json("metadata", shortFolder, false);
+            final metaPath:String = Paths.json("metadata", '#TEMP_CONTENT_${shortFolder}', false);
             if(FlxG.assets.exists(metaPath)) {
                 final parser:JsonParser<ContentMetadata> = new JsonParser<ContentMetadata>();
                 parser.ignoreUnknownVariables = true;
@@ -245,7 +276,35 @@ class Paths {
                 for(level in meta.levels)
                     level.mixes.insert(0, "default");
 
-                contentMetadata.set(shortFolder, meta);
+                if(meta.id == null || meta.id.length == 0)
+                    meta.id = shortFolder;
+
+                contentPacks.push(meta.id);
+
+                contentPacksToFolders.set(meta.id, folder);
+                contentFoldersToPacks.set(folder, meta.id);
+
+                contentMetadata.set(meta.id, meta);
+
+                // re-register under just the metadata id
+                final loader:ContentAssetLoader = cast _registeredAssetLoadersMap.get('#TEMP_CONTENT_${shortFolder}');
+                Paths._registeredAssetLoadersMap.remove(loader.id);
+
+                loader.id = meta.id;
+                Paths._registeredAssetLoadersMap.set(loader.id, loader);
+            } else {
+                contentPacks.push(shortFolder);
+
+                contentPacksToFolders.set(shortFolder, folder);
+                contentFoldersToPacks.set(folder, shortFolder);
+
+                // re-register under the short folder name
+                // without the temporary header attached
+                final loader:ContentAssetLoader = cast _registeredAssetLoadersMap.get('#TEMP_CONTENT_${shortFolder}');
+                Paths._registeredAssetLoadersMap.remove(loader.id);
+
+                loader.id = shortFolder;
+                Paths._registeredAssetLoadersMap.set(loader.id, loader);
             }
         }
     }
@@ -399,7 +458,7 @@ class Paths {
         }
     }
 
-    public static function getContentPackFromPath(path:String, ?includeContainerFolders:Bool = false):String {
+    public static function getContentFolderFromPath(path:String, ?includeContainerFolders:Bool = false):String {
         final contentDir:String = getContentDirectory();
         path = path.replace("\\", "/"); // go fuck yourself windows
 
@@ -408,6 +467,10 @@ class Paths {
                 return (!includeContainerFolders) ? rawContentFolder.substr(rawContentFolder.lastIndexOf("/") + 1) : rawContentFolder;
         }
         return "default";
+    }
+
+    public static function getContentPackFromPath(path:String):String {
+        return contentFoldersToPacks.get(getContentFolderFromPath(path, true));
     }
 
     //----------- [ Private API ] -----------//

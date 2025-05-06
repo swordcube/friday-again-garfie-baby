@@ -9,7 +9,7 @@ class AddCameraZoomBehavior extends EventBehavior {
 
     override function execute(e:SongEvent):Void {
         super.execute(e);
-
+        
         final params:AddCameraZoomParams = cast e.params;
         final cam:String = params.camera.toLowerCase();
         

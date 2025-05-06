@@ -29,7 +29,7 @@ class EventBehavior {
                 final loader:AssetLoader = loaders[i];
                 final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
     
-                if(contentMetadata == null)
+                if(Paths.forceContentPack != loader.id && !(contentMetadata?.runGlobally ?? true))
                     continue;
     
                 final scriptPath:String = Paths.script('gameplay/events/${eventType}', loader.id, false);

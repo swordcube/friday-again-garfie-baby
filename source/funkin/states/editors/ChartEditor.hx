@@ -1219,7 +1219,7 @@ class ChartEditor extends UIState {
             final warning = new UnsavedWarningSubState();
             warning.onAccept.add(() -> {
                 warning.close();
-                unsafeExit();
+                FlxTimer.wait(0.001, () -> unsafeExit());
             });
             warning.onCancel.add(warning.close);
             FlxTimer.wait(0.001, () -> {

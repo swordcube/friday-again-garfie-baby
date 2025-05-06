@@ -70,15 +70,14 @@ class FreeplayState extends FunkinState {
         grpSongs = new AtlasTextList();
         add(grpSongs);
 
-        for(rawContentFolder in Paths.contentFolders) {
-            final contentFolder:String = rawContentFolder.substr(rawContentFolder.lastIndexOf("/") + 1);
-            final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentFolder);
+        for(contentPack in Paths.contentPacks) {
+            final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentPack);
             if(contentMetadata == null)
                 continue; // if no metadata was found for this content pack, then don't bother
             
             for(category in contentMetadata.freeplayCategories) {
                 categories.push({
-                    id: '${contentFolder}:${category.id}',
+                    id: '${contentPack}:${category.id}',
                     name: category.name
                 });
             }
@@ -86,7 +85,7 @@ class FreeplayState extends FunkinState {
                 if(!level.showInFreeplay)
                     continue;
 
-                final categoryID:String = '${contentFolder}:${level.freeplayCategory}';
+                final categoryID:String = '${contentPack}:${level.freeplayCategory}';
                 if(!songs.exists(categoryID))
                     songs.set(categoryID, []);
 
@@ -95,14 +94,14 @@ class FreeplayState extends FunkinState {
                     if(level.hiddenSongs.freeplay.contains(song))
                         continue;
 
-                    if(!FlxG.assets.exists(Paths.json('gameplay/songs/${song}/default/metadata', contentFolder)))
+                    if(!FlxG.assets.exists(Paths.json('gameplay/songs/${song}/default/metadata', contentPack)))
                         continue;
 
-                    final defaultMetadata:SongMetadata = SongMetadata.load(song, null, contentFolder);
+                    final defaultMetadata:SongMetadata = SongMetadata.load(song, null, contentPack);
                     final metadataMap:Map<String, SongMetadata> = ["default" => defaultMetadata];
                     
                     for(mix in defaultMetadata.song.mixes)
-                        metadataMap.set(mix, SongMetadata.load(song, mix, contentFolder));
+                        metadataMap.set(mix, SongMetadata.load(song, mix, contentPack));
 
                     final difficultyMap:Map<String, Array<String>> = ["default" => defaultMetadata.song.difficulties];
                     for(metadata in metadataMap) {

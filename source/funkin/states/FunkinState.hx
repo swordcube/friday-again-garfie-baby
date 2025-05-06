@@ -43,9 +43,6 @@ class FunkinState extends TransitionableState implements IBeatReceiver {
             final loader:AssetLoader = loaders[i];
             final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
 
-            if(contentMetadata == null)
-                continue;
-
             final scriptPath:String = Paths.script('states/${scriptName}', loader.id, false);
             if(FlxG.assets.exists(scriptPath)) {
                 final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);

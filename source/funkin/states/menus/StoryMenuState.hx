@@ -64,9 +64,8 @@ class StoryMenuState extends FunkinState {
         grpLevelTitles = new FlxTypedContainer<LevelTitle>();
         add(grpLevelTitles);
 
-        for(rawContentFolder in Paths.contentFolders) {
-            final contentFolder:String = rawContentFolder.substr(rawContentFolder.lastIndexOf("/") + 1);
-            final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentFolder);
+        for(contentPack in Paths.contentPacks) {
+            final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentPack);
             if(contentMetadata == null)
                 continue; // if no metadata was found for this content pack, then don't bother
 
@@ -76,26 +75,26 @@ class StoryMenuState extends FunkinState {
                 if(!level.showInStory)
                     continue;
 
-                final levelID:String = '${contentFolder}:${level.id}';
+                final levelID:String = '${contentPack}:${level.id}';
                 if(songs.get(levelID) == null)
                     songs.set(levelID, []);
                 
-                level.loaderID = contentFolder;
+                level.loaderID = contentPack;
                 for(song in level.songs) {
                     if(level.hiddenSongs.story.contains(song))
                         continue;
 
-                    final metaExists:Bool = FlxG.assets.exists(Paths.json('gameplay/songs/${song}/default/metadata', contentFolder));
+                    final metaExists:Bool = FlxG.assets.exists(Paths.json('gameplay/songs/${song}/default/metadata', contentPack));
                     // if(!metaExists)
                     //     continue;
 
-                    final defaultMetadata:SongMetadata = (metaExists) ? SongMetadata.load(song, null, contentFolder) : null;
+                    final defaultMetadata:SongMetadata = (metaExists) ? SongMetadata.load(song, null, contentPack) : null;
                     final metadataMap:Map<String, SongMetadata> = ["default" => defaultMetadata];
                     final difficultyMap:Map<String, Array<String>> = ["default" => defaultMetadata?.song?.difficulties ?? ["easy", "normal", "hard", "challenge"]];
                     
                     if(defaultMetadata != null) {
                         for(mix in defaultMetadata.song.mixes)
-                            metadataMap.set(mix, SongMetadata.load(song, mix, contentFolder));
+                            metadataMap.set(mix, SongMetadata.load(song, mix, contentPack));
     
                         for(metadata in metadataMap) {
                             for(mix in metadata.song.mixes)
@@ -115,17 +114,17 @@ class StoryMenuState extends FunkinState {
 
                 for(diffs in level.difficulties) {
                     for(diff in diffs) {
-                        final key:String = '${contentFolder}:${diff}';
+                        final key:String = '${contentPack}:${diff}';
                         if(difficultySprites.exists(key))
                             continue;
     
                         final spr:FlxSprite = new FlxSprite();
-                        if(FlxG.assets.exists(Paths.xml('menus/story/difficulties/${diff}', contentFolder))) {
-                            spr.frames = Paths.getSparrowAtlas('menus/story/difficulties/${diff}', contentFolder);
+                        if(FlxG.assets.exists(Paths.xml('menus/story/difficulties/${diff}', contentPack))) {
+                            spr.frames = Paths.getSparrowAtlas('menus/story/difficulties/${diff}', contentPack);
                             spr.animation.addByPrefix("idle", "idle", 24); // TODO: add a config json for these??
                             spr.animation.play("idle");
                         } else
-                            spr.loadGraphic(Paths.image('menus/story/difficulties/${diff}', contentFolder));
+                            spr.loadGraphic(Paths.image('menus/story/difficulties/${diff}', contentPack));
                         
                         difficultySprites.set(key, spr);
                     }
@@ -140,7 +139,7 @@ class StoryMenuState extends FunkinState {
                 }
                 levelMap.set(levelID, level);
                 
-                final title:LevelTitle = new LevelTitle(0, LevelTitle.Y_OFFSET + y, level.id, isLevelLocked(levelID), contentFolder);
+                final title:LevelTitle = new LevelTitle(0, LevelTitle.Y_OFFSET + y, level.id, isLevelLocked(levelID), contentPack);
                 title.screenCenter(X);
                 grpLevelTitles.add(title);
                 y += title.height;

@@ -31,7 +31,7 @@ class FunkinHScript extends FunkinScript {
         }
         this.code = code;
         RuleScript.createInterp = createInterp;
-
+		
         final parser:FunkinRuleScriptHxParser = new FunkinRuleScriptHxParser();
         parser.setParameters({
 			allowJSON: true,
@@ -70,7 +70,8 @@ class FunkinHScript extends FunkinScript {
         
         if(filePath != null) {
             set("parentContentPack", Paths.getContentPackFromPath(filePath));
-            set("parentContentPackFull", Paths.getContentPackFromPath(filePath, true));
+            set("parentContentFolder", Paths.getContentFolderFromPath(filePath));
+            set("parentContentFolderFull", Paths.getContentFolderFromPath(filePath, true));
         }
         super(code, unsafe);
 		this.filePath = filePath;

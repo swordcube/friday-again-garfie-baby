@@ -6,6 +6,9 @@ class ContentMetadata {
     public var folder:String;
 
     @:optional
+    public var id:String;
+
+    @:optional
     @:default("0.1.0")
     public var apiVersion:String;
 

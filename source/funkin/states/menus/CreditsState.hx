@@ -34,15 +34,14 @@ class CreditsState extends FunkinState {
         super.create();
         persistentUpdate = true;
 
-        final contentFolders:Array<String> = Paths.contentFolders.copy();
-        contentFolders.push("default"); // engine credits always go last
+        final contentPacks:Array<String> = Paths.contentPacks.copy();
+        contentPacks.push("default"); // engine credits always go last
 
-        for(rawContentFolder in contentFolders) {
-            final contentFolder:String = rawContentFolder.substr(rawContentFolder.lastIndexOf("/") + 1);
-            if(!FlxG.assets.exists(Paths.json("credits", contentFolder, false)))
+        for(contentPack in contentPacks) {
+            if(!FlxG.assets.exists(Paths.json("credits", contentPack, false)))
                 continue;
 
-            final config:CreditsData = CreditsData.load(contentFolder);
+            final config:CreditsData = CreditsData.load(contentPack);
             for(category in config.categories)
                 categories.push(category);
         }
