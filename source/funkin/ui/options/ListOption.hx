@@ -6,7 +6,7 @@ class ListOption extends Option {
 
     public var valueText:AtlasText;
 
-    public function new(id:String, name:String, description:String, callback:Dynamic->Void, isGameplayModifier:Bool, possibleValues:Array<String>) {
+    public function new(id:String, name:String, description:String, callback:Dynamic->Option->Void, isGameplayModifier:Bool, possibleValues:Array<String>) {
         super(id, '${name}:', description, callback, isGameplayModifier);
         
         this.possibleValues = possibleValues;

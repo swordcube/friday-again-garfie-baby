@@ -3,7 +3,7 @@ package funkin.ui.options;
 class CheckboxOption extends Option {
     public var checkbox:Checkbox;
 
-    public function new(id:String, name:String, description:String, callback:Dynamic->Void, isGameplayModifier:Bool) {
+    public function new(id:String, name:String, description:String, callback:Dynamic->Option->Void, isGameplayModifier:Bool) {
         super(id, name, description, callback, isGameplayModifier);
 
         checkbox = new Checkbox(10, 0);

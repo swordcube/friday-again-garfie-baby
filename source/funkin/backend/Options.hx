@@ -22,6 +22,7 @@ class Options {
     public static var autoPause:Bool = true;
     public static var verboseLogging:Bool = false;
     public static var multicoreLoading:Bool = false;
+    public static var frameRate:Int = 360;
 
     // GAMEPLAY MODIFIERS
     @:ignore
@@ -83,6 +84,22 @@ class Options {
 
         FlxG.allowAntialiasing = antialiasing;
         FlxG.stage.quality = (FlxG.allowAntialiasing) ? HIGH : LOW;
+
+        final fps:Int = Options.frameRate;
+        if(fps < 10) {
+            // unlimited
+            FlxG.updateFramerate = 0;
+            FlxG.drawFramerate = 0;
+        } else {
+            // capped
+            if(fps > FlxG.drawFramerate) {
+                FlxG.updateFramerate = fps;
+                FlxG.drawFramerate = fps;
+            } else {
+                FlxG.drawFramerate = fps;
+                FlxG.updateFramerate = fps;
+            }
+        }
     }
     
     public static function save():Void {

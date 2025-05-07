@@ -4,13 +4,13 @@ class Option extends FlxSpriteContainer {
     public var id:String;
     public var description:String;
 
-    public var callback:Dynamic->Void;
+    public var callback:Dynamic->Option->Void;
     public var isGameplayModifier:Bool = false;
 
     public var text:AtlasText;
     public var controls(default, never):Controls = Controls.instance;
 
-    public function new(id:String, name:String, description:String, callback:Dynamic->Void, isGameplayModifier:Bool) {
+    public function new(id:String, name:String, description:String, callback:Dynamic->Option->Void, isGameplayModifier:Bool) {
         super();
         this.id = id;
         this.description = description;
@@ -35,7 +35,7 @@ class Option extends FlxSpriteContainer {
             Reflect.setProperty(Options, id, value);
 
         if(callback != null)
-            callback(value);
+            callback(value, this);
     }
 
     /**

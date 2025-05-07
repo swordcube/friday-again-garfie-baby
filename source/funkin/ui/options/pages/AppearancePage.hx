@@ -15,7 +15,7 @@ class AppearancePage extends OptionPage {
             id: "antialiasing",
             type: TCheckbox,
 
-            callback: (value:Dynamic) -> {
+            callback: (value:Dynamic, _) -> {
                 FlxG.allowAntialiasing = value;
                 FlxG.stage.quality = (FlxG.allowAntialiasing) ? HIGH : LOW;
             }
@@ -34,7 +34,7 @@ class AppearancePage extends OptionPage {
             id: "fpsCounter",
             type: TCheckbox,
 
-            callback: (value:Dynamic) -> Main.statsDisplay.visible = value
+            callback: (value:Dynamic, _) -> Main.statsDisplay.visible = value
         });
         addOption({
             name: "HUD Type",

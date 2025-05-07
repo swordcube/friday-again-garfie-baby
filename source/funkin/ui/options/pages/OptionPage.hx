@@ -162,6 +162,6 @@ typedef OptionData = {
     var id:String;
     var type:OptionType;
 
-    var ?callback:Dynamic->Void;
+    var ?callback:Dynamic->Option->Void;
     var ?isGameplayModifier:Bool;
 }

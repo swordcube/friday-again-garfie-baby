@@ -16,6 +16,8 @@ import rulescript.types.Property as RuleScriptProperty;
 import rulescript.parsers.HxParser;
 import rulescript.parsers.HxParser.HScriptParserPlus;
 
+// TODO: look into extending BytecodeInterp instead of normal RuleScriptInterp?
+
 class FunkinHScript extends FunkinScript {
     public static function createInterp():RuleScriptInterp {
         return new FunkinInterp();

@@ -13,7 +13,7 @@ class MiscellanousPage extends OptionPage {
             id: "autoPause",
             type: TCheckbox,
 
-            callback: (value:Dynamic) -> FlxG.autoPause = value
+            callback: (value:Dynamic, _) -> FlxG.autoPause = value
         });
         addOption({
             name: "Verbose Logging",
@@ -28,6 +28,33 @@ class MiscellanousPage extends OptionPage {
         
             id: "multicoreLoading",
             type: TCheckbox
+        });
+        addOption({
+            name: "Framerate",
+            description: "Changes the target FPS the game will try to run at.",
+        
+            id: "frameRate",
+            type: TInt(5, 1000, 5), // actual minimum is 10, will be set to unlimited if set below 10
+
+            callback: (value:Dynamic, option:Option) -> {
+                final fps:Int = cast value;
+                final numOption:NumberOption = cast option;
+                if(fps < 10) {
+                    // unlimited
+                    FlxG.updateFramerate = 0;
+                    FlxG.drawFramerate = 0;
+                    numOption.valueText.text = "Unlimited";
+                } else {
+                    // capped
+                    if(fps > FlxG.drawFramerate) {
+                        FlxG.updateFramerate = fps;
+                        FlxG.drawFramerate = fps;
+                    } else {
+                        FlxG.drawFramerate = fps;
+                        FlxG.updateFramerate = fps;
+                    }
+                }
+            }
         });
     }
 }
