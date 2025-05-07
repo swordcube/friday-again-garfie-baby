@@ -203,7 +203,8 @@ class PlayField extends FlxContainer {
         onNoteMiss.dispatch(event.recycle(
             note, note.time, note.direction, note.length, note.type,
             true, true, note.strumLine == playerStrumLine, note.strumLine == playerStrumLine,
-            100, 0.02375 + (Math.min(note.length * 0.001, 0.25) * 0.5), true, true, null, ""
+            100, 0.02375 + (Math.min(note.length * 0.001, 0.25) * 0.5), true, true, null, "",
+            Options.missSounds && FlxG.state == PlayState.instance, 'gameplay/sfx/missnote${FlxG.random.int(1, 3)}', FlxG.random.float(0.7, 0.9)
         ));
         if(event.cancelled)
             return;
@@ -246,6 +247,8 @@ class PlayField extends FlxContainer {
                 onDisplayComboPost.dispatch(cast e.flagAsPost());
             }
         }
+        if(event.playMissSound)
+            FlxG.sound.play(Paths.sound(event.missSound), event.missVolume);
 
         // the note is now cum colored
         event.note.colorTransform.redOffset = event.note.colorTransform.greenOffset = event.note.colorTransform.blueOffset = 200;

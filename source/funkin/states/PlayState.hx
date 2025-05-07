@@ -23,7 +23,11 @@ import funkin.backend.events.CountdownEvents;
 import funkin.backend.events.GameplayEvents;
 import funkin.backend.events.NoteEvents;
 
+import funkin.gameplay.UISkin;
+import funkin.gameplay.notes.NoteSkin;
+
 import funkin.gameplay.PlayerStats;
+import funkin.gameplay.character.CharacterData;
 
 import funkin.gameplay.events.*;
 import funkin.gameplay.events.EventRunner;
@@ -42,6 +46,7 @@ import funkin.gameplay.song.Highscore;
 import funkin.gameplay.song.VocalGroup;
 
 import funkin.gameplay.stage.Stage;
+import funkin.gameplay.stage.StageData;
 import funkin.gameplay.stage.props.ComboProp;
 
 import funkin.states.menus.StoryMenuState;
@@ -222,24 +227,6 @@ class PlayState extends FunkinState {
 		
 		final instPath:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/inst');
 		chartingMode = lastParams.chartingMode ?? false;
-		
-		FlxG.sound.playMusic(instPath, 0, false);
-		inst = FlxG.sound.music;
-
-		final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
-		if(FlxG.assets.exists(playerVocals)) {
-			vocals = new VocalGroup({
-				spectator: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'),
-				opponent: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'),
-				player: playerVocals
-			});
-		} else {
-			vocals = new VocalGroup({
-				player: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals'),
-				isSingleTrack: true
-			});
-		}
-		add(vocals);
 
 		camGame = new FunkinCamera();
 		camGame.bgColor = 0;
@@ -254,30 +241,7 @@ class PlayState extends FunkinState {
 		FlxG.cameras.add(camOther, false);
 		
 		Scoring.currentSystem = new PBotSystem(); // reset the scoring system, cuz you can change it thru scripting n shit, and that shouldn't persist
-
-		Conductor.instance.music = null;
-		Conductor.instance.offset = Options.songOffset + inst.latency;
-		Conductor.instance.autoIncrement = (lastParams.startTime == null || lastParams.startTime <= 0);
 		
-		Conductor.instance.reset(currentChart.meta.song.timingPoints.first()?.bpm ?? 100.0);
-		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
-		
-		Conductor.instance.time = -(Conductor.instance.beatLength * 5);
-		
-		if(lastParams.startTime != null && lastParams.startTime > 0) {
-			FlxTimer.wait((Conductor.instance.beatLength * 5) / 1000, () -> {
-				Conductor.instance.time = -Conductor.instance.offset;
-				Conductor.instance.autoIncrement = true;
-				startSong();
-			});
-		}
-		inst.pause();
-		inst.volume = 1;
-		inst.onComplete = finishSong;
-
-		WindowUtil.titlePrefix = (lastParams._unsaved) ? "* " : "";
-		WindowUtil.titleSuffix = (chartingMode) ? " - Chart Playtesting" : "";
-
 		final rawNoteSkin:String = currentChart.meta.game.noteSkin;
 		final rawUISkin:String = currentChart.meta.game.uiSkin;
 		final rawHUDSkin:String = currentChart.meta.game.hudSkin;
@@ -294,7 +258,183 @@ class PlayState extends FunkinState {
 		if(hudSkin == "default")
 			currentChart.meta.game.hudSkin = hudSkin = Options.hudType;
 
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed) {
+			scripts = new FunkinScriptGroup();
+			scripts.setParent(this);
+
+			@:privateAccess
+			final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
+
+			inline function addScripts(loader:AssetLoader, dir:String) {
+				final items:Array<String> = loader.readDirectory(dir);
+				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+
+				for(i in 0...items.length) {
+					final path:String = Path.normalize(loader.getPath('${dir}/${items[i]}'));
+					if(FlxG.assets.exists(path)) {
+						final script:FunkinScript = FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false);
+						script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
+						scripts.add(script);
+
+						script.execute();
+						script.call("onCreate");
+					}
+				}
+			}
+			inline function addSingleScript(loader:AssetLoader, path:String) {
+				final scriptPath:String = Paths.script(path, loader.id);
+				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+
+				if(FlxG.assets.exists(scriptPath)) {
+					final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
+					script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
+					scripts.add(script);
+
+					script.execute();
+					script.call("onCreate");
+				}
+			}
+			for(i in 0...loaders.length) {
+				final loader:AssetLoader = loaders[i];
+				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
+
+				if(contentMetadata == null || contentMetadata.runGlobally || Paths.forceContentPack == loader.id) {
+					// gameplay scripts
+					addScripts(loader, "gameplay/scripts"); // load any gameplay script first
+					addScripts(loader, 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
+					addScripts(loader, 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // then load from specific song and specific mix
+				}
+				// noteskin script
+				addSingleScript(loader, 'gameplay/noteskins/${noteSkin}/script');
+
+				// uiskin script
+				addSingleScript(loader, 'gameplay/uiskins/${uiSkin}/script');
+			}
+		}
+		#end
+		if(lastParams.startTime != null && lastParams.startTime > 0) {
+			FlxTimer.wait((Conductor.instance.beatLength * 5) / 1000, () -> {
+				Conductor.instance.time = -Conductor.instance.offset;
+				Conductor.instance.autoIncrement = true;
+				startSong();
+			});
+		}
+		final songTracksToLoad:Array<AssetPreload> = [];
+		songTracksToLoad.push({path: instPath, type: SOUND});
+		scripts.call("onPreloadSong", [songTracksToLoad]);
+		
+		final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
+		final vocalTrackPaths:Array<String> = [];
+		
+		final normalVocalsExist:Bool = FlxG.assets.exists(playerVocals);
+		if(normalVocalsExist) {
+			vocalTrackPaths.push(Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'));
+			vocalTrackPaths.push(Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'));
+			vocalTrackPaths.push(playerVocals);
+		} else
+			vocalTrackPaths.push(Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals'));
+		
+		for(path in vocalTrackPaths)
+			songTracksToLoad.push({path: path, type: SOUND});
+
+		Cache.preloadAssets(songTracksToLoad);
+
+		if(normalVocalsExist) {
+			vocals = new VocalGroup({
+				spectator: vocalTrackPaths[0],
+				opponent: vocalTrackPaths[1],
+				player: vocalTrackPaths[2]
+			});
+		} else {
+			vocals = new VocalGroup({
+				player: vocalTrackPaths[0],
+				isSingleTrack: true
+			});
+		}
+		add(vocals);
+
+		FlxG.sound.playMusic(instPath, 0, false);
+		inst = FlxG.sound.music;
+
+		Conductor.instance.music = null;
+		Conductor.instance.offset = Options.songOffset + inst.latency;
+		Conductor.instance.autoIncrement = (lastParams.startTime == null || lastParams.startTime <= 0);
+		
+		Conductor.instance.reset(currentChart.meta.song.timingPoints.first()?.bpm ?? 100.0);
+		Conductor.instance.setupTimingPoints(currentChart.meta.song.timingPoints);
+		
+		Conductor.instance.time = -(Conductor.instance.beatLength * 5);
+
+		WindowUtil.titlePrefix = (lastParams._unsaved) ? "* " : "";
+		WindowUtil.titleSuffix = (chartingMode) ? " - Chart Playtesting" : "";
+
+		inst.pause();
+		inst.volume = 1;
+		inst.onComplete = finishSong;
+
+		final noteSkinData:NoteSkinData = NoteSkin.get(noteSkin);
+		final uiSkinData:UISkinData = UISkin.get(uiSkin);
+		
+		final notesToPreload:Array<AssetPreload> = [];
+		scripts.call("onPreloadNoteSkin", [notesToPreload]);
+		
+		notesToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.strum.atlas.path}'), type: IMAGE});
+		notesToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.note.atlas.path}'), type: IMAGE});
+		notesToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.splash.atlas.path}'), type: IMAGE});
+		notesToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.hold.atlas.path}'), type: IMAGE});
+		notesToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.holdCovers.atlas.path}'), type: IMAGE});
+		notesToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.holdGradients.atlas.path}'), type: IMAGE});
+		
+		final uiToPreload:Array<AssetPreload> = [];
+		scripts.call("onPreloadUISkin", [uiToPreload]);
+
+		uiToPreload.push({path: Paths.image('gameplay/uiskins/${uiSkin}/${uiSkinData.rating.atlas.path}'), type: IMAGE});
+		uiToPreload.push({path: Paths.image('gameplay/uiskins/${uiSkin}/${uiSkinData.combo.atlas.path}'), type: IMAGE});
+		uiToPreload.push({path: Paths.image('gameplay/uiskins/${uiSkin}/${uiSkinData.countdown.atlas.path}'), type: IMAGE});
+		
 		if(!minimalMode) {
+			final pendingCharacters:Array<String> = [];
+			final charactersToLoad:Array<AssetPreload> = [];
+			scripts.call("onPreloadCharacters", [charactersToLoad]);
+			
+			inline function preloadCharacter(character:String) {
+				final data:CharacterData = CharacterData.load(character);
+
+				if(!pendingCharacters.contains(character)) {
+					charactersToLoad.push({path: Paths.image('gameplay/characters/${character}/${data.atlas.path}'), type: IMAGE});
+					pendingCharacters.push(character);
+				}
+				if(data.deathCharacter != null && data.deathCharacter.length != 0) {
+					if(!pendingCharacters.contains(data.deathCharacter)) {
+						charactersToLoad.push({path: Paths.image('gameplay/characters/${data.deathCharacter}/${data.atlas.path}'), type: IMAGE});
+						pendingCharacters.push(data.deathCharacter);
+					}
+				}
+			}
+			preloadCharacter(currentChart.meta.game.characters.get("spectator"));
+			preloadCharacter(currentChart.meta.game.characters.get("opponent"));
+			preloadCharacter(currentChart.meta.game.characters.get("player"));
+			
+			final stageData = StageData.load(currentChart.meta.game.stage);
+			final stageAssetsToPreload:Array<AssetPreload> = [];
+			scripts.call("onPreloadStage", [stageAssetsToPreload]);
+			
+			if(stageData.preload != null) {
+				for(asset in stageData.preload) {
+					switch(asset.type) {
+						case IMAGE:
+							asset.path = Paths.image('${stageData.getImageFolder()}/${asset.path}');
+							
+						case SOUND:
+							asset.path = Paths.sound('${stageData.getSFXFolder()}/${asset.path}');
+					}
+					stageAssetsToPreload.push(asset);
+				}
+			}
+			Cache.preloadAssets(charactersToLoad);
+			Cache.preloadAssets(stageAssetsToPreload);
+
 			stage = new Stage(currentChart.meta.game.stage, {
 				spectator: new Character(currentChart.meta.game.getCharacter("spectator"), false),
 				opponent: new Character(currentChart.meta.game.getCharacter("opponent"), false),
@@ -319,56 +459,22 @@ class PlayState extends FunkinState {
 		eventRunner.onExecutePost.add(onEventPost);
 		add(eventRunner);
 
+		Cache.preloadAssets(notesToPreload.concat(uiToPreload));
+
+		final assetsToPreload:Array<AssetPreload> = [];
+		scripts.call("onPreloadAssets", [assetsToPreload]);
+		
+		for(i in 0...4)
+			assetsToPreload.push({path: Paths.sound('gameplay/sfx/missnote${i + 1}'), type: SOUND});
+		
+		Cache.preloadAssets(assetsToPreload);
+
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
-			scripts = new FunkinScriptGroup();
-			scripts.setParent(this);
-	
-			@:privateAccess
-			final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
-	
-			inline function addScripts(loader:AssetLoader, dir:String) {
-				final items:Array<String> = loader.readDirectory(dir);
-				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-	
-				for(i in 0...items.length) {
-					final path:String = Path.normalize(loader.getPath('${dir}/${items[i]}'));
-					if(FlxG.assets.exists(path)) {
-						final script:FunkinScript = FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false);
-						script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
-						scripts.add(script);
-					}
-				}
-			}
-			inline function addSingleScript(loader:AssetLoader, path:String) {
-				final scriptPath:String = Paths.script(path, loader.id);
-				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-	
-				if(FlxG.assets.exists(scriptPath)) {
-					final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
-					script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
-					scripts.add(script);
-				}
-			}
-			for(i in 0...loaders.length) {
-				final loader:AssetLoader = loaders[i];
-				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-	
-				if(contentMetadata == null || contentMetadata.runGlobally || Paths.forceContentPack == loader.id) {
-					// gameplay scripts
-					addScripts(loader, "gameplay/scripts"); // load any gameplay script first
-					addScripts(loader, 'gameplay/songs/${currentSong}/scripts'); // then load from specific song, regardless of mix
-					addScripts(loader, 'gameplay/songs/${currentSong}/${currentMix}/scripts'); // then load from specific song and specific mix
-				}
-				// noteskin script
-				addSingleScript(loader, 'gameplay/noteskins/${noteSkin}/script');
-	
-				// uiskin script
-				addSingleScript(loader, 'gameplay/uiskins/${uiSkin}/script');
-			}
 			if(stage?.script != null) {
 				scripts.add(stage.script);
 				stage.script.setParent(stage);
+				stage.script.call("onCreate");
 			}
 			for(character in [spectator, opponent, player]) {
 				if(character == null)
@@ -377,6 +483,7 @@ class PlayState extends FunkinState {
 				for(script in character.scripts.members) {
                     scripts.add(script);
 					script.setParent(character);
+					script.call("onCreate");
 				}
 			}
 			for(note in currentChart.notes.get(currentDifficulty)) {
@@ -394,6 +501,9 @@ class PlayState extends FunkinState {
 	
 				noteTypeScripts.set(note.type, script);
 				noteTypeScriptsArray.push(script);
+
+				script.execute();
+				script.call("onCreate");
 			}
 			for(b in eventRunner.behaviors) {
 				for(script in b.scripts.members) {
@@ -401,16 +511,13 @@ class PlayState extends FunkinState {
 		
 					eventScripts.set(b.eventType, script);
 					eventScriptsArray.push(script);
+
+					script.execute();
+					script.call("onCreate");
 				}
-			}
-			final leScripts:Array<FunkinScript> = scripts.members.copy();
-			for(i in 0...leScripts.length) {
-				leScripts[i].execute();
-				leScripts[i].call("onCreate");
 			}
 		}
 		#end
-
 		for(e in eventRunner.events.filter((i) -> i.type == "Camera Pan")) {
 			if(e.time > 10)
 				break;
@@ -621,6 +728,39 @@ class PlayState extends FunkinState {
 			scripts.call("onSubStateClosed", [subState]);
 		}
 		#end
+	}
+
+	public function getNoteSkinPreloads(noteSkin:String):Array<AssetPreload> {
+		final noteSkinData:NoteSkinData = NoteSkin.get(noteSkin);
+		final assetsToPreload:Array<AssetPreload> = [];
+		assetsToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.strum.atlas.path}'), type: IMAGE});
+		assetsToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.note.atlas.path}'), type: IMAGE});
+		assetsToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.splash.atlas.path}'), type: IMAGE});
+		assetsToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.hold.atlas.path}'), type: IMAGE});
+		assetsToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.holdCovers.atlas.path}'), type: IMAGE});
+		assetsToPreload.push({path: Paths.image('gameplay/noteskins/${noteSkin}/${noteSkinData.holdGradients.atlas.path}'), type: IMAGE});
+		return assetsToPreload;
+	}
+
+	public function preloadNoteSkin(noteSkin:String):Array<AssetPreload> {
+		final assetsToPreload:Array<AssetPreload> = getNoteSkinPreloads(noteSkin);
+		Cache.preloadAssets(assetsToPreload);
+		return assetsToPreload;
+	}
+
+	public function getUISkinPreloads(uiSkin:String):Array<AssetPreload> {
+		final uiSkinData:UISkinData = UISkin.get(uiSkin);
+		final assetsToPreload:Array<AssetPreload> = [];
+		assetsToPreload.push({path: Paths.image('gameplay/uiskins/${uiSkin}/${uiSkinData.rating.atlas.path}'), type: IMAGE});
+		assetsToPreload.push({path: Paths.image('gameplay/uiskins/${uiSkin}/${uiSkinData.combo.atlas.path}'), type: IMAGE});
+		assetsToPreload.push({path: Paths.image('gameplay/uiskins/${uiSkin}/${uiSkinData.countdown.atlas.path}'), type: IMAGE});
+		return assetsToPreload;
+	}
+
+	public function preloadUISkin(uiSkin:String):Array<AssetPreload> {
+		final assetsToPreload:Array<AssetPreload> = getUISkinPreloads(uiSkin);
+		Cache.preloadAssets(assetsToPreload);
+		return assetsToPreload;
 	}
 
 	public function gameOver():Void {

@@ -2,6 +2,7 @@ package funkin.utilities;
 
 import sys.FileSystem;
 import lime.app.Future;
+import openfl.media.Sound;
 
 class CoolUtil {
     /**
@@ -14,12 +15,12 @@ class CoolUtil {
      * @param  volume  The volume of the music from 0 to 1.
      * @param  looped  Whether or not the music will loop.
      */
-    public static function playMusic(name:String, ?volume:Float = 1, ?looped:Bool = true):Void {
+    public static function playMusic(name:String, ?volume:Float = 1, ?looped:Bool = true, ?snd:Sound):Void {
         final parser:JsonParser<MusicConfig> = new JsonParser<MusicConfig>();
         parser.ignoreUnknownVariables = true;
 
         final config:MusicConfig = parser.fromJson(FlxG.assets.getText(Paths.json('${name}/config')));
-        FlxG.sound.playMusic(Paths.sound('${name}/music'), volume, looped);
+        FlxG.sound.playMusic((snd != null) ? snd : Paths.sound('${name}/music'), volume, looped);
 
         Conductor.instance.music = FlxG.sound.music;
         Conductor.instance.reset(config.timingPoints.first().bpm);

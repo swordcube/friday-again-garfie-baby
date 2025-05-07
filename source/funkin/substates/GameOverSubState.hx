@@ -1,6 +1,9 @@
 package funkin.substates;
 
+import lime.app.Future;
 import lime.system.System;
+
+import openfl.media.Sound;
 
 import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
@@ -22,11 +25,13 @@ class GameOverSubState extends FunkinSubState {
     public var game:PlayState = PlayState.instance;
 
     public var character:Character;
+    public var deathLoopStarted:Bool = false;
     public var isEnding:Bool = false;
 
     public var camFollow:FlxObject;
     public var deathSFX:FlxSound;
     
+    public var loadingMusic:Bool = true;
     public var prevWindowOnClose:Void->Void;
 
     override function create():Void {
@@ -61,6 +66,18 @@ class GameOverSubState extends FunkinSubState {
         if(_createEvent.cancelled)
             return;
 
+        final musicThread:Future<Sound> = CoolUtil.createASyncFuture(() -> {
+            return FlxG.assets.getSound(Paths.sound('${_createEvent.music}/music'));
+        });
+        musicThread.onComplete((snd:Sound) -> {
+            loadingMusic = false;
+            CoolUtil.playMusic(_createEvent.music, 0, true, snd);
+            FlxG.sound.music.pause();
+            FlxG.sound.music.time = 0;
+        });
+        musicThread.onError((e:Dynamic) -> {
+            loadingMusic = false;
+        });
         character = new Character(_createEvent.characterID, game.player?.isPlayer ?? true);
         character.setPosition(game.player?.x ?? 800, game.player?.y ?? 700);
         character.playAnim("death");
@@ -88,11 +105,17 @@ class GameOverSubState extends FunkinSubState {
         if(controls.justPressed.BACK)
             exit();
 
-        if(!isEnding && (!deathSFX.playing || (character.animation.name == "death" && character.animation.finished)) && (FlxG.sound.music == null || !FlxG.sound.music.playing)) {
-			CoolUtil.playMusic(_createEvent.music, 1, true);
+        if(!isEnding && (character.animation.name == "death" && character.animation.finished) && (FlxG.sound.music == null || !FlxG.sound.music.playing)) {
+			call("onDeathLoopStart");
+            deathLoopStarted = true;
             Conductor.instance.autoIncrement = true;
 			beatHit(0);
+			call("onDeathLoopStartPost");
 		}
+        if(deathLoopStarted && !loadingMusic && FlxG.sound.music != null && !FlxG.sound.music.playing) {
+            FlxG.sound.music.volume = 1;
+            FlxG.sound.music.play();
+        }
     }
 
     public function retry():Void {

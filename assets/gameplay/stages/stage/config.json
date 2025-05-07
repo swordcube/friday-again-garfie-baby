@@ -4,6 +4,12 @@
         "images": "images",
         "sfx": "sfx"
     },
+    "preload": [
+        {"path": "bg", "type": "image"},
+        {"path": "floor", "type": "image"},
+        {"path": "light", "type": "image"},
+        {"path": "curtains", "type": "image"}
+    ],
     "layers": [
         [
             {

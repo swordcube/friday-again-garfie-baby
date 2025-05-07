@@ -95,7 +95,7 @@ class Character extends FlxSprite implements IBeatReceiver {
                     final loader:AssetLoader = loaders[i];
                     final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
     
-                    if(contentMetadata == null)
+                    if(Paths.forceContentPack != loader.id && !(contentMetadata?.runGlobally ?? true))
                         continue;
     
                     final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script', loader.id, false);
@@ -108,8 +108,10 @@ class Character extends FlxSprite implements IBeatReceiver {
                 }
             }
             if(game != null && game.scriptsAllowed && game.scripts != null) {
-                for(script in scripts.members)
+                for(script in scripts.members) {
                     game.scripts.add(script);
+                    script.setParent(this);
+                }
             }
             scripts.execute();
             scripts.call("onLoad", [data]);

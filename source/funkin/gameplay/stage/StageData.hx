@@ -19,6 +19,11 @@ class StageData {
 
     public var zoom:Float;
     public var folders:Map<String, String>;
+
+    @:optional
+    @:default([])
+    public var preload:Array<AssetPreload>;
+
     public var layers:Array<Array<StagePropData>>;
 
     public static function load(stageID:String):StageData {

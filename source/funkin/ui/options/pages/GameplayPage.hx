@@ -28,6 +28,13 @@ class GameplayPage extends OptionPage {
             type: TCheckbox
         });
         addOption({
+            name: "Miss Sounds",
+            description: "Changes whether or not miss sounds are played during gameplay.",
+
+            id: "missSounds",
+            type: TCheckbox
+        });
+        addOption({
             name: "Song Offset",
             description: "Changes how offset the music is from notes (in MS).\nMainly useful for headphones with lots of latency.",
 

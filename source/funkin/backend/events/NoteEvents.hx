@@ -230,6 +230,21 @@ class NoteMissEvent extends ActionEvent {
     public var missAnimSuffix:String;
 
     /**
+     * Whether or not to play the miss sound.
+     */
+    public var playMissSound:Bool;
+
+    /**
+     * The sound to play when the note is missed.
+     */
+    public var missSound:String;
+
+    /**
+     * The volume of the miss sound.
+     */
+    public var missVolume:Float;
+
+    /**
      * This is the constructor for this event, mainly
      * used just to specify it's type.
      */

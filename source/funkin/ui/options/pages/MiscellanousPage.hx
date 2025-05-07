@@ -22,5 +22,12 @@ class MiscellanousPage extends OptionPage {
             id: "verboseLogging",
             type: TCheckbox
         });
+        addOption({
+            name: "Multicore Preloading",
+            description: "Whether or not the game should use multiple threads to preload gameplay assets.\nTurn this back off if you're experiencing issues preloading images/sounds.",
+        
+            id: "multicoreLoading",
+            type: TCheckbox
+        });
     }
 }

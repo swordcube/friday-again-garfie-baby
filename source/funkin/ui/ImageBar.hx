@@ -23,13 +23,15 @@ class ImageBar extends FlxSpriteGroup {
 	public var barHeight(default, set):Int = 1;
 	public var barOffset:FlxPoint = new FlxPoint(3, 3);
 
-	public function new(x:Float, y:Float, image:String = 'healthBar', valueFunction:Void->Float = null, boundX:Float = 0, boundY:Float = 1) {
+	public function new(x:Float, y:Float, image:String = "", valueFunction:Void->Float = null, boundX:Float = 0, boundY:Float = 1) {
 		super(x, y);
+		if(image == null || image.length == 0)
+			image = Paths.image("gameplay/healthBar");
 
 		this.valueFunction = valueFunction;
 		setBounds(boundX, boundY);
 
-		bg = new FlxSprite().loadGraphic(Paths.image(image));
+		bg = new FlxSprite().loadGraphic(image);
 		bg.setPosition(bg.x + bgOffset.x, bg.y + bgOffset.y);
 
 		barWidth = Std.int(bg.width);

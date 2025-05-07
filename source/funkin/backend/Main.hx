@@ -1,12 +1,16 @@
 package funkin.backend;
 
+import sys.io.Process;
+
 import haxe.CallStack;
+import haxe.io.BytesOutput;
 
 import openfl.display.Sprite;
 import flixel.FlxGame;
 
 import funkin.backend.InitState;
 import funkin.backend.StatsDisplay;
+import funkin.backend.native.HiddenProcess;
 
 #if (linux && !debug)
 @:cppInclude('../../../../vendor/gamemode_client.h')
@@ -47,4 +51,41 @@ class Main extends Sprite {
 		}
 		return str;
 	}
+
+	#if sys
+	// https://github.com/openfl/hxp/blob/master/src/hxp/System.hx
+	public static function runProcess(command:String, ?args:Array<String>):Null<String> {
+		var process = new HiddenProcess(command, args);
+		var buffer = new BytesOutput();
+		var waiting = true;
+
+		while (waiting) {
+			try {
+				var current = process.stdout.readAll(1024);
+				buffer.write(current);
+
+				if (current.length == 0)
+					waiting = false;
+			} catch (e) {
+				waiting = false;
+			}
+		}
+
+		var result = process.exitCode();
+		var output = buffer.getBytes().toString();
+		var retVal:Null<String> = output;
+
+		if (output == "") {
+			var error = process.stderr.readAll().toString();
+			process.close();
+
+			if (result != 0 || error != "")
+				retVal = null;
+		} else {
+			process.close();
+		}
+		
+		return retVal;
+	}
+	#end
 }

@@ -8,6 +8,7 @@ class Options {
     public static var downscroll:Bool = false;
     public static var centeredNotes:Bool = false;
     public static var useKillers:Bool = true;
+    public static var missSounds:Bool = true;
     public static var songOffset:Float = 0;
     public static var hitWindow:Float = 180;
     
@@ -20,6 +21,7 @@ class Options {
     // MISCELLANOUS //
     public static var autoPause:Bool = true;
     public static var verboseLogging:Bool = false;
+    public static var multicoreLoading:Bool = false;
 
     // GAMEPLAY MODIFIERS
     @:ignore
