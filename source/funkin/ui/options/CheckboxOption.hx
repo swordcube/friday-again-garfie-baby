@@ -9,23 +9,20 @@ class CheckboxOption extends Option {
         checkbox = new Checkbox(10, 0);
         add(checkbox);
 
-        final checked:Bool = cast getValue();
-        if(checked)
-            checkbox.select();
-        else
-            checkbox.unselect();
-
+        updateValue = (value:Dynamic) -> {
+            final checked:Bool = cast value;
+            if(checked)
+                checkbox.select();
+            else
+                checkbox.unselect();
+        };
+        updateValue(getValue());
         checkbox.animation.finish();
     }
 
     override function handleInputs():Void {
         if(controls.justPressed.ACCEPT) {
             final checked:Bool = cast getValue();
-            if(checked)
-                checkbox.unselect();
-            else
-                checkbox.select();
-
             setValue(!checked);
         }
     }

@@ -19,9 +19,14 @@ class NumberOption extends Option {
         this.isInteger = isInteger;
         value = getValue();
 
-        valueText = new AtlasText(100 + text.width + 34, -40, "default", LEFT, Std.string(value));
+        valueText = new AtlasText(100 + text.width + 34, -40, "default", LEFT, "");
         valueText.color = FlxColor.BLACK;
         add(valueText);
+
+        updateValue = (value:Dynamic) -> {
+            valueText.text = Std.string(value);
+        };
+        updateValue(value);
     } 
 
     override function handleInputs():Void {
@@ -40,8 +45,6 @@ class NumberOption extends Option {
             }
             if(holdTimer >= 0.5)
                 holdTimer = 0.45;
-
-            valueText.text = Std.string(value);
         }
     }
 }

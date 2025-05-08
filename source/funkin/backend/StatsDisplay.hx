@@ -13,6 +13,8 @@ import flixel.util.FlxColor;
 using funkin.utilities.OpenFLUtil;
 
 class StatsDisplay extends Sprite {
+    public var currentFPS:Int = 0;
+
     public var mainFPSText:TextField;
     public var subFPSText:TextField;
 
@@ -46,7 +48,8 @@ class StatsDisplay extends Sprite {
         _updateClock += deltaTime;
         
         if(_updateClock >= 1000) {
-            mainFPSText.text = Std.string(_framesPassed);
+            currentFPS = (FlxG.drawFramerate > 0) ? FlxMath.minInt(_framesPassed, FlxG.drawFramerate) : _framesPassed;
+            mainFPSText.text = Std.string(currentFPS);
             subFPSText.x = mainFPSText.x + mainFPSText.width;
             
             _framesPassed = 0;

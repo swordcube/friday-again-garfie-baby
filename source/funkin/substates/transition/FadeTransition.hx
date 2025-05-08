@@ -68,6 +68,9 @@ class FadeTransition extends TransitionSubState {
 		if(updateFunc != null)
 			updateFunc();
 
+		if(FlxG.keys.pressed.SHIFT)
+			delayThenFinish();
+
 		super.update(elapsed);
 	}
 

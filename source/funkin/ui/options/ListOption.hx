@@ -12,9 +12,14 @@ class ListOption extends Option {
         this.possibleValues = possibleValues;
         value = getValue();
 
-        valueText = new AtlasText(100 + text.width + 34, -40, "default", LEFT, value);
+        valueText = new AtlasText(100 + text.width + 34, -40, "default", LEFT, "");
         valueText.color = FlxColor.BLACK;
         add(valueText);
+
+        updateValue = (value:Dynamic) -> {
+            valueText.text = Std.string(value);
+        };
+        updateValue(value);
     } 
 
     override function handleInputs():Void {
@@ -23,7 +28,6 @@ class ListOption extends Option {
             final index:Int = FlxMath.boundInt(possibleValues.indexOf(value) + mult, 0, possibleValues.length - 1);
 
             value = possibleValues[index];
-            valueText.text = value;
             setValue(value);
         }
     }

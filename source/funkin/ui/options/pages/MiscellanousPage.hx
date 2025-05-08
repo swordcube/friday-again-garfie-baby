@@ -29,7 +29,7 @@ class MiscellanousPage extends OptionPage {
             id: "multicoreLoading",
             type: TCheckbox
         });
-        addOption({
+        final fpsOption:NumberOption = cast addOption({
             name: "Framerate",
             description: "Changes the target FPS the game will try to run at.",
         
@@ -38,12 +38,10 @@ class MiscellanousPage extends OptionPage {
 
             callback: (value:Dynamic, option:Option) -> {
                 final fps:Int = cast value;
-                final numOption:NumberOption = cast option;
                 if(fps < 10) {
                     // unlimited
                     FlxG.updateFramerate = 0;
                     FlxG.drawFramerate = 0;
-                    numOption.valueText.text = "Unlimited";
                 } else {
                     // capped
                     if(fps > FlxG.drawFramerate) {
@@ -56,5 +54,16 @@ class MiscellanousPage extends OptionPage {
                 }
             }
         });
+        fpsOption.updateValue = (value:Dynamic) -> {
+            final fps:Int = cast value;
+            if(fps < 10) {
+                // unlimited
+                fpsOption.valueText.text = "Unlimited";
+            } else {
+                // capped
+                fpsOption.valueText.text = Std.string(fps);
+            }
+        }
+        fpsOption.updateValue(fpsOption.getValue());
     }
 }

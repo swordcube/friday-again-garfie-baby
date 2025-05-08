@@ -36,7 +36,12 @@ class Option extends FlxSpriteContainer {
 
         if(callback != null)
             callback(value, this);
+
+        if(updateValue != null)
+            updateValue(value);
     }
+
+    public dynamic function updateValue(value:Dynamic):Void {}
 
     /**
      * Handle inputs for this option by

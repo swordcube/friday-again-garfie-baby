@@ -93,12 +93,13 @@ class OptionPage extends Page {
      */
     public function initOptions():Void {}
 
-    public function addOption(data:OptionData):Void {
+    public function addOption(data:OptionData):Option {
         final isGameplayModifier:Bool = data.isGameplayModifier ?? false;
         switch(data.type) {
             case TCheckbox:
                 final o:CheckboxOption = new CheckboxOption(data.id, data.name, data.description, data.callback, isGameplayModifier);
                 grpOptions.add(o);
+                return o;
 
             case TFloat(min, max, step, decimals):
                 final o:NumberOption = new NumberOption(data.id, data.name, data.description, data.callback, isGameplayModifier, false);
@@ -107,6 +108,7 @@ class OptionPage extends Page {
                 o.step = step;
                 o.decimals = decimals ?? 0;
                 grpOptions.add(o);
+                return o;
 
             case TInt(min, max, step):
                 final o:NumberOption = new NumberOption(data.id, data.name, data.description, data.callback, isGameplayModifier, true);
@@ -114,11 +116,14 @@ class OptionPage extends Page {
                 o.max = max;
                 o.step = step;
                 grpOptions.add(o);
+                return o;
 
             case TList(values):
                 final o:ListOption = new ListOption(data.id, data.name, data.description, data.callback, isGameplayModifier, values);
                 grpOptions.add(o);
+                return o;
         }
+        return null;
     }
 
     public function addGameplayModifier(data:OptionData):Void {
