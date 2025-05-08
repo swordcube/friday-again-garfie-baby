@@ -64,7 +64,7 @@ class ScoringSystem {
     public function judgeNote(note:Note, timestamp:Float):String {
         final judgements:Array<String> = getJudgements();
 
-        var diff:Float = Math.abs(note.time - timestamp);
+        var diff:Float = Math.abs(note.time - timestamp) / FlxG.timeScale;
         var result:String = judgements[judgements.length - 1];
         
         for(i in 0...judgements.length) {
