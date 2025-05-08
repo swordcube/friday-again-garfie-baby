@@ -150,6 +150,11 @@ class FunkinScript {
         setClass(funkin.ui.UIUtil);
         set("UIWindow", funkin.ui.Window);
 
+        setClass(funkin.utilities.UndoList);
+        setClass(funkin.utilities.ArrayUtil);
+        setClass(funkin.utilities.StringUtil);
+        setClass(funkin.utilities.CustomEmitter);
+
         set("BlendMode", funkin.scripting.helpers.BlendModeHelper);
         set("FlxAxes", funkin.scripting.helpers.FlxAxesHelper);
         set("FlxCameraFollowStyle", funkin.scripting.helpers.FlxCameraFollowStyleHelper);
