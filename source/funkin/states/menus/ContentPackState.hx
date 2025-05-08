@@ -1,5 +1,7 @@
 package funkin.states.menus;
 
+import thx.semver.Version;
+import funkin.backend.ContentMetadata;
 import flixel.text.FlxText;
 import flixel.util.FlxSort;
 
@@ -13,6 +15,9 @@ class ContentPackState extends FunkinState {
     public var packCam:FlxCamera;
     public var packCamFollow:FlxObject;
 
+    public var scrollBarBG:FlxSprite;
+    public var scrollBar:FlxSprite;
+
     public var grpItems:FlxTypedContainer<ContentPackItem>;
     public var lastMouseVisible:Bool = false;
 
@@ -22,8 +27,7 @@ class ContentPackState extends FunkinState {
     public var hintBG:FlxSprite;
     public var hintText:FlxText;
 
-    public var scrollBarBG:FlxSprite;
-    public var scrollBar:FlxSprite;
+    public var grpWarnings:FlxTypedContainer<ContentPackWarning>;
 
     override function create():Void {
         final transitionCam:FlxCamera = new FlxCamera();
@@ -89,6 +93,9 @@ class ContentPackState extends FunkinState {
         hintText.x = hintBG.x + ((hintBG.width - hintText.width) * 0.5);
         hintText.y += (hintBG.height - hintText.height) * 0.5;
         add(hintText);
+
+        grpWarnings = new FlxTypedContainer<ContentPackWarning>();
+        add(grpWarnings);
 
         final packs:Array<String> = cast Options.contentPackOrder;
         // for(i in 0...30)
@@ -157,6 +164,17 @@ class ContentPackState extends FunkinState {
         }
     }
 
+    public function showWarning(text:String):Void {
+        final warning:ContentPackWarning = new ContentPackWarning(0, 0, descriptionBG.width, text);
+        grpWarnings.add(warning);
+
+        var totalHeight:Float = 0;
+        for(warning in grpWarnings.members)
+            totalHeight += warning.height;
+
+        warning.setPosition(descriptionBG.x, (descriptionBG.y + descriptionBG.height) - totalHeight);
+    }
+
     public function moveItem(up:Bool):Void {
         final curItem:ContentPackItem = grpItems.members[curSelected];
         curItem.y += 40.5 * ((up) ? -1 : 1);
@@ -179,6 +197,20 @@ class ContentPackState extends FunkinState {
         if(curSelected == prevSelected && !force)
             return;
 
+        while(grpWarnings.length > 0) {
+            final warning:ContentPackWarning = grpWarnings.members.unsafeFirst();
+            grpWarnings.remove(warning, true);
+            warning.destroy();
+        }
+        final metadata:Null<ContentMetadata> = Paths.contentMetadata.get(grpItems.members[curSelected].contentPack);
+        if((metadata?.allowUnsafeScripts ?? false))
+            showWarning("This content pack may contain unsafe scripts!");
+
+        final contentAPIVersion:Version = Version.stringToVersion(metadata?.apiVersion ?? FlxG.stage.application.meta.get("version"));
+        final currentAPIVersion:Version = Version.stringToVersion(FlxG.stage.application.meta.get("version"));
+        if(currentAPIVersion != contentAPIVersion)
+            showWarning('This content pack may be incompatible with\nyour current game version (${currentAPIVersion})!');
+
         for(i => item in grpItems.members) {
             if(curSelected == i)
                 item.select();
@@ -186,7 +218,7 @@ class ContentPackState extends FunkinState {
                 item.unselect();
         }
         packCamFollow.y = grpItems.members[curSelected].y;
-        descriptionText.text = Paths.contentMetadata.get(grpItems.members[curSelected].contentPack)?.description ?? "This content pack has no description.";
+        descriptionText.text = metadata?.description ?? "This content pack has no description.";
         FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
     }
 
@@ -297,4 +329,34 @@ class ContentPackItem extends FlxSpriteContainer {
 
     private var _lastY:Float = 0;
     private var _lastMouseY:Float = 0;
+}
+
+class ContentPackWarning extends FlxSpriteContainer {
+    public var bg:FlxSprite;
+    public var icon:FlxSprite;
+    public var title:FlxText;
+
+    public function new(x:Float = 0, y:Float = 0, width:Float, warning:String) {
+        super(x, y);
+
+        bg = new FlxSprite().makeSolid(width, 40, FlxColor.BLACK);
+        bg.alpha = 0.6;
+        add(bg);
+
+        icon = new FlxSprite(5, 5).loadGraphic(Paths.image("menus/content_manager/warning"));
+        icon.setGraphicSize(30, 30);
+        icon.updateHitbox();
+        add(icon);
+
+        title = new FlxText(icon.x + icon.width + 10, 0, warning);
+        title.setFormat(Paths.font("fonts/vcr"), 20, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
+        title.borderSize = 2;
+        title.y = (bg.height - 22) * 0.5;
+        add(title);
+
+        if((title.y + title.height) > bg.height) {
+            bg.setGraphicSize(bg.width, title.height + 20);
+            bg.updateHitbox();
+        }
+    }
 }
