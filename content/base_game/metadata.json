@@ -1,6 +1,8 @@
 {
     "id": "base-game",
+
     "title": "Base Game",
+    "description": "All of the base weeks & songs from the original game, up to Weekend 1.",
 
     "apiVersion": "0.1.0",
     "levels": [

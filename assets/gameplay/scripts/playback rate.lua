@@ -40,7 +40,7 @@ function onUpdate(dt)
         setRate((FlxG.keys.pressed.SHIFT and 20 or 10))
     end
     if sex then
-        setRate(game.playbackRate - (dt * 0.25))
+        setRate(1.0 + math.sin(Conductor.instance.time / 500.0) * 0.2)
     end
 end
 
