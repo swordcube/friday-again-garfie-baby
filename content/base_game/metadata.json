@@ -1,4 +1,7 @@
 {
+    "id": "base-game",
+    "title": "Base Game",
+
     "apiVersion": "0.1.0",
     "levels": [
         {

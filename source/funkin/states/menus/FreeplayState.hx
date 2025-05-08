@@ -70,7 +70,7 @@ class FreeplayState extends FunkinState {
         grpSongs = new AtlasTextList();
         add(grpSongs);
 
-        for(contentPack in Paths.contentPacks) {
+        for(contentPack in Paths.getEnabledContentPacks()) {
             final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentPack);
             if(contentMetadata == null)
                 continue; // if no metadata was found for this content pack, then don't bother
@@ -218,7 +218,7 @@ class FreeplayState extends FunkinState {
             changeDifficulty(1);
 
         if(controls.justPressed.BACK) {
-            FlxG.switchState(new MainMenuState());
+            FlxG.switchState(MainMenuState.new);
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
         if(controls.justPressed.RESET) {

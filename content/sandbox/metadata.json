@@ -1,4 +1,7 @@
 {
+    "id": "sandbox",
+    "title": "Sandbox",
+    
     "apiVersion": "0.1.0",
     "levels": [
         {

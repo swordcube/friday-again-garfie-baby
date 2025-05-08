@@ -114,6 +114,10 @@ class ControlsPage extends Page {
                 {
                     name: "Emergency",
                     control: Control.EMERGENCY
+                },
+                {
+                    name: "Manage Content",
+                    control: Control.MANAGE_CONTENT
                 }
             ]
         }
@@ -189,10 +193,11 @@ class ControlsPage extends Page {
     override function update(elapsed:Float):Void {
         super.update(elapsed);
         if(!changingBind) {
-            if(controls.justPressed.UI_UP)
+            final wheel:Float = -FlxG.mouse.wheel;
+            if(controls.justPressed.UI_UP || wheel < 0)
                 changeSelection(-1);
     
-            if(controls.justPressed.UI_DOWN)
+            if(controls.justPressed.UI_DOWN || wheel > 0)
                 changeSelection(1);
     
             if(controls.justPressed.UI_LEFT || controls.justPressed.UI_RIGHT) {

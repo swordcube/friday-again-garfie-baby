@@ -9,6 +9,12 @@ class ContentMetadata {
     public var id:String;
 
     @:optional
+    public var title:String;
+
+    @:optional
+    public var description:String;
+
+    @:optional
     @:default("0.1.0")
     public var apiVersion:String;
 

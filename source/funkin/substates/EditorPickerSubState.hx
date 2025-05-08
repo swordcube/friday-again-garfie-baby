@@ -36,7 +36,7 @@ class EditorPickerSubState extends FunkinSubState {
             FlxG.cameras.add(transitionCam, false);
 
             FadeTransition.nextCamera = transitionCam;
-            FlxG.switchState(new ChartEditor({
+            FlxG.switchState(ChartEditor.new.bind({
                 song: null,
                 difficulty: null
             }));
@@ -47,7 +47,7 @@ class EditorPickerSubState extends FunkinSubState {
             FlxG.cameras.add(transitionCam, false);
 
             FadeTransition.nextCamera = transitionCam;
-            FlxG.switchState(new CharacterEditor());
+            FlxG.switchState(CharacterEditor.new);
         });
         call("onAddItems");
         changeSelection(0, true);

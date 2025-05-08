@@ -33,6 +33,7 @@ enum Control {
     DEBUG;
     DEBUG_RELOAD;
     EMERGENCY;
+    MANAGE_CONTENT;
 }
 
 class Controls extends FlxControls<Control> {
@@ -132,7 +133,8 @@ class Controls extends FlxControls<Control> {
 
             DEBUG => [FlxKey.SEVEN, FlxKey.NONE],
             DEBUG_RELOAD => [FlxKey.F5, FlxKey.NONE],
-            EMERGENCY => [FlxKey.F7, FlxKey.NONE]
+            EMERGENCY => [FlxKey.F7, FlxKey.NONE],
+            MANAGE_CONTENT => [FlxKey.TAB, FlxKey.NONE],
         ];
     }
 

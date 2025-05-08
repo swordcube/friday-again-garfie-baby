@@ -34,7 +34,7 @@ class CreditsState extends FunkinState {
         super.create();
         persistentUpdate = true;
 
-        final contentPacks:Array<String> = Paths.contentPacks.copy();
+        final contentPacks:Array<String> = Paths.getEnabledContentPacks();
         contentPacks.push("default"); // engine credits always go last
 
         for(contentPack in contentPacks) {
@@ -112,7 +112,7 @@ class CreditsState extends FunkinState {
             CoolUtil.openURL(category.items[curSelected].url);
         }
         if(controls.justPressed.BACK) {
-            FlxG.switchState(new MainMenuState());
+            FlxG.switchState(MainMenuState.new);
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
     }

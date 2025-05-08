@@ -77,7 +77,7 @@ class CharacterEditor extends UIState {
         grpAnims.cameras = [camUI];
         add(grpAnims);
         
-        var contentPack:String = Paths.contentPacks.first();
+        var contentPack:String = Paths.getEnabledContentPacks().first();
         if(contentPack == null || contentPack.length == 0)
             contentPack = "default";
 
@@ -344,7 +344,7 @@ class CharacterEditor extends UIState {
     }
 
     public function exit():Void {
-        FlxG.switchState(new MainMenuState());
+        FlxG.switchState(MainMenuState.new);
         FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
     }
 

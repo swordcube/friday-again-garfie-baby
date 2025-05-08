@@ -7,6 +7,8 @@ import flixel.effects.FlxFlicker;
 import funkin.backend.macros.GitCommitMacro;
 import funkin.substates.EditorPickerSubState;
 
+import funkin.utilities.InputFormatter;
+
 class MainMenuState extends FunkinState {
     public var options:Array<MainMenuOption>;
 
@@ -25,19 +27,19 @@ class MainMenuState extends FunkinState {
         options = [
             {
                 name: "storymode",
-                callback: () -> FlxG.switchState(new StoryMenuState()),
+                callback: () -> FlxG.switchState(StoryMenuState.new),
             },
             {
                 name: "freeplay",
-                callback: () -> FlxG.switchState(new FreeplayState()),
+                callback: () -> FlxG.switchState(FreeplayState.new),
             },
             {
                 name: "credits",
-                callback: () -> FlxG.switchState(new CreditsState()),
+                callback: () -> FlxG.switchState(CreditsState.new),
             },
             {
                 name: "options",
-                callback: () -> FlxG.switchState(new OptionsState()),
+                callback: () -> FlxG.switchState(OptionsState.new),
             },
         ];
     }
@@ -99,7 +101,7 @@ class MainMenuState extends FunkinState {
         #end
         versionString += "\nFriday Night Funkin' v0.6.0";
         
-        versionText = new FlxText(5, FlxG.height - 2, 0, versionString);
+        versionText = new FlxText(5, FlxG.height - 2, 0, versionString + '\nPress ${InputFormatter.formatFlixel(Controls.getKeyFromInputType(controls.getCurrentMappings().get(Control.MANAGE_CONTENT)[0])).toUpperCase()} to manage content packs');
 		versionText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		versionText.scrollFactor.set();
         versionText.y -= versionText.height;
@@ -127,10 +129,14 @@ class MainMenuState extends FunkinState {
                 persistentUpdate = false;
                 openSubState(new EditorPickerSubState());
             }
+            if(controls.justPressed.MANAGE_CONTENT) {
+                persistentUpdate = false;
+                FlxG.switchState(ContentPackState.new);
+            }
         }
         if(controls.justPressed.BACK) {
             persistentUpdate = false;
-            FlxG.switchState(new TitleState());
+            FlxG.switchState(TitleState.new);
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
     }

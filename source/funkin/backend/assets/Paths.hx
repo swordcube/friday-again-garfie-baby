@@ -172,7 +172,7 @@ class Paths {
             return;
         }
         loader.id = id;
-        _registeredAssetLoaders.insert(priority, loader);
+        _registeredAssetLoaders.insert(_registeredAssetLoaders.length - priority - 1, loader);
         _registeredAssetLoadersMap.set(id, loader);
     }
 
@@ -259,13 +259,12 @@ class Paths {
 
             contentMetadata.set(meta.id, meta);
         }
+        final contentDir:String = getContentDirectory();
         for(i in 0...contentFolders.length) {
             final folder:String = contentFolders[i];
-
             final shortFolder:String = folder.substr(folder.lastIndexOf("/") + 1);
-            Paths.registerAssetLoader('#TEMP_CONTENT_${shortFolder}', new ContentAssetLoader(folder));
 
-            final metaPath:String = Paths.json("metadata", '#TEMP_CONTENT_${shortFolder}', false);
+            final metaPath:String = '${contentDir}/${folder}/metadata.json';
             if(FlxG.assets.exists(metaPath)) {
                 final parser:JsonParser<ContentMetadata> = new JsonParser<ContentMetadata>();
                 parser.ignoreUnknownVariables = true;
@@ -285,28 +284,56 @@ class Paths {
                 contentFoldersToPacks.set(folder, meta.id);
 
                 contentMetadata.set(meta.id, meta);
-
-                // re-register under just the metadata id
-                final loader:ContentAssetLoader = cast _registeredAssetLoadersMap.get('#TEMP_CONTENT_${shortFolder}');
-                Paths._registeredAssetLoadersMap.remove(loader.id);
-
-                loader.id = meta.id;
-                Paths._registeredAssetLoadersMap.set(loader.id, loader);
             } else {
                 contentPacks.push(shortFolder);
 
                 contentPacksToFolders.set(shortFolder, folder);
                 contentFoldersToPacks.set(folder, shortFolder);
-
-                // re-register under the short folder name
-                // without the temporary header attached
-                final loader:ContentAssetLoader = cast _registeredAssetLoadersMap.get('#TEMP_CONTENT_${shortFolder}');
-                Paths._registeredAssetLoadersMap.remove(loader.id);
-
-                loader.id = shortFolder;
-                Paths._registeredAssetLoadersMap.set(loader.id, loader);
             }
         }
+        // clear out non-existent content packs from save data
+        final packs:Array<String> = cast Options.contentPackOrder;
+        if(packs.length != 0) {
+            for(i in 0...packs.length) {
+                final pack:String = packs[i];
+                if(!contentPacks.contains(pack)) {
+                    packs.remove(pack);
+                    Options.toggledContentPacks.remove(pack);
+                }
+            }
+        }
+        // add any new content packs to save data
+        for(i in 0...contentPacks.length) {
+            final pack:String = contentPacks[i];
+            if(packs.contains(pack))
+                continue;
+
+            packs.push(pack);
+            Options.toggledContentPacks.set(pack, true);
+        }
+        // remove duplicates from the list
+        Options.contentPackOrder = packs.removeDuplicates();
+        
+        // register the content packs in the correct order (and if they're enabled)
+        final packs:Array<String> = cast Options.contentPackOrder;
+        for(i in 0...packs.length) {
+            final pack:String = packs[i];
+            if(Options.toggledContentPacks.get(pack)) {
+                final loader:ContentAssetLoader = new ContentAssetLoader(contentPacksToFolders.get(pack));
+                registerAssetLoader(pack, loader);
+            }
+        }
+    }
+
+    public static function getEnabledContentPacks():Array<String> {
+        final enabledPacks:Array<String> = [];
+        final allPacks:Array<String> = cast Options.contentPackOrder;
+    
+        for(pack in allPacks) {
+            if(Options.toggledContentPacks.get(pack))
+                enabledPacks.push(pack);
+        }
+        return enabledPacks;
     }
 
     public static function getAsset(name:String, ?loaderID:String, ?useFallback:Bool = true):String {

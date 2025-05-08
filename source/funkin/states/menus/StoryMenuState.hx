@@ -64,7 +64,7 @@ class StoryMenuState extends FunkinState {
         grpLevelTitles = new FlxTypedContainer<LevelTitle>();
         add(grpLevelTitles);
 
-        for(contentPack in Paths.contentPacks) {
+        for(contentPack in Paths.getEnabledContentPacks()) {
             final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentPack);
             if(contentMetadata == null)
                 continue; // if no metadata was found for this content pack, then don't bother

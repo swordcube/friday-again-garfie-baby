@@ -24,9 +24,9 @@ class Options {
     public static var multicoreLoading:Bool = false;
     public static var frameRate:Int = 360;
 
-    // GAMEPLAY MODIFIERS
+    // GAMEPLAY MODIFIERS //
     @:ignore
-    public static var gameplayModifiers:Map<String, Dynamic> = [];
+    public static var gameplayModifiers:Map<String, Dynamic>;
 
     @:ignore
     public static var defaultGameplayModifiers:Map<String, Dynamic> = [
@@ -34,6 +34,13 @@ class Options {
         "botplay" => false,
         "playbackRate" => 1
     ];
+
+    // NOT SHOWN IN OPTIONS MENU, BUT NEEDS TO BE SAVED REGARDLESS //
+
+    public static var contentPackOrder:Array<String> = [];
+
+    @:ignore
+    public static var toggledContentPacks:Map<String, Bool>;
 
     @:ignore
     public static function init():Void {
@@ -55,11 +62,15 @@ class Options {
             }
         }
         gameplayModifiers = savedMap;
-        
-        if(doFlush) {
-            _save.data.gameplayModifiers = gameplayModifiers;
-            _save.flush();
+        toggledContentPacks = _save.data.toggledContentPacks;
+
+        if(toggledContentPacks == null) {
+            doFlush = true;
+            toggledContentPacks = new Map<String, Bool>();
         }
+        if(doFlush)
+            save();
+        
         FlxG.autoPause = autoPause;
         _lastVolume = FlxG.save.data.volume;
         
@@ -104,6 +115,7 @@ class Options {
     
     public static function save():Void {
         _save.data.gameplayModifiers = gameplayModifiers;
+        _save.data.toggledContentPacks = toggledContentPacks;
         _save.flush();
     }
 

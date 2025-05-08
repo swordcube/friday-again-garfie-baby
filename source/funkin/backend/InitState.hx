@@ -63,25 +63,19 @@ class InitState extends FlxState {
 		FlxG.stage.window.setIcon(Image.fromFile("icon.png"));
 		#end
 
-        // init logging & asset system
+        // init logging and controls
         Logs.init();
-        Paths.initAssetSystem();
-
-        // init controls and global script
         Controls.init();
-
-        #if SCRIPTING_ALLOWED
-        GlobalScript.init();
-        #end
-
+        
         // init options & highscore
         Options.init();
         Highscore.init();
-
+        
         // init some flixel stuff
         FlxUtil.init();
+        Paths.initAssetSystem();
+        
         FlxG.scaleMode = new RatioScaleModeEx();
-
         FlxG.signals.preStateCreate.add((newState:FlxState) -> {
             if(Type.getClass(newState) != _lastState) {
                 Cache.clearAll();
@@ -90,6 +84,11 @@ class InitState extends FlxState {
         });
         WindowUtil.init();
         
+        // init global script
+        #if SCRIPTING_ALLOWED
+        GlobalScript.init();
+        #end
+
         // init the transition shit stuff
         TransitionableState.defaultTransIn = FadeTransition;
         TransitionableState.defaultTransOut = FadeTransition;

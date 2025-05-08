@@ -205,7 +205,7 @@ class TitleState extends FunkinState {
         call("onSwitchToMenu", [event]);
         
         if(!event.cancelled) {
-            FlxG.switchState(new MainMenuState());
+            FlxG.switchState(MainMenuState.new);
             call("onSwitchToMenuPost", [event.flagAsPost()]);
         }
     }

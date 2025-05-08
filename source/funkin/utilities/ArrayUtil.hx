@@ -104,4 +104,13 @@ class ArrayUtil {
     public static inline function unsafeLast<T>(arr:Array<T>):T {
         return unsafeGet(arr, arr.length - 1);
     }
+
+    public static function removeDuplicates<T>(array:Array<T>):Array<T> {
+        final l:Array<T> = [];
+        for(v in array) {
+         	if(!l.contains(v))
+            	l.push(v);
+        }
+        return l;
+    }
 }
