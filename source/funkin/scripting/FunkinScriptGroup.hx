@@ -25,8 +25,10 @@ class FunkinScriptGroup {
     }
 
     public function execute():Void {
-        for(i in 0...members.length)
-            members[i].execute();
+        for(i in 0...members.length) {
+            if(members[i] != null)
+                members[i].execute();
+        }
     }
 
     public function get(name:String, ?defaultValue:Dynamic = null):Dynamic {
