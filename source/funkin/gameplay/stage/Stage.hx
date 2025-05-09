@@ -131,17 +131,17 @@ class Stage extends FlxContainer {
             }
         }
         if(characters.spectator != null && !spectatorAdded) {
-            characters.spectator.setPosition(656.0, 738.0);
+            characters.spectator.setPosition(412.0, 538.0);
             addOnLastLayer(characters.spectator);
             spectatorAdded = true;
         }
         if(characters.opponent != null && !opponentAdded) {
-            characters.opponent.setPosition(244.0, 812.0);
+            characters.opponent.setPosition(0.0, 612.0);
             addOnLastLayer(characters.opponent);
             opponentAdded = true;
         }
         if(characters.player != null && !playerAdded) {
-            characters.player.setPosition(938.0, 812.0);
+            characters.player.setPosition(694.0, 612.0);
             addOnLastLayer(characters.player);
             playerAdded = true;
         }
