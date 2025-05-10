@@ -66,6 +66,7 @@ class StoryCharacter extends FlxSprite implements IBeatReceiver {
             }
         }
         scripts.execute();
+        scripts.call("new");
         scripts.call("onLoad", [data]);
         #end
         applyData(data);

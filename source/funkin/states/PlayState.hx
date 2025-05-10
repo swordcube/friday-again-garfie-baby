@@ -284,6 +284,7 @@ class PlayState extends FunkinState {
 						scripts.add(script);
 
 						script.execute();
+						script.call("new");
 						script.call("onCreate");
 					}
 				}
@@ -298,6 +299,7 @@ class PlayState extends FunkinState {
 					scripts.add(script);
 
 					script.execute();
+					script.call("new");
 					script.call("onCreate");
 				}
 			}
@@ -509,6 +511,7 @@ class PlayState extends FunkinState {
 				noteTypeScriptsArray.push(script);
 
 				script.execute();
+				script.call("new");
 				script.call("onCreate");
 			}
 			for(b in eventRunner.behaviors) {
@@ -519,6 +522,7 @@ class PlayState extends FunkinState {
 					eventScriptsArray.push(script);
 
 					script.execute();
+					script.call("new");
 					script.call("onCreate");
 				}
 			}
@@ -956,17 +960,17 @@ class PlayState extends FunkinState {
 					Highscore.saveLevelRecord(recordID, {
 						score: storyStats.score,
 						misses: storyStats.misses,
-						accuracy: storyStats.accuracyScore,
+						accuracy: storyStats.accuracy,
 						rank: Highscore.getRankFromStats(storyStats),
 						judges: storyStats.judgements,
 						version: Highscore.RECORD_VERSION
 					});
-					playExitMusic();
 					FlxG.switchState(StoryMenuState.new);
+					playExitMusic();
 				}
 			} else {
-				playExitMusic();
 				FlxG.switchState(FreeplayState.new);
+				playExitMusic();
 			}
 		} else
 			goToCharter();

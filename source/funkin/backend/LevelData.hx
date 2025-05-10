@@ -11,6 +11,12 @@ class LevelData {
     public var name:String;
 
     @:optional
+    @:default([])
+    @:jcustomparse(funkin.utilities.DataParse.dynamicValue)
+	@:jcustomwrite(funkin.utilities.DataWrite.dynamicValue)
+    public var extra:Dynamic; 
+
+    @:optional
     @:default("NO TAGLINE SPECIFIED")
     public var tagline:String;
 

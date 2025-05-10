@@ -153,10 +153,11 @@ class ContentPackState extends FunkinState {
             Options.contentPackOrder = packs.removeDuplicates();
             Options.save();
 
+            Paths.reloadContent();
+            GlobalScript.reloadScripts();
+            
             FlxG.signals.preStateCreate.addOnce((_) -> {
                 Cache.clearAll();
-                Paths.reloadContent();
-                GlobalScript.reloadScripts();
             });
             persistentUpdate = false;
             FlxG.switchState(MainMenuState.new);

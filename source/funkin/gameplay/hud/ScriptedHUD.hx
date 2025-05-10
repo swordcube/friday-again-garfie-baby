@@ -23,6 +23,7 @@ class ScriptedHUD extends BaseHUD {
             return Paths.getSparrowAtlas('gameplay/hudskins/${skin}/images/${name}');
         });
         script.execute();
+        script.call("new");
         script.call("onLoad");
         
         super(playField);

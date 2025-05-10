@@ -45,6 +45,7 @@ class Stage extends FlxContainer {
 
             script.setParent(this);
             script.execute();
+            script.call("new");
             script.call("onLoad", [data]);
         }
         #end

@@ -19,6 +19,7 @@ class FunkinState extends TransitionableState implements IBeatReceiver {
     
     #if SCRIPTING_ALLOWED
     public var scriptName:String;
+    public var initArgs:Array<Dynamic>;
     public var stateScripts(default, null):FunkinScriptGroup;
     #end
 
@@ -52,6 +53,7 @@ class FunkinState extends TransitionableState implements IBeatReceiver {
             }
         }
         stateScripts.execute();
+        stateScripts.call("new", initArgs ?? []);
         #end
         super.create();
         _callCreate();

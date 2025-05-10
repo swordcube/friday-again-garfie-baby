@@ -87,6 +87,7 @@ class FunkinScript {
 
         setClass(funkin.gameplay.HealthIcon);
         setClass(funkin.gameplay.HoldTiledSprite);
+        setClass(funkin.gameplay.PlayerStats);
         setClass(funkin.gameplay.PlayField);
         setClass(funkin.gameplay.UISkin);
 
@@ -108,6 +109,8 @@ class FunkinScript {
         setClass(funkin.gameplay.song.ChartData);
         setClass(funkin.gameplay.song.NoteData);
         setClass(funkin.gameplay.song.EventData);
+        setClass(funkin.gameplay.song.Highscore);
+        setClass(funkin.gameplay.song.SongMetadata);
         setClass(funkin.gameplay.song.VocalGroup);
 
         setClass(funkin.gameplay.character.Character);
@@ -128,7 +131,10 @@ class FunkinScript {
 
         setClass(funkin.states.menus.TitleState);
         setClass(funkin.states.menus.MainMenuState);
+        setClass(funkin.states.menus.StoryMenuState);
         setClass(funkin.states.menus.FreeplayState);
+        setClass(funkin.states.menus.OptionsState);
+        setClass(funkin.states.menus.ContentPackState);
         
         setClass(funkin.substates.FunkinSubState);
         setClass(funkin.substates.ScriptedSubState);

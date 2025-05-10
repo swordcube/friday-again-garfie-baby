@@ -19,6 +19,7 @@ class FunkinSubState extends FlxSubState implements IBeatReceiver {
     
     #if SCRIPTING_ALLOWED
     public var scriptName:String;
+    public var initArgs:Array<Dynamic>;
     public var subStateScripts(default, null):FunkinScriptGroup;
     #end
 
@@ -52,6 +53,7 @@ class FunkinSubState extends FlxSubState implements IBeatReceiver {
             }
         }
         subStateScripts.execute();
+        subStateScripts.call("new", initArgs ?? []);
         #end
         super.create();
         _callCreate();

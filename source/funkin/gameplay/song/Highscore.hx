@@ -17,6 +17,10 @@ class Highscore {
         _scoreRecords.clear();
         _levelRecords.clear();
 
+        if(_save.data.levelRecords == null) {
+            _save.data.levelRecords = _levelRecords;
+            _save.flush();
+        }
         final ignoreIDs:Array<String> = ["levelRecords"];
         for(id in Reflect.fields(_save.data)) {
             if(ignoreIDs.contains(id))
@@ -26,15 +30,9 @@ class Highscore {
             if(record != null)
                 _scoreRecords.set(id, migrateScoreRecord(record));
         }
-        if(_save.data.levelRecords != null) {
-            _save.data.levelRecords = _levelRecords;
-            _save.flush();
-        }
-        for(id in Reflect.fields(_save.data.levelRecords)) {
-            if(ignoreIDs.contains(id))
-                continue;
-            
-            final record:Dynamic = Reflect.field(_save.data.levelRecords, id);
+        final savedRecords:Map<String, Dynamic> = cast _save.data.levelRecords;
+        for(id in savedRecords.keys()) {
+            final record:Dynamic = savedRecords.get(id);
             if(record != null)
                 _levelRecords.set(id, migrateLevelRecord(record));
         }
@@ -156,7 +154,7 @@ class Highscore {
         final prevRecord:LevelRecord = _levelRecords.get(id) ?? getDefaultLevelRecord();
         if(force || (record.score > prevRecord.score || record.accuracy > prevRecord.accuracy || record.rank > prevRecord.rank)) {
             _levelRecords.set(id, record);
-            Reflect.setField(_save.data.levelRecords, id, record);
+            _save.data.levelRecords.set(id, record);
             _save.flush();
         }
     }

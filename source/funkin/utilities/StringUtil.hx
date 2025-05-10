@@ -26,4 +26,8 @@ class StringUtil {
 	public static function getDefaultString(str:String, defaultStr:String):String {
 		return (str != null && str.length != 0) ? str : defaultStr;
 	}
+
+	public static function capitalize(text:String):String {
+		return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+	}
 }
