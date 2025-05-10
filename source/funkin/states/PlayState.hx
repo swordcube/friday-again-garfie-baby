@@ -639,6 +639,14 @@ class PlayState extends FunkinState {
 		if(startingSong && Conductor.instance.time >= -Conductor.instance.offset)
 			startSong();
 
+		if(!_aboutToEndSong && FlxG.sound.music.length >= 1000 && FlxG.sound.music.time >= FlxG.sound.music.length - 1000) {
+			// failsafe for if FlxSound doesn't decide to function
+			_aboutToEndSong = true;
+			FlxTimer.wait(1, () -> {
+				if(!endingSong && _aboutToEndSong)
+					finishSong();
+			});
+		}
 		if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.END) {
 			// TODO: warning for unsaved charts
 			endSong(); // end the song immediately when SHIFT + END is pressed, as emergency
@@ -721,8 +729,10 @@ class PlayState extends FunkinState {
 			Conductor.instance.music = null;
 			Conductor.instance.autoIncrement = false;
 			
-			FlxG.sound.music.pause();
-			vocals.pause();
+			if(!endingSong && FlxG.sound.music != null) {
+				FlxG.sound.music.pause();
+				vocals.pause();
+			}
 		}
 		_initialTransitionHappened = true;
 		
@@ -744,7 +754,7 @@ class PlayState extends FunkinState {
 			Conductor.instance.music = FlxG.sound.music;
 			Conductor.instance.autoIncrement = true;
 
-			if(!startingSong) {
+			if(!startingSong && FlxG.sound.music != null) {
 				FlxG.sound.music.time = Conductor.instance.rawTime;
 				FlxG.sound.music.resume();
 
@@ -1020,6 +1030,8 @@ class PlayState extends FunkinState {
 	}
 
 	//----------- [ Private API ] -----------//
+	
+	private var _aboutToEndSong:Bool = false;
 
 	@:unreflective
 	private var _saveScore:Bool = true; // unreflective so you can't CHEAT in scripts >:[
