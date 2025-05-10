@@ -3,8 +3,9 @@ package funkin.backend.events;
 import funkin.backend.events.Events;
 import funkin.backend.events.ActionEvent;
 
-import funkin.backend.events.GameplayEvents;
 import funkin.backend.events.CountdownEvents;
+import funkin.backend.events.GameplayEvents;
+import funkin.backend.events.MenuEvents;
 import funkin.backend.events.NoteEvents;
 
 class Events {
@@ -23,6 +24,7 @@ class Events {
                 case COUNTDOWN_STEP: _events.set(type, new CountdownStepEvent());
                 case GAME_OVER: _events.set(type, new GameOverEvent());
                 case GAME_OVER_CREATE: _events.set(type, new GameOverCreateEvent());
+                case PAUSE_MENU_CREATE: _events.set(type, new PauseMenuCreateEvent());
                 default: _events.set(type, new ActionEvent(UNKNOWN));
             }
         }

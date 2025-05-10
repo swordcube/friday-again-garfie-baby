@@ -10,6 +10,8 @@ import flixel.input.keyboard.FlxKey;
 import funkin.backend.Main;
 import funkin.graphics.RatioScaleModeEx;
 
+using funkin.utilities.OpenFLUtil;
+
 /**
  * A utility class for simplifying certain tasks in Flixel.
  */
@@ -74,8 +76,10 @@ class FlxUtil {
         FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, (e) -> {
             // Prevent Flixel from listening to key inputs when switching fullscreen mode
             // Thanks nebulazorua @crowplexus
+            // 
+            // Made ALT+ENTER prevent fullscreening entirely -swordcube
             if (e.altKey && e.keyCode == FlxKey.ENTER)
-                e.stopImmediatePropagation();
+                e.cancelEvent();
         }, false, 100);
 
         // Add some frame hooks

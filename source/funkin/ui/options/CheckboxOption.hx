@@ -1,5 +1,7 @@
 package funkin.ui.options;
 
+import flixel.effects.FlxFlicker;
+
 class CheckboxOption extends Option {
     public var checkbox:Checkbox;
 
@@ -24,6 +26,7 @@ class CheckboxOption extends Option {
         if(controls.justPressed.ACCEPT) {
             final checked:Bool = cast getValue();
             setValue(!checked);
+            FlxG.sound.play(Paths.sound("menus/sfx/select"));
         }
     }
 }

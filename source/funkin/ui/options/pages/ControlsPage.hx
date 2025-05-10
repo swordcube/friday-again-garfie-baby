@@ -7,6 +7,7 @@ import flixel.addons.input.FlxControls;
 import flixel.text.FlxText;
 import flixel.input.keyboard.FlxKey;
 
+import funkin.ui.Prompt;
 import funkin.ui.AtlasText;
 import funkin.utilities.InputFormatter;
 
@@ -131,11 +132,16 @@ class ControlsPage extends Page {
     public var bindNames:Array<AtlasText> = [];
     public var bindTexts:Array<Array<AtlasText>> = [];
 
+    public var promptCam:FlxCamera;
     public var camFollow:FlxObject;
-    public var warningText:FlxText;
 
     public var controlItems:Array<Control> = [];
     public var changingBind:Bool = false;
+    
+    public var bindPrompt:Prompt;
+    public var openedPrompt:Bool = false;
+
+    public var pressedKeyYet:Bool = false;
 
     override function create():Void {
         super.create();
@@ -144,6 +150,10 @@ class ControlsPage extends Page {
         camera = new FlxCamera();
         camera.bgColor = 0;
         FlxG.cameras.add(camera, false);
+
+        promptCam = new FlxCamera();
+        promptCam.bgColor = 0;
+        FlxG.cameras.add(promptCam, false);
 
         grpText = new FlxTypedContainer<AtlasText>();
         add(grpText);
@@ -175,12 +185,12 @@ class ControlsPage extends Page {
         camFollow = new FlxObject(0, 0, 1, 1);
         add(camFollow);
 
-        warningText = new FlxText(0, FlxG.height - 10, 0, "Waiting for input...");
-        warningText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, CENTER, OUTLINE, FlxColor.BLACK);
-        warningText.screenCenter(X);
-        warningText.y -= warningText.height;
-        warningText.visible = false;
-        add(warningText);
+        bindPrompt = new Prompt("\nPress any key to rebind\n\n\nBackspace to unbind\nEscape to cancel", None);
+        bindPrompt.create();
+        bindPrompt.createBGFromMargin(100, 0xFFfafd6d);
+        bindPrompt.cameras = [promptCam];
+        bindPrompt.exists = false;
+        add(bindPrompt);
         
         final margin:Float = 100;
         camera.follow(camFollow, LOCKON, 0.16);
@@ -192,6 +202,9 @@ class ControlsPage extends Page {
 
     override function update(elapsed:Float):Void {
         super.update(elapsed);
+        if(openedPrompt)
+            return;
+
         if(!changingBind) {
             final wheel:Float = -FlxG.mouse.wheel;
             if(controls.justPressed.UI_UP || wheel < 0)
@@ -204,17 +217,55 @@ class ControlsPage extends Page {
                 curBindIndex = (curBindIndex + 1) % 2;
                 changeSelection(0, true);
             }
-            if(controls.justPressed.ACCEPT)
+            if(controls.justPressed.ACCEPT) {
+                bindPrompt.exists = true;
                 startChangingBind();
-    
+            }
+            if(controls.justPressed.RESET) {
+                final resetPrompt:Prompt = new Prompt("\nAre you sure you want\nto reset this bind?", YesNo);
+                resetPrompt.create();
+                resetPrompt.createBGFromMargin(100, 0xFFfafd6d);
+                resetPrompt.onYes = () -> {
+                    final defaultMappings:ActionMap<Control> = controls.getDefaultMappings();
+                    final newKey:FlxKey = Controls.getKeyFromInputType(defaultMappings.get(controlItems[curSelected])[curBindIndex]);
+                    
+                    final bindText:AtlasText = bindTexts[curSelected][curBindIndex];
+                    bindText.text = InputFormatter.formatFlixel(newKey);
+                    
+                    FlxTimer.wait(0.001, () -> {
+                        openedPrompt = false;
+                        controls.bind(controlItems[curSelected], curBindIndex, newKey);
+                        controls.apply();
+                    });
+                    curMappings.get(controlItems[curSelected])[curBindIndex] = newKey;
+
+                    resetPrompt.closePrompt();
+                    FlxG.sound.play(Paths.sound("menus/sfx/select"));
+                };
+                resetPrompt.onNo = () -> {
+                    FlxTimer.wait(0.001, () -> {
+                        openedPrompt = false;
+                        resetPrompt.closePrompt();
+                    });
+                };
+                resetPrompt.cameras = [promptCam];
+                add(resetPrompt);
+
+                openedPrompt = true;
+            }
             if(controls.justPressed.BACK) {
                 controls.flush();
                 menu.loadPage(new MainPage());
                 FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
             }
         } else {
-            if(FlxG.keys.justPressed.ANY)
+            if(changingBind && !pressedKeyYet && FlxG.keys.justPressed.ANY)
+                pressedKeyYet = true;
+            
+            if(changingBind && pressedKeyYet && FlxG.keys.justReleased.ANY) {
+                bindPrompt.exists = false;
                 stopChangingBind();
+            }
         }
     }
 
@@ -223,9 +274,6 @@ class ControlsPage extends Page {
         FlxG.sound.play(Paths.sound("menus/sfx/select"));
 
         final bindText:AtlasText = bindTexts[curSelected][curBindIndex];
-        warningText.visible = true;
-        warningText.text = "Waiting for input...";
-
         if(Options.flashingLights)
             FlxFlicker.flicker(bindText, 0, 0.06, true, false);
         else
@@ -233,16 +281,32 @@ class ControlsPage extends Page {
     }
 
     public function stopChangingBind():Void {
-        final newKey:FlxKey = FlxG.keys.firstJustPressed();
-        if(newKey == NONE)
-            return;
+        var newKey:FlxKey = FlxG.keys.firstJustReleased();
+        switch(newKey) {
+            case NONE:
+                return;
 
+            case BACKSPACE:
+                newKey = NONE;
+
+            case ESCAPE:
+                changingBind = false;
+                pressedKeyYet = false;
+
+                final bindText:AtlasText = bindTexts[curSelected][curBindIndex];
+                bindText.visible = true;
+                FlxFlicker.stopFlickering(bindText);
+
+                return;
+
+            default:
+        }
         changingBind = false;
+        pressedKeyYet = false;
 
         final bindText:AtlasText = bindTexts[curSelected][curBindIndex];
-        warningText.visible = false;
-
         FlxFlicker.stopFlickering(bindText);
+
         bindText.text = InputFormatter.formatFlixel(newKey);
         bindText.visible = true;
         

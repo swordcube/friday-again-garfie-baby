@@ -29,6 +29,8 @@ class ListOption extends Option {
 
             value = possibleValues[index];
             setValue(value);
+
+            FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
         }
     }
 }

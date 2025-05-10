@@ -57,6 +57,8 @@ import funkin.states.editors.ChartEditor;
 import funkin.substates.PauseSubState;
 import funkin.substates.GameOverSubState;
 
+import funkin.substates.transition.TransitionSubState;
+
 // import scripting events anyways because i'm too lazy
 // to make it work on no scripting mode lol!!
 #if SCRIPTING_ALLOWED
@@ -270,8 +272,12 @@ class PlayState extends FunkinState {
 				final items:Array<String> = loader.readDirectory(dir);
 				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
 
+				final scriptExts:Array<String> = Paths.ASSET_EXTENSIONS.get(SCRIPT);
 				for(i in 0...items.length) {
 					final path:String = Path.normalize(loader.getPath('${dir}/${items[i]}'));
+					if(!scriptExts.contains('.${Path.extension(path)}'))
+						continue;
+					
 					if(FlxG.assets.exists(path)) {
 						final script:FunkinScript = FunkinScript.fromFile(path, contentMetadata?.allowUnsafeScripts ?? false);
 						script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
@@ -283,7 +289,7 @@ class PlayState extends FunkinState {
 				}
 			}
 			inline function addSingleScript(loader:AssetLoader, path:String) {
-				final scriptPath:String = Paths.script(path, loader.id);
+				final scriptPath:String = Paths.script(path, loader.id, false);
 				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
 
 				if(FlxG.assets.exists(scriptPath)) {
@@ -708,8 +714,18 @@ class PlayState extends FunkinState {
 
 	override function onSubStateOpen(subState:FlxSubState):Void {
 		super.onSubStateOpen(subState);
-		paused = true;
-
+		if(_initialTransitionHappened || !(subState is TransitionSubState)) {
+			paused = true;
+			camGame.followEnabled = false;
+			
+			Conductor.instance.music = null;
+			Conductor.instance.autoIncrement = false;
+			
+			FlxG.sound.music.pause();
+			vocals.pause();
+		}
+		_initialTransitionHappened = true;
+		
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
 			scripts.call("onSubStateOpen", [subState]);
@@ -720,8 +736,22 @@ class PlayState extends FunkinState {
 
 	override function onSubStateClose(subState:FlxSubState):Void {
 		super.onSubStateClose(subState);
-		paused = false;
 
+		if(!(subState is TransitionSubState)) {
+			paused = false;
+			camGame.followEnabled = true;
+
+			Conductor.instance.music = FlxG.sound.music;
+			Conductor.instance.autoIncrement = true;
+
+			if(!startingSong) {
+				FlxG.sound.music.time = Conductor.instance.rawTime;
+				FlxG.sound.music.resume();
+
+				vocals.seek(FlxG.sound.music.time);
+				vocals.resume();
+			}
+		}
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
 			scripts.call("onSubStateClose", [subState]);
@@ -795,14 +825,6 @@ class PlayState extends FunkinState {
 	}
 
 	public function pause():Void {
-		camGame.followEnabled = false;
-
-		Conductor.instance.music = null;
-		Conductor.instance.autoIncrement = false;
-
-		FlxG.sound.music.pause();
-		vocals.pause();
-		
 		persistentUpdate = false;
 		openSubState(new PauseSubState());
 	}
@@ -1310,6 +1332,9 @@ class PlayState extends FunkinState {
 	}
 
 	//----------- [ Private API ] -----------//
+
+	@:noCompletion
+	private var _initialTransitionHappened:Bool = false;
 
 	@:noCompletion
 	private inline function get_songPercent():Float {

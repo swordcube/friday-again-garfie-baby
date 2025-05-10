@@ -39,7 +39,7 @@ class MainMenuState extends FunkinState {
             },
             {
                 name: "options",
-                callback: () -> FlxG.switchState(OptionsState.new),
+                callback: () -> FlxG.switchState(OptionsState.new.bind({exitState: null})),
             },
         ];
     }

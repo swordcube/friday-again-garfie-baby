@@ -37,7 +37,11 @@ class Countdown extends FlxContainer {
         timer = FlxTimer.wait(attachedConductor.beatLength / 1000, () -> {
             final stepEvent:CountdownStepEvent = cast Events.get(COUNTDOWN_STEP);
             onStep.dispatch(stepEvent.recycle(counter, json.countdown.steps[counter].soundPath, null, null));
-            
+
+            if(stepEvent.cancelled) {
+                counter++;
+                return;
+            }
             final sprite:CountdownSprite = new CountdownSprite();
             sprite.loadSkin(uiSkin);
             sprite.step = json.countdown.steps[stepEvent.counter].name;

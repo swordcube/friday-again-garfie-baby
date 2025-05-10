@@ -35,6 +35,9 @@ class NumberOption extends Option {
         else
             holdTimer = 0;
 
+        if(controls.justPressed.UI_LEFT || controls.justPressed.UI_RIGHT)
+            FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
+        
         if(controls.justPressed.UI_LEFT || controls.justPressed.UI_RIGHT || holdTimer >= 0.5) {
             if(decimals == 0 || isInteger) {
                 value = FlxMath.bound(Std.int(value + ((controls.pressed.UI_LEFT) ? -step : step)), min, max);

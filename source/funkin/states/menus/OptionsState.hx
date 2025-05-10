@@ -1,10 +1,28 @@
 package funkin.states.menus;
 
+import flixel.util.typeLimit.NextState;
 import funkin.ui.options.pages.*;
 
+typedef OptionsStateParams = {
+    var exitState:NextState;
+}
+
 class OptionsState extends FunkinState {
+    public var initParams:OptionsStateParams = {
+        exitState: null
+    };
     public var bg:FlxSprite;
     public var currentPage:Page;
+
+    public function new(?params:OptionsStateParams) {
+		super();
+		if(params == null) {
+			params = {
+                exitState: null
+            };
+        }
+		initParams = params;
+    }
 
     override function create():Void {
         super.create();

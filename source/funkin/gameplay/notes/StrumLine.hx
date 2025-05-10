@@ -166,7 +166,7 @@ class StrumLine extends FlxSpriteGroup {
                             playField.hud.updatePlayerStats(playField.stats);
                         }
                     }
-                    if(note.hitEvent.playConfirmAnim && note.hitEvent.strumHoldJitter) {
+                    if(note.hitEvent.playConfirmAnim && note.hitEvent.strumHoldJitter && playField.strumsPressed[note.direction]) {
                         if(botplay)
                             strum.holdTime = attachedConductor.stepLength * 2;
                         

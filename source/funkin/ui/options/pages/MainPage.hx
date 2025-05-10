@@ -74,7 +74,7 @@ class MainPage extends Page {
 
         if(controls.justPressed.BACK) {
             Options.save();
-            FlxG.switchState(MainMenuState.new);
+            FlxG.switchState((menu.initParams.exitState != null) ? menu.initParams.exitState : MainMenuState.new);
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
     }

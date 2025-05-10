@@ -1,6 +1,7 @@
 package funkin.backend;
 
 import lime.graphics.Image;
+import flixel.util.FlxTimer;
 
 import funkin.backend.native.NativeAPI;
 import funkin.backend.plugins.ForceCrashPlugin;
@@ -21,6 +22,8 @@ import funkin.substates.transition.FadeTransition;
 
 class InitState extends FlxState {
     private static var _lastState:Class<FlxState>;
+
+    private var _started:Bool = false;
 
     override function create() {
         super.create();
@@ -107,20 +110,33 @@ class InitState extends FlxState {
 
         // hide cursor, we probably don't need it rn
         FlxG.mouse.visible = false;
+    }
 
-        final args = Sys.args();
-        if(args.contains("--song")) {
-            // if song arguments are passed, immediately go
-            // to playstate with that song
-            // 
-            // NOTE: difficulty MUST be passed!!
-            FlxG.switchState(PlayState.new.bind({
-                song: args[args.indexOf("--song") + 1],
-                difficulty: args[args.indexOf("--diff") + 1]
-            }));    
-        } else {
-            // otherwise do normal starting logic
-            FlxG.switchState(TitleState.new);
+    override function update(elapsed:Float):Void {
+        super.update(elapsed);
+        
+        // for some reason i have to do this bullshittery
+        // just for the cursor to be hidden on linux. what the fuck.
+        if(!_started && !FlxG.mouse.visible) {
+            FlxTimer.wait(0.001, () -> {
+                // do starting logic shit
+                final args = Sys.args();
+                if(args.contains("--song")) {
+                    // if song arguments are passed, immediately go
+                    // to playstate with that song
+                    // 
+                    // NOTE: difficulty MUST be passed!!
+                    FlxG.switchState(PlayState.new.bind({
+                        song: args[args.indexOf("--song") + 1],
+                        difficulty: args[args.indexOf("--diff") + 1]
+                    }));    
+                } else {
+                    // otherwise do normal starting logic
+                    FlxG.switchState(TitleState.new);
+                }
+            });
+            _started = true;
         }
+        FlxG.mouse.visible = false;
     }
 }
