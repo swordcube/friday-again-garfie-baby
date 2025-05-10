@@ -166,7 +166,7 @@ class StrumLine extends FlxSpriteGroup {
                             playField.hud.updatePlayerStats(playField.stats);
                         }
                     }
-                    if(note.hitEvent.playConfirmAnim && note.hitEvent.strumHoldJitter && playField.strumsPressed[note.direction]) {
+                    if(note.hitEvent.playConfirmAnim && note.hitEvent.strumHoldJitter && (botplay || playField.strumsPressed[note.direction])) {
                         if(botplay)
                             strum.holdTime = attachedConductor.stepLength * 2;
                         
@@ -251,8 +251,13 @@ class StrumLine extends FlxSpriteGroup {
 
     @:noCompletion
     private function set_botplay(newValue:Bool):Bool {
+        if(playField != null) {
+            for(i in 0...Constants.KEY_COUNT)
+                playField.strumsPressed[i] = false;
+        }
         botplay = newValue;
         onBotplayToggle.dispatch(botplay);
+        
         return botplay;
     }
 
