@@ -68,7 +68,7 @@
 
 		lime test platform -DNO_DISCORD_RPC
 	-->
-	<define name="DISCORD_ALLOWED" if="windows || linux" unless="NO_DISCORD_RPC || NO_DISCORD" />
+	<define name="DISCORD_ALLOWED" if="windows || mac || linux" unless="NO_DISCORD_RPC || NO_DISCORD" />
 
 	<!--
 		Comment/delete this line below to disable the crash handler
