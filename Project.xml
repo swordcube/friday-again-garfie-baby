@@ -63,6 +63,14 @@
 	<define name="LUA_ALLOWED" if="SCRIPTING_ALLOWED cpp" unless="NO_LUA" />
 
 	<!--
+		Comment/delete this line below to disable Discord RPC
+		Or compile with the NO_DISCORD_RPC define, like so:
+
+		lime test platform -DNO_DISCORD_RPC
+	-->
+	<define name="DISCORD_ALLOWED" if="windows || linux" unless="NO_DISCORD_RPC || NO_DISCORD" />
+
+	<!--
 		Comment/delete this line below to disable the crash handler
 		Or compile with the NO_CRASH_HANDLER define, like so:
 		
@@ -120,6 +128,9 @@
 
 	<!-- Loading Animate Atlas -->
 	<haxelib name="flxanimate" />
+
+	<!-- Discord RPC -->
+	<haxelib name="hxdiscord_gamesdk" />
 
 	<!-- Versioning Libraries -->
 	<haxelib name="thx.core" />

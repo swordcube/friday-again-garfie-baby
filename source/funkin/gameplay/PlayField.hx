@@ -50,6 +50,8 @@ class PlayField extends FlxContainer {
     public var onDisplayCombo:FlxTypedSignal<DisplayComboEvent->Void> = new FlxTypedSignal<DisplayComboEvent->Void>();
     public var onDisplayComboPost:FlxTypedSignal<DisplayComboEvent->Void> = new FlxTypedSignal<DisplayComboEvent->Void>();
 
+    public var onUpdateStats:FlxTypedSignal<PlayerStats->Void> = new FlxTypedSignal<PlayerStats->Void>();
+
     public var strumsPressed:Array<Bool> = [false, false, false, false];
     public var controls:Array<Control> = [NOTE_LEFT, NOTE_DOWN, NOTE_UP, NOTE_RIGHT];
 
@@ -189,6 +191,7 @@ class PlayField extends FlxContainer {
             hud.updateHealthBar();
             hud.updatePlayerStats(stats);
         }
+        onUpdateStats.dispatch(stats);
         onNoteHitPost.dispatch(cast event.flagAsPost());
     }
 
@@ -263,6 +266,7 @@ class PlayField extends FlxContainer {
             hud.updateHealthBar();
             hud.updatePlayerStats(stats);
         }
+        onUpdateStats.dispatch(stats);
         onNoteMissPost.dispatch(cast event.flagAsPost());
     }
 

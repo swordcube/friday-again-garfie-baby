@@ -96,8 +96,9 @@ class InitState extends FlxState {
         TransitionableState.defaultTransIn = FadeTransition;
         TransitionableState.defaultTransOut = FadeTransition;
 
-        // init cursor
+        // init cursor and discord rpc
         Cursor.init();
+        DiscordRPC.init();
         
         // init conductor
         Conductor.instance = new Conductor();

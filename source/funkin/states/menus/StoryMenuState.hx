@@ -436,6 +436,8 @@ class StoryMenuState extends FunkinState {
             FlxTween.cancelTweensOf(difficultySpr);
             FlxTween.tween(difficultySpr, {y: leftArrow.y + ((difficultySprites.get(Constants.DEFAULT_DIFFICULTY).height - difficultySpr.height) * 0.5) + 10, alpha: 1}, 0.07);
         }
+        // update discord rpc
+        DiscordRPC.changePresence("Story Menu", '${levels[curSelected].name ?? levels[curSelected].id} [${currentDifficulty.toUpperCase()} - ${currentMix.toUpperCase()}]');
     }
     
     public function onSelect():Void {

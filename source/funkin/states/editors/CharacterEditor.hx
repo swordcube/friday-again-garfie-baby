@@ -278,6 +278,11 @@ class CharacterEditor extends UIState {
         pos.put();
 
         reloadAnimList();
+        var stateStr:String = 'Editing ${characterID}';
+        if(loaderID != null)
+            stateStr += ' (${loaderID})';
+        
+        DiscordRPC.changePresence("Character Editor", stateStr);
     }
 
     public function saveCharacter():Void {

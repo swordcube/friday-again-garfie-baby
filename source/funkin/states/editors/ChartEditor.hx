@@ -134,6 +134,7 @@ class ChartEditor extends UIState {
 
     override function create() {
         super.create();
+        DiscordRPC.changePresence("Chart Editor", null);
         
         if(FlxG.sound.music != null)
             FlxG.sound.music.stop();

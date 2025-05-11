@@ -82,10 +82,11 @@ class FunkinScript {
         setClass(Conductor);
         setClass(GlobalScript);
         setClass(Constants);
+        setClass(DiscordRPC);
         setClass(WindowUtil); // this util only lets you change the title
 
-        setClass(FunkinLua);
         setClass(FunkinHScript);
+        setClass(FunkinLua);
 
         setClass(funkin.gameplay.HealthIcon);
         setClass(funkin.gameplay.HoldTiledSprite);

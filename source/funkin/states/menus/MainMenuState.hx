@@ -27,18 +27,22 @@ class MainMenuState extends FunkinState {
         options = [
             {
                 name: "storymode",
+                rpcName: "Story Mode",
                 callback: () -> FlxG.switchState(StoryMenuState.new),
             },
             {
                 name: "freeplay",
+                rpcName: "Freeplay",
                 callback: () -> FlxG.switchState(FreeplayState.new),
             },
             {
                 name: "credits",
+                rpcName: "Credits",
                 callback: () -> FlxG.switchState(CreditsState.new),
             },
             {
                 name: "options",
+                rpcName: "Options",
                 callback: () -> FlxG.switchState(OptionsState.new.bind({exitState: null})),
             },
         ];
@@ -160,6 +164,8 @@ class MainMenuState extends FunkinState {
                 item.centerOffsets();
             }
         }
+        final option:MainMenuOption = options[curSelected];
+        DiscordRPC.changePresence("Main Menu", '${option.rpcName ?? option.name}');
         FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
     }
     
@@ -238,6 +244,10 @@ class MainMenuState extends FunkinState {
 @:structInit
 class MainMenuOption {
     public var name:String;
+
+    @:optional
+    public var rpcName:String;
+    
     public var callback:Void->Void;
 
     @:optional

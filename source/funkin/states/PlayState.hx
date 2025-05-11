@@ -557,7 +557,9 @@ class PlayState extends FunkinState {
 		playField.onDisplayCombo.add(onDisplayCombo);
 		playField.onDisplayComboPost.add(onDisplayComboPost);
 
+		playField.onUpdateStats.add(updateDiscordRPC);
 		playField.playerStrumLine.onBotplayToggle.add(onBotplayToggle);
+
 		playField.cameras = [camHUD];
 		add(playField);
 		
@@ -622,6 +624,7 @@ class PlayState extends FunkinState {
 			playbackRate = Options.gameplayModifiers.get("playbackRate");
 			playField.playerStrumLine.botplay = Options.gameplayModifiers.get("botplay");
 		}
+		DiscordRPC.changePresence("Starting song", "Gameplay");
 	}
 
 	override function createPost():Void {
@@ -881,6 +884,7 @@ class PlayState extends FunkinState {
 			playField.noteSpawner.skipToTime(Conductor.instance.rawTime);
 		
 		Conductor.instance.music = FlxG.sound.music;
+		updateDiscordRPC(playField.stats);
 
 		onSongStartPost.dispatch();
 		#if SCRIPTING_ALLOWED
@@ -984,6 +988,13 @@ class PlayState extends FunkinState {
 		#end
 		playField.hud.call("onEndSongPost");
 		playField.hud.call("onSongEndPost");
+	}
+
+	public function updateDiscordRPC(stats:PlayerStats):Void {
+		DiscordRPC.changePresence(
+			'${currentChart.meta.song.title ?? currentSong} (${currentDifficulty.toUpperCase()})',
+			'${stats.score} (${FlxMath.roundDecimal(stats.accuracy * 100, 2)}%) - ${stats.misses} miss${(stats.misses != 1) ? "es" : ""}'
+		);
 	}
 
 	public function playExitMusic():Void {

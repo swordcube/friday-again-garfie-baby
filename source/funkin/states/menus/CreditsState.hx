@@ -32,6 +32,7 @@ class CreditsState extends FunkinState {
 
     override function create():Void {
         super.create();
+        DiscordRPC.changePresence("Credits Menu", null);
         persistentUpdate = true;
 
         final contentPacks:Array<String> = Paths.getEnabledContentPacks();

@@ -22,6 +22,7 @@ import flixel.tweens.FlxTween;
 
 import flixel.util.FlxColor;
 
+import funkin.backend.DiscordRPC;
 import funkin.backend.Conductor;
 import funkin.backend.Controls;
 

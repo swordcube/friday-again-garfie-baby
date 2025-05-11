@@ -36,6 +36,8 @@ class ContentPackState extends FunkinState {
 
         FadeTransition.nextCamera = transitionCam;
         super.create();
+
+        DiscordRPC.changePresence("Managing Content Packs", null);
         persistentUpdate = true;
 
         lastMouseVisible = FlxG.mouse.visible;

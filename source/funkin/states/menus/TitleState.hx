@@ -58,6 +58,7 @@ class TitleState extends FunkinState {
     
     override function create():Void {
         super.create();
+        DiscordRPC.changePresence("Title Screen", null);
         
         persistentUpdate = true;
         initQuotes();

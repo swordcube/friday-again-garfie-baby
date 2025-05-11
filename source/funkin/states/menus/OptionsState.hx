@@ -26,6 +26,7 @@ class OptionsState extends FunkinState {
 
     override function create():Void {
         super.create();
+        DiscordRPC.changePresence("Options Menu", null);
 
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_blue"));
         bg.screenCenter();

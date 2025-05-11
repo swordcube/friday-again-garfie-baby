@@ -1,6 +1,34 @@
 {
   "dependencies": [
     {
+      "name": "flixel",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcubes-grave-of-shite/flixel"
+    },
+    {
+      "name": "flixel-addons",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcubes-grave-of-shite/flixel-addons"
+    },
+    {
+      "name": "flixel-controls",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/swordcubes-grave-of-shite/FlxControls"
+    },
+    {
+      "name": "flxanimate",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/swordcube/flxanimate"
+    },
+    {
       "name": "format",
       "type": "haxelib",
       "version": null
@@ -18,51 +46,16 @@
       "url": "https://github.com/HaxeFoundation/hxcpp"
     },
     {
+      "name": "hxdiscord_gamesdk",
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/swordcube/hxdiscord_gamesdk"
+    },
+    {
       "name": "hxp",
       "type": "haxelib",
       "version": null
-    },
-    {
-      "name": "lime",
-      "type": "git",
-      "dir": null,
-      "ref": "develop",
-      "url": "https://github.com/swordcubes-grave-of-shite/lime"
-    },
-    {
-      "name": "openfl",
-      "type": "git",
-      "dir": null,
-      "ref": "develop",
-      "url": "https://github.com/swordcubes-grave-of-shite/openfl"
-    },
-    {
-      "name": "flixel",
-      "type": "git",
-      "dir": null,
-      "ref": "dev",
-      "url": "https://github.com/swordcubes-grave-of-shite/flixel"
-    },
-    {
-      "name": "flixel-addons",
-      "type": "git",
-      "dir": null,
-      "ref": "dev",
-      "url": "https://github.com/swordcubes-grave-of-shite/flixel-addons"
-    },
-    {
-      "name": "thx.core",
-      "type": "git",
-      "dir": null,
-      "ref": "master",
-      "url": "https://github.com/fponticelli/thx.core"
-    },
-    {
-      "name": "thx.semver",
-      "type": "git",
-      "dir": null,
-      "ref": "master",
-      "url": "https://github.com/fponticelli/thx.semver"
     },
     {
       "name": "json2object",
@@ -70,6 +63,13 @@
       "dir": null,
       "ref": "master",
       "url": "https://github.com/FunkinCrew/json2object"
+    },
+    {
+      "name": "lime",
+      "type": "git",
+      "dir": null,
+      "ref": "develop",
+      "url": "https://github.com/swordcubes-grave-of-shite/lime"
     },
     {
       "name": "linc_luajit",
@@ -86,18 +86,11 @@
       "url": "https://github.com/swordcubes-grave-of-shite/lscript"
     },
     {
-      "name": "flixel-controls",
+      "name": "openfl",
       "type": "git",
       "dir": null,
-      "ref": "master",
-      "url": "https://github.com/swordcubes-grave-of-shite/FlxControls"
-    },
-    {
-      "name": "flxanimate",
-      "type": "git",
-      "dir": null,
-      "ref": "dev",
-      "url": "https://github.com/swordcube/flxanimate"
+      "ref": "develop",
+      "url": "https://github.com/swordcubes-grave-of-shite/openfl"
     },
     {
       "name": "rulescript",
@@ -105,6 +98,20 @@
       "dir": null,
       "ref": "dev",
       "url": "https://github.com/Kriptel/RuleScript.git"
+    },
+    {
+      "name": "thx.core",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/fponticelli/thx.core"
+    },
+    {
+      "name": "thx.semver",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/fponticelli/thx.semver"
     }
   ]
 }

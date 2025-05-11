@@ -352,6 +352,9 @@ class FreeplayState extends FunkinState {
         final showArrows:Bool = (meta.song.difficulties.length > 1 || defaultMeta.song.mixes.length > 1);
         diffText.text = '${(showArrows) ? "< " : ""}${currentDifficulty.toUpperCase()}${(showArrows) ? " >" : ""}';
         positionHighscore();
+
+        // update discord rpc
+        DiscordRPC.changePresence("Freeplay Menu", '${meta.song.title ?? song.id} [${currentDifficulty.toUpperCase()} - ${currentMix.toUpperCase()}]');
     }
 
     public function updateHighscore():Void {
