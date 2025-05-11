@@ -94,7 +94,7 @@ class Options {
         FlxSprite.defaultAntialiasing = true;
 
         FlxG.allowAntialiasing = antialiasing;
-        FlxG.stage.quality = (FlxG.allowAntialiasing) ? HIGH : LOW;
+        FlxG.stage.quality = (FlxG.allowAntialiasing) ? BEST : LOW;
 
         final fps:Int = Options.frameRate;
         if(fps < 10) {

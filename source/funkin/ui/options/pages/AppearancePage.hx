@@ -17,7 +17,7 @@ class AppearancePage extends OptionPage {
 
             callback: (value:Dynamic, _) -> {
                 FlxG.allowAntialiasing = value;
-                FlxG.stage.quality = (FlxG.allowAntialiasing) ? HIGH : LOW;
+                FlxG.stage.quality = (FlxG.allowAntialiasing) ? BEST : LOW;
             }
         });
         addOption({
