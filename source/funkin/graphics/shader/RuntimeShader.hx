@@ -25,7 +25,7 @@ class RuntimeShader extends FlxShader {
 	private static var __programErrors:Map<String, String> = [];
 	private static var __linkErrors:Map<String, String> = [];
 
-	public var glslVer:String = "320 es";
+	public var glslVer:String = #if mac "410" #else "320 es" #end;
 	public var fragFileName:String;
 	public var vertFileName:String;
 
@@ -36,7 +36,7 @@ class RuntimeShader extends FlxShader {
 	 * @param vert Vertex source (pass `null` to use default)
 	 * @param glslVer Version of GLSL to use (defaults to 320 es)
 	 */
-	public override function new(frag:String, vert:String, glslVer:String = "320 es") {
+	public override function new(frag:String, vert:String, glslVer:String = #if mac "410" #else "320 es" #end) {
 		if (frag == null) frag = ShaderTemplates.defaultFragmentSource;
 		if (vert == null) vert = ShaderTemplates.defaultVertexSource;
 		this.glFragmentSource = frag;
