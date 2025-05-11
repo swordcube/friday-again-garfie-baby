@@ -147,7 +147,7 @@ class Controls extends FlxControls<Control> {
         return map;
     }
 
-    public function bind(control:Control, idx:Int, input:FlxControlInputType):Void {
+    public function bindKey(control:Control, idx:Int, input:FlxKey):Void {
         var inputs:Array<FlxControlInputType> = Reflect.field(save.data, control.getName());
         inputs[idx] = input;
         Reflect.setField(save.data, control.getName(), inputs);

@@ -4,6 +4,7 @@ import flixel.util.FlxTimer;
 
 import funkin.ui.AtlasText;
 import funkin.states.menus.MainMenuState;
+import funkin.states.menus.OptionsState;
 
 class MainPage extends Page {
     public var pages:Array<PageData> = [
@@ -74,7 +75,7 @@ class MainPage extends Page {
 
         if(controls.justPressed.BACK) {
             Options.save();
-            FlxG.switchState((menu.initParams.exitState != null) ? menu.initParams.exitState : MainMenuState.new);
+            FlxG.switchState((OptionsState.lastParams.exitState != null) ? OptionsState.lastParams.exitState : MainMenuState.new);
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
     }

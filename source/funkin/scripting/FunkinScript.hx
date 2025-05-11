@@ -68,6 +68,8 @@ class FunkinScript {
         setClass(flixel.addons.display.FlxBackdrop);
         setClass(flixel.addons.display.FlxTiledSprite);
 
+        setClass(flixel.effects.FlxFlicker);
+
         setClass(Paths);
         setClass(Cache);
         setClass(Logs);
@@ -138,6 +140,7 @@ class FunkinScript {
         
         setClass(funkin.substates.FunkinSubState);
         setClass(funkin.substates.ScriptedSubState);
+        setClass(funkin.substates.GameplayModifiersMenu);
 
         setClass(funkin.ui.ImageBar);
         setClass(funkin.ui.AtlasFont);
@@ -160,6 +163,10 @@ class FunkinScript {
         setClass(funkin.utilities.ArrayUtil);
         setClass(funkin.utilities.StringUtil);
         setClass(funkin.utilities.CustomEmitter);
+        setClass(funkin.utilities.InputFormatter);
+
+        set("UIPrompt", funkin.ui.Prompt);
+        set("UIPromptButtonStyle", funkin.ui.Prompt.ButtonStyle);
 
         set("BlendMode", funkin.scripting.helpers.BlendModeHelper);
         set("FlxAxes", funkin.scripting.helpers.FlxAxesHelper);

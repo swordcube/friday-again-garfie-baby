@@ -8,7 +8,7 @@ typedef OptionsStateParams = {
 }
 
 class OptionsState extends FunkinState {
-    public var initParams:OptionsStateParams = {
+    public static var lastParams:OptionsStateParams = {
         exitState: null
     };
     public var bg:FlxSprite;
@@ -21,7 +21,7 @@ class OptionsState extends FunkinState {
                 exitState: null
             };
         }
-		initParams = params;
+		lastParams = params;
     }
 
     override function create():Void {

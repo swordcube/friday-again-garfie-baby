@@ -158,6 +158,10 @@ class ControlsPage extends Page {
         grpText = new FlxTypedContainer<AtlasText>();
         add(grpText);
 
+        bindCategories[bindCategories.length - 1].binds.push({
+            name: "Reset to Default Keys",
+            control: null
+        });
         var y:Int = 0;
         for(category in bindCategories) {
             final categoryName:AtlasText = new AtlasText(0, (70 * y++) + 30, "bold", LEFT, category.name);
@@ -165,20 +169,30 @@ class ControlsPage extends Page {
             grpText.add(categoryName);
 
             for(bind in category.binds) {
-                final bindName:AtlasText = new AtlasText(50, (70 * y) + 30, "bold", LEFT, bind.name);
-                bindNames.push(bindName);  
-                grpText.add(bindName);
+                if(bind.control != null) {
+                    final bindName:AtlasText = new AtlasText(50, (70 * y) + 30, "bold", LEFT, bind.name);
+                    bindNames.push(bindName);  
+                    grpText.add(bindName);
+    
+                    final firstBind:AtlasText = new AtlasText(FlxG.width - 530, ((70 * y) + 30) - 40, "default", LEFT, InputFormatter.formatFlixel(Controls.getKeyFromInputType(curMappings.get(bind.control)[0])));
+                    firstBind.color = FlxColor.BLACK;
+                    grpText.add(firstBind);
+    
+                    final secondBind:AtlasText = new AtlasText(firstBind.x + 300, ((70 * y) + 30) - 40, "default", LEFT, InputFormatter.formatFlixel(Controls.getKeyFromInputType(curMappings.get(bind.control)[1])));
+                    secondBind.color = FlxColor.BLACK;
+                    grpText.add(secondBind);
+    
+                    controlItems.push(bind.control);
+                    bindTexts.push([firstBind, secondBind]);
+                } else {
+                    y++;
+                    final bindName:AtlasText = new AtlasText(50, (70 * y) + 30, "bold", LEFT, bind.name);
+                    bindNames.push(bindName);  
+                    grpText.add(bindName);
 
-                final firstBind:AtlasText = new AtlasText(FlxG.width - 530, ((70 * y) + 30) - 40, "default", LEFT, InputFormatter.formatFlixel(Controls.getKeyFromInputType(curMappings.get(bind.control)[0])));
-                firstBind.color = FlxColor.BLACK;
-                grpText.add(firstBind);
-
-                final secondBind:AtlasText = new AtlasText(firstBind.x + 300, ((70 * y) + 30) - 40, "default", LEFT, InputFormatter.formatFlixel(Controls.getKeyFromInputType(curMappings.get(bind.control)[1])));
-                secondBind.color = FlxColor.BLACK;
-                grpText.add(secondBind);
-
-                controlItems.push(bind.control);
-                bindTexts.push([firstBind, secondBind]);
+                    controlItems.push(null);
+                    bindTexts.push(null);
+                }
                 y++;
             }
         }
@@ -218,41 +232,16 @@ class ControlsPage extends Page {
                 changeSelection(0, true);
             }
             if(controls.justPressed.ACCEPT) {
-                bindPrompt.exists = true;
-                startChangingBind();
+                if(curSelected >= bindTexts.length - 1)
+                    resetAllBinds();
+                else {
+                    bindPrompt.exists = true;
+                    startChangingBind();
+                }
             }
-            if(controls.justPressed.RESET) {
-                final resetPrompt:Prompt = new Prompt("\nAre you sure you want\nto reset this bind?", YesNo);
-                resetPrompt.create();
-                resetPrompt.createBGFromMargin(100, 0xFFfafd6d);
-                resetPrompt.onYes = () -> {
-                    final defaultMappings:ActionMap<Control> = controls.getDefaultMappings();
-                    final newKey:FlxKey = Controls.getKeyFromInputType(defaultMappings.get(controlItems[curSelected])[curBindIndex]);
-                    
-                    final bindText:AtlasText = bindTexts[curSelected][curBindIndex];
-                    bindText.text = InputFormatter.formatFlixel(newKey);
-                    
-                    FlxTimer.wait(0.001, () -> {
-                        openedPrompt = false;
-                        controls.bind(controlItems[curSelected], curBindIndex, newKey);
-                        controls.apply();
-                    });
-                    curMappings.get(controlItems[curSelected])[curBindIndex] = newKey;
-
-                    resetPrompt.closePrompt();
-                    FlxG.sound.play(Paths.sound("menus/sfx/select"));
-                };
-                resetPrompt.onNo = () -> {
-                    FlxTimer.wait(0.001, () -> {
-                        openedPrompt = false;
-                        resetPrompt.closePrompt();
-                    });
-                };
-                resetPrompt.cameras = [promptCam];
-                add(resetPrompt);
-
-                openedPrompt = true;
-            }
+            if(controls.justPressed.RESET)
+                resetSpecificBind();
+            
             if(controls.justPressed.BACK) {
                 controls.flush();
                 menu.loadPage(new MainPage());
@@ -267,6 +256,85 @@ class ControlsPage extends Page {
                 stopChangingBind();
             }
         }
+    }
+
+    function resetAllBinds() {
+        final resetPrompt:Prompt = new Prompt("\nAre you sure you want\nto reset all binds?", YesNo);
+        resetPrompt.create();
+        resetPrompt.createBGFromMargin(100, 0xFFfafd6d);
+        resetPrompt.onYes = () -> {
+            final defaultMappings:ActionMap<Control> = controls.getDefaultMappings();
+            for(i => fuck in bindTexts) {
+                if(fuck == null)
+                    continue;
+                
+                for(j in 0...fuck.length) {
+                    final newKey:FlxKey = Controls.getKeyFromInputType(defaultMappings.get(controlItems[i])[j]);
+                    bindTexts[i][j].text = InputFormatter.formatFlixel(newKey);
+                }
+            }
+            FlxTimer.wait(0.001, () -> {
+                final defaultMappings:ActionMap<Control> = controls.getDefaultMappings();
+                openedPrompt = false;
+                for(c in controlItems) {
+                    if(c == null)
+                        continue;
+    
+                    for(i in 0...2) {
+                        final newKey:FlxKey = Controls.getKeyFromInputType(defaultMappings.get(c)[i]);
+                        controls.bindKey(c, i, newKey);
+                        controls.apply();
+                    }
+                }
+            });
+            curMappings = controls.getCurrentMappings();
+    
+            resetPrompt.closePrompt();
+            FlxG.sound.play(Paths.sound("menus/sfx/select"));
+        };
+        resetPrompt.onNo = () -> {
+            FlxTimer.wait(0.001, () -> {
+                openedPrompt = false;
+                resetPrompt.closePrompt();
+            });
+        };
+        resetPrompt.cameras = [promptCam];
+        add(resetPrompt);
+    
+        openedPrompt = true;
+    }
+
+    public function resetSpecificBind():Void {
+        final resetPrompt:Prompt = new Prompt("\nAre you sure you want\nto reset this bind?", YesNo);
+        resetPrompt.create();
+        resetPrompt.createBGFromMargin(100, 0xFFfafd6d);
+        resetPrompt.onYes = () -> {
+            final defaultMappings:ActionMap<Control> = controls.getDefaultMappings();
+            final newKey:FlxKey = Controls.getKeyFromInputType(defaultMappings.get(controlItems[curSelected])[curBindIndex]);
+            
+            final bindText:AtlasText = bindTexts[curSelected][curBindIndex];
+            bindText.text = InputFormatter.formatFlixel(newKey);
+            
+            FlxTimer.wait(0.001, () -> {
+                openedPrompt = false;
+                controls.bindKey(controlItems[curSelected], curBindIndex, newKey);
+                controls.apply();
+            });
+            curMappings.get(controlItems[curSelected])[curBindIndex] = newKey;
+
+            resetPrompt.closePrompt();
+            FlxG.sound.play(Paths.sound("menus/sfx/select"));
+        };
+        resetPrompt.onNo = () -> {
+            FlxTimer.wait(0.001, () -> {
+                openedPrompt = false;
+                resetPrompt.closePrompt();
+            });
+        };
+        resetPrompt.cameras = [promptCam];
+        add(resetPrompt);
+
+        openedPrompt = true;
     }
 
     public function startChangingBind():Void {
@@ -311,7 +379,7 @@ class ControlsPage extends Page {
         bindText.visible = true;
         
         FlxTimer.wait(0.001, () -> {
-            controls.bind(controlItems[curSelected], curBindIndex, newKey);
+            controls.bindKey(controlItems[curSelected], curBindIndex, newKey);
             controls.apply();
         });
         curMappings.get(controlItems[curSelected])[curBindIndex] = newKey;
@@ -329,11 +397,13 @@ class ControlsPage extends Page {
             else
                 item.alpha = 0.6;
 
-            for(j => item2 in bindTexts[i]) {
-                if(curSelected == i && curBindIndex == j)
-                    item2.alpha = 1;
-                else
-                    item2.alpha = 0.6;
+            if(bindTexts[i] != null) {
+                for(j => item2 in bindTexts[i]) {
+                    if(curSelected == i && curBindIndex == j)
+                        item2.alpha = 1;
+                    else
+                        item2.alpha = 0.6;
+                }
             }
         }
         camFollow.y = bindNames[curSelected].y;
