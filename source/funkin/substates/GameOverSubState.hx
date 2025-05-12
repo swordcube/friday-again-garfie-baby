@@ -196,6 +196,7 @@ class GameOverSubState extends FunkinSubState {
 
             FlxTimer.wait(0.001, () -> {
                 if(wasMusicPlaying) {
+                    FlxG.sound.music.time = 0;
                     FlxG.sound.music.play();
                     FlxG.sound.music.fadeIn(0.16, 0, 1);
                 }
