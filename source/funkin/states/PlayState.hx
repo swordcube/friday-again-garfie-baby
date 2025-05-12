@@ -731,7 +731,9 @@ class PlayState extends FunkinState {
 		super.onSubStateOpen(subState);
 		if(_initialTransitionHappened || !(subState is TransitionSubState)) {
 			paused = true;
-			camGame.followEnabled = false;
+
+			if(!(subState is GameOverSubState))
+				camGame.followEnabled = false;
 			
 			Conductor.instance.music = null;
 			Conductor.instance.autoIncrement = false;
@@ -756,7 +758,9 @@ class PlayState extends FunkinState {
 
 		if(!(subState is TransitionSubState)) {
 			paused = false;
-			camGame.followEnabled = true;
+
+			if(!(subState is GameOverSubState))
+				camGame.followEnabled = true;
 
 			Conductor.instance.music = FlxG.sound.music;
 			Conductor.instance.autoIncrement = true;

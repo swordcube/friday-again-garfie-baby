@@ -90,7 +90,7 @@ class GameOverSubState extends FunkinSubState {
 
         FlxG.camera.follow(camFollow, LOCKON, 0.05);
         camPos.put();
-
+        
         deathSFX = FlxG.sound.play(Paths.sound(_createEvent.deathSFX));
     }
 
@@ -177,7 +177,6 @@ class GameOverSubState extends FunkinSubState {
 
         FlxTimer.wait(0.001, () -> {
             CoolUtil.playMenuMusic(0.0);
-            FlxG.sound.music.fadeIn(0.16, 0, 1);
 
             final transitionCam:FlxCamera = new FlxCamera();
             transitionCam.bgColor = 0;
@@ -187,12 +186,20 @@ class GameOverSubState extends FunkinSubState {
             FlxG.signals.postStateSwitch.addOnce(() -> {
                 FlxG.cameras.remove(FadeTransition.nextCamera);
             });
+            final wasMusicPlaying:Bool = FlxG.sound.music.playing;
             FlxG.sound.music.onComplete = null;
 
             if(PlayState.instance.isStoryMode)
                 FlxG.switchState(StoryMenuState.new);
             else
                 FlxG.switchState(FreeplayState.new);
+
+            FlxTimer.wait(0.001, () -> {
+                if(wasMusicPlaying) {
+                    FlxG.sound.music.play();
+                    FlxG.sound.music.fadeIn(0.16, 0, 1);
+                }
+            });
         });
         FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         close();
