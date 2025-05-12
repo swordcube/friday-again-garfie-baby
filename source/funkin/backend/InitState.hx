@@ -1,5 +1,8 @@
 package funkin.backend;
 
+#if hxvlc
+import hxvlc.util.Handle;
+#end
 import lime.graphics.Image;
 import flixel.util.FlxTimer;
 
@@ -96,9 +99,13 @@ class InitState extends FlxState {
         TransitionableState.defaultTransIn = FadeTransition;
         TransitionableState.defaultTransOut = FadeTransition;
 
-        // init cursor and discord rpc
+        // init cursor, discord rpc, and vlc
         Cursor.init();
         DiscordRPC.init();
+
+        #if hxvlc
+        Handle.initAsync();
+        #end
         
         // init conductor
         Conductor.instance = new Conductor();

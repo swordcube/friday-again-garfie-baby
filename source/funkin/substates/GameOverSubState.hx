@@ -1,5 +1,6 @@
 package funkin.substates;
 
+import funkin.graphics.VideoSprite;
 import lime.app.Future;
 import lime.system.System;
 
@@ -34,7 +35,10 @@ class GameOverSubState extends FunkinSubState {
     public var loadingMusic:Bool = true;
     public var prevWindowOnClose:Void->Void;
 
+    public var doFunnyDeath:Bool = false;
+
     override function create():Void {
+        doFunnyDeath = FlxG.random.bool(5);
         super.create();
 
         FlxTimer.globalManager.forEach((tmr:FlxTimer) -> {
@@ -66,32 +70,55 @@ class GameOverSubState extends FunkinSubState {
         if(_createEvent.cancelled)
             return;
 
-        final musicThread:Future<Sound> = CoolUtil.createASyncFuture(() -> {
-            return FlxG.assets.getSound(Paths.sound('${_createEvent.music}/music'));
-        });
-        musicThread.onComplete((snd:Sound) -> {
-            loadingMusic = false;
-            CoolUtil.playMusic(_createEvent.music, 0, true, snd);
-            FlxG.sound.music.pause();
-            FlxG.sound.music.time = 0;
-        });
-        musicThread.onError((e:Dynamic) -> {
-            loadingMusic = false;
-        });
-        character = new Character(_createEvent.characterID, game.player?.isPlayer ?? true);
-        character.setPosition(game.player?.x ?? 800, game.player?.y ?? 700);
-        character.playAnim("death");
-        add(character);
+        if(doFunnyDeath) {
+            final vidCam:FlxCamera = new FlxCamera();
+            vidCam.bgColor = 0;
+            FlxG.cameras.add(vidCam, false);
 
-        final camPos:FlxPoint = character.getCameraPosition();
-        camFollow = new FlxObject(0, 0, 1, 1);
-        camFollow.setPosition(camPos.x, camPos.y);
-        add(camFollow);
+            final shits:Array<String> = [];
+            Paths.iterateDirectory("shitpost", (f) -> {
+                shits.push(f);
+            });
+            final vid:VideoSprite = new VideoSprite();
+            vid.bitmap.onFormatSetup.add(() -> {
+                vid.setGraphicSize(400, 0);
+                vid.updateHitbox();
+                vid.screenCenter();
+            });
+            vid.cameras = [vidCam];
+            vid.bitmap.onEndReached.add(retry);
+            add(vid);
 
-        FlxG.camera.follow(camFollow, LOCKON, 0.05);
-        camPos.put();
-        
-        deathSFX = FlxG.sound.play(Paths.sound(_createEvent.deathSFX));
+            if(vid.load(shits[FlxG.random.int(0, shits.length - 1)]))
+                FlxTimer.wait(0.001, () -> vid.play());
+        } else {
+            final musicThread:Future<Sound> = CoolUtil.createASyncFuture(() -> {
+                return FlxG.assets.getSound(Paths.sound('${_createEvent.music}/music'));
+            });
+            musicThread.onComplete((snd:Sound) -> {
+                loadingMusic = false;
+                CoolUtil.playMusic(_createEvent.music, 0, true, snd);
+                FlxG.sound.music.pause();
+                FlxG.sound.music.time = 0;
+            });
+            musicThread.onError((e:Dynamic) -> {
+                loadingMusic = false;
+            });
+            character = new Character(_createEvent.characterID, game.player?.isPlayer ?? true);
+            character.setPosition(game.player?.x ?? 800, game.player?.y ?? 700);
+            character.playAnim("death");
+            add(character);
+    
+            final camPos:FlxPoint = character.getCameraPosition();
+            camFollow = new FlxObject(0, 0, 1, 1);
+            camFollow.setPosition(camPos.x, camPos.y);
+            add(camFollow);
+    
+            FlxG.camera.follow(camFollow, LOCKON, 0.05);
+            camPos.put();
+            
+            deathSFX = FlxG.sound.play(Paths.sound(_createEvent.deathSFX));
+        }
     }
 
     override function update(elapsed):Void {
@@ -105,16 +132,18 @@ class GameOverSubState extends FunkinSubState {
         if(controls.justPressed.BACK)
             exit();
 
-        if(!isEnding && (character.animation.name == "death" && character.animation.finished) && (FlxG.sound.music == null || !FlxG.sound.music.playing)) {
-			call("onDeathLoopStart");
-            deathLoopStarted = true;
-            Conductor.instance.autoIncrement = true;
-			beatHit(0);
-			call("onDeathLoopStartPost");
-		}
-        if(deathLoopStarted && !loadingMusic && FlxG.sound.music != null && !FlxG.sound.music.playing) {
-            FlxG.sound.music.volume = 1;
-            FlxG.sound.music.play();
+        if(!doFunnyDeath) {
+            if(!isEnding && (character.animation.name == "death" && character.animation.finished) && (FlxG.sound.music == null || !FlxG.sound.music.playing)) {
+                call("onDeathLoopStart");
+                deathLoopStarted = true;
+                Conductor.instance.autoIncrement = true;
+                beatHit(0);
+                call("onDeathLoopStartPost");
+            }
+            if(deathLoopStarted && !loadingMusic && FlxG.sound.music != null && !FlxG.sound.music.playing) {
+                FlxG.sound.music.volume = 1;
+                FlxG.sound.music.play();
+            }
         }
     }
 
@@ -134,37 +163,44 @@ class GameOverSubState extends FunkinSubState {
 			FlxG.sound.music.stop();
             FlxG.sound.music = null;
         }
-        character.canDance = false;
-        character.playAnim("retry", NONE, true);
+        inline function goBackToGame() {
+            FlxTimer.wait(0.001, () -> {
+                FlxG.switchState(PlayState.new.bind({
+                    song: game.currentSong,
+                    difficulty: game.currentDifficulty,
+                    mix: game.currentMix,
+                    mod: PlayState.lastParams.mod,
         
-		final sound:FlxSound = FlxG.sound.play(Paths.sound(_createEvent.retrySFX));
-		final secsLength:Float = sound.length / 1000;
+                    startTime: PlayState.lastParams.startTime,
         
-		var waitTime:Float = 0.7;
-		var fadeOutTime:Float = secsLength - 0.7;
-
-		if(fadeOutTime < 0.5) {
-			fadeOutTime = secsLength;
-			waitTime = 0;
-		}
-		FlxTimer.wait(waitTime, () -> {
-			FlxG.camera.fade(FlxColor.BLACK, fadeOutTime, false, () -> {
-                FlxTimer.wait(0.001, () -> {
-                    FlxG.switchState(PlayState.new.bind({
-                        song: game.currentSong,
-                        difficulty: game.currentDifficulty,
-                        mix: game.currentMix,
-                        mod: PlayState.lastParams.mod,
+                    _chart: game.currentChart,
+                    _unsaved: PlayState.lastParams._unsaved
+                }));
+            });
+            close();
+        }
+        if(!doFunnyDeath) {
+            character.canDance = false;
+            character.playAnim("retry", NONE, true);
             
-                        startTime: PlayState.lastParams.startTime,
+            final sound:FlxSound = FlxG.sound.play(Paths.sound(_createEvent.retrySFX));
+            final secsLength:Float = sound.length / 1000;
             
-                        _chart: game.currentChart,
-                        _unsaved: PlayState.lastParams._unsaved
-                    }));
+            var waitTime:Float = 0.7;
+            var fadeOutTime:Float = secsLength - 0.7;
+    
+            if(fadeOutTime < 0.5) {
+                fadeOutTime = secsLength;
+                waitTime = 0;
+            }
+            FlxTimer.wait(waitTime, () -> {
+                FlxG.camera.fade(FlxColor.BLACK, fadeOutTime, false, () -> {
+                    goBackToGame();
                 });
-                close();
-			});
-		});
+            });
+        } else
+            goBackToGame();
+        
         call("onRetryPost", [event.flagAsPost()]);
     }
 

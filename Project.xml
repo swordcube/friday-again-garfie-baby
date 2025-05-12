@@ -71,6 +71,14 @@
 	<define name="DISCORD_ALLOWED" if="windows || mac || linux" unless="NO_DISCORD_RPC || NO_DISCORD" />
 
 	<!--
+		Comment/delete this line below to disable video playback
+		Or compile with the NO_VIDEOS define, like so:
+
+		lime test platform -DNO_VIDEOS
+	-->
+	<define name="VIDEOS_ALLOWED" if="cpp" unless="NO_VIDEOS" />
+
+	<!--
 		Comment/delete this line below to disable the crash handler
 		Or compile with the NO_CRASH_HANDLER define, like so:
 		
@@ -130,7 +138,10 @@
 	<haxelib name="flxanimate" />
 
 	<!-- Discord RPC -->
-	<haxelib name="hxdiscord_gamesdk" />
+	<haxelib name="hxdiscord_gamesdk" if="DISCORD_ALLOWED" />
+
+	<!-- Video Playback (via VLC) -->
+	<haxelib name="hxvlc" if="VIDEOS_ALLOWED" />
 
 	<!-- Versioning Libraries -->
 	<haxelib name="thx.core" />

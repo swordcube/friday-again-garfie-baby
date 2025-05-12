@@ -58,6 +58,13 @@
       "version": null
     },
     {
+      "name": "hxvlc",
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/Vortex2Oblivion/hxvlc"
+    },
+    {
       "name": "json2object",
       "type": "git",
       "dir": null,
