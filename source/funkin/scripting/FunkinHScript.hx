@@ -43,7 +43,7 @@ class FunkinHScript extends FunkinScript {
 			allowImport: unsafe,
 			allowUsing: unsafe,
 			allowStringInterpolation: true,
-			allowTypePath: true
+			allowTypePath: unsafe
 		});
         _rscript = new RuleScript(null, parser);
         _rscript.variables.set("trace", Reflect.makeVarArgs((args:Array<Dynamic>) -> {
