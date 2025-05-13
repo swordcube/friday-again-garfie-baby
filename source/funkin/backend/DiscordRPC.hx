@@ -17,6 +17,11 @@ class DiscordRPC {
                 if(!threadActive)
                     break;
 
+                if(_pendingActivity != null && _currentActivity != _pendingActivity) {
+                    GameSDK.updateActivity(_pendingActivity);
+                    _currentActivity = _pendingActivity;
+                    _pendingActivity = null;
+                }
                 final result:Result = GameSDK.runCallbacks();
                 if(result != Ok)
                     Logs.error('Error running Discord callbacks: ${result}');
@@ -46,10 +51,13 @@ class DiscordRPC {
             Logs.error('Cannot use invalid Discord Presence data!');
             return;
         }
-        GameSDK.updateActivity(activity);
+        _pendingActivity = activity;
     }
     
     //----------- [ Private API ] -----------//
+
+    private static var _pendingActivity:Activity;
+    private static var _currentActivity:Activity;
     
     private static function set_appID(newAppID:String):String {
         if(appID != newAppID) {
