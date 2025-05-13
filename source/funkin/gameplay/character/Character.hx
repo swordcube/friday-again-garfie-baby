@@ -136,7 +136,7 @@ class Character extends AttachedSprite implements IBeatReceiver {
                 holdTimer = 0;
         }
         if(!debugMode && animation.finished && animation.exists('${animation.name}-loop'))
-            playAnim('${animation.name}-loop');
+            playAnim('${animation.name}-loop', curAnimContext);
 
         if(holdingPose && holdTimer <= 0 && (game == null || !game.playField.strumsPressed.contains(true)))
             holdingPose = false;
