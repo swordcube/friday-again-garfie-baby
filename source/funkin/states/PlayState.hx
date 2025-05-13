@@ -264,10 +264,10 @@ class PlayState extends FunkinState {
 		if(scriptsAllowed) {
 			scripts = new FunkinScriptGroup();
 			scripts.setParent(this);
-
+			
 			@:privateAccess
 			final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
-
+			
 			inline function addScripts(loader:AssetLoader, dir:String) {
 				final items:Array<String> = loader.readDirectory(dir);
 				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
@@ -482,6 +482,7 @@ class PlayState extends FunkinState {
 			if(stage?.script != null) {
 				scripts.add(stage.script);
 				stage.script.setParent(stage);
+				stage.script.set("this", stage);
 				stage.script.call("onCreate");
 			}
 			for(character in [spectator, opponent, player]) {

@@ -57,10 +57,9 @@ class StoryCharacter extends FlxSprite implements IBeatReceiver {
             if(contentMetadata == null)
                 continue;
 
-            final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script', loader.id, false);
+            final scriptPath:String = Paths.script('menus/story/characters/${characterID}/script', loader.id, false);
             if(FlxG.assets.exists(scriptPath)) {
                 final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
-                script.set("this", this);
                 script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
                 scripts.add(script);
             }

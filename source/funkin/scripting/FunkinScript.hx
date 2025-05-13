@@ -117,12 +117,22 @@ class FunkinScript {
         setClass(funkin.gameplay.song.VocalGroup);
 
         setClass(funkin.gameplay.character.Character);
+        setClass(funkin.gameplay.character.CharacterData);
 
         setClass(funkin.gameplay.scoring.Scoring);
         setClass(funkin.gameplay.scoring.ScoringSystem);
 
         setClass(funkin.gameplay.scoring.system.PBotSystem);
         setClass(funkin.gameplay.scoring.system.Judge4System);
+
+        setClass(funkin.graphics.TiledSprite);
+        setClass(funkin.graphics.GraphicCacheSprite);
+
+        setClass(funkin.graphics.SkinnableSprite);
+        setClass(funkin.graphics.SkinnableUISprite);
+
+        setClass(funkin.graphics.AttachedSprite);
+        setClass(funkin.graphics.VideoSprite);
 
         set("FlxRuntimeShader", funkin.graphics.shader.RuntimeShader);
         setClass(funkin.graphics.shader.RuntimeShader);

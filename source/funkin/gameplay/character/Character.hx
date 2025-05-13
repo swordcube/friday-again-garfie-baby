@@ -7,6 +7,7 @@ import funkin.backend.ContentMetadata;
 import funkin.backend.assets.loaders.AssetLoader;
 
 import funkin.graphics.AtlasType;
+import funkin.graphics.AttachedSprite;
 import funkin.graphics.SkinnableSprite;
 
 import funkin.states.PlayState;
@@ -46,7 +47,7 @@ enum abstract AnimationContext(String) from String to String {
 }
 
 @:allow(funkin.states.PlayState)
-class Character extends FlxSprite implements IBeatReceiver {
+class Character extends AttachedSprite implements IBeatReceiver {
     public var game:PlayState = PlayState.instance;
 
     public var data(default, null):CharacterData;
@@ -101,7 +102,6 @@ class Character extends FlxSprite implements IBeatReceiver {
                     final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script', loader.id, false);
                     if(FlxG.assets.exists(scriptPath)) {
                         final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
-                        script.set("this", this);
                         script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
                         scripts.add(script);
                     }
@@ -136,7 +136,7 @@ class Character extends FlxSprite implements IBeatReceiver {
                 holdTimer = 0;
         }
         if(!debugMode && animation.finished && animation.exists('${animation.name}-loop'))
-            animation.play('${animation.name}-loop');
+            playAnim('${animation.name}-loop');
 
         if(holdingPose && holdTimer <= 0 && (game == null || !game.playField.strumsPressed.contains(true)))
             holdingPose = false;
@@ -236,6 +236,11 @@ class Character extends FlxSprite implements IBeatReceiver {
         curAnimContext = context;
         animation.play(name, force, reversed, frame);
         offset.set(footOffset.x - data.position[0] ?? 0.0, footOffset.y - data.position[1] ?? 0.0);
+        
+        #if SCRIPTING_ALLOWED
+        if(game == null || (game != null && game.scriptsAllowed))
+            scripts.call("onPlayAnim", [name, context, force, reversed, frame]);
+        #end
     }
 
     public inline function playSingAnim(direction:Int, ?suffix:String, ?force:Bool = false, ?reversed:Bool = false, ?frame:Int = 0):Void {

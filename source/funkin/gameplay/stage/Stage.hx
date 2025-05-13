@@ -42,8 +42,8 @@ class Stage extends FlxContainer {
         if(FlxG.assets.exists(scriptPath)) {
             final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
             script = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
-
             script.setParent(this);
+
             script.execute();
             script.call("new");
             script.call("onLoad", [data]);
