@@ -1,7 +1,3 @@
-if(!isCurrentPack()) {
-    closeScript();
-    return;
-}
 var speakers:Character;
 
 function onCreatePost() {

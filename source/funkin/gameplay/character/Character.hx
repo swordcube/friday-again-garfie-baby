@@ -18,7 +18,6 @@ import funkin.backend.events.Events;
 import funkin.backend.events.ActionEvent;
 
 import funkin.scripting.FunkinScript;
-import funkin.scripting.FunkinScriptGroup;
 #end
 
 enum abstract AnimationContext(String) from String to String {
@@ -69,7 +68,7 @@ class Character extends AttachedSprite implements IBeatReceiver {
     public var holdingPose:Bool = false;
 
     #if SCRIPTING_ALLOWED
-    public var scripts:FunkinScriptGroup;
+    public var script:FunkinScript;
     #end
 
     public function new(characterID:String, ?isPlayer:Bool = false, ?debugMode:Bool = false) {
@@ -86,49 +85,41 @@ class Character extends AttachedSprite implements IBeatReceiver {
 
         #if SCRIPTING_ALLOWED
         if(game == null || (game != null && game.scriptsAllowed)) {
-            scripts = new FunkinScriptGroup();
-            scripts.setParent(this);
-    
             if(!debugMode) {
-                @:privateAccess
-                final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
-                for(i in 0...loaders.length) {
-                    final loader:AssetLoader = loaders[i];
-                    final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-    
-                    if(Paths.forceContentPack != loader.id && !(contentMetadata?.runGlobally ?? true))
-                        continue;
-    
-                    final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script', loader.id, false);
-                    if(FlxG.assets.exists(scriptPath)) {
-                        final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
-                        script.set("isCurrentPack", () -> return Paths.forceContentPack == loader.id);
-                        scripts.add(script);
-                    }
-                }
-            }
-            if(game != null && game.scriptsAllowed && game.scripts != null) {
-                for(script in scripts.members) {
-                    game.scripts.add(script);
+                final scriptPath:String = Paths.script('gameplay/characters/${characterID}/script');
+                if(FlxG.assets.exists(scriptPath)) {
+                    final contentPack:String = Paths.getContentPackFromPath(scriptPath);
+                    final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentPack);
+
+                    script = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
                     script.setParent(this);
+                    script.set("isCurrentPack", () -> return Paths.forceContentPack == contentPack);
+
+                    _initializedScript = true;
                 }
             }
-            scripts.execute();
-            scripts.call("onLoad", [data]);
+            if(_initializedScript && game != null && game.scriptsAllowed && game.scripts != null) {
+                game.scripts.add(script);
+                script.setParent(this);
+            }
+            if(_initializedScript) {
+                script.execute();
+                script.call("onLoad", [data]);
+            }
         }
         #end
         applyData(data);
 
         #if SCRIPTING_ALLOWED
-        if(game == null || (game != null && game.scriptsAllowed))
-            scripts.call("onLoadPost", [data]);
+        if(_initializedScript && (game == null || (game != null && game.scriptsAllowed)))
+            script.call("onLoadPost", [data]);
         #end
     }
 
     override function update(elapsed:Float):Void {
         #if SCRIPTING_ALLOWED
-        if(game == null)
-            scripts.call("onUpdate", [elapsed]);
+        if(_initializedScript && game == null)
+            script.call("onUpdate", [elapsed]);
         #end
         if(!debugMode && curAnimContext == SING) {
             holdTimer -= elapsed * 1000;
@@ -144,8 +135,8 @@ class Character extends AttachedSprite implements IBeatReceiver {
         super.update(elapsed);
 
         #if SCRIPTING_ALLOWED
-        if(game == null)
-            scripts.call("onUpdatePost", [elapsed]);
+        if(_initializedScript && game == null)
+            script.call("onUpdatePost", [elapsed]);
         #end
     }
 
@@ -238,8 +229,8 @@ class Character extends AttachedSprite implements IBeatReceiver {
         offset.set(footOffset.x - data.position[0] ?? 0.0, footOffset.y - data.position[1] ?? 0.0);
         
         #if SCRIPTING_ALLOWED
-        if(game == null || (game != null && game.scriptsAllowed))
-            scripts.call("onPlayAnim", [name, context, force, reversed, frame]);
+        if(_initializedScript && (game == null || (game != null && game.scriptsAllowed)))
+            script.call("onPlayAnim", [name, context, force, reversed, frame]);
         #end
     }
 
@@ -262,8 +253,8 @@ class Character extends AttachedSprite implements IBeatReceiver {
     public function dance():Void {
         #if SCRIPTING_ALLOWED
         final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
-        if(game == null || (game != null && game.scriptsAllowed))
-            scripts.call("onDance", [event]);
+        if(_initializedScript && (game == null || (game != null && game.scriptsAllowed)))
+            script.call("onDance", [event]);
         
         if(event.cancelled)
             return;
@@ -276,8 +267,8 @@ class Character extends AttachedSprite implements IBeatReceiver {
             playAnim(data.danceSteps[curDanceStep], DANCE);
         }
         #if SCRIPTING_ALLOWED
-        if(game == null || (game != null && game.scriptsAllowed))
-            scripts.call("onDancePost", [event.flagAsPost()]);
+        if(_initializedScript && (game == null || (game != null && game.scriptsAllowed)))
+            script.call("onDancePost", [event.flagAsPost()]);
         #end
     }
 
@@ -300,8 +291,8 @@ class Character extends AttachedSprite implements IBeatReceiver {
 
     public function stepHit(step:Int):Void {
         #if SCRIPTING_ALLOWED
-        if(game == null)
-            scripts.call("onStepHit", [step]);
+        if(_initializedScript && game == null)
+            script.call("onStepHit", [step]);
         #end
     }
 
@@ -320,15 +311,15 @@ class Character extends AttachedSprite implements IBeatReceiver {
             }
         }
         #if SCRIPTING_ALLOWED
-        if(game == null)
-            scripts.call("onBeatHit", [beat]);
+        if(_initializedScript && game == null)
+            script.call("onBeatHit", [beat]);
         #end
     }
 
     public function measureHit(measure:Int):Void {
         #if SCRIPTING_ALLOWED
-        if(game == null)
-            scripts.call("onMeasureHit", [measure]);
+        if(_initializedScript && game == null)
+            script.call("onMeasureHit", [measure]);
         #end
     }
 
@@ -348,11 +339,11 @@ class Character extends AttachedSprite implements IBeatReceiver {
 
     override function destroy():Void {
         #if SCRIPTING_ALLOWED
-        if(game == null) {
-            scripts.call("onDestroy");
-            scripts.close();
+        if(_initializedScript && game == null) {
+            script.call("onDestroy");
+            script.close();
         }
-        scripts = null;
+        script = null;
         #end
         footOffset = FlxDestroyUtil.put(footOffset);
         super.destroy();
@@ -362,6 +353,9 @@ class Character extends AttachedSprite implements IBeatReceiver {
 
     @:noCompletion
     private var _baseFlipped:Bool = false;
+
+    @:noCompletion
+    private var _initializedScript:Bool = false;
 
     @:noCompletion
     private function set_isPlayer(value:Bool):Bool {

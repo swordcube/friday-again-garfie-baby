@@ -38,8 +38,9 @@ class ScriptCallBehavior extends EventBehavior {
         }
         final chars:Array<Character> = [game.spectator, game.opponent, game.player];
         for(char in chars) {
-            if(char != null)
-                char.scripts.call(params.method, args);
+            @:privateAccess
+            if(char?._initializedScript)
+                char.script.call(params.method, args);
         }
         if(game.scriptsAllowed)
             scripts.call("onExecutePost", [e.flagAsPost()]);

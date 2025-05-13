@@ -486,14 +486,12 @@ class PlayState extends FunkinState {
 				stage.script.call("onCreate");
 			}
 			for(character in [spectator, opponent, player]) {
-				if(character == null)
+				if(character?.script == null)
 					continue;
 
-				for(script in character.scripts.members) {
-                    scripts.add(script);
-					script.setParent(character);
-					script.call("onCreate");
-				}
+				scripts.add(character.script);
+				character.script.setParent(character);
+				character.script.call("onCreate");
 			}
 			for(note in currentChart.notes.get(currentDifficulty)) {
 				if(noteTypeScripts.exists(note.type))
