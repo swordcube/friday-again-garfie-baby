@@ -533,7 +533,12 @@ class FunkinInterp extends RuleScriptInterp {
 					if (depth == 0)
 					{
 						// global function
-                        ((isStatic && allowStaticVariables) ? staticVariables : ((isPublic && allowPublicVariables) ? publicVariables : variables)).set(name, f);
+						if(isStatic && allowStaticVariables)
+							staticVariables.set(name, f);
+						else if(isPublic && allowPublicVariables)
+							publicVariables.set(name, f);
+						else
+							variables.set(name, f);
 					}
 					else
 					{
@@ -739,6 +744,15 @@ class FunkinHScriptParser extends HScriptParserPlus { // i love abusing deprecat
 				{
 					mk(EProp(ident, props.get, props.set, t, e, null, nextIsPublic, nextIsStatic), p1, (e == null) ? tokenMax : pmax(e));
 				}
+			case "function":
+				var tk = token();
+				var name = null;
+				switch( tk ) {
+					case TId(id): name = id;
+					default: push(tk);
+				}
+				var inf = parseFunctionDecl();
+				mk(EFunction(inf.args, inf.body, name, inf.ret, nextIsPublic, nextIsStatic),p1,pmax(inf.body));
 			default:
 				super.parseStructure(id);
 		}
