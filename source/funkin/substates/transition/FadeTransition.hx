@@ -30,7 +30,7 @@ class FadeTransition extends TransitionSubState {
 		var duration:Float = .48;
 		var angle:Int = 90;
 		var zoom:Float = FlxMath.bound(cam.zoom, 0.001);
-		var width:Int = Math.ceil(cam.width / zoom);
+		var width:Int = Math.ceil(cam.width / zoom) * 4;
 		var height:Int = Math.ceil(cam.height / zoom);
 		var yStart = -height;
 		var yEnd = height;
@@ -46,12 +46,14 @@ class FadeTransition extends TransitionSubState {
 			
             default:
 		}
-		gradient = FlxGradient.createGradientFlxSprite(width, height, [FlxColor.BLACK, FlxColor.TRANSPARENT], 1, angle);
+		gradient = FlxGradient.createGradientFlxSprite(1, height, [FlxColor.BLACK, FlxColor.TRANSPARENT], 1, angle);
 		gradient.scrollFactor.set();
+		gradient.setGraphicSize(width, height);
+		gradient.updateHitbox();
 		gradient.screenCenter(X);
 		gradient.y = yStart;
 
-		gradientFill = new FlxSprite().makeGraphic(width, height, FlxColor.BLACK);
+		gradientFill = new FlxSprite().makeSolid(width, height, FlxColor.BLACK);
 		gradientFill.scrollFactor.set();
 		gradientFill.screenCenter(X);
 		updateFunc();
