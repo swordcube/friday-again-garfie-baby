@@ -177,7 +177,20 @@ class PauseSubState extends FunkinSubState {
             case MAIN:
                 final game:PlayState = PlayState.instance;
                 grpItems.addItem("Resume", {onAccept: (_, _) -> close()});
-                grpItems.addItem("Restart Song", {onAccept: (_, _) -> restartSong()});
+
+                if(game.inCutscene) {
+                    grpItems.addItem("Skip Cutscene", {onAccept: (_, _) -> {
+                        game.cutscene.finish();
+                        close();
+                    }});
+                    if(game.cutscene.canRestart) {
+                        grpItems.addItem("Restart Cutscene", {onAccept: (_, _) -> {
+                            game.cutscene.restart();
+                            close();
+                        }});
+                    }
+                } else
+                    grpItems.addItem("Restart Song", {onAccept: (_, _) -> restartSong()});
                 
                 if(game.currentChart.meta.song.difficulties.length > 1)
                     grpItems.addItem("Change Difficulty", {onAccept: (_, _) -> regenerateItems(CHANGE_DIFF)});

@@ -49,14 +49,15 @@ import funkin.gameplay.stage.Stage;
 import funkin.gameplay.stage.StageData;
 import funkin.gameplay.stage.props.ComboProp;
 
+import funkin.gameplay.cutscenes.*;
+import funkin.gameplay.cutscenes.Cutscene;
+
 import funkin.states.menus.StoryMenuState;
 import funkin.states.menus.FreeplayState;
-
 import funkin.states.editors.ChartEditor;
 
 import funkin.substates.PauseSubState;
 import funkin.substates.GameOverSubState;
-
 import funkin.substates.transition.TransitionSubState;
 
 // import scripting events anyways because i'm too lazy
@@ -102,6 +103,11 @@ class PlayState extends FunkinState {
 
 	public var inCutscene:Bool = false;
 	public var minimalMode:Bool = false;
+
+	public var startCutscenes:Array<Cutscene> = [];
+	public var endCutscenes:Array<Cutscene> = [];
+
+	public var cutscene:Cutscene;
 
 	#if SCRIPTING_ALLOWED
 	public var scriptsAllowed:Bool = true;
@@ -533,7 +539,8 @@ class PlayState extends FunkinState {
 
 			eventRunner.execute(e);
 		}
-		camFollow = new FlxObject(0, 0, 1, 1);
+		final startingCamPos:Array<Float> = stage?.data.startingCamPos ?? [0.0, 0.0];
+		camFollow = new FlxObject(startingCamPos[0], startingCamPos[1], 1, 1);
 		add(camFollow);
 
 		camGame.follow(camFollow, LOCKON, 0.05);
@@ -604,7 +611,19 @@ class PlayState extends FunkinState {
 
 		countdown.cameras = [camHUD];
 		add(countdown);
+
+		for(cutscene in startCutscenes)
+			cutscene.onFinish.add(startNextCutscene);
 		
+		cutscene = startCutscenes.shift();
+		if(cutscene != null) {
+			camGame.followEnabled = false;
+			camHUD.visible = false;
+			Conductor.instance.autoIncrement = false;
+
+			cutscene.start();
+			add(cutscene);
+		}
 		if(!inCutscene)
 			startCountdown();
 
@@ -757,19 +776,39 @@ class PlayState extends FunkinState {
 
 		if(!(subState is TransitionSubState)) {
 			paused = false;
+			
+			final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
+			#if SCRIPTING_ALLOWED
+			if(scriptsAllowed && subState is PauseSubState) {
+				scripts.event("onResume", event);
+				scripts.event("onGameResume", event);
+			}
+			#end
+			if(!event.cancelled) {
+				if(cutscene != null)
+					cutscene.resume();
 
-			if(!(subState is GameOverSubState))
-				camGame.followEnabled = true;
+				if(!(subState is GameOverSubState))
+					camGame.followEnabled = true;
 
-			Conductor.instance.music = FlxG.sound.music;
-			Conductor.instance.autoIncrement = true;
-
-			if(!startingSong && FlxG.sound.music != null) {
-				FlxG.sound.music.time = Conductor.instance.rawTime;
-				FlxG.sound.music.resume();
-
-				vocals.seek(FlxG.sound.music.time);
-				vocals.resume();
+				if(!inCutscene) {
+					Conductor.instance.music = FlxG.sound.music;
+					Conductor.instance.autoIncrement = true;
+		
+					if(!startingSong && FlxG.sound.music != null) {
+						FlxG.sound.music.time = Conductor.instance.rawTime;
+						FlxG.sound.music.resume();
+		
+						vocals.seek(FlxG.sound.music.time);
+						vocals.resume();
+					}
+				}
+				#if SCRIPTING_ALLOWED
+				if(scriptsAllowed && subState is PauseSubState) {
+					scripts.event("onResumePost", event);
+					scripts.event("onGameResumePost", event);
+				}
+				#end
 			}
 		}
 		#if SCRIPTING_ALLOWED
@@ -813,6 +852,23 @@ class PlayState extends FunkinState {
 		return assetsToPreload;
 	}
 
+	public function startNextCutscene():Void {
+		final newCutscene:Cutscene = ((startingSong) ? startCutscenes : endCutscenes).shift();
+		cutscene = newCutscene;
+		
+		if(cutscene == null) {
+			camGame.followEnabled = true;
+			camHUD.visible = true;
+			Conductor.instance.autoIncrement = (lastParams.startTime == null || lastParams.startTime <= 0);
+
+			inCutscene = false;
+			startCountdown();
+			return;
+		}
+		cutscene.start();
+		add(cutscene);
+	}
+
 	public function gameOver():Void {
 		final event:GameOverEvent = cast Events.get(GAME_OVER);
 		onGameOver.dispatch(event.recycle());
@@ -845,8 +901,28 @@ class PlayState extends FunkinState {
 	}
 
 	public function pause():Void {
+		final event:ActionEvent = Events.get(UNKNOWN).recycleBase();
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed) {
+			scripts.event("onPause", event);
+			scripts.event("onGamePause", event);
+		}
+		#end
+		if(event.cancelled)
+			return;
+
+		if(cutscene != null)
+			cutscene.pause();
+
 		persistentUpdate = false;
 		openSubState(new PauseSubState());
+
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed) {
+			scripts.event("onPausePost", event);
+			scripts.event("onGamePausePost", event);
+		}
+		#end
 	}
 
 	public function startCountdown():Void {

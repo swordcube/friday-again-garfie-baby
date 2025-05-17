@@ -125,6 +125,15 @@ class FunkinScript {
         setClass(funkin.gameplay.scoring.system.PBotSystem);
         setClass(funkin.gameplay.scoring.system.Judge4System);
 
+        setClass(funkin.gameplay.cutscenes.Cutscene);
+        setClass(funkin.gameplay.cutscenes.ScriptedCutscene);
+        setClass(funkin.gameplay.cutscenes.ScriptedSongCutscene);
+        setClass(funkin.gameplay.cutscenes.VideoCutscene);
+
+        setClass(funkin.gameplay.cutscenes.Timeline);
+        setClass(funkin.gameplay.cutscenes.Timeline.TimelineAction);
+        setClass(funkin.gameplay.cutscenes.Timeline.CallbackAction);
+
         setClass(funkin.graphics.TiledSprite);
         setClass(funkin.graphics.GraphicCacheSprite);
 

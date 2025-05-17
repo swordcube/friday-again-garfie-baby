@@ -32,6 +32,9 @@ class DiscordRPC {
     }
 
     public static function shutdown():Void {
+        if(!threadActive)
+            return;
+        
         threadActive = false;
         GameSDK.shutdown();
     }
@@ -60,6 +63,10 @@ class DiscordRPC {
     private static var _currentActivity:Activity;
     
     private static function set_appID(newAppID:String):String {
+        if(!threadActive) {
+            appID = newAppID;
+            return appID;
+        }
         if(appID != newAppID) {
             if(appID != null)
                 GameSDK.shutdown();
@@ -67,8 +74,10 @@ class DiscordRPC {
             appID = newAppID;
             
             final result:Result = GameSDK.create(appID);
-            if(result != Ok)
+            if(result != Ok) {
+                threadActive = false;
                 Logs.error('Error initializing Discord RPC: ${result}');
+            }
         }
         return appID;
     }

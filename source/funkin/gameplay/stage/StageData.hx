@@ -26,6 +26,10 @@ class StageData {
 
     public var layers:Array<Array<StagePropData>>;
 
+    @:optional
+    @:default([0, 0])
+    public var startingCamPos:Array<Float>;
+
     public static function load(stageID:String):StageData {
         final confPath:String = Paths.json('gameplay/stages/${stageID}/config');
         if(FlxG.assets.exists(confPath)) {

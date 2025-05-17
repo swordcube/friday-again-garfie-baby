@@ -23,6 +23,7 @@ import funkin.backend.assets.loaders.DefaultAssetLoader;
 enum AssetType {
     IMAGE;
     SOUND;
+    VIDEO;
     FONT;
     JSON;
     XML;
@@ -37,6 +38,7 @@ class Paths {
     public static final ASSET_EXTENSIONS:Map<AssetType, Array<String>> = [
         IMAGE => [".png", ".jpg", ".jpeg", ".bmp"],
         SOUND => [".ogg", ".wav", ".mp3"],
+        VIDEO => [".mp4", ".mkv", ".ogv", ".avi", ".flv", ".3gp", ".avif"],
         FONT => [".ttf", ".otf"],
         SCRIPT => [".hx", ".hxs", ".hsc", ".hscript", ".lua"]
     ];
@@ -398,6 +400,16 @@ class Paths {
                 return path;
         }
         return getAsset('${name}.ogg', loaderID, useFallback);
+    }
+
+    public static function video(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        final exts:Array<String> = ASSET_EXTENSIONS.get(VIDEO);
+        for(i in 0...exts.length) {
+            final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
+            if(FlxG.assets.exists(path))
+                return path;
+        }
+        return getAsset('${name}.mp4', loaderID, useFallback);
     }
 
     public static function font(name:String, ?loaderID:String, ?useFallback:Bool = true):String {

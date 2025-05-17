@@ -1,0 +1,9 @@
+function onStart() {
+    final timeline:Timeline = new Timeline();
+    timeline.frameRate = 24; // timelines work based off of frames
+    timeline.easeCallback(timeline.secToFrame(0.5), timeline.secToFrame(1.5), FlxEase.cubeOut, (progress:Float) -> {
+        game.opponent.scale.x = game.opponent.data.scale * (1 + (progress * 2));
+    });
+    timeline.once(timeline.secToFrame(2.6), () -> finish());
+    add(timeline);
+}
