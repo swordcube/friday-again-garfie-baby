@@ -44,13 +44,17 @@ class VideoCutscene extends Cutscene {
     override function resume():Void {
         super.resume();
         video.play();
+
+        #if (hxvlc < "2.1.1")
+        video.bitmap.time = video.bitmap.time;
+        #end
     }
 
     override function restart():Void {
         super.restart();
+        video.stop();
 
-        video.pause();
-        FlxTimer.wait(0.001, () -> {
+        FlxTimer.wait(0.1, () -> {
             video.bitmap.time = 0;
             video.play();
         });

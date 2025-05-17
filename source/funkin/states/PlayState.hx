@@ -750,6 +750,10 @@ class PlayState extends FunkinState {
 		if(_initialTransitionHappened || !(subState is TransitionSubState)) {
 			paused = true;
 
+			FlxTimer.wait(0.001, () -> {
+				if(cutscene != null)
+					cutscene.pause();
+			});
 			if(!(subState is GameOverSubState))
 				camGame.followEnabled = false;
 			
@@ -910,9 +914,6 @@ class PlayState extends FunkinState {
 		#end
 		if(event.cancelled)
 			return;
-
-		if(cutscene != null)
-			cutscene.pause();
 
 		persistentUpdate = false;
 		openSubState(new PauseSubState());
