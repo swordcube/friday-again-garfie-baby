@@ -1,44 +1,58 @@
 package funkin.gameplay.song;
 
-import flixel.util.FlxDestroyUtil;
 import flixel.sound.FlxSound;
 
 class VocalGroup extends FlxBasic {
     public var resyncRange:Float = 30;
 
-    public var spectator(default, null):FlxSound;
-    public var opponent(default, null):FlxSound;
-    public var player(default, null):FlxSound;
-
-    /**
-     * Whether or not the vocals are a single track.
-     * 
-     * If this is true, the `player` vocals will be the
-     * only vocal track active.
-     * 
-     * They will also not mute on player note missing.
-     */
-    public var isSingleTrack(default, null):Bool = false;
+    public var spectator(default, null):Array<FlxSound> = [];
+    public var opponent(default, null):Array<FlxSound> = [];
+    public var player(default, null):Array<FlxSound> = [];
 
     public var attachedConductor:Conductor;
 
     public function new(params:VocalGroupParams) {
         super();
-        if(params.isSingleTrack)
-            isSingleTrack = true;
-        else {
-            if(params.spectator != null && FlxG.assets.exists(params.spectator)) {
-                spectator = FlxG.sound.play(params.spectator, 0, false, null, false).pause();
-                spectator.volume = 1;
+        if((params.spectator?.length ?? 0) == 0 && (params.opponent?.length ?? 0) == 0 && (params.player?.length ?? 0) == 0 && params.mainVocals == null)
+            Logs.error('You must define main vocals if you\'re not defining character vocals!');
+
+        else if((params.spectator?.length ?? 0) == 0 && (params.opponent?.length ?? 0) == 0 && (params.player?.length ?? 0) == 0 && params.mainVocals != null) {
+            if(FlxG.assets.exists(params.mainVocals)) {
+                final sound:FlxSound = FlxG.sound.play(params.mainVocals, 0, false, null, false).pause();
+                sound.volume = 1;
+                spectator.push(sound);
             }
-            if(params.opponent != null && FlxG.assets.exists(params.opponent)) {
-                opponent = FlxG.sound.play(params.opponent, 0, false, null, false).pause();
-                opponent.volume = 1;
+        } else {
+            if(params.spectator != null) {
+                for(path in params.spectator) {
+                    if(!FlxG.assets.exists(path))
+                        continue;
+        
+                    final sound:FlxSound = FlxG.sound.play(path, 0, false, null, false).pause();
+                    sound.volume = 1;
+                    spectator.push(sound);
+                }
             }
-        }
-        if(params.player != null && FlxG.assets.exists(params.player)) {
-            player = FlxG.sound.play(params.player, 0, false, null, false).pause();
-            player.volume = 1;
+            if(params.opponent != null) {
+                for(path in params.opponent) {
+                    if(!FlxG.assets.exists(path))
+                        continue;
+        
+                    final sound:FlxSound = FlxG.sound.play(path, 0, false, null, false).pause();
+                    sound.volume = 1;
+                    opponent.push(sound);
+                }
+            }
+            if(params.player != null) {
+                for(path in params.player) {
+                    if(!FlxG.assets.exists(path))
+                        continue;
+        
+                    final sound:FlxSound = FlxG.sound.play(path, 0, false, null, false).pause();
+                    sound.volume = 1;
+                    player.push(sound);
+                }
+            }
         }
         if(params.attachedConductor != null)
             attachedConductor = params.attachedConductor;
@@ -47,131 +61,86 @@ class VocalGroup extends FlxBasic {
     }
 
     public function play():Void {
-        if(!isSingleTrack) {
-            if(spectator != null)
-                spectator.play();
-
-            if(opponent != null)
-                opponent.play();
+        for(list in [spectator, opponent, player]) {
+            for(sound in list)
+                sound.play();
         }
-        if(player != null)
-            player.play();
     }
 
     public function stop():Void {
-        if(!isSingleTrack) {
-            if(spectator != null)
-                spectator.stop();
-
-            if(opponent != null)
-                opponent.stop();
+        for(list in [spectator, opponent, player]) {
+            for(sound in list)
+                sound.stop();
         }
-        if(player != null)
-            player.stop();
     }
 
     public function pause():Void {
-        if(!isSingleTrack) {
-            if(spectator != null)
-                spectator.pause();
-
-            if(opponent != null)
-                opponent.pause();
+        for(list in [spectator, opponent, player]) {
+            for(sound in list)
+                sound.pause();
         }
-        if(player != null)
-            player.pause();
     }
 
     public function resume():Void {
-        if(!isSingleTrack) {
-            if(spectator != null)
-                spectator.resume();
-
-            if(opponent != null)
-                opponent.resume();
+        for(list in [spectator, opponent, player]) {
+            for(sound in list)
+                sound.resume();
         }
-        if(player != null)
-            player.resume();
     }
 
     override function update(elapsed:Float) {
         if(attachedConductor.music == null || !attachedConductor.music.playing)
             return;
         
-        if(!isSingleTrack) {
-            if(spectator != null && spectator.playing && Math.abs(attachedConductor.music.time - spectator.time) >= resyncRange)
-                spectator.time = attachedConductor.music.time;
-            
-            if(opponent != null && opponent.playing && Math.abs(attachedConductor.music.time - opponent.time) >= resyncRange)
-                opponent.time = attachedConductor.music.time;
+        for(list in [spectator, opponent, player]) {
+            for(sound in list) {
+                if(sound != null && sound.playing && Math.abs(attachedConductor.music.time - sound.time) >= resyncRange)
+                    sound.time = attachedConductor.music.time;
+            }
         }
-        if(player != null && player.playing && Math.abs(attachedConductor.music.time - player.time) >= resyncRange)
-            player.time = attachedConductor.music.time;
     }
 
     public function seek(time:Float):Void {
-        if(!isSingleTrack) {
-            if(spectator != null)
-                spectator.time = time;
-            
-            if(opponent != null)
-                opponent.time = time;
+        for(list in [spectator, opponent, player]) {
+            for(sound in list)
+                sound.time = time;
         }
-        if(player != null)
-            player.time = time;
     }
 
     public function setVolume(volume:Float):Void {
-        if(!isSingleTrack) {
-            if(spectator != null)
-                spectator.volume = volume;
-            
-            if(opponent != null)
-                opponent.volume = volume;
+        for(list in [spectator, opponent, player]) {
+            for(sound in list)
+                sound.volume = volume;
         }
-        if(player != null)
-            player.volume = volume;
     }
 
     public function setPitch(pitch:Float):Void {
-        if(!isSingleTrack) {
-            if(spectator != null)
-                spectator.pitch = pitch;
-            
-            if(opponent != null)
-                opponent.pitch = pitch;
+        for(list in [spectator, opponent, player]) {
+            for(sound in list)
+                sound.pitch = pitch;
         }
-        if(player != null)
-            player.pitch = pitch;
     }
 
     public function setMuted(muted:Bool):Void {
-        if(!isSingleTrack) {
-            if(spectator != null)
-                spectator.muted = muted;
-            
-            if(opponent != null)
-                opponent.muted = muted;
+        for(list in [spectator, opponent, player]) {
+            for(sound in list)
+                sound.muted = muted;
         }
-        if(player != null)
-            player.muted = muted;
     }
 
-    override function destroy() {
-        if(!isSingleTrack) {
-            spectator = FlxDestroyUtil.destroy(spectator);
-            opponent = FlxDestroyUtil.destroy(opponent);
-        }
-        player = FlxDestroyUtil.destroy(player);
+    override function destroy():Void {
+        for(list in [spectator, opponent, player])
+            list.clear(true);
+        
         super.destroy();
     }
 }
 
 typedef VocalGroupParams = {
-    var ?spectator:String;
-    var ?opponent:String;
-    var player:String;
+    var ?spectator:Array<String>;
+    var ?opponent:Array<String>;
+    var ?player:Array<String>;
 
-    var ?isSingleTrack:Bool;
+    var ?mainVocals:String;
     var ?attachedConductor:Conductor;
 }

@@ -69,19 +69,44 @@ class CharterPlaytest extends FunkinSubState {
         final instPath:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/inst');
 		inst = FlxG.sound.play(instPath, 0, false);
 
-		final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
-		if(FlxG.assets.exists(playerVocals)) {
+        if(currentChart.meta.song.tracks != null) {
+			final trackSet = currentChart.meta.song.tracks;
+			final spectatorTrackPaths:Array<String> = [];
+			for(track in trackSet.spectator) {
+				final path:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${track}');
+				spectatorTrackPaths.push(path);
+			}
+			final opponentTrackPaths:Array<String> = [];
+			for(track in trackSet.opponent) {
+				final path:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${track}');
+				opponentTrackPaths.push(path);
+			}
+			final playerTrackPaths:Array<String> = [];
+			for(track in trackSet.player) {
+				final path:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${track}');
+				playerTrackPaths.push(path);
+			}
 			vocals = new VocalGroup({
-				spectator: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'),
-				opponent: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'),
-				player: playerVocals
+				spectator: spectatorTrackPaths,
+				opponent: opponentTrackPaths,
+				player: playerTrackPaths
 			});
+			add(vocals);
 		} else {
+            final vocalTrackPaths:Array<String> = [
+                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'),
+                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'),
+                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}')
+            ];
+			final mainVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals');
 			vocals = new VocalGroup({
-				player: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals'),
-				isSingleTrack: true
+				spectator: (FlxG.assets.exists(vocalTrackPaths[0])) ? [vocalTrackPaths[0]] : null,
+				opponent: (FlxG.assets.exists(vocalTrackPaths[1])) ? [vocalTrackPaths[1]] : null,
+				player: (FlxG.assets.exists(vocalTrackPaths[2])) ? [vocalTrackPaths[2]] : null,
+				mainVocals: (FlxG.assets.exists(mainVocals)) ? mainVocals : null
 			});
-		}
+            add(vocals);
+        }
         vocals.setPitch(FlxG.timeScale);
 		add(vocals);
         

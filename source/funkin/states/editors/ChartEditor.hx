@@ -189,29 +189,52 @@ class ChartEditor extends UIState {
         inst.time = 0;
         inst.volume = 1;
 
-        final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
-		if(FlxG.assets.exists(playerVocals)) {
+        if(currentChart.meta.song.tracks != null) {
+			final trackSet = currentChart.meta.song.tracks;
+			final spectatorTrackPaths:Array<String> = [];
+			for(track in trackSet.spectator) {
+				final path:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${track}');
+				spectatorTrackPaths.push(path);
+			}
+			final opponentTrackPaths:Array<String> = [];
+			for(track in trackSet.opponent) {
+				final path:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${track}');
+				opponentTrackPaths.push(path);
+			}
+			final playerTrackPaths:Array<String> = [];
+			for(track in trackSet.player) {
+				final path:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${track}');
+				playerTrackPaths.push(path);
+			}
 			vocals = new VocalGroup({
-				spectator: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'),
-				opponent: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'),
-				player: playerVocals
+				spectator: spectatorTrackPaths,
+				opponent: opponentTrackPaths,
+				player: playerTrackPaths
 			});
+			add(vocals);
 		} else {
+            final vocalTrackPaths:Array<String> = [
+                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'),
+                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'),
+                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}')
+            ];
+			final mainVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals');
 			vocals = new VocalGroup({
-				player: Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals'),
-				isSingleTrack: true
+				spectator: (FlxG.assets.exists(vocalTrackPaths[0])) ? [vocalTrackPaths[0]] : null,
+				opponent: (FlxG.assets.exists(vocalTrackPaths[1])) ? [vocalTrackPaths[1]] : null,
+				player: (FlxG.assets.exists(vocalTrackPaths[2])) ? [vocalTrackPaths[2]] : null,
+				mainVocals: (FlxG.assets.exists(mainVocals)) ? mainVocals : null
 			});
-		}
-		add(vocals);
+            add(vocals);
+        }
+        for(track in vocals.spectator)
+            track.muted = editorSettings.muteSpectatorVocals;
 
-        if(vocals.spectator != null)
-            vocals.spectator.muted = editorSettings.muteSpectatorVocals;
+        for(track in vocals.opponent)
+            track.muted = editorSettings.muteOpponentVocals;
 
-        if(vocals.opponent != null)
-            vocals.opponent.muted = editorSettings.muteOpponentVocals;
-
-        if(vocals.player != null)
-            vocals.player.muted = editorSettings.mutePlayerVocals;
+        for(track in vocals.player)
+            track.muted = editorSettings.mutePlayerVocals;
 
         // note layer
 
@@ -866,14 +889,14 @@ class ChartEditor extends UIState {
         inst.pitch = editorSettings.playbackRate;
         Conductor.instance.rate = editorSettings.playbackRate;
 
-        if(vocals.spectator != null)
-            vocals.spectator.pitch = editorSettings.playbackRate;
+        for(track in vocals.spectator)
+            track.pitch = editorSettings.playbackRate;
         
-        if(vocals.opponent != null)
-            vocals.opponent.pitch = editorSettings.playbackRate;
+        for(track in vocals.opponent)
+            track.pitch = editorSettings.playbackRate;
         
-        if(vocals.player != null)
-            vocals.player.pitch = editorSettings.playbackRate;
+        for(track in vocals.player)
+            track.pitch = editorSettings.playbackRate;
     }
     
     public inline function seekToTime(newTime:Float):Void {
@@ -1098,32 +1121,32 @@ class ChartEditor extends UIState {
 
     public function toggleAllVocals(value:Bool):Void {
         editorSettings.muteAllVocals = value;
-        if(vocals.spectator != null)
-            vocals.spectator.muted = editorSettings.muteAllVocals || editorSettings.muteSpectatorVocals;
+        for(track in vocals.spectator)
+            track.muted = editorSettings.muteAllVocals || editorSettings.muteSpectatorVocals;
         
-        if(vocals.opponent != null)
-            vocals.opponent.muted = editorSettings.muteAllVocals || editorSettings.muteOpponentVocals;
+        for(track in vocals.opponent)
+            track.muted = editorSettings.muteAllVocals || editorSettings.muteOpponentVocals;
         
-        if(vocals.player != null)
-            vocals.player.muted = editorSettings.muteAllVocals || editorSettings.mutePlayerVocals;
+        for(track in vocals.player)
+            track.muted = editorSettings.muteAllVocals || editorSettings.mutePlayerVocals;
     }
 
     public function toggleSpectatorVocals(value:Bool):Void {
         editorSettings.muteSpectatorVocals = value;
-        if(vocals.spectator != null)
-            vocals.spectator.muted = editorSettings.muteAllVocals || editorSettings.muteSpectatorVocals;
+        for(track in vocals.spectator)
+            track.muted = editorSettings.muteAllVocals || editorSettings.muteSpectatorVocals;
     }
 
     public function toggleOpponentVocals(value:Bool):Void {
         editorSettings.muteOpponentVocals = value;
-        if(vocals.opponent != null)
-            vocals.opponent.muted = editorSettings.muteAllVocals || editorSettings.muteOpponentVocals;
+        for(track in vocals.opponent)
+            track.muted = editorSettings.muteAllVocals || editorSettings.muteOpponentVocals;
     }
 
     public function togglePlayerVocals(value:Bool):Void {
         editorSettings.mutePlayerVocals = value;
-        if(vocals.player != null)
-            vocals.player.muted = editorSettings.muteAllVocals || editorSettings.mutePlayerVocals;
+        for(track in vocals.player)
+            track.muted = editorSettings.muteAllVocals || editorSettings.mutePlayerVocals;
     }
 
     public function toggleMinimalPlaytest(value:Bool):Void {

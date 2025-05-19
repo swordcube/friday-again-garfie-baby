@@ -149,7 +149,9 @@ class FunkinScript {
 
         setClass(funkin.states.PlayState);
         setClass(funkin.states.FunkinState);
+
         setClass(funkin.states.ScriptedState);
+        setClass(funkin.states.ScriptedUIState);
 
         setClass(funkin.states.menus.TitleState);
         setClass(funkin.states.menus.MainMenuState);
@@ -159,8 +161,15 @@ class FunkinScript {
         setClass(funkin.states.menus.ContentPackState);
         
         setClass(funkin.substates.FunkinSubState);
+        setClass(funkin.substates.GameOverSubState);
+        setClass(funkin.substates.PauseSubState);
+        setClass(funkin.substates.ResetScoreSubState);
+        
         setClass(funkin.substates.ScriptedSubState);
+        setClass(funkin.substates.ScriptedUISubState);
+        
         setClass(funkin.substates.GameplayModifiersMenu);
+        setClass(funkin.substates.UnsavedWarningSubState);
 
         setClass(funkin.ui.ImageBar);
         setClass(funkin.ui.AtlasFont);

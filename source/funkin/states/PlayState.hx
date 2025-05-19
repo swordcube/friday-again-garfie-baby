@@ -84,6 +84,8 @@ class PlayState extends FunkinState {
 	public static var storyLevel:String;
 	public static var storyStats:PlayerStats;
 	public static var storyPlaylist:Array<String> = [];
+	
+	public static var seenCutscene:Bool = false;
 
 	public var isStoryMode(default, null):Bool = false;
 	
@@ -225,7 +227,7 @@ class PlayState extends FunkinState {
 			Paths.forceContentPack = null;
 
 			if(rawInstPath.startsWith(parentDir))
-				Paths.forceContentPack = rawInstPath.substr(parentDir.length);
+				Paths.forceContentPack = Paths.getContentPackFromPath(rawInstPath);
 		}
 		if(lastParams._chart != null) {
 			currentChart = lastParams._chart;
@@ -338,35 +340,57 @@ class PlayState extends FunkinState {
 		songTracksToLoad.push({path: instPath, type: SOUND});
 		scripts.call("onPreloadSong", [songTracksToLoad]);
 		
-		final playerVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}');
-		final vocalTrackPaths:Array<String> = [];
-		
-		final normalVocalsExist:Bool = FlxG.assets.exists(playerVocals);
-		if(normalVocalsExist) {
-			vocalTrackPaths.push(Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'));
-			vocalTrackPaths.push(Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'));
-			vocalTrackPaths.push(playerVocals);
-		} else
-			vocalTrackPaths.push(Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals'));
-		
-		for(path in vocalTrackPaths)
-			songTracksToLoad.push({path: path, type: SOUND});
+		if(currentChart.meta.song.tracks != null) {
+			final trackSet = currentChart.meta.song.tracks;
+			final spectatorTrackPaths:Array<String> = [];
+			for(track in trackSet.spectator) {
+				final path:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${track}');
+				spectatorTrackPaths.push(path);
+				songTracksToLoad.push({path: path, type: SOUND});
+			}
+			final opponentTrackPaths:Array<String> = [];
+			for(track in trackSet.opponent) {
+				final path:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${track}');
+				opponentTrackPaths.push(path);
+				songTracksToLoad.push({path: path, type: SOUND});
+			}
+			final playerTrackPaths:Array<String> = [];
+			for(track in trackSet.player) {
+				final path:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${track}');
+				playerTrackPaths.push(path);
+				songTracksToLoad.push({path: path, type: SOUND});
+			}
+			Cache.preloadAssets(songTracksToLoad);
 
-		Cache.preloadAssets(songTracksToLoad);
-
-		if(normalVocalsExist) {
 			vocals = new VocalGroup({
-				spectator: vocalTrackPaths[0],
-				opponent: vocalTrackPaths[1],
-				player: vocalTrackPaths[2]
+				spectator: spectatorTrackPaths,
+				opponent: opponentTrackPaths,
+				player: playerTrackPaths
 			});
+			add(vocals);
 		} else {
+			final vocalTrackPaths:Array<String> = [
+                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'),
+                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'),
+                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}')
+            ];
+			final mainVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals');
+			if(FlxG.assets.exists(mainVocals))
+				songTracksToLoad.push({path: mainVocals, type: SOUND});
+			
+			for(path in vocalTrackPaths)
+				songTracksToLoad.push({path: path, type: SOUND});
+	
+			Cache.preloadAssets(songTracksToLoad);
+	
 			vocals = new VocalGroup({
-				player: vocalTrackPaths[0],
-				isSingleTrack: true
+				spectator: (FlxG.assets.exists(vocalTrackPaths[0])) ? [vocalTrackPaths[0]] : null,
+				opponent: (FlxG.assets.exists(vocalTrackPaths[1])) ? [vocalTrackPaths[1]] : null,
+				player: (FlxG.assets.exists(vocalTrackPaths[2])) ? [vocalTrackPaths[2]] : null,
+				mainVocals: (FlxG.assets.exists(mainVocals)) ? mainVocals : null
 			});
+			add(vocals);
 		}
-		add(vocals);
 
 		FlxG.sound.playMusic(instPath, 0, false);
 		inst = FlxG.sound.music;
@@ -612,17 +636,20 @@ class PlayState extends FunkinState {
 		countdown.cameras = [camHUD];
 		add(countdown);
 
-		for(cutscene in startCutscenes)
-			cutscene.onFinish.add(startNextCutscene);
-		
-		cutscene = startCutscenes.shift();
-		if(cutscene != null) {
-			camGame.followEnabled = false;
-			camHUD.visible = false;
-			Conductor.instance.autoIncrement = false;
-
-			cutscene.start();
-			add(cutscene);
+		if(!seenCutscene) {
+			for(cutscene in startCutscenes)
+				cutscene.onFinish.add(startNextCutscene);
+			
+			cutscene = startCutscenes.shift();
+			if(cutscene != null) {
+				camGame.followEnabled = false;
+				camHUD.visible = false;
+				Conductor.instance.autoIncrement = false;
+	
+				cutscene.start();
+				add(cutscene);
+			}
+			seenCutscene = true;
 		}
 		if(!inCutscene)
 			startCountdown();
@@ -982,6 +1009,7 @@ class PlayState extends FunkinState {
 			return;
 
 		endingSong = true;
+		seenCutscene = false;
 		persistentUpdate = false;
 
 		FlxTween.globalManager.forEach((tween:FlxTween) -> {
@@ -1209,13 +1237,13 @@ class PlayState extends FunkinState {
 		if(event.cancelled)
 			return;
 		
-		if(event.unmuteVocals && !vocals.isSingleTrack) {
+		if(event.unmuteVocals) {
 			if(isPlayer) {
-				if(vocals.player != null)
-					vocals.player.muted = false;
+				for(track in vocals.player)
+					track.muted = false;
 			} else {
-				if(vocals.opponent != null)
-					vocals.opponent.muted = false;
+				for(track in vocals.opponent)
+					track.muted = false;
 			}
 		}
 		if(event.playSingAnim) {
@@ -1278,13 +1306,13 @@ class PlayState extends FunkinState {
 		if(event.cancelled)
 			return;
 		
-		if(event.muteVocals && !vocals.isSingleTrack) {
+		if(event.muteVocals) {
 			if(isPlayer) {
-				if(vocals.player != null)
-					vocals.player.muted = true;
+				for(track in vocals.player)
+					track.muted = true;
 			} else {
-				if(vocals.opponent != null)
-					vocals.opponent.muted = true;
+				for(track in vocals.opponent)
+					track.muted = true;
 			}
 		}
 		if(event.playMissAnim) {

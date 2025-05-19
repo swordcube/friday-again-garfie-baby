@@ -53,11 +53,25 @@ class GameplayModifiersPage extends OptionPage {
             type: TCheckbox
         });
         addGameplayModifier({
+            name: "Scroll Type",
+            description: "Changes how scroll speed is applied to the notes.\n\nMultiplicative multiplies the chart's scroll speed with your multiplier.\nConstant sets the scroll speed directly.\nXMod sets the scroll speed based on song BPM.",
+
+            id: "scrollType",
+            type: TList(["Multiplicative", "Constant", "XMod"])
+        });
+        addGameplayModifier({
+            name: "Scroll Speed",
+            description: "Changes how fast or slow the notes will scroll by.\nThis is affected by playback rate and scroll type!\n\nIf your scroll type is XMod, this value is redundant.",
+
+            id: "scrollSpeed",
+            type: TFloat(0.05, 10, 0.05, 2)
+        });
+        addGameplayModifier({
             name: "Playback Rate",
             description: "Changes how fast or slow the song will be.\nIf you're on a lower rate, your score will be multiplied by that rate!",
 
             id: "playbackRate",
-            type: TFloat(0.01, 10, 0.01, 2)
+            type: TFloat(0.05, 10, 0.05, 2)
         });
     }
 }

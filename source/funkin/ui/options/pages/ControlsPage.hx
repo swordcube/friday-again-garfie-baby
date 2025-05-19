@@ -248,10 +248,9 @@ class ControlsPage extends Page {
                 FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
             }
         } else {
-            if(changingBind && !pressedKeyYet && FlxG.keys.justPressed.ANY)
+            if(changingBind && !pressedKeyYet && FlxG.keys.justPressed.ANY) {
                 pressedKeyYet = true;
-            
-            if(changingBind && pressedKeyYet && FlxG.keys.justReleased.ANY) {
+
                 bindPrompt.exists = false;
                 stopChangingBind();
             }
@@ -349,7 +348,7 @@ class ControlsPage extends Page {
     }
 
     public function stopChangingBind():Void {
-        var newKey:FlxKey = FlxG.keys.firstJustReleased();
+        var newKey:FlxKey = FlxG.keys.firstJustPressed();
         switch(newKey) {
             case NONE:
                 return;

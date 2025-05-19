@@ -30,6 +30,15 @@
 				]
 			}
 		],
+		"tracks": {
+			"spectator": [],
+			"opponent": [
+				"vocals-mom"
+			],
+			"player": [
+				"vocals-bf"
+			]
+		},
 		"artist": "Kawai Sprite",
 		"charter": "ninjamuffin99 + MtH + Spazkid",
 		"difficulties": [

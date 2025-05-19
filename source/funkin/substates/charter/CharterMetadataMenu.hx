@@ -26,6 +26,9 @@ class CharterMetadataMenu extends UISubState {
     }
 
     override function update(elapsed:Float):Void {
+        final isUIFocused:Bool = UIUtil.isAnyComponentFocused([window.charter.grid, window.charter.selectionBox]);
+        FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY) && !isUIFocused;
+        
         if(FlxG.mouse.justReleased && !window.checkMouseOverlap())
             FlxTimer.wait(0.001, window.close);
         

@@ -30,6 +30,11 @@ class Options {
 
     @:ignore
     public static var defaultGameplayModifiers:Map<String, Dynamic> = [
+        // SCROLL SPEED MODIFIERS //
+        "scrollType" => "Multiplicative", // types are Multiplicative, Constant, and XMod
+        "scrollSpeed" => 1,
+        
+        // GENERAL MODIFIERS //
         "practiceMode" => false,
         "botplay" => false,
         "playbackRate" => 1

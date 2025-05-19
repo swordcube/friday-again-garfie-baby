@@ -29,6 +29,15 @@
 				]
 			}
 		],
+		"tracks": {
+			"spectator": [],
+			"opponent": [
+				"vocals-dad"
+			],
+			"player": [
+				"vocals-bf"
+			]
+		},
 		"artist": "Kawai Sprite (feat. Saruky)",
 		"charter": "Jenny Crowe + fabs",
 		"difficulties": [

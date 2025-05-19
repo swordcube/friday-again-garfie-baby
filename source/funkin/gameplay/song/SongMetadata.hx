@@ -1,6 +1,13 @@
 package funkin.gameplay.song;
 
 @:structInit
+class SongTrackData {
+	public var spectator:Array<String>;
+	public var opponent:Array<String>;
+	public var player:Array<String>;
+}
+
+@:structInit
 class SongData {
 	public var title:String;
 
@@ -11,6 +18,9 @@ class SongData {
 
 	public var artist:String;
 	public var charter:String;
+
+	@:optional
+	public var tracks:SongTrackData;
 }
 
 @:structInit

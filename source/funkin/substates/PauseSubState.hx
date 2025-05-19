@@ -366,6 +366,8 @@ class PauseSubState extends FunkinSubState {
 
         final wasMusicPlaying:Bool = FlxG.sound.music.playing;
         FlxTimer.wait(0.001, () -> {
+            PlayState.seenCutscene = false;
+
             final game:PlayState = PlayState.instance;
             game.persistentUpdate = false;
             

@@ -72,14 +72,28 @@ class PlayField extends FlxContainer {
                 strumLine.playField = null;
             }
         });
+        var scrollSpeed:Float = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
+        switch(Std.string(Options.gameplayModifiers.get("scrollType")).toLowerCase()) {
+            case "multiplicative", "mult":
+                final mult:Float = cast Options.gameplayModifiers.get("scrollSpeed");
+                scrollSpeed *= mult;
+                
+            case "constant", "cmod":
+                final value:Float = cast Options.gameplayModifiers.get("scrollSpeed");
+                scrollSpeed = value;
+
+            case "xmod", "bpm":
+                final bpm:Float = currentChart.meta.song.timingPoints.first()?.bpm ?? 100.0;
+                scrollSpeed = bpm / 60.0;
+        }
         final noteSkinData:NoteSkinData = NoteSkin.get(noteSkin ?? currentChart.meta.game.noteSkin);
 
         opponentStrumLine = new StrumLine(FlxG.width * 0.25, noteSkinData.baseStrumY, Options.downscroll, true, noteSkin ?? currentChart.meta.game.noteSkin);
-        opponentStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
+        opponentStrumLine.scrollSpeed = scrollSpeed;
         add(opponentStrumLine);
 
         playerStrumLine = new StrumLine(FlxG.width * 0.75, noteSkinData.baseStrumY, Options.downscroll, false, noteSkin ?? currentChart.meta.game.noteSkin);
-        playerStrumLine.scrollSpeed = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
+        playerStrumLine.scrollSpeed = scrollSpeed;
         add(playerStrumLine);
         
         if(Options.centeredNotes) {

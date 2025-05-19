@@ -19,13 +19,13 @@ class CharterTopBar extends TopBar {
             noteTypeItems.push(Checkbox('(${i}) ${charter.noteTypes[i]}', (value:Bool) -> charter.curNoteType = i, () -> return charter.curNoteType == i));
         
         final vocalItems:Array<DropDownItemType> = [];
-        if(charter.vocals.spectator != null)
-            vocalItems.push(Checkbox("Mute spectator vocals", (value:Bool) -> charter.toggleSpectatorVocals(value), () -> return ChartEditor.editorSettings.muteSpectatorVocals));
+        if(charter.vocals.spectator.length != 0)
+            vocalItems.push(Checkbox('Mute ${(charter.vocals.opponent.length == 0 && charter.vocals.player.length == 0) ? "main" : "spectator"} vocals', (value:Bool) -> charter.toggleSpectatorVocals(value), () -> return ChartEditor.editorSettings.muteSpectatorVocals));
         
-        if(charter.vocals.opponent != null)
+        if(charter.vocals.opponent.length != 0)
             vocalItems.push(Checkbox("Mute opponent vocals", (value:Bool) -> charter.toggleOpponentVocals(value), () -> return ChartEditor.editorSettings.muteOpponentVocals));
         
-        if(charter.vocals.player != null)
+        if(charter.vocals.player.length != 0)
             vocalItems.push(Checkbox("Mute player vocals", (value:Bool) -> charter.togglePlayerVocals(value), () -> return ChartEditor.editorSettings.mutePlayerVocals));
 
         if(vocalItems.length != 0)
