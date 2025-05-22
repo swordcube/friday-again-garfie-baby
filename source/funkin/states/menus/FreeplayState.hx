@@ -186,7 +186,7 @@ class FreeplayState extends FunkinState {
                 tryingToListen = true;
                 grpSongs.active = false;
                 
-                FlxG.sound.playMusic(Paths.sound('gameplay/songs/${song.id}/${currentMix}/music/inst'), 0, false);
+                FlxG.sound.playMusic(Paths.sound('gameplay/songs/${song.id}/${currentMix}/music/inst'), 0, true);
                 FlxG.sound.music.fadeIn(2.0, 0.0, 1.0);
                 
                 final meta:SongMetadata = song.metadata.get(currentMix);
