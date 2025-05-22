@@ -235,7 +235,7 @@ class CharacterEditor extends UIState {
             if(characters.contains(character))
                 return;
 
-            final contentPack:String = Paths.getContentPackFromPath(path);
+            final contentPack:String = Paths.getContentPackFromPath(path) ?? "default";
             items.push(Button((contentPack != "default") ? '${contentPack}:${character}' : character, null, () -> changeCharacter(character, contentPack)));
         });
         final dropdown:DropDown = new DropDown(selectCharacterButton.x, selectCharacterButton.y + selectCharacterButton.height, 0, 0, items);
