@@ -15,7 +15,8 @@ class ComboDisplay extends FlxSpriteGroup {
         super(x, y);
         this.skin = skin;
 
-        for(i in 0...20) {
+        maxSize = 40;
+        for(i in 0...Std.int(maxSize / 2)) {
             final rating:RatingSprite = new RatingSprite().setup(x, y, Scoring.getJudgements().first(), skin ?? (this.skin ?? "funkin"));
             rating.kill();
             add(rating);
@@ -27,14 +28,14 @@ class ComboDisplay extends FlxSpriteGroup {
     }
 
     public function getRatingSprite():RatingSprite {
-        final sprite:RatingSprite = cast recycle(RatingSprite);
+        final sprite:RatingSprite = cast group.getFirst(_isRatingSprite);
         members.remove(sprite);
         members.push(sprite);
         return sprite;
     }
 
     public function getComboDigitSprite():ComboDigitSprite {
-        final sprite:ComboDigitSprite = cast recycle(ComboDigitSprite);
+        final sprite:ComboDigitSprite = cast group.getFirst(_isComboDigitSprite);
         members.remove(sprite);
         members.push(sprite);
         return sprite;
@@ -102,6 +103,14 @@ class ComboDisplay extends FlxSpriteGroup {
             digitSprites.push(sprite);
         }
         return digitSprites;
+    }
+
+    private static function _isRatingSprite(sprite:FlxSprite):Bool {
+        return sprite is RatingSprite;
+    }
+
+    private static function _isComboDigitSprite(sprite:FlxSprite):Bool {
+        return sprite is ComboDigitSprite;
     }
 }
 

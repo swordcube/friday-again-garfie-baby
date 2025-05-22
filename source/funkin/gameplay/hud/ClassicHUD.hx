@@ -93,6 +93,7 @@ class ClassicHUD extends BaseHUD {
             iconP1.updateHitbox();
             positionIcons();
         };
+        positionIcons();
     }
     
     override function beatHit(beat:Int):Void {

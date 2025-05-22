@@ -48,6 +48,7 @@ class StrumLine extends FlxSpriteGroup {
         add(holdCovers);
 
         splashes = new FlxTypedSpriteGroup<NoteSplash>();
+        splashes.maxSize = Constants.KEY_COUNT * 3;
         add(splashes);
 
         for(i in 0...Constants.KEY_COUNT) {

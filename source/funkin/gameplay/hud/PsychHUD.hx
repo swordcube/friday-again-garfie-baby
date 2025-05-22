@@ -220,6 +220,8 @@ class PsychHUD extends BaseHUD {
 
         iconP2.bopTween.cancel();
         iconP1.bopTween.cancel();
+
+        positionIcons();
     }
 
     override function beatHit(beat:Int):Void {
