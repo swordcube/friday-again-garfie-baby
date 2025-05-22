@@ -25,6 +25,7 @@ import funkin.backend.events.NoteEvents;
 
 import funkin.gameplay.UISkin;
 import funkin.gameplay.notes.NoteSkin;
+import funkin.gameplay.notes.StrumLine;
 
 import funkin.gameplay.PlayerStats;
 import funkin.gameplay.character.CharacterData;
@@ -133,6 +134,12 @@ class PlayState extends FunkinState {
 
 	public var currentChart:ChartData;
 	public var playField:PlayField;
+
+	public var opponentStrumLine(get, never):StrumLine;
+	public var opponentStrums(get, never):StrumLine;
+	
+	public var playerStrumLine(get, never):StrumLine;
+	public var playerStrums(get, never):StrumLine;
 
 	public var countdown:Countdown;
 	public var eventRunner:EventRunner;
@@ -1474,6 +1481,26 @@ class PlayState extends FunkinState {
 	@:noCompletion
 	private inline function get_songPercent():Float {
 		return FlxMath.bound(Conductor.instance.rawTime / songLength, 0, 1);
+	}
+
+	@:noCompletion
+	private inline function get_opponentStrumLine():StrumLine {
+		return playField.opponentStrumLine;
+	}
+
+	@:noCompletion
+	private inline function get_opponentStrums():StrumLine {
+		return playField.opponentStrumLine;
+	}
+
+	@:noCompletion
+	private inline function get_playerStrumLine():StrumLine {
+		return playField.playerStrumLine;
+	}
+
+	@:noCompletion
+	private inline function get_playerStrums():StrumLine {
+		return playField.playerStrumLine;
 	}
 
 	@:noCompletion
