@@ -10,6 +10,9 @@ class IncludeMacro {
     public static function build() {
         #if macro
         final includes:Array<String> = [
+            // OPENFL
+            "openfl.system", "openfl.display", "openfl.geom", "openfl.media",
+
 			// FLIXEL
 			"flixel.util", "flixel.ui", "flixel.tweens", "flixel.tile", "flixel.text",
 			"flixel.system", "flixel.sound", "flixel.path", "flixel.math", "flixel.input",
@@ -29,6 +32,9 @@ class IncludeMacro {
             // FUNKIN
             "funkin",
 
+            // HAXELIBS
+            "flxanimate",
+
 			// LET'S GO GAMBLING!
 			"sys"
 		];
@@ -37,7 +43,10 @@ class IncludeMacro {
             "haxe.ui.macros",
             
             // FLIXEL
-            "flixel.system.macros"
+            "flixel.system.macros",
+
+            // HAXELIBS
+            "flxanimate.format", "flxanimate.motion" 
         ];
         final isHashlink:Bool = Context.defined("hl");
         if(isHashlink) {
@@ -48,6 +57,8 @@ class IncludeMacro {
             // FATAL ERROR : Failed to load library sqlite.hdll
             ignores.push("sys.db");
             ignores.push("sys.ssl");
+        } else {
+            includes.push("openfl.net");
         }
         for(inc in includes)
 			Compiler.include(inc, true, ignores);

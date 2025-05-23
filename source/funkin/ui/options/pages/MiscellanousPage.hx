@@ -65,5 +65,6 @@ class MiscellanousPage extends OptionPage {
             }
         }
         fpsOption.updateValue(fpsOption.getValue());
+        super.initOptions();
     }
 }

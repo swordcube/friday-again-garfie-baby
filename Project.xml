@@ -104,6 +104,14 @@
 	-->
 	<define name="SAVE_CRASH_LOGS" if="CRASH_HANDLER" unless="NO_SAVE_CRASH_LOGS" />
 
+	<!--
+		Comment/delete this line below to disable crash log saving
+		Or compile with the NO_COMPILE_ALL_CLASSES define, like so:
+
+		lime test platform -DNO_COMPILE_ALL_CLASSES
+	-->
+	<define name="COMPILE_ALL_CLASSES" if="SCRIPTING_ALLOWED" unless="NO_COMPILE_ALL_CLASSES || DONT_COMPILE_ALL_CLASSES || COMPILE_USED_CLASSES_ONLY" />
+
 	<!-- _____________________________ Path Settings ____________________________ -->
 	
 	<!--
@@ -224,11 +232,13 @@
 
 	<!-- _________________________________ Custom _______________________________ -->
 
-	<!--Allows unused classes to be compiled, useful for scripting-->
-    <haxeflag name="-dce" value="no" if="SCRIPTING_ALLOWED" />
-
-    <!--Include every class into the executable, useful for scripting -->
-    <haxeflag name="--macro" value="funkin.backend.macros.IncludeMacro.build()" if="SCRIPTING_ALLOWED" />
+	<section if="COMPILE_ALL_CLASSES">
+		<!--Allows unused classes to be compiled, useful for scripting-->
+		<haxeflag name="-dce" value="no" if="SCRIPTING_ALLOWED" />
+	
+		<!--Include most classes into the executable, useful for scripting -->
+		<haxeflag name="--macro" value="funkin.backend.macros.IncludeMacro.build()" if="SCRIPTING_ALLOWED" />
+	</section>
 
     <!-- Fix compiling issues with local libraries -->
     <setenv name="HAXEPATH" value="./"/>

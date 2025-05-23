@@ -314,15 +314,60 @@ class Paths {
             Options.toggledContentPacks.set(pack, true);
         }
         // remove duplicates from the list
+        // and clear custom option pages
         Options.contentPackOrder = packs.removeDuplicates();
+
+        Options.customPages.clear();
+        Options.customOptionConfigs.clear();
         
         // register the content packs in the correct order (and if they're enabled)
         final packs:Array<String> = cast Options.contentPackOrder;
         for(i in 0...packs.length) {
             final pack:String = packs[i];
             if(Options.toggledContentPacks.get(pack)) {
+                // register me that yummy asset loader 😋
                 final loader:ContentAssetLoader = new ContentAssetLoader(contentPacksToFolders.get(pack));
                 registerAssetLoader(pack, loader);
+
+                // init any new options for this content pack
+                final jsonPath:String = Paths.json("options", pack, false);
+                if(FlxG.assets.exists(jsonPath)) {
+                    final parser:JsonParser<CustomOptionsData> = new JsonParser<CustomOptionsData>();
+                    parser.ignoreUnknownVariables = true;
+    
+                    final optionsData:CustomOptionsData = parser.fromJson(FlxG.assets.getText(jsonPath));
+                    Options.customPages.set(pack, optionsData.pages);
+
+                    var map:Map<String, Dynamic> = Options.customOptions.get(pack);
+                    if(map == null)
+                        map = new Map<String, Dynamic>();
+                    
+                    var arr:Array<CustomOption> = Options.customOptionConfigs.get(pack);
+                    if(arr == null)
+                        arr = new Array<CustomOption>();
+                    
+                    for(option in optionsData.options) {
+                        final config:CustomOption = {
+                            name: option.name,
+                            description: option.description,
+
+                            id: '${pack}://${option.id}',
+                            defaultValue: option.defaultValue,
+
+                            type: option.type,
+                            params: option.params,
+
+                            page: option.page,
+                            showInMenu: option.showInMenu
+                        };
+                        arr.push(config);
+                        
+                        if(map.get(option.id) == null)
+                            map.set(option.id, option.defaultValue);
+                    }
+                    Options.customOptions.set(pack, map);
+                    Options.customOptionConfigs.set(pack, arr);
+                }
             }
         }
     }
@@ -479,6 +524,10 @@ class Paths {
             Cache.atlasCache.set(key, atlas);
         }
         return cast Cache.atlasCache.get(key);
+    }
+
+    public static function animateAtlas(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        return getAsset(name, loaderID, useFallback);
     }
 
     public static function iterateDirectory(dir:String, callback:String->Void, ?recursive:Bool = false):Void {

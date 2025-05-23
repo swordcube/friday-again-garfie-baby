@@ -157,6 +157,7 @@ class FunkinScript {
         setClass(funkin.states.menus.MainMenuState);
         setClass(funkin.states.menus.StoryMenuState);
         setClass(funkin.states.menus.FreeplayState);
+        setClass(funkin.states.menus.CreditsState);
         setClass(funkin.states.menus.OptionsState);
         setClass(funkin.states.menus.ContentPackState);
         

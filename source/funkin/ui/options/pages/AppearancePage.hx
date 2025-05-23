@@ -43,5 +43,6 @@ class AppearancePage extends OptionPage {
             id: "hudType",
             type: TList(["Classic", "Psych"])
         });
+        super.initOptions();
     }
 }

@@ -10,19 +10,19 @@ class MainPage extends Page {
     public var pages:Array<PageData> = [
         {
             name: "Gameplay",
-            menu: GameplayPage
+            menu: () -> new GameplayPage()
         },
         {
             name: "Appearance",
-            menu: AppearancePage
+            menu: () -> new AppearancePage()
         },
         {
             name: "Miscellanous",
-            menu: MiscellanousPage
+            menu: () -> new MiscellanousPage()
         },
         {
             name: "Controls",
-            menu: ControlsPage
+            menu: () -> new ControlsPage()
         }
     ];
     public var curSelected:Int = 0;
@@ -33,6 +33,14 @@ class MainPage extends Page {
     override function create():Void {
         super.create();
 
+        for(pack => customPages in Options.customPages) {
+            for(page in customPages) {
+                pages.push({
+                    name: page,
+                    menu: () -> new OptionPage('${pack}://${page}')
+                });
+            }
+        }
         menuItems = new FlxTypedSpriteContainer<AtlasText>();
         add(menuItems);
 
@@ -71,7 +79,7 @@ class MainPage extends Page {
             changeSelection(1);
 
         if(controls.justPressed.ACCEPT)
-            FlxTimer.wait(0.001, () -> menu.loadPage(Type.createInstance(pages[curSelected].menu, [])));
+            FlxTimer.wait(0.001, () -> menu.loadPage(pages[curSelected].menu()));
 
         if(controls.justPressed.BACK) {
             Options.save();
@@ -101,5 +109,5 @@ class MainPage extends Page {
 
 typedef PageData = {
     var name:String;
-    var menu:Class<Page>;
+    var menu:Void->Page;
 }

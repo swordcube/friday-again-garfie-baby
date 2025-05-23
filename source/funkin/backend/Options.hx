@@ -40,6 +40,17 @@ class Options {
         "playbackRate" => 1
     ];
 
+    // CUSTOM OPTIONS //
+
+    @:ignore
+    public static var customOptions:Map<String, Map<String, Dynamic>>;
+
+    @:ignore
+    public static var customOptionConfigs:Map<String, Array<CustomOption>>;
+
+    @:ignore
+    public static var customPages:Map<String, Array<String>>;
+
     // NOT SHOWN IN OPTIONS MENU, BUT NEEDS TO BE SAVED REGARDLESS //
 
     public static var contentPackOrder:Array<String> = [];
@@ -73,8 +84,17 @@ class Options {
             doFlush = true;
             toggledContentPacks = new Map<String, Bool>();
         }
+        customOptions = _save.data.customOptions;
+
+        if(customOptions == null) {
+            doFlush = true;
+            customOptions = new Map<String, Map<String, Dynamic>>();
+        }
         if(doFlush)
             save();
+
+        customPages = new Map<String, Array<String>>();
+        customOptionConfigs = new Map<String, Array<CustomOption>>();
         
         FlxG.autoPause = autoPause;
         _lastVolume = FlxG.save.data.volume;
@@ -121,6 +141,7 @@ class Options {
     public static function save():Void {
         _save.data.gameplayModifiers = gameplayModifiers;
         _save.data.toggledContentPacks = toggledContentPacks;
+        _save.data.customOptions = customOptions;
         _save.flush();
     }
 
@@ -134,4 +155,45 @@ class Options {
 
     @:ignore
     private static var _musicVolTween:FlxTween;
+}
+
+@:structInit
+class CustomOption {
+    public var name:String;
+
+    @:optional
+    @:default("No description available.")
+    public var description:String;
+
+    public var id:String;
+
+    @:optional
+    @:jcustomparse(funkin.utilities.DataParse.dynamicValue)
+	@:jcustomwrite(funkin.utilities.DataWrite.dynamicValue)
+    public var defaultValue:Dynamic;
+
+    public var type:String;
+
+    @:optional
+    @:default({})
+    @:jcustomparse(funkin.utilities.DataParse.dynamicValue)
+	@:jcustomwrite(funkin.utilities.DataWrite.dynamicValue)
+    public var params:Dynamic;
+
+    public var page:String;
+
+    @:optional
+    @:default(true)
+    public var showInMenu:Bool; // just in case you need to add it yourself, for callbacks n shit
+}
+
+@:structInit
+class CustomOptionsData {
+    @:optional
+    @:default([])
+    public var pages:Array<String>;
+
+    @:optional
+    @:default([])
+    public var options:Array<CustomOption>;
 }

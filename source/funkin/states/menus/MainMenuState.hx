@@ -46,6 +46,7 @@ class MainMenuState extends FunkinState {
                 callback: () -> FlxG.switchState(OptionsState.new.bind({exitState: null})),
             },
         ];
+        call("onInitOptions", [options]);
     }
 
     override function create():Void {

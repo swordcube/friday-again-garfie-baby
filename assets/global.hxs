@@ -20,10 +20,8 @@ function onUpdate(dt) {
             final constructor = FlxG.state._constructor;
             FlxG.game._nextState = constructor;
             FlxG.game.switchState();
-        } else {
-            trace("Reloading state normally...");
+        } else
             FlxG.resetState();
-        }
     }
     if(Controls.instance.justPressed.check(Control.EMERGENCY)) {
         trace("Forcefully loading main menu...");

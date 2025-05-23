@@ -48,5 +48,6 @@ class GameplayPage extends OptionPage {
             id: "hitWindow",
             type: TInt(5, 180, 5)
         });
+        super.initOptions();
     }
 }

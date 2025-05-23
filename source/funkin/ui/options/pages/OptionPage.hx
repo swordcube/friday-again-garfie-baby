@@ -9,6 +9,7 @@ import funkin.ui.options.*;
 class OptionPage extends Page {
     public static final OPTION_HEIGHT:Float = 120;
 
+    public var contentPack:String;
     public var pageName:String;
 
     public var curSelected:Int = 0;
@@ -24,7 +25,13 @@ class OptionPage extends Page {
 
     public function new(pageName:String) {
         super();
-        this.pageName = pageName;
+
+        final split:Array<String> = pageName.split("://");
+        if(split.length > 1) {
+            this.contentPack = split[0];
+            this.pageName = split[1];
+        } else
+            this.pageName = pageName;
     }
 
     override function create():Void {
@@ -34,7 +41,7 @@ class OptionPage extends Page {
         add(grpOptions);
 
         initOptions();
-
+        
         for(i => option in grpOptions)
             option.setPosition(0, 30 + (70 * i));
 
@@ -91,7 +98,34 @@ class OptionPage extends Page {
      * Initialize your options for this page
      * by overriding this function!
      */
-    public function initOptions():Void {}
+    public function initOptions():Void {
+        if(contentPack == null)
+            return;
+
+        final options = Options.customOptionConfigs.get(contentPack);
+        if(options == null)
+            return;
+
+        for(config in options) {
+            final type:OptionType = switch(config.type.toLowerCase()) {
+                case "bool", "boolean", "checkbox": TCheckbox;
+                case "float": TFloat(config.params.min ?? 0.0, config.params.max ?? 1.0, config.params.step ?? 0.1, config.params.decimals ?? 0);
+                case "int": TInt(config.params.min ?? 0, config.params.max ?? 1, config.params.step ?? 1);
+                case "list": TList(config.params.values ?? new Array<String>());
+                default: null;
+            };
+            if(type == null || !config.showInMenu)
+                continue;
+
+            addOption({
+                name: config.name,
+                description: config.description,
+
+                id: config.id,
+                type: type
+            });
+        }
+    }
 
     public function addOption(data:OptionData):Option {
         final isGameplayModifier:Bool = data.isGameplayModifier ?? false;
