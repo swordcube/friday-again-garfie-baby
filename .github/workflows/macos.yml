@@ -27,9 +27,11 @@ jobs:
             cache-build-mac
       - name: Installing/Updating libraries
         run: |
+          rm -rf .haxelib/
           haxelib --global --always install hmm
           haxelib run hmm install
           haxelib update --always
+          haxelib set lime git
       
       - name: Building HXCPP
         run: |
