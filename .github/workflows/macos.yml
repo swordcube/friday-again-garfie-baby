@@ -29,6 +29,7 @@ jobs:
         run: |
           haxelib --global --always install hmm
           haxelib run hmm install
+          haxelib update --always
       
       - name: Building HXCPP
         run: |
