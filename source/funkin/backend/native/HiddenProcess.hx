@@ -35,17 +35,17 @@ class Stdin extends haxe.io.Output {
 		buf = haxe.io.Bytes.alloc(1);
 	}
 
-	public override function close() {
+	override function close() {
 		super.close();
 		NativeProcess.process_stdin_close(p);
 	}
 
-	public override function writeByte(c) {
+	override function writeByte(c) {
 		buf.set(0, c);
 		writeBytes(buf, 0, 1);
 	}
 
-	public override function writeBytes(buf:haxe.io.Bytes, pos:Int, len:Int):Int {
+	override function writeBytes(buf:haxe.io.Bytes, pos:Int, len:Int):Int {
 		try {
 			return NativeProcess.process_stdin_write(p, buf.getData(), pos, len);
 		} catch (e:Dynamic) {
@@ -66,13 +66,13 @@ class Stdout extends haxe.io.Input {
 		buf = haxe.io.Bytes.alloc(1);
 	}
 
-	public override function readByte() {
+	override function readByte() {
 		if (readBytes(buf, 0, 1) == 0)
 			throw haxe.io.Error.Blocked;
 		return buf.get(0);
 	}
 
-	public override function readBytes(str:haxe.io.Bytes, pos:Int, len:Int):Int {
+	override function readBytes(str:haxe.io.Bytes, pos:Int, len:Int):Int {
 		var result:Int;
 		try {
 			result = out ? NativeProcess.process_stdout_read(p, str.getData(), pos, len) : NativeProcess.process_stderr_read(p, str.getData(), pos, len);
