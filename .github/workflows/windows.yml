@@ -45,7 +45,6 @@ jobs:
 
       - name: Building the game
         run: |
-          rm -r -fo export/
           haxelib --always run lime build windows -DDEV_BUILD
       
       - name: Uploading artifact (entire build)
