@@ -53,6 +53,13 @@
       "url": "https://github.com/swordcube/hxdiscord_gamesdk"
     },
     {
+      "name": "hxnativefiledialog",
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/swordcube/hxnativefiledialog-zenity.git"
+    },
+    {
       "name": "hxp",
       "type": "haxelib",
       "version": null
@@ -91,6 +98,13 @@
       "dir": null,
       "ref": "main",
       "url": "https://github.com/swordcubes-grave-of-shite/lscript"
+    },
+    {
+      "name": "moonchart",
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/MaybeMaru/moonchart"
     },
     {
       "name": "openfl",

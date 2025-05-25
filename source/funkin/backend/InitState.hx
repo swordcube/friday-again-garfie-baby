@@ -15,6 +15,10 @@ import funkin.graphics.RatioScaleModeEx;
 import funkin.utilities.FlxUtil;
 import funkin.utilities.AudioSwitchFix;
 
+#if USE_MOONCHART
+import moonchart.backend.FormatDetector;
+import funkin.gameplay.song.moonchart.GarfieFormat;
+#end
 import funkin.gameplay.song.Highscore;
 
 import funkin.states.PlayState;
@@ -111,6 +115,11 @@ class InitState extends FlxState {
         Conductor.instance = new Conductor();
         Conductor.instance.dispatchToStates = true;
         FlxG.plugins.addPlugin(Conductor.instance);
+
+        // init moonchart shit
+        #if USE_MOONCHART
+        FormatDetector.registerFormat(GarfieFormat.__getFormat());
+        #end
 
         // init extra plugins
         FlxG.plugins.addPlugin(new ForceCrashPlugin());

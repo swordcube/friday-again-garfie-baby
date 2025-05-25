@@ -12,6 +12,7 @@ import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.PNGEncoderOptions;
 
+import funkin.utilities.FileUtil;
 import funkin.utilities.MemoryUtil;
 
 /**
@@ -130,7 +131,7 @@ class ScreenShotPreview extends Sprite {
     }
 
     private function onMouseUp(e:MouseEvent):Void {
-        CoolUtil.openFolder(Path.directory(FileSystem.fullPath(imagePath)));
+        FileUtil.openFolder(Path.directory(FileSystem.fullPath(imagePath)));
     }
 
     private function onMouseOver(e:MouseEvent):Void {

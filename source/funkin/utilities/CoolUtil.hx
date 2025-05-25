@@ -1,6 +1,5 @@
 package funkin.utilities;
 
-import sys.FileSystem;
 import lime.app.Future;
 import openfl.media.Sound;
 
@@ -55,28 +54,6 @@ class CoolUtil {
         Sys.command('/usr/bin/xdg-open', [url]);
         #else
         FlxG.openURL(url);
-        #end
-    }
-
-    /**
-     * A utility function to open a folder in the file manager.
-     * 
-     * @param  pathFolder  The path of the folder to open.
-     */
-    public static function openFolder(pathFolder:String):Void {
-        if(FileSystem.exists(pathFolder) && !FileSystem.isDirectory(pathFolder))
-            throw 'Invalid folder: ${pathFolder}';
-
-        #if windows
-        // windows is dumb <3
-        final oldCwd:String = Sys.getCwd();
-        Sys.setCwd(pathFolder);
-        Sys.command("explorer", ["."]);
-        Sys.setCwd(oldCwd);
-        #elseif mac
-        Sys.command("open", [pathFolder]);
-        #elseif linux
-        Sys.command("/usr/bin/xdg-open", [pathFolder]);
         #end
     }
 

@@ -1,0 +1,44 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "bf",
+		"ratings": {}
+	},
+	"game": {
+		"stage": "stage",
+		"scrollSpeed": {
+			"easy": 1.4,
+			"normal": 1.6,
+			"hard": 1.8
+		},
+		"characters": {
+			"spectator": "gf",
+			"opponent": "dad",
+			"player": "bf"
+		},
+		"noteSkin": "default",
+		"uiSkin": "default"
+	},
+	"song": {
+		"timingPoints": [
+			{
+				"b": 120,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"artist": "Kawai Sprite",
+		"charter": "ninjamuffin99 + MtH",
+		"bpm": 120,
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [],
+		"title": "Fresh"
+	}
+}

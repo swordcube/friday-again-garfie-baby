@@ -112,6 +112,14 @@
 	-->
 	<define name="COMPILE_ALL_CLASSES" if="SCRIPTING_ALLOWED" unless="NO_COMPILE_ALL_CLASSES || DONT_COMPILE_ALL_CLASSES || COMPILE_USED_CLASSES_ONLY" />
 
+	<!--
+		Comment/delete this line below to disable Moonchart
+		Or compile with the NO_MOONCHART define, like so:
+
+		lime test platform -DNO_MOONCHART
+	-->
+	<define name="USE_MOONCHART" unless="NO_MOONCHART" />
+
 	<!-- _____________________________ Path Settings ____________________________ -->
 	
 	<!--
@@ -137,6 +145,16 @@
 
 	<!-- _______________________________ Libraries ______________________________ -->
 
+	<!--
+		Native File Dialog Library
+		
+		This is here because Lime's built-in file dialog
+		stuff is really broken on Linux and i don't feel
+		like trying to fix it because Lime's codebase
+		is a massive headache
+	-->
+	<haxelib name="hxnativefiledialog" />
+
 	<!-- HaxeFlixel -->
 	<haxelib name="flixel" />
 	<haxelib name="flixel-addons" />
@@ -157,6 +175,9 @@
 
 	<!-- JSON Parsing (Parses to classes instead of dynamic objects) -->
 	<haxelib name="json2object" />
+
+	<!-- Extra chart format support -->
+	<haxelib name="moonchart" if="USE_MOONCHART" />
 
 	<!-- Runtime scripting -->
 	<section if="SCRIPTING_ALLOWED">

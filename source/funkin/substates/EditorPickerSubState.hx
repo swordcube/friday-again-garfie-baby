@@ -4,6 +4,8 @@ import flixel.util.FlxTimer;
 import funkin.ui.AtlasText;
 
 import funkin.states.editors.*;
+import funkin.states.TransitionableState;
+
 import funkin.substates.transition.FadeTransition;
 
 class EditorPickerSubState extends FunkinSubState {
@@ -40,6 +42,11 @@ class EditorPickerSubState extends FunkinSubState {
                 song: null,
                 difficulty: null
             }));
+        });
+        addItem("Chart Converter", () -> {
+            TransitionableState.skipNextTransIn = true;
+            TransitionableState.skipNextTransOut = true;
+            FlxG.switchState(ChartConverter.new);
         });
         addItem("Character Editor", () -> {
             final transitionCam:FlxCamera = new FlxCamera();

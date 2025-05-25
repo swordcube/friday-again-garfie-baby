@@ -65,6 +65,7 @@ class GameplayData {
     }
 }
 
+@:structInit
 class SongMetadata {
 	public var song:SongData;
 	public var freeplay:FreeplayData;

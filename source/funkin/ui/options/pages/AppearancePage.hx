@@ -37,6 +37,13 @@ class AppearancePage extends OptionPage {
             callback: (value:Dynamic, _) -> Main.statsDisplay.visible = value
         });
         addOption({
+            name: "Intensive Shaders",
+            description: "Whether or not intensive shaders can be used.\n\nThese kinds of shaders can cause performance issues on lower end machines,\nSo you may want to turn this off!\n\nThis may not work for all mods, be warned!",
+        
+            id: "intensiveShaders",
+            type: TCheckbox
+        });
+        addOption({
             name: "HUD Type",
             description: "Changes how the HUD looks during gameplay.\nThis only works if the song has the default HUD skin!",
 
