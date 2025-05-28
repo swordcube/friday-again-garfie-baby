@@ -28,6 +28,7 @@ jobs:
       
       - name: Installing LibVLC and LuaJIT
         run: |
+          sudo apt-get update
           sudo apt-get install libvlc-dev libvlccore-dev libluajit-5.1-dev
 
       - name: Install lime dependencies
