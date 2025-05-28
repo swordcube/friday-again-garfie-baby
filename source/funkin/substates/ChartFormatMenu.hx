@@ -10,6 +10,8 @@ import haxe.io.Path;
 
 import moonchart.formats.*;
 import moonchart.formats.BasicFormat.BasicChart;
+import moonchart.formats.BasicFormat.DynamicFormat;
+import moonchart.formats.BasicFormat.FormatStringify;
 
 import moonchart.formats.fnf.*;
 import moonchart.formats.fnf.legacy.*;
@@ -208,73 +210,126 @@ class ChartFormatMenu extends FunkinSubState {
         FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
     }
 
-    public function selectChart(fromFormat:Dynamic, toFormat:Dynamic) {
-        var fullChartFilePath:String = null;
-        var fullChartMetaFilePath:String = null;
-
-        FlxTimer.wait(0.25, () -> {
-            final file = new FileDialogMenu(Open, "Select a chart file to convert");
+    public function selectChart(fromFormat:DynamicFormat, toFormat:DynamicFormat) {
+        var fullMetaPath:String = null;
+        function continueConverting() {
+            final file = new FileDialogMenu(OpenMultiple, "Select chart files to convert");
             file.onSelect.add((files:Array<String>) -> {
-                // Select a chart file
-                fullChartFilePath = files[0];
+                var i:Int = 0;
+                var metaToSave:Dynamic = null;
                 
-                FlxTimer.wait(0.25, () -> {
-                    final file = new FileDialogMenu(Open, "Select a chart metadata file to convert");
-                    file.onSelect.add((files:Array<String>) -> {
-                        // Select a chart metadata file
-                        fullChartMetaFilePath = files[0];
-                        convertChart(fullChartFilePath, fullChartMetaFilePath, fromFormat, toFormat);
-                    });
-                    file.onCancel.add(() -> {
-                        convertChart(fullChartFilePath, fullChartMetaFilePath, fromFormat, toFormat);
-                    });
-                    openSubState(file);
-                });
+                function doShit() {
+                    if(i >= files.length) {
+                        // Save the metadata
+                        FlxTimer.wait(0.001, () -> {
+                            if(metaToSave != null) {
+                                final file = new FileDialogMenu(Save, "Select a location to save the metadata", metaToSave, {
+                                    defaultSaveFile: (fullMetaPath != null) ? Path.withoutDirectory(fullMetaPath) : "meta.json",
+                                    filters: ["json"]
+                                });
+                                function yaySuccessGood() {
+                                    Logs.success('Conversion successful! Going back to main menu in 2 seconds...');
+                                    if(onSuccess != null)
+                                        onSuccess();
+                                }
+                                file.onSelect.add((_) -> yaySuccessGood());
+                                file.onCancel.add(yaySuccessGood);
+                                openSubState(file);
+                            }
+                        });
+                        return;
+                    }
+                    
+                    // Select chart files to convert
+                    // These files will correspond to each difficulty
+                    
+                    // for most FNF charts, only a single chart is required for
+                    // V-Slice and Garfie Baby formats though
+                    
+                    final filePath:String = files[i];
+                    if(filePath == null)
+                        return;
+
+                    var curDiff:String = null;
+                    var knownDiffs:Array<String> = ["easy", "normal", "hard"];
+        
+                    var fileName:String = Path.withoutExtension(Path.withoutDirectory(filePath));
+                    if(!fileName.startsWith("chart")) {
+                        var split:Array<String> = fileName.split("-");
+                        for(diff in knownDiffs) {
+                            var detectedDiff:String = split[1];
+                            if(detectedDiff != null)
+                                detectedDiff = detectedDiff.toLowerCase();
+                            else
+                                detectedDiff = fileName;
+
+                            switch(diff.toLowerCase()) {
+                                case "normal":
+                                    // legacy fnf charts are weird
+                                    // and save normal diffs as song only
+                                    // instead of song-normal
+                                    final split2:Array<String> = filePath.replace("\\", "/").split("/");
+                                    final songName:String = split2[split2.length - 2];
+
+                                    if(songName != null && detectedDiff == songName) {
+                                        fileName = diff;
+                                        curDiff = diff;
+                                    }
+                                    else if(detectedDiff == diff) {
+                                        fileName = diff;
+                                        curDiff = diff;
+                                    }
+                
+                                default:
+                                    if(detectedDiff == diff) {
+                                        fileName = detectedDiff;
+                                        curDiff = diff;
+                                    }
+                            }
+                        }
+                    }
+                    trace('Converting ${filePath}');
+                    fromFormat.fromFile(filePath, fullMetaPath);
+                    toFormat.fromFormat(fromFormat, curDiff);
+    
+                    // Cache the metadata for later use
+                    if(metaToSave == null) {
+                        final stringifiedShit:FormatStringify = toFormat.stringify();
+                        metaToSave = stringifiedShit.meta;
+                    }
+                    // Convert & save the chart
+                    final dialog:FileDialogMenu = saveChart(filePath, fileName, toFormat);
+                    dialog.closeCallback = doShit;
+                    i++;
+                }
+                doShit();
             });
             file.onCancel.add(() -> {
                 if(onCancel != null)
                     onCancel();
             });
             openSubState(file);
+        }
+        final file = new FileDialogMenu(Open, "Select a chart metadata file to convert");
+        file.onSelect.add((files:Array<String>) -> {
+            // Select a chart metadata file to convert
+            fullMetaPath = files[0];
+            continueConverting();
         });
+        file.onCancel.add(continueConverting);
+        openSubState(file);
     }
 
-    public function convertChart(chartPath:String, chartMetaPath:String, fromFormat:Dynamic, toFormat:Dynamic) {
-        trace(fromFormat, toFormat);
-        fromFormat.fromFile(chartPath, chartMetaPath);
+    public function saveChart(chartPath:String, fileName:String, toFormat:DynamicFormat):FileDialogMenu {
+        final ext:String = Path.extension(chartPath);
+        final stringifiedShit:FormatStringify = toFormat.stringify();
 
-        final basic:BasicChart = fromFormat.toBasicFormat();
-        toFormat.fromFormat(fromFormat);
-
-        final stringifiedShit:Dynamic = toFormat.stringify();
-        FlxTimer.wait(0.25, () -> {
-            final file = new FileDialogMenu(Save, "Select a location to save the metadata", stringifiedShit.meta, {
-                defaultSaveFile: (chartMetaPath != null) ? Path.withoutDirectory(chartMetaPath) : "meta.json",
-                filters: ["json"]
-            });
-            openSubState(file);
-
-            var diffsSaved:Int = 1;
-            final ext:String = Path.extension(chartPath);
-            for(key in basic.data.diffs.keys()) {
-                diffsSaved++;
-                toFormat.fromFormat(fromFormat, key);
-
-                final stringifiedShit:Dynamic = toFormat.stringify();
-                FlxTimer.wait(0.25 * diffsSaved, () -> {
-                    final file = new FileDialogMenu(Save, "Select a location to save the chart", stringifiedShit.data, {
-                        defaultSaveFile: '${Path.withoutExtension(Path.withoutDirectory(chartPath))}-${key}.${ext}',
-                        filters: ["json"]
-                    });
-                    openSubState(file);
-                });
-            }
-            FlxTimer.wait((0.25 * diffsSaved) + 0.5, () -> {
-                Logs.success('Conversion successful! Going back to main menu in 2 seconds...');
-                if(onSuccess != null)
-                    onSuccess();
-            });
+        final file = new FileDialogMenu(Save, "Select a location to save the chart", stringifiedShit.data, {
+            defaultSaveFile: '${fileName}.${ext}',
+            filters: [ext]
         });
+        openSubState(file);
+        return file;
     }
 
     // --------------- //

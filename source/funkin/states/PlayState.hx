@@ -480,10 +480,15 @@ class PlayState extends FunkinState {
 			Cache.preloadAssets(charactersToLoad);
 			Cache.preloadAssets(stageAssetsToPreload);
 
+			final rawCharacterIDs:Array<String> = [
+				currentChart.meta.game.getCharacter("spectator"),
+				currentChart.meta.game.getCharacter("opponent"),
+				currentChart.meta.game.getCharacter("player")
+			];
 			stage = new Stage(currentChart.meta.game.stage, {
-				spectator: new Character(currentChart.meta.game.getCharacter("spectator"), false),
-				opponent: new Character(currentChart.meta.game.getCharacter("opponent"), false),
-				player: new Character(currentChart.meta.game.getCharacter("player"), true)
+				spectator: new Character(rawCharacterIDs[0], false),
+				opponent: new Character(rawCharacterIDs[1], false),
+				player: new Character(rawCharacterIDs[2], true)
 			});
 			camGame.zoom = stage.data.zoom;
 			add(stage);
@@ -491,6 +496,12 @@ class PlayState extends FunkinState {
 			spectator = stage.characters.spectator;
 			opponent = stage.characters.opponent;
 			player = stage.characters.player;
+
+			if(rawCharacterIDs[1] == rawCharacterIDs[0]) {
+				opponent.setPosition(spectator.x, spectator.y);
+				opponent.scrollFactor.set(spectator.scrollFactor.x, spectator.scrollFactor.y);
+				spectator.kill();
+			}
 		}
 		else {
 			final bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menus/bg_desat"));
@@ -731,12 +742,15 @@ class PlayState extends FunkinState {
 				switch(curCameraTarget) {
 					case OPPONENT:
 						opponent.getCameraPosition(cameraPos);
+						cameraPos += stage.cameraOffsets.get("opponent");
 		
 					case PLAYER:
 						player.getCameraPosition(cameraPos);
+						cameraPos += stage.cameraOffsets.get("player");
 		
 					case SPECTATOR:
 						spectator.getCameraPosition(cameraPos);
+						cameraPos += stage.cameraOffsets.get("spectator");
 				}
 				var event:CameraMoveEvent = cast Events.get(CAMERA_MOVE);
 				event.recycle(cameraPos);

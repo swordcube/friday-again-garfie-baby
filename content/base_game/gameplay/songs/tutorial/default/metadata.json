@@ -1,0 +1,45 @@
+{
+    "song": {
+        "title": "Tutorial",
+        "mixes": [],
+        "difficulties": [
+            "easy",
+            "normal",
+            "hard"
+        ],
+        "timingPoints": [
+            {
+                "t": 0,
+                "b": 100,
+                "ts": [
+                    4,
+                    4
+                ]
+            }
+        ],
+        "artist": "Kawai Sprite",
+        "charter": "ninjamuffin99 + MtH",
+        "tracks": null
+    },
+    "freeplay": {
+        "ratings": {},
+        "icon": "bf",
+        "album": "vol1"
+    },
+    "game": {
+        "characters": {
+            "player": "bf",
+            "spectator": "gf",
+            "opponent": "gf"
+        },
+        "scrollSpeed": {
+            "easy": 1,
+            "normal": 1,
+            "hard": 1
+        },
+        "stage": "stage",
+        "noteSkin": "default",
+        "uiSkin": "default",
+        "hudSkin": null
+    }
+}

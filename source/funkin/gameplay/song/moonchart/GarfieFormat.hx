@@ -25,11 +25,23 @@ class GarfieFormat extends BasicFormat<ChartData, SongMetadata> {
 			name: "FNF (Garfie Baby)",
 			description: "gay sex simulator 2025",
 			extension: "json",
+            formatFile: formatFile,
 			hasMetaFile: POSSIBLE,
 			metaFileExtension: "json",
             specialValues: ['_"n":', '_"e":', '_"n":', '_"e":', '_"n":', '_"e":', '_"n":', '_"e":', '_"n":', '_"e":'],
+            findMeta: (files) -> {
+				for(file in files) {
+					if(FlxG.assets.getText(file).contains('"game":'))
+						return file;
+				}
+				return files[0];
+			},
 			handler: GarfieFormat
 		}
+	}
+
+    public static function formatFile(title:String, diff:String):Array<String> {
+		return ['chart', 'metadata'];
 	}
 
     public function new(?data:ChartData, ?meta:SongMetadata) {
@@ -219,9 +231,9 @@ class GarfieFormat extends BasicFormat<ChartData, SongMetadata> {
         }
         events.sort((a, b) -> Std.int(a.time - b.time));
 
-        final legallyObtainedScrollSpeeds:Dynamic = {};
+        final legallyObtainedScrollSpeeds:Map<String, Float> = [];
         for(diff => scrollSpeed in basicMeta.scrollSpeeds)
-            Reflect.setField(legallyObtainedScrollSpeeds, diff, scrollSpeed);
+            legallyObtainedScrollSpeeds.set(diff, scrollSpeed);
 
         final extraVariants:Array<String> = basicMeta.extraData.get("mixes") ?? basicMeta.extraData.get("variants");
         final realDiffs:Array<String> = [];
@@ -317,15 +329,11 @@ class GarfieFormat extends BasicFormat<ChartData, SongMetadata> {
                 stepsPerBeat: event.timeSignature[1]
             });
         }
-        final legallyObtainedScrollSpeeds:Map<String, Float> = [];
-        for(diff in Reflect.fields(meta.game.scrollSpeed))
-            legallyObtainedScrollSpeeds.set(diff, Reflect.field(meta.game.scrollSpeed, diff));
-
         return {
             title: meta.song.title,
             bpmChanges: basicBPMChanges,
             offset: 0.0,
-            scrollSpeeds: legallyObtainedScrollSpeeds,
+            scrollSpeeds: meta.game.scrollSpeed,
             extraData: [
                 "icon" => meta.freeplay.icon,
                 "album" => meta.freeplay.album,
@@ -348,8 +356,8 @@ class GarfieFormat extends BasicFormat<ChartData, SongMetadata> {
 
     override function stringify() {
         return {
-            data: Json.stringify(data),
-            meta: Json.stringify(meta, "\t")
+            data: ChartData.stringify(data),
+            meta: SongMetadata.stringify(meta)
         };
     }
 }

@@ -140,6 +140,22 @@ class Character extends AttachedSprite implements IBeatReceiver {
         #end
     }
 
+    override function kill():Void {
+        super.kill();
+        #if SCRIPTING_ALLOWED
+        if(_initializedScript && (game == null || (game != null && game.scriptsAllowed)))
+            script.call("onKill");
+        #end
+    }
+
+    override function revive():Void {
+        super.revive();
+        #if SCRIPTING_ALLOWED
+        if(_initializedScript && (game == null || (game != null && game.scriptsAllowed)))
+            script.call("onRevive");
+        #end
+    }
+
     public function applyData(data:CharacterData):Void {
         switch(data.atlas.type) {
             case SPARROW:

@@ -129,7 +129,6 @@
 	<section unless="TEST_BUILD || display || macro">
 		<assets path="assets" />
 		<assets path="content"/>
-		<assets path="tools" />
 	</section>
 
 	<!--

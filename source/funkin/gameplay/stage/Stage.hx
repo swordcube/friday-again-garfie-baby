@@ -1,7 +1,9 @@
 package funkin.gameplay.stage;
 
-import funkin.gameplay.character.Character;
+import flixel.math.FlxPoint;
+
 import funkin.gameplay.stage.props.*;
+import funkin.gameplay.character.Character;
 
 #if SCRIPTING_ALLOWED
 import funkin.scripting.FunkinScript;
@@ -22,7 +24,12 @@ class Stage extends FlxContainer {
     
     public var data:StageData;
     public var characters:CharacterSet;
-    
+
+    public var cameraOffsets:Map<String, FlxPoint> = [
+        "spectator" => new FlxPoint(),
+        "opponent" => new FlxPoint(),
+        "player" => new FlxPoint()
+    ];
     public var props:Map<String, StageProp> = [];
     public var layers:Array<FlxContainer> = [];
     
@@ -77,8 +84,9 @@ class Stage extends FlxContainer {
                         
                     case SPECTATOR:
                         if(!spectatorAdded) {
-                            characters.spectator.x = propData.properties?.position[0] ?? 412.0;
+                            characters.spectator.x = propData.properties?.position[0] ?? 542.0;
                             characters.spectator.y = propData.properties?.position[1] ?? 538.0;
+                            cameraOffsets.get("spectator").set(propData.properties?.camera[0] ?? 0.0, propData.properties?.camera[1] ?? 0.0);
 
                             var scroll:Array<Float> = cast propData.properties?.scroll;
                             if(scroll == null)
@@ -92,8 +100,9 @@ class Stage extends FlxContainer {
                             
                     case OPPONENT:
                         if(!opponentAdded) {
-                            characters.opponent.x = propData.properties?.position[0] ?? 0.0;
-                            characters.opponent.y = propData.properties?.position[1] ?? 612.0;
+                            characters.opponent.x = propData.properties?.position[0] ?? 100.0;
+                            characters.opponent.y = propData.properties?.position[1] ?? 642.0;
+                            cameraOffsets.get("opponent").set(propData.properties?.camera[0] ?? 0.0, propData.properties?.camera[1] ?? 0.0);
 
                             var scroll:Array<Float> = cast propData.properties?.scroll;
                             if(scroll == null)
@@ -107,8 +116,9 @@ class Stage extends FlxContainer {
                         
                     case PLAYER:
                         if(!playerAdded) {
-                            characters.player.x = propData.properties?.position[0] ?? 694.0;
-                            characters.player.y = propData.properties?.position[1] ?? 612.0;
+                            characters.player.x = propData.properties?.position[0] ?? 794.0;
+                            characters.player.y = propData.properties?.position[1] ?? 642.0;
+                            cameraOffsets.get("player").set(propData.properties?.camera[0] ?? 0.0, propData.properties?.camera[1] ?? 0.0);
 
                             var scroll:Array<Float> = cast propData.properties?.scroll;
                             if(scroll == null)
@@ -132,17 +142,17 @@ class Stage extends FlxContainer {
             }
         }
         if(characters.spectator != null && !spectatorAdded) {
-            characters.spectator.setPosition(412.0, 538.0);
+            characters.spectator.setPosition(542.0, 538.0);
             addOnLastLayer(characters.spectator);
             spectatorAdded = true;
         }
         if(characters.opponent != null && !opponentAdded) {
-            characters.opponent.setPosition(0.0, 612.0);
+            characters.opponent.setPosition(100.0, 642.0);
             addOnLastLayer(characters.opponent);
             opponentAdded = true;
         }
         if(characters.player != null && !playerAdded) {
-            characters.player.setPosition(694.0, 612.0);
+            characters.player.setPosition(794.0, 642.0);
             addOnLastLayer(characters.player);
             playerAdded = true;
         }

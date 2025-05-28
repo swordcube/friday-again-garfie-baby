@@ -7,7 +7,22 @@ function onCreatePost() {
     container.insert(container.members.indexOf(super), speakers);
 }
 
+function onUpdate(elapsed:Float) {
+    if(speakers != null)
+        speakers.scrollFactor.set(super.scrollFactor.x, super.scrollFactor.y);
+}
+
 function onPlayAnim(name, context, force, reversed, frame) {
     if(speakers != null)
         speakers.dance();
+}
+
+function onKill() {
+    if(speakers != null)
+        speakers.kill();
+}
+
+function onRevive() {
+    if(speakers != null)
+        speakers.revive();
 }

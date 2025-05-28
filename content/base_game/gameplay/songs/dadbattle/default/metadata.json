@@ -1,0 +1,53 @@
+{
+    "song": {
+        "title": "DadBattle",
+        "mixes": [],
+        "difficulties": [
+            "easy",
+            "normal",
+            "hard"
+        ],
+        "timingPoints": [
+            {
+                "t": 0,
+                "b": 180,
+                "ts": [
+                    4,
+                    4
+                ]
+            }
+        ],
+        "artist": "Kawai Sprite",
+        "charter": "ninjamuffin99 + MtH",
+        "tracks": {
+            "spectator": [],
+            "opponent": [
+                "vocals-dad"
+            ],
+            "player": [
+                "vocals-bf"
+            ]
+        }
+    },
+    "freeplay": {
+        "ratings": {},
+        "icon": "bf",
+        "album": "vol1"
+    },
+    "game": {
+        "characters": {
+            "player": "bf",
+            "spectator": "gf",
+            "opponent": "dad"
+        },
+        "scrollSpeed": {
+            "easy": 1.6,
+            "normal": 1.8,
+            "hard": 2.3
+        },
+        "stage": "stage",
+        "noteSkin": "default",
+        "uiSkin": "default",
+        "hudSkin": null
+    }
+}
