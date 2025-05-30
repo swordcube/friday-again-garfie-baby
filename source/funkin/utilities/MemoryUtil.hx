@@ -42,8 +42,10 @@ class MemoryUtil {
      * ! `[WARNING]` - This can be expensive!
      */
     public static function clearAll():Void {
-        clearMajor();
-        clearMinor();
+        for(i in 0...10) {
+            clearMajor();
+            clearMinor();
+        }
     }
 
     public static function enable():Void {
@@ -64,9 +66,17 @@ class MemoryUtil {
         #elseif hl
         return Gc.stats().currentMemory;
         #elseif sys
-        return cast(cast(System.totalMemory, UInt), Float);
+        return System.totalMemoryNumber;
         #else
         return 0;
+        #end
+    }
+
+    public static function currentAppMemUsage():Float {
+        #if cpp
+        return cast NativeMemory.getCurrentUsage();
+        #else
+        return currentMemUsage();
         #end
     }
 

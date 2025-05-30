@@ -1,7 +1,5 @@
 package funkin.backend;
 
-import flixel.util.FlxStringUtil;
-import funkin.utilities.MemoryUtil;
 import lime.system.System;
 
 import openfl.events.Event;
@@ -9,6 +7,9 @@ import openfl.display.Sprite;
 import openfl.text.TextField;
 
 import flixel.util.FlxColor;
+import flixel.util.FlxStringUtil;
+
+import funkin.utilities.MemoryUtil;
 
 using funkin.utilities.OpenFLUtil;
 
