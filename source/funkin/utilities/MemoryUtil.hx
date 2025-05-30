@@ -42,10 +42,8 @@ class MemoryUtil {
      * ! `[WARNING]` - This can be expensive!
      */
     public static function clearAll():Void {
-        for(i in 0...10) {
-            clearMajor();
-            clearMinor();
-        }
+        clearMajor();
+        clearMinor();
     }
 
     public static function enable():Void {
