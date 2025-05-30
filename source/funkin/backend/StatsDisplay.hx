@@ -44,7 +44,7 @@ class StatsDisplay extends Sprite {
     public function onEnterFrame(e:Event):Void {
         _framesPassed++;
 
-        final deltaTime:Float = System.getTimerPrecise() - _previousTime;
+        final deltaTime:Float = Math.abs(System.getTimerPrecise() - _previousTime);
         _updateClock += deltaTime;
         
         if(_updateClock >= 1000) {

@@ -709,7 +709,7 @@ class PlayState extends FunkinState {
 		if(startingSong && Conductor.instance.time >= -Conductor.instance.offset)
 			startSong();
 
-		if(!_aboutToEndSong && FlxG.sound.music.length >= 1000 && FlxG.sound.music.time >= FlxG.sound.music.length - 1000) {
+		if(!_aboutToEndSong && FlxG.sound.music != null && FlxG.sound.music.length >= 1000 && FlxG.sound.music.time >= FlxG.sound.music.length - 1000) {
 			// failsafe for if FlxSound doesn't decide to function
 			_aboutToEndSong = true;
 			FlxTimer.wait(1, () -> {

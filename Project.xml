@@ -225,7 +225,6 @@
 			<haxedef name="HXCPP_CATCH_SEGV" />
 			<haxedef name="openfl-enable-handle-error" />
 		</section>
-
     </section>
 
 	<!-- Enable generational garbage collection -->

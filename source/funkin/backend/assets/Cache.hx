@@ -126,6 +126,7 @@ class Cache {
 
     public static function clearAll():Void {
         // Clear atlases
+        final pendingAtlasGraphics:Map<String, FlxGraphic> = [];
         for(atlas in atlasCache) {
             if(atlas.parent != null) {
                 atlas.parent.persist = false;
@@ -141,6 +142,10 @@ class Cache {
                 // I check for destroyOnNoUse because if i don't, interacting
                 // with some HaxeUI elements will try to access an invalid graphic
                 // and immediately crash the game
+                if(pendingAtlasGraphics.exists(key)) {
+                    final pendingGraph:FlxGraphic = pendingAtlasGraphics.get(key);
+                    pendingGraph._useCount--;
+                }
                 if(graph != null && !graph.persist && graph.destroyOnNoUse) {
                     // The extra disposing code that was here has
                     // been added to the flixel fork
