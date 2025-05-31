@@ -1,0 +1,20 @@
+{
+  "song": {
+    "title": "South",
+    "mixes": [],
+    "difficulties": ["easy", "normal", "hard"],
+    "timingPoints": [{ "t": 0, "b": 165, "ts": [4, 4] }],
+    "artist": "Kawai Sprite",
+    "charter": "ninjamuffin99 + MtH",
+    "tracks": null
+  },
+  "freeplay": { "ratings": {}, "icon": "bf", "album": "vol1" },
+  "game": {
+    "characters": { "player": "bf", "spectator": "gf", "opponent": "spooky" },
+    "scrollSpeed": { "easy": 1.6, "normal": 1.8, "hard": 2 },
+    "stage": "spookyMansion",
+    "noteSkin": "default",
+    "uiSkin": "default",
+    "hudSkin": null
+  }
+}
