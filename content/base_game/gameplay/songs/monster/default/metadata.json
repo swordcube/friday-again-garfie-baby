@@ -1,0 +1,32 @@
+{
+  "song": {
+    "title": "Monster",
+    "mixes": [],
+    "difficulties": ["easy", "normal", "hard"],
+    "timingPoints": [
+      { "t": 0, "b": 95, "ts": [4, 4] },
+      { "t": 44180, "b": 105, "ts": [4, 4] },
+      { "t": 81860, "b": 110, "ts": [4, 4] },
+      { "t": 81861, "b": 95, "ts": [4, 4] },
+      { "t": 117230, "b": 132, "ts": [4, 4] },
+      { "t": 133310, "b": 107, "ts": [4, 4] },
+      { "t": 133311, "b": 132, "ts": [4, 4] },
+      { "t": 133770, "b": 120, "ts": [4, 4] },
+      { "t": 42975, "b": 100, "ts": [4, 4] },
+      { "t": 81285, "b": 107.5, "ts": [4, 4] },
+      { "t": 132540, "b": 119.5, "ts": [4, 4] }
+    ],
+    "artist": "BassetFilms",
+    "charter": "ChaoticGamerCG + Spazkid",
+    "tracks": null
+  },
+  "freeplay": { "ratings": {}, "icon": "bf", "album": "vol1" },
+  "game": {
+    "characters": { "player": "bf", "spectator": "gf", "opponent": "monster" },
+    "scrollSpeed": { "easy": 1.4, "normal": 1.4, "hard": 1.5 },
+    "stage": "spookyMansion",
+    "noteSkin": "default",
+    "uiSkin": "default",
+    "hudSkin": null
+  }
+}

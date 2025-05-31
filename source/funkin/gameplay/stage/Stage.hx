@@ -172,6 +172,10 @@ class Stage extends FlxContainer {
         return Paths.image('${data.getImageFolder()}/${id}');
     }
 
+    public function getStageSparrow(id:String):flixel.graphics.frames.FlxAtlasFrames {
+        return Paths.getSparrowAtlas('${data.getImageFolder()}/${id}');
+    }
+
     public function getStageSFX(id:String):String {
         return Paths.sound('${data.getSFXFolder()}/${id}');
     }

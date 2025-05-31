@@ -1,0 +1,6 @@
+C:\HaxeToolkit\haxe\std/cpp/_std/sys/FileSystem.hx:101
+funkin/backend/assets/Paths.hx:236
+funkin/backend/assets/Paths.hx:168
+funkin/backend/InitState.hx:86
+flixel/FlxGame.hx:596
+flixel/FlxGame.hx:341

@@ -20,26 +20,15 @@
 		0
 	],
 	"animations": {
-		"singRIGHT": {
-			"prefix": "GF Right Note",
+		"scared": {
+			"prefix": "GF FEAR",
 			"texture": null,
 			"indices": [			],
 			"fps": 24,
-			"looped": false,
+			"looped": true,
 			"offset": [
-				-2,
-				-10
-			]
-		},
-		"singDOWN": {
-			"prefix": "GF Down Note",
-			"texture": null,
-			"indices": [			],
-			"fps": 24,
-			"looped": false,
-			"offset": [
-				-14,
-				-11
+				-12,
+				-12
 			]
 		},
 		"danceRight": {
@@ -69,15 +58,37 @@
 				0
 			]
 		},
-		"singUP": {
-			"prefix": "GF Up Note",
+		"singDOWN": {
+			"prefix": "GF Down Note",
 			"texture": null,
 			"indices": [			],
 			"fps": 24,
 			"looped": false,
 			"offset": [
-				-10,
-				12
+				-14,
+				-11
+			]
+		},
+		"singRIGHT": {
+			"prefix": "GF Right Note",
+			"texture": null,
+			"indices": [			],
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				-2,
+				-10
+			]
+		},
+		"singLEFT": {
+			"prefix": "GF left note",
+			"texture": null,
+			"indices": [			],
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				-1,
+				-12
 			]
 		},
 		"danceLeft": {
@@ -108,15 +119,15 @@
 				0
 			]
 		},
-		"singLEFT": {
-			"prefix": "GF left note",
+		"singUP": {
+			"prefix": "GF Up Note",
 			"texture": null,
 			"indices": [			],
 			"fps": 24,
 			"looped": false,
 			"offset": [
-				-1,
-				-12
+				-10,
+				12
 			]
 		}
 	},

@@ -1,0 +1,37 @@
+{
+    "zoom": 1,
+    "folders": {
+        "images": "images",
+        "sfx": "sfx"
+    },
+    "preload": [
+        {"path": "bg", "type": "image"}
+    ],
+    "layers": [
+        [
+            {
+                "type": "spectator",
+                "properties": {
+                    "scroll": [0.95, 0.95],
+                    "position": [542, 538],
+                    "camera": [0, 0]
+                }
+            },
+            {
+                "type": "opponent",
+                "properties": {
+                    "position": [100, 642],
+                    "camera": [0, 0]
+                }
+            },
+            {
+                "type": "player",
+                "properties": {
+                    "position": [794, 642],
+                    "camera": [0, -10]
+                }
+            }
+        ]
+    ],
+    "startingCamPos": [380, 500]
+}
