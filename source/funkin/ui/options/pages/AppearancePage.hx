@@ -48,7 +48,7 @@ class AppearancePage extends OptionPage {
             description: "Changes how the HUD looks during gameplay.\nThis only works if the song has the default HUD skin!",
 
             id: "hudType",
-            type: TList(["Classic", "Psych"])
+            type: TList(["Classic", "Psych", "Kade"])
         });
         super.initOptions();
     }

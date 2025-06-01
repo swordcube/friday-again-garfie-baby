@@ -12,6 +12,16 @@
             
                     "roles": ["Programmer", "Artist"],
                     "url": "https://bsky.app/profile/swordcube.bsky.social"
+                },
+                {
+                    "name": "kittysleeper",
+                    "description": "Helped Work On Base Game And Coded Kade UI\nMeow Meow Meow Meow Meow Meow Meow Meow Meow Meow Meow Meow Meow Meow Meow Meow",
+                    
+                    "icon": "kittysleeper",
+                    "color": "#FF8C00",
+            
+                    "roles": ["Programmer"],
+                    "url": "https://bsky.app/profile/swordcube.bsky.social"
                 }
             ]
         },
