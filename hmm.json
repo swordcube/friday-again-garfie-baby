@@ -121,6 +121,13 @@
       "url": "https://github.com/Kriptel/RuleScript.git"
     },
     {
+      "name": "hscript",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/HaxeFoundation/hscript"
+    },
+    {
       "name": "thx.core",
       "type": "git",
       "dir": null,
