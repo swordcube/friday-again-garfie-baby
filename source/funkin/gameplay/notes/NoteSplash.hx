@@ -49,6 +49,11 @@ class NoteSplash extends SkinnableSprite {
 
         splashCount = Lambda.count(json.splash.animation);
         direction = direction; // force animation update
+
+        final prevAlpha:Float = alpha;
+        alpha = 0.0000001;
+        drawComplex(FlxG.camera);
+        alpha = prevAlpha;
     }
 
     override function update(elapsed:Float):Void {

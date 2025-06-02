@@ -68,6 +68,10 @@ import funkin.scripting.FunkinScript;
 import funkin.scripting.FunkinScriptGroup;
 #end
 
+import modchart.Config as FMConfig;
+import modchart.Manager as ModManager;
+import modchart.engine.PlayField as PlayFieldRenderer;
+
 enum abstract CameraTarget(Int) from Int to Int {
 	final OPPONENT = 0;
 	final PLAYER = 1;
@@ -134,6 +138,11 @@ class PlayState extends FunkinState {
 
 	public var currentChart:ChartData;
 	public var playField:PlayField;
+
+	#if MODCHARTING_ALLOWED
+	public var modManager:ModManager;
+	public var playFieldRenderer:PlayFieldRenderer;
+	#end
 
 	public var opponentStrumLine(get, never):StrumLine;
 	public var opponentStrums(get, never):StrumLine;
@@ -643,6 +652,16 @@ class PlayState extends FunkinState {
 			hud.script.setParent(hud);
 			hud.script.call("onCreate");
 		}
+		#end
+		#if MODCHARTING_ALLOWED
+		FMConfig.PREVENT_SCALED_HOLD_END = true; // nasty ass sustains be GONE
+
+		modManager = new ModManager();
+		add(modManager);
+
+		playFieldRenderer = new PlayFieldRenderer();
+		playFieldRenderer.cameras = [camHUD];
+		add(playFieldRenderer);
 		#end
 		countdown = new Countdown();
 		countdown.onStart.add(onCountdownStart);

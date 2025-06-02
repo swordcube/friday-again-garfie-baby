@@ -34,9 +34,16 @@
       "version": null
     },
     {
-      "name": "hmm",
+      "name": "utest",
       "type": "haxelib",
       "version": null
+    },
+    {
+      "name": "hmm",
+      "type": "git",
+      "dir": null,
+      "ref": "funkin-patches",
+      "url": "https://github.com/swordcube/hmm"
     },
     {
       "name": "hxcpp",
@@ -79,6 +86,11 @@
       "url": "https://github.com/FunkinCrew/json2object"
     },
     {
+      "name": "hxjsonast",
+      "type": "haxelib",
+      "version": null
+    },
+    {
       "name": "lime",
       "type": "git",
       "dir": null,
@@ -112,6 +124,13 @@
       "dir": null,
       "ref": "develop",
       "url": "https://github.com/swordcubes-grave-of-shite/openfl"
+    },
+    {
+      "name": "funkin-modchart",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/TheoDevelops/FunkinModchart"
     },
     {
       "name": "rulescript",

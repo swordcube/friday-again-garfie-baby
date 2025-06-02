@@ -301,6 +301,43 @@ class PlayField extends FlxContainer {
         super.update(elapsed);
     }
 
+    #if MODCHARTING_ALLOWED
+    override function draw():Void {
+		final oldDefaultCameras = @:privateAccess FlxCamera._defaultCameras;
+		if (_cameras != null)
+			@:privateAccess FlxCamera._defaultCameras = _cameras;
+		
+		if(zIndexesAllowed) {
+            if(_drawQueue.length != 0)
+				_drawQueue.resize(0);
+            
+			var basic:FlxBasic = null;
+			for (i in 0...members.length) {
+                basic = members[i];
+
+                final isExcluded:Bool = basic == opponentStrumLine || basic == playerStrumLine;
+				if (!isExcluded && basic != null && basic.exists && basic.visible)
+					_drawQueue.push(i);
+			}
+			_drawQueue.sort(_drawQueueSort);
+			
+			for(i in 0..._drawQueue.length) {
+                basic = members[_drawQueue[i]];
+
+                final isExcluded:Bool = basic == opponentStrumLine || basic == playerStrumLine;
+				if (!isExcluded && basic != null && basic.exists && basic.visible)
+					basic.draw();
+			}
+		} else {
+			for (basic in members) {
+				if (basic != null && basic.exists && basic.visible)
+					basic.draw();
+			}
+		}
+		@:privateAccess FlxCamera._defaultCameras = oldDefaultCameras;
+	}
+    #end
+
     //----------- [ Private API ] -----------//
 
     private function onNotePress(direction:Int):Void {

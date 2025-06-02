@@ -7,7 +7,7 @@ import flixel.graphics.frames.FlxTileFrames;
 
 import flixel.system.FlxAssets.FlxShader;
 
-class HoldTrail extends FlxSpriteGroup {
+class HoldTrail extends FlxSpriteContainer {
     /**
      * The note that this hold trail belongs to.
      */
@@ -40,9 +40,11 @@ class HoldTrail extends FlxSpriteGroup {
         super(x, y);
 
         strip = new HoldTiledSprite();
+        strip.holdTrail = this;
         add(strip);
 
         tail = new HoldTail();
+        tail.holdTrail = this;
         add(tail);
 
         directAlpha = true;

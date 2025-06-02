@@ -132,6 +132,11 @@ class Note extends SkinnableSprite {
         loadSkinComplex(newSkin, json.note, 'gameplay/noteskins/${newSkin}');
 
         direction = direction; // force animation update
+
+        final prevAlpha:Float = alpha;
+        alpha = 0.0000001;
+        drawComplex(FlxG.camera);
+        alpha = prevAlpha;
     }
     
     //----------- [ Private API ] -----------//

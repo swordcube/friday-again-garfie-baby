@@ -21,7 +21,7 @@ for linux, install luajit, vlc, and g++ if you don't have any of those already
 
 install hmm if not installed already:
 ```sh
-haxelib install hmm
+haxelib git hmm https://github.com/swordcube/hmm
 ```
 
 then use hmm to install the libs:

@@ -9,6 +9,7 @@ import funkin.gameplay.notes.NoteSkin;
  * Tiled sprite class specifically made for hold tails
  */
 class HoldTail extends SkinnableSprite {
+    public var holdTrail:HoldTrail;
     public var direction(default, set):Int;
     
     public function setup(direction:Int, skin:String):HoldTail {

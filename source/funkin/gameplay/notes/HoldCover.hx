@@ -54,6 +54,11 @@ class HoldCover extends SkinnableSprite {
         loadSkinComplex(newSkin, json.holdCovers, 'gameplay/noteskins/${newSkin}');
 
         direction = direction; // force animation update
+
+        final prevAlpha:Float = alpha;
+        alpha = 0.0000001;
+        drawComplex(FlxG.camera);
+        alpha = prevAlpha;
     }
     
     //----------- [ Private API ] -----------//

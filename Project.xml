@@ -44,7 +44,7 @@
 		
 		lime test platform -DNO_SCRIPTING
 	-->
-	<define name="SCRIPTING_ALLOWED" unless="NO_SCRIPTING" />
+	<define name="SCRIPTING_ALLOWED" unless="NO_SCRIPTING || NO_SCRIPTING_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable HScript
@@ -52,7 +52,7 @@
 
 		lime test platform -DNO_HSCRIPT
 	-->
-	<define name="HSCRIPT_ALLOWED" if="SCRIPTING_ALLOWED" unless="NO_HSCRIPT" />
+	<define name="HSCRIPT_ALLOWED" if="SCRIPTING_ALLOWED" unless="NO_HSCRIPT || NO_HSCRIPT_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable LuaJIT scripts
@@ -60,7 +60,7 @@
 
 		lime test platform -DNO_LUA
 	-->
-	<define name="LUA_ALLOWED" if="SCRIPTING_ALLOWED cpp" unless="NO_LUA" />
+	<define name="LUA_ALLOWED" if="SCRIPTING_ALLOWED cpp" unless="NO_LUA || NO_LUA_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable Discord RPC
@@ -68,7 +68,7 @@
 
 		lime test platform -DNO_DISCORD_RPC
 	-->
-	<define name="DISCORD_ALLOWED" if="windows || mac || linux" unless="NO_DISCORD_RPC || NO_DISCORD" />
+	<define name="DISCORD_ALLOWED" if="windows || mac || linux" unless="NO_DISCORD_RPC || NO_DISCORD || NO_DISCORD_RPC_ALLOWED || NO_DISCORD_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable video playback
@@ -76,7 +76,7 @@
 
 		lime test platform -DNO_VIDEOS
 	-->
-	<define name="VIDEOS_ALLOWED" if="cpp" unless="NO_VIDEOS" />
+	<define name="VIDEOS_ALLOWED" if="cpp" unless="NO_VIDEOS || NO_VIDEOS_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable the crash handler
@@ -84,7 +84,7 @@
 		
 		lime test platform -DNO_CRASH_HANDLER
 	-->
-	<define name="CRASH_HANDLER" unless="NO_CRASH_HANDLER" />
+	<define name="CRASH_HANDLER" unless="NO_CRASH_HANDLER || NO_CRASH_HANDLER_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable the ability to
@@ -94,7 +94,7 @@
 
 		lime test platform -DNO_WINDOWS_CRASH_HANDLER
 	-->
-	<define name="WINDOWS_CRASH_HANDLER" unless="NO_WINDOWS_CRASH_HANDLER" />
+	<define name="WINDOWS_CRASH_HANDLER" unless="NO_WINDOWS_CRASH_HANDLER || NO_WINDOWS_CRASH_HANDLER_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable crash log saving
@@ -102,7 +102,7 @@
 
 		lime test platform -DNO_SAVE_CRASH_LOGS
 	-->
-	<define name="SAVE_CRASH_LOGS" if="CRASH_HANDLER" unless="NO_SAVE_CRASH_LOGS" />
+	<define name="SAVE_CRASH_LOGS" if="CRASH_HANDLER" unless="NO_SAVE_CRASH_LOGS || NO_SAVE_CRASH_LOGS_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable crash log saving
@@ -119,6 +119,14 @@
 		lime test platform -DNO_MOONCHART
 	-->
 	<define name="USE_MOONCHART" unless="NO_MOONCHART" />
+
+	<!--
+		Comment/delete this line below to disable crash log saving
+		Or compile with the NO_MODCHARTING define, like so:
+
+		lime test platform -DNO_MODCHARTING
+	-->
+	<define name="MODCHARTING_ALLOWED" unless="NO_MODCHARTING || NO_MODCHARTING_ALLOWED" />
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 	
@@ -177,6 +185,9 @@
 
 	<!-- Extra chart format support -->
 	<haxelib name="moonchart" if="USE_MOONCHART" />
+
+	<!-- Modcharting -->
+	<haxelib name="funkin-modchart" if="MODCHARTING_ALLOWED" />
 
 	<!-- Runtime scripting -->
 	<section if="SCRIPTING_ALLOWED">
@@ -249,6 +260,12 @@
 	-->
 	<define name="openfl_enable_experimental_update_queue" />
 
+	<!--
+		Haxe Analyzer Optimization
+		TODO: Make this work, LScript for some reason causes a C++ compile error with this enabled!
+	-->
+	<!-- <define name="analyzer-optimize" /> -->
+
 	<!-- _________________________________ Custom _______________________________ -->
 
 	<section if="COMPILE_ALL_CLASSES">
@@ -257,6 +274,12 @@
 	
 		<!--Include most classes into the executable, useful for scripting -->
 		<haxeflag name="--macro" value="funkin.backend.macros.IncludeMacro.build()" if="SCRIPTING_ALLOWED" />
+	</section>
+
+	<section if="MODCHARTING_ALLOWED">
+		<haxedef name="FM_ENGINE" value="Garfie"/>
+		<haxedef name="FM_ENGINE_VERSION" value="0.1.0"/>
+		<haxeflag name="--macro" value="modchart.backend.macros.Macro.includeFiles()"/>
 	</section>
 
     <!-- Fix compiling issues with local libraries -->

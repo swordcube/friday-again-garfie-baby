@@ -56,6 +56,11 @@ class Strum extends SkinnableSprite {
 
         centerOffsets();
         offset.add(skinData.offset[0] ?? 0.0, skinData.offset[1] ?? 0.0);
+
+        final prevAlpha:Float = alpha;
+        alpha = 0.0000001;
+        drawComplex(FlxG.camera);
+        alpha = prevAlpha;
     }
     
     //----------- [ Private API ] -----------//

@@ -89,26 +89,26 @@ class FunkinScript {
         setClass(FunkinLua);
 
         setClass(funkin.gameplay.HealthIcon);
-        setClass(funkin.gameplay.HoldTiledSprite);
         setClass(funkin.gameplay.PlayerStats);
         setClass(funkin.gameplay.PlayField);
         setClass(funkin.gameplay.UISkin);
-
+        
         setClass(funkin.graphics.SkinnableSprite);
         setClass(funkin.graphics.TiledSprite);
-
+        
         setClass(funkin.gameplay.hud.BaseHUD);
-
+        
         setClass(funkin.gameplay.notes.Strum);
         setClass(funkin.gameplay.notes.StrumLine);
-
+        
         setClass(funkin.gameplay.notes.Note);
         setClass(funkin.gameplay.notes.NoteSkin);
         setClass(funkin.gameplay.notes.NoteSpawner);
-
+        
         setClass(funkin.gameplay.notes.HoldTail);
         setClass(funkin.gameplay.notes.HoldTrail);
-
+        setClass(funkin.gameplay.notes.HoldTiledSprite);
+        
         setClass(funkin.gameplay.song.ChartData);
         setClass(funkin.gameplay.song.NoteData);
         setClass(funkin.gameplay.song.EventData);

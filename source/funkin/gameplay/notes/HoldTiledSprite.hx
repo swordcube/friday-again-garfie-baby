@@ -1,4 +1,4 @@
-package funkin.gameplay;
+package funkin.gameplay.notes;
 
 import flixel.util.FlxColor;
 import funkin.graphics.TiledSprite;
@@ -10,6 +10,7 @@ import funkin.gameplay.notes.NoteSkin;
  * Tiled sprite class specifically made for hold notes
  */
 class HoldTiledSprite extends TiledSprite {
+    public var holdTrail:HoldTrail;
     public var direction(default, set):Int;
     
     public function setup(direction:Int, skin:String):HoldTiledSprite {
