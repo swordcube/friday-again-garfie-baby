@@ -242,26 +242,37 @@ class Garfie implements IAdapter {
     public function getArrowItems() {
         final pspr:Array<Array<Array<FlxSprite>>> = [[[], [], [], []], [[], [], [], []]];
         final strums = [PlayState.instance.opponentStrums, PlayState.instance.playerStrums];
+        @:privateAccess
         for (i in 0...strums.length) {
             strums[i].strums.forEachAlive(strumNote -> {
-                if (pspr[i] == null)
-                    pspr[i] = [];
-
-                pspr[i][0].push(strumNote);
+                if(strumNote._fmVisible) {
+                    if (pspr[i] == null)
+                        pspr[i] = [];
+    
+                    pspr[i][0].push(strumNote);
+                }
             });
             strums[i].notes.forEachAlive(note -> {
-                pspr[i][1].push(note);
-                pspr[i][2].push(note.holdTrail.strip);
-                pspr[i][2].push(note.holdTrail.tail);
+                if(note._fmVisible)
+                    pspr[i][1].push(note);
+
+                if(note.holdTrail.strip._fmVisible)
+                    pspr[i][2].push(note.holdTrail.strip);
+
+                if(note.holdTrail.tail._fmVisible)
+                    pspr[i][2].push(note.holdTrail.tail);
             });
             strums[i].splashes.forEachAlive(spr -> {
-                pspr[i][3].push(spr);
+                if(spr._fmVisible)
+                    pspr[i][3].push(spr);
             });
             strums[i].holdGradients.forEachAlive(spr -> {
-                pspr[i][3].push(spr);
+                if(spr._fmVisible)
+                    pspr[i][3].push(spr);
             });
             strums[i].holdCovers.forEachAlive(spr -> {
-                pspr[i][3].push(spr);
+                if(spr._fmVisible)
+                    pspr[i][3].push(spr);
             });
         }
         return pspr;
