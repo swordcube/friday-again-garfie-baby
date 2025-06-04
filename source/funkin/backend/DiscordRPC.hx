@@ -85,6 +85,10 @@ class DiscordRPC {
         }
         _pendingActivity = activity;
     }
+
+    public static function getCurrentPresence():Activity {
+        return _currentActivity;
+    }
     
     //----------- [ Private API ] -----------//
 
