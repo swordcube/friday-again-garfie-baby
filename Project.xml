@@ -171,7 +171,7 @@
 	<haxelib name="flxanimate" />
 
 	<!-- Discord RPC -->
-	<haxelib name="hxdiscord_gamesdk" if="DISCORD_ALLOWED" />
+	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED" />
 
 	<!-- Video Playback (via VLC) -->
 	<haxelib name="hxvlc" if="VIDEOS_ALLOWED" />
@@ -250,6 +250,9 @@
 
 	<!-- Better error reporting for HScript -->
 	<haxedef name="hscriptPos" if="HSCRIPT_ALLOWED" />
+	
+	<!-- Disable IO Thread for Discord RPC -->
+	<haxedef name="DISCORD_DISABLE_IO_THREAD" if="DISCORD_ALLOWED" />
 
 	<!-- Fixes linux compilation -->
 	<haxedef name="NO_PRECOMPILED_HEADERS" />

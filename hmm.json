@@ -53,11 +53,11 @@
       "url": "https://github.com/HaxeFoundation/hxcpp"
     },
     {
-      "name": "hxdiscord_gamesdk",
+      "name": "hxdiscord_rpc",
       "type": "git",
       "dir": null,
       "ref": "main",
-      "url": "https://github.com/swordcube/hxdiscord_gamesdk"
+      "url": "https://github.com/MAJigsaw77/hxdiscord_rpc"
     },
     {
       "name": "hxnativefiledialog",
