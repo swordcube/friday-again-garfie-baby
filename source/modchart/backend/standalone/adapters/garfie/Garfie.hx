@@ -244,6 +244,9 @@ class Garfie implements IAdapter {
         final strums = [PlayState.instance.opponentStrums, PlayState.instance.playerStrums];
         @:privateAccess
         for (i in 0...strums.length) {
+            if(!strums[i].visible)
+                continue;
+            
             strums[i].strums.forEachAlive(strumNote -> {
                 if(strumNote._fmVisible) {
                     if (pspr[i] == null)
