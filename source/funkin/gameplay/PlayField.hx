@@ -323,14 +323,12 @@ class PlayField extends FlxContainer {
 			
 			for(i in 0..._drawQueue.length) {
                 basic = members[_drawQueue[i]];
-
-                final isExcluded:Bool = basic == opponentStrumLine || basic == playerStrumLine;
-				if (!isExcluded && basic != null && basic.exists && basic.visible)
-					basic.draw();
+				basic.draw();
 			}
 		} else {
-			for (basic in members) {
-				if (basic != null && basic.exists && basic.visible)
+            for (basic in members) {
+                final isExcluded:Bool = basic == opponentStrumLine || basic == playerStrumLine;
+				if (!isExcluded && basic != null && basic.exists && basic.visible)
 					basic.draw();
 			}
 		}
