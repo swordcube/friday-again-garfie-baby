@@ -23,9 +23,17 @@ import funkin.backend.events.NoteEvents;
 import funkin.states.PlayState;
 import funkin.gameplay.scoring.Scoring;
 
+#if MODCHARTING_ALLOWED
+import modchart.engine.PlayField as PlayFieldRenderer;
+#end
+
 class PlayField extends FlxContainer {
     public var opponentStrumLine:StrumLine;
     public var playerStrumLine:StrumLine;
+    
+    #if MODCHARTING_ALLOWED
+    public var renderer:PlayFieldRenderer;
+    #end
 
     public var stats:PlayerStats;
     public var hud:BaseHUD;
@@ -315,7 +323,7 @@ class PlayField extends FlxContainer {
 			for (i in 0...members.length) {
                 basic = members[i];
 
-                final isExcluded:Bool = basic == opponentStrumLine || basic == playerStrumLine;
+                final isExcluded:Bool = (renderer?.visible ?? false) && (basic == opponentStrumLine || basic == playerStrumLine);
 				if (!isExcluded && basic != null && basic.exists && basic.visible)
 					_drawQueue.push(i);
 			}
@@ -327,7 +335,7 @@ class PlayField extends FlxContainer {
 			}
 		} else {
             for (basic in members) {
-                final isExcluded:Bool = basic == opponentStrumLine || basic == playerStrumLine;
+                final isExcluded:Bool = (renderer?.visible ?? false) && (basic == opponentStrumLine || basic == playerStrumLine);
 				if (!isExcluded && basic != null && basic.exists && basic.visible)
 					basic.draw();
 			}
