@@ -126,18 +126,34 @@ class GarfieFormat extends BasicFormat<ChartData, SongMetadata> {
             basicMeta.extraData.get("beatsPerMeasure") ?? Std.int(firstChange.beatsPerMeasure),
             basicMeta.extraData.get("stepsPerBeat") ?? Std.int(firstChange.stepsPerBeat)
         ];
+        if(timeSig.getNumerator() <= 0)
+            timeSig.setNumerator(4);
+
+        if(timeSig.getDenominator() <= 0)
+            timeSig.setDenominator(4);
+
         var timingPointTime:Float = 0;
         var timingPointStep:Float = 0;
 
         for(i in 1...basicMeta.bpmChanges.length) {
             final bpmChange = basicMeta.bpmChanges[i];
+            final curTimeSig:TimeSignature = [
+                Std.int(bpmChange.beatsPerMeasure),
+                Std.int(bpmChange.stepsPerBeat)
+            ];
+            if(curTimeSig.getNumerator() <= 0)
+                curTimeSig.setNumerator(4);
+
+            if(curTimeSig.getDenominator() <= 0)
+                curTimeSig.setDenominator(4);
+
             timingPoints.push({
                 time: Math.max(bpmChange.time, 0.0),
                 bpm: bpmChange.bpm,
                 step: 0,
                 beat: 0,
                 measure: 0,
-                timeSignature: [Std.int(bpmChange.beatsPerMeasure), Std.int(bpmChange.stepsPerBeat)]
+                timeSignature: curTimeSig
             });
         }
         timingPoints.insert(0, {
@@ -146,7 +162,7 @@ class GarfieFormat extends BasicFormat<ChartData, SongMetadata> {
             step: 0,
             beat: 0,
             measure: 0,
-            timeSignature: [Std.int(firstChange.beatsPerMeasure), Std.int(firstChange.stepsPerBeat)]
+            timeSignature: timeSig
         });
         inline function pushNotes(basicNotes:Array<BasicNote>, diff:String) {
             notes.set(diff, []);

@@ -28,8 +28,16 @@ enum abstract TimeSignature(Array<Int>) from Array<Int> to Array<Int> {
         return this[0];
     }
 
+    public inline function setNumerator(value:Int):Void {
+        this[0] = value;
+    }
+
     public inline function getDenominator():Int {
         return this[1];
+    }
+
+    public inline function setDenominator(value:Int):Void {
+        this[1] = value;
     }
 }
 

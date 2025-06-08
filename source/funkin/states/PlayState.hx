@@ -107,6 +107,7 @@ class PlayState extends FunkinState {
 	public var isCameraOnForcedPos:Bool = false;
 
 	public var paused:Bool = false;
+	public var exitingState:Bool = false;
 
 	public var inCutscene:Bool = false;
 	public var minimalMode:Bool = false;
@@ -804,6 +805,20 @@ class PlayState extends FunkinState {
 		#end
 	}
 
+	override function startOutro(onOutroComplete:Void->Void):Void {
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed)
+			scripts.call("onStartOutro");
+		#end
+		exitingState = true;
+		super.startOutro(onOutroComplete);
+
+		#if SCRIPTING_ALLOWED
+		if(scriptsAllowed)
+			scripts.call("onStartOutroPost");
+		#end
+	}
+
 	override function onSubStateOpen(subState:FlxSubState):Void {
 		super.onSubStateOpen(subState);
 		if(_initialTransitionHappened || !(subState is TransitionSubState)) {
@@ -819,9 +834,11 @@ class PlayState extends FunkinState {
 			Conductor.instance.music = null;
 			Conductor.instance.autoIncrement = false;
 			
-			if(!endingSong && FlxG.sound.music != null) {
-				FlxG.sound.music.pause();
-				vocals.pause();
+			if(!(subState is TransitionSubState)) {
+				if(!endingSong && FlxG.sound.music != null) {
+					FlxG.sound.music.pause();
+					vocals.pause();
+				}
 			}
 		}
 		_initialTransitionHappened = true;
@@ -858,7 +875,7 @@ class PlayState extends FunkinState {
 					Conductor.instance.music = FlxG.sound.music;
 					Conductor.instance.autoIncrement = true;
 		
-					if(!startingSong && FlxG.sound.music != null) {
+					if(!exitingState && !startingSong && FlxG.sound.music != null) {
 						FlxG.sound.music.time = Conductor.instance.rawTime;
 						FlxG.sound.music.resume();
 		
