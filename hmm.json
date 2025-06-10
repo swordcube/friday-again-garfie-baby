@@ -136,7 +136,7 @@
       "name": "rulescript",
       "type": "git",
       "dir": null,
-      "ref": "dev",
+      "ref": "06747255e9463db3d4a529df3ebca129c308e694",
       "url": "https://github.com/Kriptel/RuleScript.git"
     },
     {

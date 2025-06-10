@@ -21,11 +21,19 @@ for linux, install luajit, vlc, and g++ if you don't have any of those already
 
 install hmm if not installed already:
 ```sh
+haxelib --never newrepo
 haxelib git hmm https://github.com/swordcube/hmm
 ```
 
 then use hmm to install the libs:
 ```sh
+haxelib run hmm install
+```
+
+if this doesn't install the libraries correctly, try the normal version of hmm instead:
+```sh
+haxelib remove hmm
+haxelib install hmm
 haxelib run hmm install
 ```
 
