@@ -3,7 +3,7 @@ package funkin.graphics.shader;
 import haxe.io.Path;
 
 class CustomShader extends RuntimeShader {
-    public function new(name:String, ?glslVer:String = #if mac "410" #else "320 es" #end) {
+    public function new(name:String, ?glslVer:String = #if mac "410" #else "300 es" #end) {
         final fragPath:String = Paths.frag('shaders/${name}');
         fragFileName = Path.withoutDirectory(fragPath);
 

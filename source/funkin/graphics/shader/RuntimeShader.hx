@@ -25,7 +25,7 @@ class RuntimeShader extends FlxShader {
 	private static var __programErrors:Map<String, String> = [];
 	private static var __linkErrors:Map<String, String> = [];
 
-	public var glslVer:String = #if mac "410" #else "320 es" #end;
+	public var glslVer:String = #if mac "410" #else "300 es" #end;
 	public var fragFileName:String;
 	public var vertFileName:String;
 
