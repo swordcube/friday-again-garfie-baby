@@ -7,7 +7,7 @@ import funkin.backend.ContentMetadata;
 import funkin.backend.assets.loaders.AssetLoader;
 
 import funkin.graphics.AtlasType;
-import funkin.graphics.AttachedSprite;
+import funkin.graphics.TrackingSprite;
 import funkin.graphics.SkinnableSprite;
 
 import funkin.states.PlayState;
@@ -46,7 +46,7 @@ enum abstract AnimationContext(String) from String to String {
 }
 
 @:allow(funkin.states.PlayState)
-class Character extends AttachedSprite implements IBeatReceiver {
+class Character extends TrackingSprite implements IBeatReceiver {
     public var game:PlayState = PlayState.instance;
 
     public var data(default, null):CharacterData;
@@ -73,6 +73,8 @@ class Character extends AttachedSprite implements IBeatReceiver {
 
     public function new(characterID:String, ?isPlayer:Bool = false, ?debugMode:Bool = false) {
         super();
+        trackingMode = DIRECT;
+        
         if(characterID == null || characterID.length == 0)
             characterID = Constants.DEFAULT_CHARACTER;
 

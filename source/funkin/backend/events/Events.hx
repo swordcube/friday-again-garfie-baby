@@ -25,6 +25,7 @@ class Events {
                 case GAME_OVER: _events.set(type, new GameOverEvent());
                 case GAME_OVER_CREATE: _events.set(type, new GameOverCreateEvent());
                 case PAUSE_MENU_CREATE: _events.set(type, new PauseMenuCreateEvent());
+                case FREEPLAY_SONG_ACCEPT: _events.set(type, new FreeplaySongAcceptEvent());
                 default: _events.set(type, new ActionEvent(UNKNOWN));
             }
         }

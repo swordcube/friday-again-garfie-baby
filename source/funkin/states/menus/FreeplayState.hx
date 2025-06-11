@@ -9,6 +9,9 @@ import funkin.ui.AtlasTextList;
 import funkin.backend.LevelData;
 import funkin.backend.ContentMetadata;
 
+import funkin.backend.events.Events;
+import funkin.backend.events.MenuEvents;
+
 import funkin.gameplay.song.Highscore;
 import funkin.gameplay.song.ChartData;
 import funkin.gameplay.song.SongMetadata;
@@ -30,9 +33,13 @@ class FreeplayState extends FunkinState {
     public static var curCategory:Int = 0;
     
     public var bg:FlxSprite;
+
     public var categories:Array<FreeplayCategory> = [];
+    public var categoryMap:Map<String, FreeplayCategory> = [];
     
-    public var songs:Map<String, Array<FreeplaySongData>> = [];
+    public var songs:Array<FreeplaySongData> = [];
+    public var songListMap:Map<String, Array<FreeplaySongData>> = [];
+    
     public var listeningSong:String = "";
 
     public var grpSongs:AtlasTextList;
@@ -70,6 +77,7 @@ class FreeplayState extends FunkinState {
         grpSongs = new AtlasTextList();
         add(grpSongs);
 
+        call("onGenerateCategories", [categories]);
         for(contentPack in Paths.getEnabledContentPacks()) {
             final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentPack);
             if(contentMetadata == null)
@@ -80,16 +88,17 @@ class FreeplayState extends FunkinState {
                     id: '${contentPack}:${category.id}',
                     name: category.name
                 });
+                categoryMap.set('${contentPack}:${category.id}', category);
             }
             for(level in contentMetadata.levels) {
                 if(!level.showInFreeplay)
                     continue;
 
                 final categoryID:String = '${contentPack}:${level.freeplayCategory}';
-                if(!songs.exists(categoryID))
-                    songs.set(categoryID, []);
+                if(!songListMap.exists(categoryID))
+                    songListMap.set(categoryID, []);
 
-                final category:Array<FreeplaySongData> = songs.get(categoryID);
+                final validSongs:Array<String> = [];
                 for(song in level.songs) {
                     if(level.hiddenSongs.freeplay.contains(song))
                         continue;
@@ -97,27 +106,15 @@ class FreeplayState extends FunkinState {
                     if(!FlxG.assets.exists(Paths.json('gameplay/songs/${song}/default/metadata', contentPack)))
                         continue;
 
-                    final defaultMetadata:SongMetadata = SongMetadata.load(song, null, contentPack);
-                    final metadataMap:Map<String, SongMetadata> = ["default" => defaultMetadata];
-                    
-                    for(mix in defaultMetadata.song.mixes)
-                        metadataMap.set(mix, SongMetadata.load(song, mix, contentPack));
-
-                    final difficultyMap:Map<String, Array<String>> = ["default" => defaultMetadata.song.difficulties];
-                    for(metadata in metadataMap) {
-                        for(mix in metadata.song.mixes)
-                            difficultyMap.set(mix, metadataMap.get(mix).song.difficulties);
-                    }
-                    category.push({
-                        metadata: metadataMap,
-                        id: song,
-                        difficulties: difficultyMap
-                    });
+                    validSongs.push(song);
                 }
+                addSongsToCategory(level.freeplayCategory, validSongs, contentPack);
             }
         }
+        call("onGenerateCategoriesPost", [categories]);
+
         for(category in categories.copy()) {
-            final songList:Array<FreeplaySongData> = songs.get(category.id);
+            final songList:Array<FreeplaySongData> = songListMap.get(category.id);
             if(songList != null && songList.length != 0)
                 continue;
 
@@ -125,7 +122,7 @@ class FreeplayState extends FunkinState {
             Logs.warn('No songs found for category "${category.id}"');
 
             // which means it'd be pointless to show it, so remove it
-            songs.remove(category.id);
+            songListMap.remove(category.id);
             categories.remove(category);
         }
 		scoreBG = new FlxSprite((FlxG.width * 0.7) - 6, 0).makeGraphic(1, 1, 0x99000000);
@@ -179,7 +176,7 @@ class FreeplayState extends FunkinState {
     override function update(elapsed:Float) {
         var tryingToListen:Bool = false;
         if(FlxG.keys.justPressed.SPACE) {
-            final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+            final song:FreeplaySongData = songListMap.get(categories[curCategory].id)[curSelected];
             final newListeningSong:String = '${categories[curCategory].id}:${song.id}:${currentMix}';
 
             if(newListeningSong != listeningSong) {
@@ -222,7 +219,7 @@ class FreeplayState extends FunkinState {
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
         if(controls.justPressed.RESET) {
-            final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+            final song:FreeplaySongData = songListMap.get(categories[curCategory].id)[curSelected];
             
             var meta:SongMetadata = song.metadata.get(currentMix);
             if(meta == null)
@@ -242,7 +239,7 @@ class FreeplayState extends FunkinState {
 
         #if TEST_BUILD
         if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.G) {
-            final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+            final song:FreeplaySongData = songListMap.get(categories[curCategory].id)[curSelected];
             final recordID:String = Highscore.getScoreRecordID(song.id, currentDifficulty, currentMix);
             Highscore.forceSaveScoreRecord(recordID, {
                 score: FlxG.random.int(0, 999999),
@@ -273,6 +270,71 @@ class FreeplayState extends FunkinState {
             grpSongs.active = true;
     }
 
+    public function addCategory(id:String, name:String, ?songIDs:Array<String>, ?contentPack:String):Void {
+        if(contentPack == null)
+            contentPack = Paths.forceContentPack;
+
+        categories.push({
+            id: '${contentPack}:${id}',
+            name: name
+        });
+        addSongsToCategory(id, songIDs, contentPack);
+    }
+
+    public function addSongsToCategory(categoryID:String, ?songIDs:Array<String>, ?contentPack:String, ?priority:Int = 0):Void {
+        if(contentPack == null)
+            contentPack = Paths.forceContentPack;
+
+        if(songIDs == null || songIDs.length == 0)
+            return;
+
+        var songList:Array<FreeplaySongData> = songListMap.get('${contentPack}:${categoryID}');
+        if(songList == null) {
+            songList = [];
+            songListMap.set('${contentPack}:${categoryID}', songList);
+        }
+        for(song in songIDs) {
+            final defaultMetadata:SongMetadata = SongMetadata.load(song, null, contentPack);
+            final metadataMap:Map<String, SongMetadata> = ["default" => defaultMetadata];
+            
+            for(mix in defaultMetadata.song.mixes)
+                metadataMap.set(mix, SongMetadata.load(song, mix, contentPack));
+
+            final difficultyMap:Map<String, Array<String>> = ["default" => defaultMetadata.song.difficulties];
+            for(metadata in metadataMap) {
+                for(mix in metadata.song.mixes)
+                    difficultyMap.set(mix, metadataMap.get(mix).song.difficulties);
+            }
+            final songData:FreeplaySongData = {
+                metadata: metadataMap,
+                id: song,
+                difficulties: difficultyMap
+            };
+            songs.insert(songs.length - priority, songData);
+            songList.insert(songList.length - priority, songData);
+        }
+    }
+
+    public function removeSongsFromCategory(categoryID:String, ?songIDs:Array<String>, ?contentPack:String):Void {
+        if(contentPack == null)
+            contentPack = Paths.forceContentPack;
+
+        if(songIDs == null || songIDs.length == 0)
+            return;
+
+        final songList:Array<FreeplaySongData> = songListMap.get('${contentPack}:${categoryID}');
+        for(song in songIDs) {
+            for(i in 0...songList.length) {
+                final songData:FreeplaySongData = songList[i];
+                if(songData.id == song) {
+                    songs.remove(songData);
+                    songList.remove(songData);
+                    break;
+                }
+            }
+        }
+    }
+
     public function changeCategory(by:Int = 0, ?force:Bool = false):Void {
         if(by == 0 && !force)
             return;
@@ -280,7 +342,7 @@ class FreeplayState extends FunkinState {
         grpSongs.clearList();
         curCategory = FlxMath.wrap(curCategory + by, 0, categories.length - 1);
 
-        for(song in songs.get(categories[curCategory].id)) {
+        for(song in songListMap.get(categories[curCategory].id)) {
             grpSongs.addItem(song.metadata.get("default").song.title, {
                 onSelect: onChangeSelection,
                 onAccept: onAccept
@@ -292,7 +354,7 @@ class FreeplayState extends FunkinState {
         currentDifficulty = "normal";
         currentMix = "default";
 
-        final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+        final song:FreeplaySongData = songListMap.get(categories[curCategory].id)[curSelected];
         final meta:SongMetadata = song.metadata.get(currentMix);
         
         if(!meta.song.difficulties.contains(currentDifficulty))
@@ -314,7 +376,7 @@ class FreeplayState extends FunkinState {
         final contentPack:String = categories[curCategory].id.split(":").first();
         Paths.forceContentPack = (contentPack.length > 0 && contentPack != "default") ? contentPack : null;
 
-        final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+        final song:FreeplaySongData = songListMap.get(categories[curCategory].id)[curSelected];
         final defaultMeta:SongMetadata = song.metadata.get("default");
 
         var meta:SongMetadata = song.metadata.get(currentMix);
@@ -359,7 +421,7 @@ class FreeplayState extends FunkinState {
 
     public function updateHighscore():Void {
         // update the score display
-        final song:FreeplaySongData = songs.get(categories[curCategory].id)[curSelected];
+        final song:FreeplaySongData = songListMap.get(categories[curCategory].id)[curSelected];
         final recordID:String = Highscore.getScoreRecordID(song.id, currentDifficulty, currentMix);
 
         curScoreRecord = Highscore.getScoreRecord(recordID);
@@ -396,17 +458,31 @@ class FreeplayState extends FunkinState {
 	}
 
     public function onAccept(index:Int, item:AtlasText):Void {
-        if(FlxG.keys.pressed.SHIFT)
+        final categoryID:String = categories[curCategory].id;
+        final songData:FreeplaySongData = songListMap.get(categoryID)[curSelected];
+
+        final e:FreeplaySongAcceptEvent = cast Events.get(FREEPLAY_SONG_ACCEPT);
+        e.recycle(
+            songData.id, currentDifficulty, currentMix,
+            categoryID.split(":").first(), FlxG.keys.pressed.SHIFT
+        );
+        call("onAccept", [e]);
+
+        if(e.cancelled)
+            return;
+
+        if(e.goingToChartEditor)
             loadIntoCharter();
         else
             loadIntoSong();
 
         FlxG.sound.music.fadeOut(0.16, 0);
+        call("onAcceptPost", [e.flagAsPost()]);
     }
 
     public function loadIntoCharter():Void {
         final categoryID:String = categories[curCategory].id;
-        final songData:FreeplaySongData = songs.get(categoryID)[curSelected];
+        final songData:FreeplaySongData = songListMap.get(categoryID)[curSelected];
 
         FlxG.switchState(ChartEditor.new.bind({
             song: songData.id,
@@ -418,7 +494,7 @@ class FreeplayState extends FunkinState {
 
     public function loadIntoSong():Void {
         final categoryID:String = categories[curCategory].id;
-        final songData:FreeplaySongData = songs.get(categoryID)[curSelected];
+        final songData:FreeplaySongData = songListMap.get(categoryID)[curSelected];
 
         PlayState.deathCounter = 0;
         FlxG.switchState(PlayState.new.bind({

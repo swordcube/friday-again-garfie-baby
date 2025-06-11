@@ -17,6 +17,7 @@ enum abstract ActionEventType(String) from String to String {
 	final GAME_OVER = "GAME_OVER";
 	final GAME_OVER_CREATE = "GAME_OVER_CREATE";
 	final PAUSE_MENU_CREATE = "PAUSE_MENU_CREATE";
+	final FREEPLAY_SONG_ACCEPT = "FREEPLAY_SONG_ACCEPT";
 }
 
 /**

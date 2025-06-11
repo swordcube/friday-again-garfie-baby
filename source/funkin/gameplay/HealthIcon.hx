@@ -174,7 +174,7 @@ class HealthIcon extends TrackingSprite {
      * Makes a new `HealthIcon` instance.
      */
     public function new(character:String = "bf", iconType:HealthIconType = OPPONENT) {
-        super(0, 0);
+        super();
         this.characterID = character;
         this.iconType = iconType;
     }

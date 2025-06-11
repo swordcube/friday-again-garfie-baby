@@ -2,14 +2,9 @@ var speakers:Character;
 
 function onCreatePost() {
     speakers = new Character("gf-speakers", isPlayer, debugMode);
-    speakers.sprTracker = super;
+    speakers.tracked = super;
     speakers.update(0); // track gf immediately
     container.insert(container.members.indexOf(super), speakers);
-}
-
-function onUpdate(elapsed:Float) {
-    if(speakers != null)
-        speakers.scrollFactor.set(super.scrollFactor.x, super.scrollFactor.y);
 }
 
 function onPlayAnim(name, context, force, reversed, frame) {

@@ -140,7 +140,7 @@ class FunkinScript {
         setClass(funkin.graphics.SkinnableSprite);
         setClass(funkin.graphics.SkinnableUISprite);
 
-        setClass(funkin.graphics.AttachedSprite);
+        setClass(funkin.graphics.TrackingSprite);
         setClass(funkin.graphics.VideoSprite);
 
         set("FlxRuntimeShader", funkin.graphics.shader.RuntimeShader);

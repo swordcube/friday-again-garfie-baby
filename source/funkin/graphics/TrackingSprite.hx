@@ -1,5 +1,7 @@
 package funkin.graphics;
 
+import haxe.io.Path;
+
 import flixel.FlxObject;
 import flixel.math.FlxPoint;
 
@@ -13,10 +15,11 @@ import flixel.system.FlxAssets.FlxGraphicAsset;
  * Enum to store the mode (or direction) that a tracking sprite tracks.
  */
 enum abstract TrackingMode(Int) to Int from Int {
-	var RIGHT = 0;
-	var LEFT = 1;
-	var UP = 2;
-	var DOWN = 3;
+	final RIGHT = 0;
+	final LEFT = 1;
+	final UP = 2;
+	final DOWN = 3;
+	final DIRECT = 4;
 }
 
 /**
@@ -46,10 +49,42 @@ class TrackingSprite extends FlxSprite {
 	public var copyAlpha:Bool = true;
 
 	/**
+	 * Multiplier for the alpha value.
+	 */
+	public var alphaMult:Float = 1;
+
+	/**
 	 * Whether or not to copy the visibility from
 	 * the sprite being tracked.
 	 */
 	public var copyVisibility:Bool = true;
+
+	/**
+	 * Whether or not to copy the scroll factor from
+	 * the sprite being tracked.
+	 */
+	public var copyScrollFactor:Bool = true;
+
+	/**
+	 * Whether or not to copy the angle from
+	 * the sprite being tracked.
+	 */
+	public var copyAngle:Bool = true;
+
+	/**
+	 * An offset to add to this sprite's angle.
+	 */
+	public var angleOffset:Float = 0;
+
+	public function new(?file:String = null, ?anim:String = null, ?parentFolder:String = null, ?loop:Bool = false) {
+		super();
+		if(anim != null) {
+			frames = Paths.getSparrowAtlas(Path.join([parentFolder, file]));
+			animation.addByPrefix('idle', anim, 24, loop);
+			animation.play('idle');
+		} else if(file != null)
+			loadGraphic(Paths.image(Path.join([parentFolder, file])));
+	}
 
 	override function update(elapsed:Float):Void {
 		// tracking modes
@@ -66,15 +101,24 @@ class TrackingSprite extends FlxSprite {
 
 				case DOWN:
 					setPosition(tracked.x + (tracked.width * 0.5) + trackingOffset.x, tracked.y + tracked.height + trackingOffset.y);
+
+				case DIRECT:
+					setPosition(tracked.x + trackingOffset.x, tracked.y + trackingOffset.y);
 			}
             final isTrackingSprite:Bool = (tracked is FlxSprite);
             if(isTrackingSprite) {
                 final sprite:FlxSprite = cast tracked;
                 if(copyAlpha)
-                    alpha = sprite.alpha;
+                    alpha = sprite.alpha * alphaMult;
 
                 if(copyVisibility)
                     visible = sprite.visible;
+
+				if(copyScrollFactor)
+					scrollFactor.copyFrom(sprite.scrollFactor);
+				
+				if(copyAngle)
+					angle = sprite.angle + angleOffset;
             }
 		}
 		super.update(elapsed);
