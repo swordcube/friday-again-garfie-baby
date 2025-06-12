@@ -56,7 +56,6 @@ class FunkinScriptGroup {
     }
 
     public function call(method:String, ?args:Array<Dynamic>, ?exclude:Array<FunkinScript>, ?defaultValue:Dynamic):Dynamic {
-        _busy = true;
         var member:FunkinScript = null;
         var value:Dynamic = defaultValue;
         
@@ -72,13 +71,11 @@ class FunkinScriptGroup {
         for(i in 0..._scriptsToClose.length)
             remove(_scriptsToClose[i]);
 
-        _busy = false;
         _scriptsToClose.clear();
         return value;
     }
     
     public function event<T:ActionEvent>(method:String, event:T, ?exclude:Array<FunkinScript>):T {
-        _busy = true;
         var member:FunkinScript = null;
         for(i in 0...members.length) {
             if(!event._canPropagate)
@@ -93,7 +90,6 @@ class FunkinScriptGroup {
         for(i in 0..._scriptsToClose.length)
             remove(_scriptsToClose[i]);
         
-        _busy = false;
         _scriptsToClose.clear();
         return event;
     }
@@ -117,10 +113,7 @@ class FunkinScriptGroup {
         script.setParent(parent);
         script.setPublicMap(publicVariables);
         script.onClose.add(() -> {
-            if(_busy)
-                _scriptsToClose.push(script);
-            else
-                remove(script);
+            _scriptsToClose.push(script);
         });
         for(k => v in additionalDefaults)
             script.set(k, v);
@@ -140,7 +133,6 @@ class FunkinScriptGroup {
         members.remove(script);
     }
 
-    private var _busy:Bool = false;
     private var _scriptsToClose:Array<FunkinScript> = [];
 }
 #end
