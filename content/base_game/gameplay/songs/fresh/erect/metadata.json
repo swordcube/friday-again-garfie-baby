@@ -1,24 +1,23 @@
 {
     "song": {
-        "title": "DadBattle",
-        "mixes": ["erect"],
+        "title": "Fresh Erect",
+        "mixes": [],
         "difficulties": [
-            "easy",
-            "normal",
-            "hard"
+            "erect",
+            "nightmare"
         ],
         "timingPoints": [
             {
                 "t": 0,
-                "b": 180,
+                "b": 125,
                 "ts": [
                     4,
                     4
                 ]
             }
         ],
-        "artist": "Kawai Sprite",
-        "charter": "ninjamuffin99 + MtH",
+        "artist": "Kohta Takahashi (feat. Saruky)",
+        "charter": "fabs",
         "tracks": {
             "spectator": [],
             "opponent": [
@@ -41,13 +40,11 @@
             "opponent": "dad"
         },
         "scrollSpeed": {
-            "easy": 1.6,
-            "normal": 1.8,
-            "hard": 2.3
+            "nightmare": 2.4,
+            "erect": 2.3
         },
         "stage": "stage",
         "noteSkin": "default",
-        "uiSkin": "default",
-        "hudSkin": null
+        "uiSkin": "default"
     }
 }
