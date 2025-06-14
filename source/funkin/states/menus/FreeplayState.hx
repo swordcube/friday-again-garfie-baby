@@ -274,10 +274,13 @@ class FreeplayState extends FunkinState {
         if(contentPack == null)
             contentPack = Paths.forceContentPack;
 
-        categories.push({
+        final category:FreeplayCategory = {
             id: '${contentPack}:${id}',
             name: name
-        });
+        };
+        categories.push(category);
+        categoryMap.set('${contentPack}:${id}', category);
+        
         addSongsToCategory(id, songIDs, contentPack);
     }
 

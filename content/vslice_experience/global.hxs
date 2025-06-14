@@ -1,0 +1,24 @@
+import openfl.system.Capabilities;
+
+var stateRedirects = [
+    FreeplayState => () -> new ScriptedSubState("VSliceFreeplay"),
+];
+
+function onStateCreate(state) {
+    var redirect = stateRedirects.get(Type.getClass(state));
+    if(redirect != null) {
+        var constructor:Function = null;
+        if(redirect is String)
+            constructor = () -> return new ScriptedState(redirect);
+        else if(Reflect.isFunction(redirect))
+            constructor = redirect;
+        else
+            constructor = () -> return Type.createInstance(redirect, []);
+        
+        var newState = constructor();
+        Reflect.setProperty(newState, "_constructor", constructor); // constructor must be set otherwise FlxG.resetState won't work
+        
+        FlxG.game._state = newState;
+        FlxG.game._nextState = null; // just in case
+    }
+}

@@ -22,11 +22,11 @@
       "url": "https://github.com/swordcubes-grave-of-shite/FlxControls"
     },
     {
-      "name": "flxanimate",
+      "name": "flixel-animate",
       "type": "git",
       "dir": null,
-      "ref": "dev",
-      "url": "https://github.com/swordcube/flxanimate"
+      "ref": "main",
+      "url": "https://github.com/MaybeMaru/flixel-animate"
     },
     {
       "name": "format",

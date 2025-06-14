@@ -43,6 +43,8 @@ class TransitionableState extends FlxState {
 	public var hasTransIn(get, never):Bool;
 	public var hasTransOut(get, never):Bool;
 
+	public static var overrideSubState:Bool = true; // this is here because fnf jank sovl.
+
 	/**
 	 * Create a state with the ability to do visual transitions
 	 */
@@ -80,10 +82,19 @@ class TransitionableState extends FlxState {
 			return;
 		}
 		var trans = Type.createInstance(transIn, []);
-		openSubState(trans);
-
+		if(overrideSubState)
+			openSubState(trans);
+		else {
+			var state:FlxState = this;
+			while(state.subState != null)
+				state = state.subState;
+			
+			state.openSubState(trans);
+		}
 		trans.finishCallback = _finishTransIn;
 		trans.start(OUT);
+
+		overrideSubState = true;
 	}
 
 	/**
@@ -94,12 +105,21 @@ class TransitionableState extends FlxState {
 
 		if(hasTransOut) {
 			var trans = Type.createInstance(transOut, []);
-			openSubState(trans);
+			if(overrideSubState)
+				openSubState(trans);
+			else {
+				var state:FlxState = this;
+				while(state.subState != null)
+					state = state.subState;
 
+				state.openSubState(trans);
+			}
 			trans.finishCallback = _finishTransOut;
 			trans.start(IN);
 		} else
 			_onExit();
+
+		overrideSubState = true;
 	}
 
     //----------- [ Private API ] -----------//

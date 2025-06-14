@@ -33,6 +33,7 @@ import funkin.backend.assets.Cache;
 import funkin.backend.assets.Paths;
 
 import funkin.ui.Cursor;
+import funkin.graphics.FunkinSprite;
 
 import funkin.utilities.Constants;
 import funkin.utilities.CoolUtil;

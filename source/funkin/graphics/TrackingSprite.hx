@@ -26,7 +26,7 @@ enum abstract TrackingMode(Int) to Int from Int {
  * A sprite that tracks another sprite with customizable offsets.
  * @author Leather128
  */
-class TrackingSprite extends FlxSprite {
+class TrackingSprite extends FunkinSprite {
 	/**
 	 * The offset in X and Y to the tracked object.
 	 */

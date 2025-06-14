@@ -1,0 +1,749 @@
+import openfl.geom.Point;
+import openfl.geom.Matrix;
+
+import openfl.display.BitmapData;
+import openfl.filters.BlurFilter;
+
+import flixel.graphics.FlxGraphic;
+import animate.internal.FilterRenderer;
+
+import funkin.scripting.FunkinScript;
+
+import funkin.states.TransitionableState;
+import funkin.states.editors.ChartEditor;
+import funkin.states.menus.FreeplayState.FreeplaySongData;
+
+final ext:String = "menus/freeplay/";
+
+final songNameSelectColor:FlxColor = 0xFFFFFFFF;
+final songNameDeselectColor:FlxColor = 0xFF969A9D;
+final songNameSelectBorderColor:FlxColor = 0xFF6B9FBA;
+final songNameDeselectBorderColor:FlxColor = 0xFF3E508C;
+
+var parent:MainMenuState;
+
+// makin several groups for each part of
+// the song capsules, for better batching
+var capsuleData = {
+    offsetX: 0.0
+};
+var grpCapsules:FlxTypedGroup<FunkinSprite>;
+var grpSongNames:FlxTypedGroup<FlxText>;
+
+var grpSongIcons:FlxTypedGroup<FunkinSprite>;
+var grpCapsuleIcons:FlxTypedGroup<FunkinSprite>;
+
+// groups for category stuff!
+var grpCategoryArrows:FlxTypedSpriteGroup<FunkinSprite>;
+var grpCategorySeparators:FlxTypedSpriteGroup<FunkinSprite>;
+var grpCategories:FlxTypedSpriteGroup<FunkinSprite>;
+
+var diffDisplay:FunkinSprite;
+var diffLeftSelector:FunkinSprite;
+var diffRightSelector:FunkinSprite;
+
+var categoryLeftArrow:FunkinSprite;
+var categoryRightArrow:FunkinSprite;
+
+// taken straight from garfie baby source code
+var categories:Array<FreeplayCategory> = [];
+var categoryMap:Map<String, FreeplayCategory> = ["" => null];
+
+var songs:Array<VSliceFreeplaySongData> = [];
+var songListMap:Map<String, Array<VSliceFreeplaySongData>> = ["" => null];
+
+var curMenuSkin:String;
+var songFilters:Array<String> = [
+    "#", // only songs that contain numbers in their title?? i think??
+    "fav", // favorited songs
+    "ALL", // all songs
+    "AB", // only songs that contain A or B in their title
+    "CD", // only songs that contain C or D in their title
+    "EH", // only songs that contain E or H in their title
+    "IL", // only songs that contain I or L in their title
+    "MN", // only songs that contain M or N in their title
+    "OR", // only songs that contain O or R in their title
+    "S", // only songs that contain S in their title
+    "T", // only songs that contain T in their title
+    "UZ", // only songs that contain U or Z in their title
+];
+
+var pinkBG:FlxSprite;
+var dadCover:FlxSprite;
+
+var curSelected:Int = 1;
+var curSongFilter:Int = 2;
+
+var currentDifficulty:String = "normal";
+var currentMix:String = "default";
+
+var accepted:Bool = false;
+var goMyFreeplay:Bool = false;
+
+var header:FunkinSprite;
+var headerFreeplayText:FlxText;
+var headerOSTText:FlxText;
+
+var dj:FunkinSprite;
+var djScript:FunkinScript;
+
+function new(_parent:MainMenuState, ?menuSkin:String) {
+    parent = _parent;
+    curMenuSkin = menuSkin ?? "bf";
+}
+
+function addSongsToCategory(categoryID:String, ?songIDs:Array<String>, ?contentPack:String, ?priority:Int):Void {
+    priority ??= 0;
+
+    if(contentPack == null)
+        contentPack = Paths.forceContentPack;
+
+    if(songIDs == null || songIDs.length == 0)
+        return;
+
+    var songList:Array<FreeplaySongData> = songListMap.get('${contentPack}:${categoryID}');
+    if(songList == null) {
+        songList = [];
+        songListMap.set('${contentPack}:${categoryID}', songList);
+    }
+    for(song in songIDs) {
+        final defaultMetadata:SongMetadata = SongMetadata.load(song, null, contentPack);
+        final metadataMap:Map<String, SongMetadata> = ["default" => defaultMetadata];
+        
+        for(mix in defaultMetadata.song.mixes)
+            metadataMap.set(mix, SongMetadata.load(song, mix, contentPack));
+
+        final difficultyMap:Map<String, Array<String>> = ["default" => defaultMetadata.song.difficulties];
+        for(metadata in metadataMap) {
+            for(mix in metadata.song.mixes)
+                difficultyMap.set(mix, metadataMap.get(mix).song.difficulties);
+        }
+        final songData:VSliceFreeplaySongData = {
+            metadata: metadataMap,
+            id: song,
+            difficulties: difficultyMap,
+            contentPack: contentPack
+        };
+        songs.insert(songs.length - priority, songData);
+        songList.insert(songList.length - priority, songData);
+    }
+}
+
+function regenCapsules(filter:String) {
+    var filteredSongs:Array<FreeplaySongData> = null;
+    switch(filter) {
+        case "#":
+            final nums:String = "0123456789";
+            filteredSongs = songs.filter((data:FreeplaySongData) -> {
+                final meta:SongMetadata = data.metadata.get("default");
+                for(i in 0...nums.length) {
+                    if(meta.song.title.contains(nums.charAt(i)))
+                        return true;
+                }
+                return false;
+            });
+
+        case "fav":
+            filteredSongs = []; // TODO: favorite songs
+        
+        case "ALL":
+            filteredSongs = songs.copy();
+
+        default:
+            if(filter.length == 1) {
+                // handle "S" and "T" categories
+                filteredSongs = songs.filter((data:FreeplaySongData) -> {
+                    final meta:SongMetadata = data.metadata.get("default");
+                    return meta != null && StringTools.contains(meta.song.title, filter);
+                });
+            } else {
+                // handle the two-lettered categories
+                filteredSongs = songs.filter((data:FreeplaySongData) -> {
+                    final meta:SongMetadata = data.metadata.get("default");
+                    return meta != null && (StringTools.contains(meta.song.title, filter.charAt(0)) || StringTools.contains(meta.song.title, filter.charAt(1)));
+                });
+            }
+    }
+    filteredSongs.insert(0, new FreeplaySongData(null, "CUSTOM://random", null));
+
+    for(grp in [grpCapsules, grpSongNames, grpSongIcons, grpCapsuleIcons]) {
+        while(grp.length > 0) {
+            final memb = grp.members[0];
+            grp.remove(memb, true);
+            memb.destroy();
+        }
+    }
+    final blur:BlurFilter = new BlurFilter();
+    for(i in 0...filteredSongs.length) {
+        // get song metadata
+        final songData:FreeplaySongData = filteredSongs[i];
+        final songMeta:SongMetadata = (songData.metadata != null) ? songData.metadata.get("default") : null;
+
+        var displayedName:String = null;
+        switch(songData.id) {
+            case "CUSTOM://random":
+                displayedName = "Random";
+
+            default:
+                displayedName = songMeta.song.title;
+        }
+
+        // make capsule base
+        final capsule:FunkinSprite = new FunkinSprite().loadSparrowFrames('${ext}skins/${curMenuSkin}/capsule');
+        capsule.anim.addByPrefix('idle', 'mp3 capsule w backing NOT SELECTED0', 24, true);
+        capsule.anim.addByPrefix('selected', 'mp3 capsule w backing0', 24, true);
+        capsule.anim.setOffset('selected', 4, 0);
+        capsule.anim.play('idle');
+        capsule.setPosition(335 + Math.sin((i - curSelected) + 1) * 60 + FlxG.width, -200 + ((i - curSelected) * 115));
+        capsule.setScale(0.8, FlxAxes.XY);
+        Reflect.setProperty(capsule, "ID", i); // rulescript.
+        grpCapsules.add(capsule);
+
+        // make capsule text
+
+        // WARNING: this is kinda of a hack, i'm making an FlxText
+        // to generate the song name graphic, then using that graphic
+        // on a TrackingSprite. kinda stupid i know
+        final textGraphic:FlxText = new FlxText(0, 0, 0, displayedName);
+        textGraphic.setFormat(Paths.font("fonts/5by7"), 32, songNameSelectColor);
+        textGraphic.color = 0xFF00CCFF;
+        textGraphic.regenGraphic();
+        
+        // generate the blurred part of the text
+        final textGlowBitmap:BitmapData = new BitmapData(textGraphic.pixels.width + 12, textGraphic.pixels.height + 12, true, FlxColor.RED);
+        final bmd1:BitmapData = new BitmapData(textGlowBitmap.width, textGlowBitmap.height, true, FlxColor.RED);
+        FilterRenderer.__applyFilter(textGlowBitmap, bmd1, null, textGraphic.pixels, [blur], new Point(6, 6));
+        
+        // make the text white and regen graphic
+        textGraphic.color = FlxColor.WHITE;
+        textGraphic.regenGraphic();
+        
+        // then draw that on-top of the blurred text
+        // basically giving it a glow effect
+        final matrix:Matrix = new Matrix();
+        matrix.translate(6, 6);
+        textGlowBitmap.draw(textGraphic.pixels, matrix);
+
+        // then finally, use that bitmap on a sprite
+        final text:TrackingSprite = new TrackingSprite();
+        text.loadGraphic(FlxGraphic.fromBitmapData(textGlowBitmap));
+        text.tracked = capsule;
+        text.trackingMode = 4; // 4 = DIRECT
+        text.trackingOffset.set(88, 26);
+        text.copyAlpha = false;
+        Reflect.setProperty(text, "ID", i);
+        // text.kill();
+        text.update(0);
+        grpSongNames.add(text);
+
+        // make the character icon for this song
+        var chosenIcon:String = "none";
+        if(songMeta != null && songMeta.freeplay.icon != null)
+            chosenIcon = songMeta.freeplay.icon;
+        
+        if(chosenIcon != "none") {
+            final iconJsonPath:String = Paths.json('menus/freeplay/icons/${chosenIcon}');
+            final iconConfig:Dynamic = (FlxG.assets.exists(iconJsonPath)) ? Json.parse(FlxG.assets.getText(iconJsonPath)) : {offset: [0, 0]};
+
+            final songIcon:TrackingSprite = new TrackingSprite();
+            songIcon.tracked = capsule;
+            songIcon.trackingMode = 4; // 4 = DIRECT
+            songIcon.trackingOffset.set(iconConfig.offset[0] - 4, iconConfig.offset[1] - 2);
+            songIcon.loadSparrowFrames('menus/freeplay/icons/${chosenIcon}');
+            songIcon.anim.addByPrefix('idle', 'idle', 12, true);
+            songIcon.anim.addByPrefix('confirm', 'confirm0', 12, false);
+            songIcon.anim.play('idle');
+            songIcon.antialiasing = false;
+            songIcon.setScale(2, FlxAxes.XY);
+            Reflect.setProperty(songIcon, "ID", i); // rulescript.
+            grpSongIcons.add(songIcon);
+        }
+        
+        // we don't need the text object from earlier anymore,
+        // KILL IT WITH FIRE 🔥🔥🔥
+        textGraphic.destroy();
+    }
+}
+
+function changeSelection(?by:Int, ?force:Bool) {
+    by ??= 0;
+    force ??= false;
+
+    if(by == 0 && !force)
+        return;
+
+    curSelected = FlxMath.wrap(curSelected + by, 0, grpCapsules.length - 1);
+    grpCapsules.forEach((capsule) -> {
+        if(capsule.ID == curSelected)
+            capsule.anim.play('selected');
+        else
+            capsule.anim.play('idle');
+    });
+    grpSongNames.forEach((text) -> {
+        if(text.ID == curSelected)
+            text.alpha = 1;
+        else
+            text.alpha = 0.6;
+    });
+    if(!force)
+        FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
+}
+
+function changeFilter(?by:Int, ?force:Bool) {
+    by ??= 0;
+    force ??= false;
+
+    if(by == 0 && !force)
+        return;
+
+    curSongFilter = FlxMath.wrap(curSongFilter + by, 0, songFilters.length - 1);
+    for(i in 0...grpCategories.length) {
+        final category:FunkinSprite = grpCategories.members[i];
+
+        category.anim.addBySymbol("move", songFilters[FlxMath.wrap(curSongFilter + (i - 2), 0, songFilters.length - 1)] + " move", 24, false);
+        category.anim.play("move");
+        
+        if(i != 2)
+            category.anim.pause();
+        else
+            category.anim.resume();
+        
+        category.setPosition(grpCategories.x + (i * 80) + 70, grpCategories.y + 35);
+        category.updateHitbox();
+    }
+    changeDifficulty(0, true);
+    
+    curSelected = -1;
+    changeSelection(1);
+}
+
+function changeDifficulty(?by:Int, ?force:Bool) {
+    by ??= 0;
+    force ??= false;
+
+    if(by == 0 && !force)
+        return;
+
+    regenCapsules(songFilters[curSongFilter]);
+}
+
+function updateCapsule(capsule:FunkinSprite) {
+    final index:Int = capsule.ID - curSelected;
+
+    final lerpAmountX:Float = FlxMath.getElapsedLerp(0.3, FlxG.elapsed);
+    final lerpAmountY:Float = FlxMath.getElapsedLerp(0.4, FlxG.elapsed);
+
+    capsule.setPosition(
+        FlxMath.lerp(capsule.x - capsuleData.offsetX, 335 + Math.sin(index + 1) * 60 - (index > 3 ? 50 : 0), lerpAmountX),
+        FlxMath.lerp(capsule.y, 250 + (index * 115) - (index < -1 ? 100 : 0), lerpAmountY)
+    );
+    capsule.x += capsuleData.offsetX;
+}
+
+function switchState(nextState:NextState) {
+    if(FlxG.state == super) {
+        final shit = Type.createInstance(TransitionableState.defaultTransOut, []);
+        openSubState(shit);
+
+        shit.finishCallback = () -> FlxG.switchState(nextState);
+        shit.start(0);
+    } else
+        FlxG.switchState(nextState);
+}
+
+function loadIntoCharter():Void {
+    final songData:FreeplaySongData = songs[curSelected - 1];
+    switchState(() -> new ChartEditor({
+        song: songData.id,
+        difficulty: currentDifficulty,
+        mix: currentMix,
+        mod: songData.contentPack
+    }));
+}
+
+function loadIntoSong():Void {
+    final songData:FreeplaySongData = songs[curSelected - 1];
+    PlayState.deathCounter = 0;
+    switchState(() -> new PlayState({
+        song: songData.id,
+        difficulty: currentDifficulty,
+        mix: currentMix,
+        mod: songData.contentPack
+    }));
+}
+
+function callOntoDJ(method:String, ?args:Array<Dynamic>) {
+    if(djScript != null)
+        djScript.call(method, args);
+}
+
+function onAccept() {
+    if(curSelected == 0) {
+        // 1st entry is always "Random", so select a random song!
+        curSelected = FlxG.random.int(1, grpCapsules.length - 1);
+        changeSelection(0, true);
+    }
+    if(grpCapsules.length < 2) {
+        for(spr in [grpCapsules.members[curSelected], grpSongNames.members[curSelected]]) {
+            spr.updateHitbox();
+            FlxTween.cancelTweensOf(spr);
+            FlxTween.shake(spr, 0.01, 0.16, FlxAxes.XY);
+        }
+        FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
+        return;
+    }
+    accepted = true;
+    callOntoDJ("onAccept");
+    callOntoDJ("onConfirm");
+    callOntoDJ("onConfirmSong");
+    callOntoDJ("onSongConfirm");
+
+    FlxTimer.wait(1.5, () -> {
+        if(FlxG.state.subState != null) {
+            FlxG.state.persistentDraw = true;
+            FlxG.state.subState = null;
+            FlxG.state.add(super);
+            Reflect.setProperty(super, "_parentState", null);
+        }
+        FlxTimer.wait(0.001, () -> {
+            if(FlxG.keys.pressed.SHIFT)
+                loadIntoCharter();
+            else
+                loadIntoSong();
+
+            if(FlxG.sound.music != null)
+                FlxG.sound.music.fadeOut(0.16, 0);
+        });
+    });
+    grpSongIcons.forEach((icon) -> {
+        if(icon.ID == curSelected)
+            icon.anim.play("confirm");
+    });
+    FlxG.sound.play(Paths.sound("menus/sfx/select"));
+}
+
+function onExit() {
+    FlxG.state.persistentDraw = true;
+    callOntoDJ("onExit");
+    callOntoDJ("onCancel");
+
+    pinkBG.revive();
+    FlxTween.tween(capsuleData, {offsetX: FlxG.width}, 0.5, {ease: FlxEase.cubeIn});
+    
+    // left side
+    FlxTween.tween(dj, {x: -dj.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(pinkBG, {x: -pinkBG.width}, 0.5, {ease: FlxEase.cubeIn});
+
+    FlxTween.tween(diffDisplay, {x: -diffDisplay.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(diffLeftSelector, {x: -diffLeftSelector.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(diffRightSelector, {x: -diffRightSelector.width}, 0.5, {ease: FlxEase.cubeIn});
+    
+    // right side
+    FlxTween.tween(dadCover, {x: FlxG.width}, 0.5, {ease: FlxEase.cubeIn});
+
+    // top
+    FlxTween.tween(header, {y: -(header.height * 2)}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(headerFreeplayText, {y: headerFreeplayText.y - (header.height * 2)}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(headerOSTText, {y: headerOSTText.y - (header.height * 2)}, 0.5, {ease: FlxEase.cubeIn});
+
+    FlxTween.tween(grpCategoryArrows, {y: grpCategoryArrows.y - (header.height * 2)}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(grpCategorySeparators, {y: grpCategorySeparators.y - (header.height * 2)}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(grpCategories, {y: grpCategories.y - (header.height * 2)}, 0.5, {ease: FlxEase.cubeIn});
+
+    if(FlxG.sound.music != null)
+        FlxG.sound.music.fadeOut(0.5, 0.0);
+
+    FlxTimer.wait(0.55, () -> {
+        if(FlxG.state == super) {
+            FlxG.game._state = members[0];
+            FlxG.game._state.active = true;
+            FlxG.game._state._cameras = null;
+
+            remove(members[0], true);
+            super.destroy();
+        } else
+            close();
+        
+        CoolUtil.playMenuMusic();
+    });
+    FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
+}
+
+function onCreate() {
+    persistentUpdate = true;
+
+    for(contentPack in Paths.getEnabledContentPacks()) {
+        final contentMetadata:ContentMetadata = Paths.contentMetadata.get(contentPack);
+        if(contentMetadata == null)
+            continue; // if no metadata was found for this content pack, then don't bother
+        
+        for(category in contentMetadata.freeplayCategories) {
+            categories.push({
+                id: '${contentPack}:${category.id}',
+                name: category.name
+            });
+            categoryMap.set('${contentPack}:${category.id}', category);
+        }
+        for(level in contentMetadata.levels) {
+            if(!level.showInFreeplay)
+                continue;
+
+            final categoryID:String = '${contentPack}:${level.freeplayCategory}';
+            if(!songListMap.exists(categoryID))
+                songListMap.set(categoryID, []);
+
+            final validSongs:Array<String> = [];
+            for(song in level.songs) {
+                if(level.hiddenSongs.freeplay.contains(song))
+                    continue;
+
+                if(!FlxG.assets.exists(Paths.json('gameplay/songs/${song}/default/metadata', contentPack)))
+                    continue;
+
+                validSongs.push(song);
+            }
+            addSongsToCategory(level.freeplayCategory, validSongs, contentPack);
+        }
+    }
+    pinkBG = new FunkinSprite().loadGraphic(Paths.image("menus/freeplay/pink_bg"));
+    pinkBG.x = -pinkBG.width;
+    pinkBG.screenCenter(FlxAxes.Y);
+    add(pinkBG);
+
+    final djScriptPath:String = Paths.script('menus/freeplay/dj/${curMenuSkin}/script');
+    if(FlxG.assets.exists(djScriptPath)) {
+        djScript = FunkinScript.fromFile(djScriptPath);
+        djScript.set("menu", super);
+        djScript.set("djName", curMenuSkin);
+        djScript.set("curMenuSkin", curMenuSkin);
+        djScript.set("curMenuDJ", curMenuSkin);
+        djScript.set("curDJ", curMenuSkin);
+        djScript.execute();
+
+        djScript.call("new");
+        djScript.call("onLoad");
+
+        dj = djScript.call("initDJ");
+        djScript.call("playIntro");
+
+        super.subStateScripts.add(djScript);
+    }
+    dadCover = new FunkinSprite().loadGraphic(Paths.image('menus/freeplay/covers/dad${(curMenuSkin != "bf") ? '-${curMenuSkin}' : ""}'));
+    dadCover.x = FlxG.width;
+    dadCover.screenCenter(FlxAxes.Y);
+    dadCover.color = FlxColor.BLACK;
+    add(dadCover);
+
+    grpCapsules = new FlxTypedGroup();
+    add(grpCapsules);
+
+    grpSongNames = new FlxTypedGroup();
+    add(grpSongNames);
+
+    grpSongIcons = new FlxTypedGroup();
+    add(grpSongIcons);
+
+    grpCapsuleIcons = new FlxTypedGroup();
+    add(grpCapsuleIcons);
+
+    diffDisplay = new FunkinSprite(197, 115);
+    diffDisplay.loadGraphic(Paths.image("menus/freeplay/difficulties/default/hard"));
+    diffDisplay.kill();
+    add(diffDisplay);
+    
+    diffLeftSelector = new FunkinSprite(20, 70);
+    diffLeftSelector.frames = Paths.getSparrowAtlas('menus/freeplay/skins/${curMenuSkin}/selector');
+    diffLeftSelector.animation.addByPrefix("idle", "arrow pointer loop", 24);
+    diffLeftSelector.animation.play("idle");
+    diffLeftSelector.kill();
+    add(diffLeftSelector);
+    
+    diffRightSelector = new FunkinSprite(325, 70);
+    diffRightSelector.frames = Paths.getSparrowAtlas('menus/freeplay/skins/${curMenuSkin}/selector');
+    diffRightSelector.animation.addByPrefix("idle", "arrow pointer loop", 24);
+    diffRightSelector.animation.play("idle");
+    diffRightSelector.flipX = true;
+    diffRightSelector.kill();
+    add(diffRightSelector);
+
+    grpCategoryArrows = new FlxTypedSpriteGroup();
+    grpCategoryArrows.setPosition(380, 90);
+    grpCategoryArrows.kill();
+    add(grpCategoryArrows);
+
+    grpCategorySeparators = new FlxTypedSpriteGroup();
+    grpCategorySeparators.setPosition(grpCategoryArrows.x, grpCategoryArrows.y);
+    grpCategorySeparators.kill();
+    add(grpCategorySeparators);
+    
+    grpCategories = new FlxTypedSpriteGroup();
+    grpCategories.setPosition(grpCategoryArrows.x, grpCategoryArrows.y);
+    grpCategories.kill();
+    add(grpCategories);
+
+    for(i in 0...4) {
+        final sep:FunkinSprite = new FunkinSprite().loadGraphic(Paths.image("menus/freeplay/separator"));
+        sep.setPosition((i * 80) + 80, 4);
+        grpCategorySeparators.add(sep);
+    }
+    for(i in 0...5) {
+        // using raw ass FlxAnimate since you can't add
+        // these animations through labels (they don't exist?!?)
+        final category:FunkinSprite = new FunkinSprite();
+        category.loadAnimateFrames("menus/freeplay/categories");
+        category.setPosition((i * 80) + 70, 35);
+
+        category.anim.addBySymbol("move", songFilters[FlxMath.wrap(curSongFilter + (i - 2), 0, songFilters.length - 1)] + " move", 24, false);
+        category.anim.play("move");
+
+        var darkness:Float = Math.abs(i - 2) / 6;
+        category.color = new FlxColor(0xFFFFFFFF).getDarkened(darkness);
+        
+        if(i != 2) {
+            category.scale.set(0.8, 0.8);
+            category.updateHitbox();
+            category.anim.pause();
+        }
+        grpCategories.add(category);
+    }
+    categoryLeftArrow = new FunkinSprite().loadGraphic(Paths.image("menus/freeplay/mini_arrow"));
+    categoryLeftArrow.scale.set(0.7, 0.7);
+    categoryLeftArrow.updateHitbox();
+    categoryLeftArrow.flipX = true;
+    grpCategoryArrows.add(categoryLeftArrow);
+
+    categoryRightArrow = new FunkinSprite().loadGraphic(Paths.image("menus/freeplay/mini_arrow"));
+    categoryRightArrow.x = 400;
+    categoryRightArrow.scale.set(0.7, 0.7);
+    categoryRightArrow.updateHitbox();
+    grpCategoryArrows.add(categoryRightArrow);
+
+    header = new FunkinSprite().makeSolid(FlxG.width, 65, 0xFF000000);
+    header.y -= header.height;
+    add(header);
+    
+    headerFreeplayText = new FlxText(10, 6, 0, "FREEPLAY");
+    headerFreeplayText.setFormat(Paths.font("fonts/vcr"), 48);
+    headerFreeplayText.y -= header.height;
+    headerFreeplayText.kill();
+    add(headerFreeplayText);
+    
+    headerOSTText = new FlxText(FlxG.width - 10, 6, 0, "OFFICIAL OST");
+    headerOSTText.setFormat(Paths.font("fonts/vcr"), 48);
+    headerOSTText.x -= headerOSTText.width;
+    headerOSTText.y -= header.height;
+    headerOSTText.kill();
+    add(headerOSTText);
+
+    changeFilter(0, true);
+
+    // final refImg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('${ext}/reference'));
+    // refImg.alpha = 0.25;
+    // refImg.screenCenter();
+    // add(refImg);
+
+    camera = new FlxCamera();
+    camera.bgColor = 0;
+    FlxG.cameras.add(camera, false);
+
+    FlxTween.tween(pinkBG, {x: 0}, 0.5, {ease: FlxEase.cubeOut});
+    FlxTween.tween(dadCover, {x: FlxG.width - dadCover.width}, 0.5, {ease: FlxEase.cubeOut});
+
+    for(obj in [header, headerFreeplayText, headerOSTText])
+        FlxTween.tween(obj, {y: obj.y + header.height}, 0.5, {ease: FlxEase.cubeOut});
+
+    FlxTimer.wait(0.5, () -> {
+        if(parent != null)
+            parent.persistentDraw = false;
+
+        pinkBG.kill();
+        dadCover.color = FlxColor.WHITE;
+
+        headerFreeplayText.revive();
+        headerOSTText.revive();
+        
+        diffDisplay.x = -diffDisplay.width;
+        FlxTween.tween(diffDisplay, {x: 197}, 0.5, {ease: FlxEase.cubeOut});
+        
+        diffDisplay.revive();
+        diffLeftSelector.revive();
+        diffRightSelector.revive();
+
+        grpCategoryArrows.revive();
+        grpCategorySeparators.revive();
+        grpCategories.revive();
+
+        dadCover.colorTransform.redMultiplier = 0;
+        dadCover.colorTransform.greenMultiplier = 0;
+        dadCover.colorTransform.blueMultiplier = 0;
+
+        FlxTween.tween(dadCover.colorTransform, {redMultiplier: 1, greenMultiplier: 1, blueMultiplier: 1}, 0.25, {ease: FlxEase.cubeOut});
+        callOntoDJ("showBackingCard");
+    });
+}
+
+function onCreatePost() {
+    if(FlxG.state == super) {
+        final shit = Type.createInstance(TransitionableState.defaultTransIn, []);
+        
+        var state:FlxState = super;
+        while(state.subState != null)
+            state = state.subState;
+        
+        state.openSubState(shit);
+
+        shit.finishCallback = shit.close;
+        shit.start(1);
+    }
+}
+
+function onUpdatePre(dt:Float) {
+    if(!goMyFreeplay) {
+        goMyFreeplay = true;
+        return;
+    }
+    if(FlxG.keys.justPressed.END) {
+        if(parent != null)
+            parent.persistentDraw = true;
+
+        close();
+    }
+    if(!accepted) {
+        final wheel:Float = -FlxG.mouse.wheel;
+        if(controls.justPressed.check(Control.UI_UP) || wheel < 0)
+            changeSelection(-1);
+    
+        if(controls.justPressed.check(Control.UI_DOWN) || wheel > 0)
+            changeSelection(1);
+
+        if(FlxG.keys.justPressed.Q)
+            changeFilter(-1);
+
+        if(FlxG.keys.justPressed.E)
+            changeFilter(1);
+    
+        if(controls.justPressed.check(Control.BACK)) {
+            accepted = true;
+            if(FlxG.game._state == super) {
+                final constructor = () -> new MainMenuState();
+                
+                final menu:MainMenuState = constructor();
+                Reflect.setProperty(menu, "_constructor", constructor); // constructor must be set otherwise FlxG.resetState won't work
+                menu.create();
+                menu.createPost();
+
+                menu.active = false;
+                menu.cameras = [FlxG.camera];
+                insert(0, menu);
+            }
+            onExit();
+        }
+        if(controls.justPressed.check(Control.ACCEPT))
+            onAccept();
+    }
+    grpCapsules.forEach(updateCapsule);
+}
+
+function onDestroy() {
+    FlxG.cameras.remove(camera);
+}

@@ -34,7 +34,7 @@ class SkinnableUISpriteData {
 	public var animation:Map<String, AnimationData>;//DynamicAccess<DynamicAccess<AnimationData>>;
 }
 
-class SkinnableUISprite extends FlxSprite {
+class SkinnableUISprite extends FunkinSprite {
     public var skin(get, never):String;
     public var skinData(get, never):SkinnableUISpriteData;
 
@@ -58,14 +58,14 @@ class SkinnableUISprite extends FlxSprite {
 
         switch(_skinData.atlas.type) {
             case SPARROW:
-                frames = Paths.getSparrowAtlas('${skinDir}/${_skinData.atlas.path}');
+                loadSparrowFrames('${skinDir}/${_skinData.atlas.path}');
 
             case GRID:
                 final gridSize:Array<Int> = _skinData.atlas.gridSize;
                 loadGraphic(Paths.image('${skinDir}/${_skinData.atlas.path}'), true, gridSize[0] ?? 0, gridSize[1] ?? gridSize[0] ?? 0);
 
             case ANIMATE:
-                // TODO: this shit
+                loadAnimateFrames('${skinDir}/${_skinData.atlas.path}');
 
             case IMAGE:
                 final atlasKey:String = '#_ATLAS_${skinDir}:${_skinData.atlas.path}';

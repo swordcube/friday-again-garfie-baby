@@ -168,7 +168,7 @@
 	<haxelib name="flixel-controls" />
 
 	<!-- Loading Animate Atlas -->
-	<haxelib name="flxanimate" />
+	<haxelib name="flixel-animate" />
 
 	<!-- Discord RPC -->
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED" />

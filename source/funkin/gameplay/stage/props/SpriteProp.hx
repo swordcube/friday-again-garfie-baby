@@ -2,7 +2,7 @@ package funkin.gameplay.stage.props;
 
 import flixel.util.FlxColor;
 
-class SpriteProp extends FlxSprite implements StageProp {
+class SpriteProp extends FunkinSprite implements StageProp {
 	public var stage:Stage;
     public var layer:FlxGroup;
 

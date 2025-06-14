@@ -93,6 +93,7 @@ class FunkinScript {
         setClass(funkin.gameplay.PlayField);
         setClass(funkin.gameplay.UISkin);
         
+        setClass(funkin.graphics.FunkinSprite);
         setClass(funkin.graphics.SkinnableSprite);
         setClass(funkin.graphics.TiledSprite);
         

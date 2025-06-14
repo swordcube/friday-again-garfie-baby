@@ -13,6 +13,8 @@ import openfl.display.BitmapData;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.system.frontEnds.AssetFrontEnd;
 
+import animate.FlxAnimateFrames;
+
 import funkin.backend.LevelData;
 import funkin.backend.ContentMetadata;
 
@@ -514,7 +516,7 @@ class Paths {
         final imgPath:String = image(name, loaderID, useFallback);
         final xmlPath:String = xml(name, loaderID, useFallback);
 
-        final key:String = '${imgPath}:${xmlPath}';
+        final key:String = 'SPARROW://${imgPath}:${xmlPath}';
         if(Cache.atlasCache.get(key) == null) {
             final atlas:FlxAtlasFrames = FlxAtlasFrames.fromSparrow(imgPath, xmlPath);
             if(atlas.parent != null) {
@@ -526,8 +528,19 @@ class Paths {
         return cast Cache.atlasCache.get(key);
     }
 
-    public static function animateAtlas(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
-        return getAsset(name, loaderID, useFallback);
+    public static function getAnimateAtlas(name:String, ?loaderID:String, ?useFallback:Bool = true):FlxAtlasFrames {
+        final basePath:String = getAsset(name, loaderID, useFallback);
+        final key:String = 'ANIMATE_TA://${basePath}';
+        
+        if(Cache.atlasCache.get(key) == null) {
+            final atlas:FlxAnimateFrames = FlxAnimateFrames.fromAnimate(basePath);
+            if(atlas.parent != null) {
+                atlas.parent.persist = true;
+                atlas.parent.incrementUseCount();
+            }
+            Cache.atlasCache.set(key, atlas);
+        }
+        return cast Cache.atlasCache.get(key);
     }
 
     public static function iterateDirectory(dir:String, callback:String->Void, ?recursive:Bool = false):Void {

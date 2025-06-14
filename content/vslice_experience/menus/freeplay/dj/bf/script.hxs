@@ -1,0 +1,184 @@
+var bg:FunkinSprite;
+
+var acceptBG:FunkinSprite;
+var acceptText:AtlasSprite;
+var acceptTextGlow:FunkinSprite;
+var glowBright:FunkinSprite;
+var glowDark:FunkinSprite;
+var pinkFlash:FunkinSprite;
+
+var scrollingText:FlxSpriteGroup;
+var scrollingTextList:Array<ScrollingTextData> = [];
+
+var dj:FunkinSprite;
+var stopDancing:Bool = false;
+
+function createScrollingText() {
+    scrollingText.forEach((text) -> {
+        text.destroy();
+    });
+    scrollingText.clear();
+
+    for(x in scrollingTextList) {
+        var tempText = new FlxText(0, 0, 0, x.text);
+        tempText.setFormat(x.font, x.size, x.color);
+        tempText.regenGraphic();
+
+        var scrolling:FlxBackdrop = new FlxBackdrop(tempText.graphic, FlxAxes.X);
+        scrolling.setPosition(x.position.x, x.position.y);
+        scrolling.velocity.x = x.velocity * 60;
+        scrollingText.add(scrolling);
+
+        tempText.destroy();
+    }
+}
+
+function onLoad() {
+    bg = new FunkinSprite().loadGraphic(Paths.image('menus/freeplay/bgs/${djName}/card_bg'));
+    bg.kill();
+    menu.add(bg);
+
+    acceptBG = new FunkinSprite().makeSolid(528, FlxG.height, 0xFF171831);
+    acceptBG.visible = false;
+    menu.add(acceptBG);
+    
+    glowBright = new FunkinSprite(-30, 240).loadGraphic(Paths.image('menus/freeplay/bgs/${djName}/confirm_glow_bright'));
+    glowBright.antialiasing = true;
+    glowBright.alpha = 0;
+    glowBright.blend = BlendMode.ADD;
+    menu.add(glowBright);
+    
+    glowDark = new FunkinSprite(glowBright.x, glowBright.y).loadGraphic(Paths.image('menus/freeplay/bgs/${djName}/confirm_glow_dark'));
+    glowDark.antialiasing = true;
+    glowDark.alpha = 0;
+    menu.add(glowDark);
+    
+    acceptText = new FunkinSprite();
+    acceptText.setPosition(640, 420);
+    acceptText.loadAnimateFrames('menus/freeplay/bgs/${djName}/backing-text-yeah');
+    acceptText.anim.addBySymbol("text", "BF back card confirm raw", 24, false);
+    acceptText.antialiasing = true;
+    acceptText.visible = false;
+    menu.add(acceptText);
+    
+    acceptTextGlow = new FunkinSprite(-8, 165).loadGraphic(Paths.image('menus/freeplay/bgs/${djName}/glowing_text'));
+    acceptTextGlow.antialiasing = true;
+    acceptTextGlow.blend = BlendMode.ADD;
+    acceptTextGlow.visible = false;
+    menu.add(acceptTextGlow);
+
+    pinkFlash = new FunkinSprite().makeSolid(528, 720, 0xFFFFD0D5);
+    pinkFlash.antialiasing = true;
+    pinkFlash.alpha = 0;
+    menu.add(pinkFlash);
+
+    scrollingText = new FlxSpriteGroup();
+    scrollingText.visible = false;
+    menu.add(scrollingText);
+
+    scrollingTextList.push({
+        text: "HOT BLOODED IN MORE WAYS THAN ONE ",
+        font: Paths.font("fonts/5by7"),
+        size: 43,
+        color: 0xFFFFF383,
+        position: new FlxPoint(0, 168),
+        velocity: 6.8
+    });
+    scrollingTextList.push({
+        text: "BOYFRIEND ",
+        font: Paths.font("fonts/5by7"),
+        size: 60,
+        color: 0xFFFF9963,
+        position: new FlxPoint(0, 220),
+        velocity: -3.8
+    });
+    scrollingTextList.push({
+        text: "PROTECT YO NUTS ",
+        font: Paths.font("fonts/5by7"),
+        size: 43,
+        color: 0xFFFFFFFF,
+        position: new FlxPoint(0, 285),
+        velocity: 3.5
+    });
+    scrollingTextList.push({
+        text: "BOYFRIEND ",
+        font: Paths.font("fonts/5by7"),
+        size: 60,
+        color: 0xFFFF9963,
+        position: new FlxPoint(0, 335),
+        velocity: -3.8
+    });
+    scrollingTextList.push({
+        text: "HOT BLOODED IN MORE WAYS THAN ONE ",
+        font: Paths.font("fonts/5by7"),
+        size: 43,
+        color: 0xFFFFF383,
+        position: new FlxPoint(0, 397),
+        velocity: 6.8
+    });
+    scrollingTextList.push({
+        text: "BOYFRIEND ",
+        font: Paths.font("fonts/5by7"),
+        size: 60,
+        color: 0xFFFEA400,
+        position: new FlxPoint(0, 455),
+        velocity: -3.8
+    });
+    createScrollingText();
+}
+
+function initDJ() {
+    dj = new FunkinSprite(5, 290);
+    dj.loadAnimateFrames('menus/freeplay/dj/${djName}');
+    dj.anim.addByFrameLabel("intro", "Intro", 24, false);
+    dj.anim.addByFrameLabel("idle", "Idle", 24, false);
+    dj.anim.addByFrameLabel("confirm", "Confirm", 24, false);
+    dj.anim.onFinish.add((name:String) -> {
+        if(name == "intro")
+            dj.anim.play("idle");
+    });
+    dj.anim.play("intro");
+    menu.add(dj);
+    return dj;
+}
+
+function showBackingCard() {
+    bg.revive();
+    bg.colorTransform.redMultiplier = 3;
+    bg.colorTransform.greenMultiplier = 3;
+    bg.colorTransform.blueMultiplier = 3;
+
+    scrollingText.visible = true;
+    FlxTween.tween(bg.colorTransform, {redMultiplier: 1, greenMultiplier: 1, blueMultiplier: 1}, 0.5, {ease: FlxEase.cubeOut});
+}
+
+function onBeatHit(beat:Int) {
+    if(!stopDancing && dj.anim.name == "idle")
+        dj.anim.play("idle", true);
+}
+
+function onAccept() {
+    scrollingText.visible = false;
+    acceptBG.visible = true;
+
+    acceptText.visible = true;
+    acceptText.anim.play("text");
+
+    pinkFlash.alpha = 1;
+    FlxTween.tween(pinkFlash, {alpha: 0}, 6/24, {ease: FlxEase.quadOut});
+
+    FlxTween.tween(glowDark, {alpha: 0.5}, 0.33, {ease: FlxEase.quadOut, onComplete: (t) -> {
+        glowDark.alpha = 0.6;
+        glowBright.alpha = 1;
+        acceptTextGlow.visible = true;
+        FlxTween.tween(acceptTextGlow, {alpha: 0.4}, 0.5);
+        FlxTween.tween(glowBright, {alpha: 0}, 0.5);
+    }});
+    dj.anim.play("confirm");
+}
+
+function onExit() {
+    stopDancing = true;
+    bg.kill();
+    scrollingText.kill();
+}
