@@ -31,7 +31,7 @@ var grpCapsules:FlxTypedGroup<FunkinSprite>;
 var grpSongNames:FlxTypedGroup<FlxText>;
 
 var grpSongIcons:FlxTypedGroup<FunkinSprite>;
-var grpCapsuleIcons:FlxTypedGroup<FunkinSprite>;
+var grpCapsuleExtras:FlxTypedGroup<FunkinSprite>;
 
 // groups for category stuff!
 var grpCategoryArrows:FlxTypedSpriteGroup<FunkinSprite>;
@@ -52,7 +52,7 @@ var categoryMap:Map<String, FreeplayCategory> = ["" => null];
 var songs:Array<VSliceFreeplaySongData> = [];
 var songListMap:Map<String, Array<VSliceFreeplaySongData>> = ["" => null];
 
-var curMenuSkin:String;
+var curCharacter:String;
 var songFilters:Array<String> = [
     "#", // only songs that contain numbers in their title?? i think??
     "fav", // favorited songs
@@ -67,6 +67,7 @@ var songFilters:Array<String> = [
     "T", // only songs that contain T in their title
     "UZ", // only songs that contain U or Z in their title
 ];
+var accessibleSongs:Array<VSliceFreeplaySongData> = [];
 
 var pinkBG:FlxSprite;
 var dadCover:FlxSprite;
@@ -87,9 +88,11 @@ var headerOSTText:FlxText;
 var dj:FunkinSprite;
 var djScript:FunkinScript;
 
+var playingIntro:Bool = true;
+
 function new(_parent:MainMenuState, ?menuSkin:String) {
     parent = _parent;
-    curMenuSkin = menuSkin ?? "bf";
+    curCharacter = menuSkin ?? "bf";
 }
 
 function addSongsToCategory(categoryID:String, ?songIDs:Array<String>, ?contentPack:String, ?priority:Int):Void {
@@ -130,11 +133,14 @@ function addSongsToCategory(categoryID:String, ?songIDs:Array<String>, ?contentP
 }
 
 function regenCapsules(filter:String) {
+    var songsToFilter:Array<FreeplaySongData> = songs.filter((song:FreeplaySongData) -> {
+        return song.metadata.exists(currentMix) && song.metadata.get(currentMix).song.difficulties.contains(currentDifficulty);
+    });
     var filteredSongs:Array<FreeplaySongData> = null;
     switch(filter) {
         case "#":
             final nums:String = "0123456789";
-            filteredSongs = songs.filter((data:FreeplaySongData) -> {
+            filteredSongs = songsToFilter.filter((data:FreeplaySongData) -> {
                 final meta:SongMetadata = data.metadata.get("default");
                 for(i in 0...nums.length) {
                     if(meta.song.title.contains(nums.charAt(i)))
@@ -147,26 +153,27 @@ function regenCapsules(filter:String) {
             filteredSongs = []; // TODO: favorite songs
         
         case "ALL":
-            filteredSongs = songs.copy();
+            filteredSongs = songsToFilter;
 
         default:
             if(filter.length == 1) {
                 // handle "S" and "T" categories
-                filteredSongs = songs.filter((data:FreeplaySongData) -> {
+                filteredSongs = songsToFilter.filter((data:FreeplaySongData) -> {
                     final meta:SongMetadata = data.metadata.get("default");
                     return meta != null && StringTools.contains(meta.song.title, filter);
                 });
             } else {
                 // handle the two-lettered categories
-                filteredSongs = songs.filter((data:FreeplaySongData) -> {
+                filteredSongs = songsToFilter.filter((data:FreeplaySongData) -> {
                     final meta:SongMetadata = data.metadata.get("default");
                     return meta != null && (StringTools.contains(meta.song.title, filter.charAt(0)) || StringTools.contains(meta.song.title, filter.charAt(1)));
                 });
             }
     }
     filteredSongs.insert(0, new FreeplaySongData(null, "CUSTOM://random", null));
+    accessibleSongs = filteredSongs;
 
-    for(grp in [grpCapsules, grpSongNames, grpSongIcons, grpCapsuleIcons]) {
+    for(grp in [grpCapsules, grpSongNames, grpSongIcons, grpCapsuleExtras]) {
         while(grp.length > 0) {
             final memb = grp.members[0];
             grp.remove(memb, true);
@@ -189,7 +196,7 @@ function regenCapsules(filter:String) {
         }
 
         // make capsule base
-        final capsule:FunkinSprite = new FunkinSprite().loadSparrowFrames('${ext}skins/${curMenuSkin}/capsule');
+        final capsule:FunkinSprite = new FunkinSprite().loadSparrowFrames('${ext}skins/${curCharacter}/capsule');
         capsule.anim.addByPrefix('idle', 'mp3 capsule w backing NOT SELECTED0', 24, true);
         capsule.anim.addByPrefix('selected', 'mp3 capsule w backing0', 24, true);
         capsule.anim.setOffset('selected', 4, 0);
@@ -265,6 +272,19 @@ function regenCapsules(filter:String) {
     }
 }
 
+function updateDifficultyDisplay():Void {
+    final thing:String = 'menus/freeplay/difficulties/${currentMix ?? "default"}/${currentDifficulty}';
+    final xmlPath:String = Paths.xml(thing);
+    if(FlxG.assets.exists(xmlPath)) {
+        diffDisplay.frames = Paths.getSparrowAtlas(thing);
+        diffDisplay.animation.addByPrefix("idle", "idle", 24);
+        diffDisplay.animation.play("idle");
+    } else
+        diffDisplay.loadGraphic(Paths.image(thing));
+    
+    diffDisplay.offset.set(diffDisplay.width * 0.5, diffDisplay.height * 0.5);
+}
+
 function changeSelection(?by:Int, ?force:Bool) {
     by ??= 0;
     force ??= false;
@@ -312,9 +332,6 @@ function changeFilter(?by:Int, ?force:Bool) {
         category.updateHitbox();
     }
     changeDifficulty(0, true);
-    
-    curSelected = -1;
-    changeSelection(1);
 }
 
 function changeDifficulty(?by:Int, ?force:Bool) {
@@ -324,7 +341,76 @@ function changeDifficulty(?by:Int, ?force:Bool) {
     if(by == 0 && !force)
         return;
 
-    regenCapsules(songFilters[curSongFilter]);
+    final capsule:SongCapsule = grpCapsules.members[curSelected];
+    final songMeta:ChartMetadata = (accessibleSongs[curSelected].metadata != null) ? accessibleSongs[curSelected].metadata.get("default") : null;
+    
+    var currentMixIndex:Int = (songMeta?.song != null) ? songMeta.song.mixes.indexOf(currentMix) : -1;
+    currentMix = (songMeta?.song != null) ? songMeta.song.mixes[currentMixIndex] : "default";
+
+    final songMixMeta:ChartMetadata = (accessibleSongs[curSelected].metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
+    final diffs:Array<String> = (songMixMeta?.song != null) ? songMixMeta.song.difficulties : ["easy", "normal", "hard"];
+    
+    var currentDifficultyIndex:Int = diffs.indexOf(currentDifficulty);
+    currentDifficultyIndex += by;
+    currentDifficulty = diffs[currentDifficultyIndex];
+
+    if(currentDifficultyIndex < 0) {
+        changeMix(-1);
+        final songMixMeta:ChartMetadata = accessibleSongs[curSelected].metadata.get(currentMix);
+        final variantDiffs:Array<String> = (songMixMeta?.song != null) ? songMixMeta.song.difficulties : diffs;
+        currentDifficulty = variantDiffs[variantDiffs.length - 1];
+    }
+    else if(currentDifficultyIndex > diffs.length - 1) {
+        changeMix(1);
+        final songMixMeta:ChartMetadata = accessibleSongs[curSelected].metadata.get(currentMix);
+        final variantDiffs:Array<String> = (songMixMeta?.song != null) ? songMixMeta.song.difficulties : diffs;
+        currentDifficulty = variantDiffs[0];
+    }
+    changeMix(0, true);
+    FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
+}
+
+function changeMix(?by:Int = 0, ?force:Bool = false):Void {
+    if(by == 0 && !force)
+        return;
+
+    final capsule:SongCapsule = grpCapsules.members[curSelected + 1];
+
+    final lastSongData:FreeplaySongData = accessibleSongs[curSelected];
+    final songMeta:ChartMetadata = (lastSongData?.metadata != null) ? lastSongData.metadata.get("default") : null;
+    
+    var currentMixIndex:Int = (songMeta?.song != null) ? songMeta.song.mixes.indexOf(currentMix) : -1;
+    if(songMeta != null && songMeta.song.mixes.length != 0)
+        currentMixIndex = FlxMath.wrap(currentMixIndex + by, 0, songMeta.song.mixes.length - 1);
+    else
+        currentMixIndex = 0;
+
+    currentMix = (songMeta?.song != null) ? songMeta.song.mixes[currentMixIndex] : "default";
+    
+    final songMixMeta:ChartMetadata = (accessibleSongs[curSelected].metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
+    final diffs:Array<String> = (songMixMeta?.song != null) ? songMixMeta.song.difficulties : ["easy", "normal", "hard"];
+    
+    var currentDifficultyIndex:Int = diffs.indexOf(currentDifficulty);
+    currentDifficultyIndex = FlxMath.wrap(currentDifficultyIndex + by, 0, diffs.length - 1);
+    currentDifficulty = diffs[currentDifficultyIndex];
+
+    updateDifficultyDisplay();
+    
+    diffDisplay.y = 115 - 15;
+    FlxTween.completeTweensOf(diffDisplay);
+    FlxTween.tween(diffDisplay, {y: 115}, 0.1, {ease: FlxEase.cubeOut});
+    
+    if(diffs.length > 1)
+        regenCapsules(songFilters[curSongFilter]);
+    
+    for(i in 0...accessibleSongs.length) {
+        final songData:FreeplaySongData = accessibleSongs[i];
+        if(songData.id == lastSongData.id) {
+            curSelected = i;
+            break;
+        }
+    }
+    changeSelection(0, true);
 }
 
 function updateCapsule(capsule:FunkinSprite) {
@@ -352,7 +438,7 @@ function switchState(nextState:NextState) {
 }
 
 function loadIntoCharter():Void {
-    final songData:FreeplaySongData = songs[curSelected - 1];
+    final songData:FreeplaySongData = accessibleSongs[curSelected];
     switchState(() -> new ChartEditor({
         song: songData.id,
         difficulty: currentDifficulty,
@@ -362,7 +448,7 @@ function loadIntoCharter():Void {
 }
 
 function loadIntoSong():Void {
-    final songData:FreeplaySongData = songs[curSelected - 1];
+    final songData:FreeplaySongData = accessibleSongs[curSelected];
     PlayState.deathCounter = 0;
     switchState(() -> new PlayState({
         song: songData.id,
@@ -434,9 +520,9 @@ function onExit() {
     FlxTween.tween(dj, {x: -dj.width}, 0.5, {ease: FlxEase.cubeIn});
     FlxTween.tween(pinkBG, {x: -pinkBG.width}, 0.5, {ease: FlxEase.cubeIn});
 
-    FlxTween.tween(diffDisplay, {x: -diffDisplay.width}, 0.5, {ease: FlxEase.cubeIn});
-    FlxTween.tween(diffLeftSelector, {x: -diffLeftSelector.width}, 0.5, {ease: FlxEase.cubeIn});
-    FlxTween.tween(diffRightSelector, {x: -diffRightSelector.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(diffDisplay, {x: diffDisplay.x - pinkBG.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(diffLeftSelector, {x: diffLeftSelector.x - pinkBG.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(diffRightSelector, {x: diffRightSelector.x - pinkBG.width}, 0.5, {ease: FlxEase.cubeIn});
     
     // right side
     FlxTween.tween(dadCover, {x: FlxG.width}, 0.5, {ease: FlxEase.cubeIn});
@@ -510,14 +596,14 @@ function onCreate() {
     pinkBG.screenCenter(FlxAxes.Y);
     add(pinkBG);
 
-    final djScriptPath:String = Paths.script('menus/freeplay/dj/${curMenuSkin}/script');
+    final djScriptPath:String = Paths.script('menus/freeplay/dj/${curCharacter}/script');
     if(FlxG.assets.exists(djScriptPath)) {
         djScript = FunkinScript.fromFile(djScriptPath);
         djScript.set("menu", super);
-        djScript.set("djName", curMenuSkin);
-        djScript.set("curMenuSkin", curMenuSkin);
-        djScript.set("curMenuDJ", curMenuSkin);
-        djScript.set("curDJ", curMenuSkin);
+        djScript.set("djName", curCharacter);
+        djScript.set("curCharacter", curCharacter);
+        djScript.set("curMenuDJ", curCharacter);
+        djScript.set("curDJ", curCharacter);
         djScript.execute();
 
         djScript.call("new");
@@ -528,7 +614,7 @@ function onCreate() {
 
         super.subStateScripts.add(djScript);
     }
-    dadCover = new FunkinSprite().loadGraphic(Paths.image('menus/freeplay/covers/dad${(curMenuSkin != "bf") ? '-${curMenuSkin}' : ""}'));
+    dadCover = new FunkinSprite().loadGraphic(Paths.image('menus/freeplay/covers/dad${(curCharacter != "bf") ? '-${curCharacter}' : ""}'));
     dadCover.x = FlxG.width;
     dadCover.screenCenter(FlxAxes.Y);
     dadCover.color = FlxColor.BLACK;
@@ -543,8 +629,8 @@ function onCreate() {
     grpSongIcons = new FlxTypedGroup();
     add(grpSongIcons);
 
-    grpCapsuleIcons = new FlxTypedGroup();
-    add(grpCapsuleIcons);
+    grpCapsuleExtras = new FlxTypedGroup();
+    add(grpCapsuleExtras);
 
     diffDisplay = new FunkinSprite(197, 115);
     diffDisplay.loadGraphic(Paths.image("menus/freeplay/difficulties/default/hard"));
@@ -552,14 +638,14 @@ function onCreate() {
     add(diffDisplay);
     
     diffLeftSelector = new FunkinSprite(20, 70);
-    diffLeftSelector.frames = Paths.getSparrowAtlas('menus/freeplay/skins/${curMenuSkin}/selector');
+    diffLeftSelector.frames = Paths.getSparrowAtlas('menus/freeplay/skins/${curCharacter}/selector');
     diffLeftSelector.animation.addByPrefix("idle", "arrow pointer loop", 24);
     diffLeftSelector.animation.play("idle");
     diffLeftSelector.kill();
     add(diffLeftSelector);
     
     diffRightSelector = new FunkinSprite(325, 70);
-    diffRightSelector.frames = Paths.getSparrowAtlas('menus/freeplay/skins/${curMenuSkin}/selector');
+    diffRightSelector.frames = Paths.getSparrowAtlas('menus/freeplay/skins/${curCharacter}/selector');
     diffRightSelector.animation.addByPrefix("idle", "arrow pointer loop", 24);
     diffRightSelector.animation.play("idle");
     diffRightSelector.flipX = true;
@@ -635,6 +721,7 @@ function onCreate() {
     headerOSTText.kill();
     add(headerOSTText);
 
+    regenCapsules("ALL");
     changeFilter(0, true);
 
     // final refImg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('${ext}/reference'));
@@ -653,6 +740,8 @@ function onCreate() {
         FlxTween.tween(obj, {y: obj.y + header.height}, 0.5, {ease: FlxEase.cubeOut});
 
     FlxTimer.wait(0.5, () -> {
+        playingIntro = false;
+
         if(parent != null)
             parent.persistentDraw = false;
 
@@ -708,13 +797,19 @@ function onUpdatePre(dt:Float) {
 
         close();
     }
-    if(!accepted) {
+    if(!accepted && !playingIntro) {
         final wheel:Float = -FlxG.mouse.wheel;
         if(controls.justPressed.check(Control.UI_UP) || wheel < 0)
             changeSelection(-1);
     
         if(controls.justPressed.check(Control.UI_DOWN) || wheel > 0)
             changeSelection(1);
+
+        if(controls.justPressed.check(Control.UI_LEFT))
+            changeDifficulty(-1);
+
+        if(controls.justPressed.check(Control.UI_RIGHT))
+            changeDifficulty(1);
 
         if(FlxG.keys.justPressed.Q)
             changeFilter(-1);
