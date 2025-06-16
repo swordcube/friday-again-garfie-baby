@@ -6,6 +6,8 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.frames.FlxFramesCollection;
 
 import flixel.util.FlxAxes;
+import flixel.math.FlxPoint;
+import flixel.math.FlxAngle;
 
 /**
  * An extension of `FlxSprite` which can both load normal
@@ -14,6 +16,7 @@ import flixel.util.FlxAxes;
  * Also contains some small utility functions for loading
  * these atlases, to make your life a lil bit easier.
  */
+@:access(animate.FlxAnimate)
 class FunkinSprite extends FlxAnimate {
     public function loadFrames(frames:FlxFramesCollection):FunkinSprite {
         this.frames = frames;
@@ -51,4 +54,60 @@ class FunkinSprite extends FlxAnimate {
 
         return this;
     }
+
+    override function drawAnimate(camera:FlxCamera) {
+		if (alpha <= 0.0 || Math.abs(scale.x) < 0.0000001 || Math.abs(scale.y) < 0.0000001)
+			return;
+
+		_matrix.setTo(this.checkFlipX() ? -1 : 1, 0, 0, this.checkFlipY() ? -1 : 1, 0, 0);
+
+		if (applyStageMatrix)
+			_matrix.concat(library.matrix);
+
+        _matrix.translate(-origin.x, -origin.y);
+
+		var _animOffset:FlxPoint = animation.curAnim?.offset ?? FlxPoint.weak();
+		if (frameOffsetAngle != null && frameOffsetAngle != angle)
+		{
+			var angleOff = (-angle + frameOffsetAngle) * FlxAngle.TO_RAD;
+			_matrix.rotate(-angleOff);
+			_matrix.translate(-(frameOffset.x + _animOffset.x), -(frameOffset.y + _animOffset.y));
+			_matrix.rotate(angleOff);
+		}
+		else
+			_matrix.translate(-(frameOffset.x + _animOffset.x), -(frameOffset.y + _animOffset.y));
+
+		_matrix.scale(scale.x, scale.y);
+		_animOffset.putWeak();
+		
+		if (angle != 0)
+		{
+			updateTrig();
+			_matrix.rotateWithTrig(_cosAngle, _sinAngle);
+		}
+
+		if (skew.x != 0 || skew.y != 0)
+		{
+			updateSkew();
+			_matrix.concat(FlxAnimate._skewMatrix);
+		}
+
+		getScreenPosition(_point, camera);
+		_point.add(-offset.x, -offset.y);
+		_point.add(origin.x, origin.y);
+
+		if (!useLegacyBounds)
+		{
+			@:privateAccess
+			var bounds = timeline.__bounds;
+			_point.add(-bounds.x, -bounds.y);
+		}
+
+		_matrix.translate(_point.x, _point.y);
+
+		if (renderStage)
+			drawStage(camera);
+
+		timeline.draw(camera, _matrix, colorTransform, blend, antialiasing, shader);
+	}
 }

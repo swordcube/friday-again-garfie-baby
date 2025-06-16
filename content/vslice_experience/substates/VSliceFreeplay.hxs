@@ -280,6 +280,10 @@ function regenCapsules(filter:String) {
 }
 
 function updateAlbumDisplay():Void {
+    albumCover.visible = curSelected > 0;
+    albumTitle.visible = curSelected > 0;
+    difficultyStars.grp.visible = curSelected > 0;
+    
     if(curAlbum == lastAlbum)
         return;
 
@@ -819,7 +823,6 @@ function onCreate() {
     add(albumTitle);
 
     difficultyStars = makeDifficultyStars(955, 220);
-    difficultyStars.grp.visible = false;
     add(difficultyStars.grp);
 
     grpCapsules = new FlxTypedGroup();
@@ -923,6 +926,7 @@ function onCreate() {
 
     regenCapsules("ALL");
     changeFilter(0, true);
+    difficultyStars.grp.visible = false;
 
     // final refImg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('${ext}/reference'));
     // refImg.alpha = 0.25;
