@@ -2,7 +2,11 @@
 	"freeplay": {
 		"album": "vol1",
 		"icon": "dad",
-		"ratings": {}
+		"ratings": {
+			"easy": 1,
+			"normal": 1,
+			"hard": 2
+		}
 	},
 	"game": {
 		"stage": "stage",

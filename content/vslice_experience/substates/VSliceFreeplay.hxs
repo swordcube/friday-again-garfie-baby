@@ -72,11 +72,18 @@ var accessibleSongs:Array<VSliceFreeplaySongData> = [];
 var pinkBG:FlxSprite;
 var dadCover:FlxSprite;
 
+var albumCover:FunkinSprite;
+var albumTitle:FunkinSprite;
+var difficultyStars:DifficultyStars;
+
 var curSelected:Int = 1;
 var curSongFilter:Int = 2;
 
 var currentDifficulty:String = "normal";
 var currentMix:String = "default";
+
+var currentAlbum:String = "vol1";
+var lastAlbum:String = "vol1";
 
 var accepted:Bool = false;
 var goMyFreeplay:Bool = false;
@@ -272,6 +279,46 @@ function regenCapsules(filter:String) {
     }
 }
 
+function updateAlbumDisplay():Void {
+    if(curAlbum == lastAlbum)
+        return;
+
+    if(curAlbum != null) {
+        albumCover.loadGraphic(Paths.image('menus/freeplay/album/${curAlbum}/album'));
+        albumTitle.loadGraphic(Paths.image('menus/freeplay/album/${curAlbum}/title'));
+
+        difficultyStars.stars.y = difficultyStars.grp.y + 5;
+        
+        for(i in 0...difficultyStars.flames.length) {
+            final flame:FlxSprite = difficultyStars.flames.members[i];
+            flame.frameOffset.y = -5;
+        }
+        albumCover.frameOffset.y = -5;
+        albumTitle.frameOffset.y = -5;
+
+        albumCover.visible = true;
+        albumTitle.visible = true;
+
+        difficultyStars.visible = true;
+
+        new FlxTimer().start((1 / 12) * 1, (_) -> {
+            difficultyStars.stars.y = difficultyStars.grp.y;
+            
+            for(i in 0...difficultyStars.flames.length) {
+                final flame:FlxSprite = difficultyStars.flames.members[i];
+                flame.frameOffset.y = 0;
+            }
+            albumCover.frameOffset.y = 0;
+            albumTitle.frameOffset.y = 0;
+        });
+    } else {
+        albumCover.visible = false;
+        albumTitle.visible = false;
+        difficultyStars.visible = false;
+    }
+    lastAlbum = curAlbum;
+}
+
 function updateDifficultyDisplay():Void {
     final thing:String = 'menus/freeplay/difficulties/${currentMix ?? "default"}/${currentDifficulty}';
     final xmlPath:String = Paths.xml(thing);
@@ -283,6 +330,15 @@ function updateDifficultyDisplay():Void {
         diffDisplay.loadGraphic(Paths.image(thing));
     
     diffDisplay.offset.set(diffDisplay.width * 0.5, diffDisplay.height * 0.5);
+}
+
+function updateDifficultyStars() {
+    if(curSelected == 0) {
+        difficultyStars.setDifficulty(0);
+        return;
+    }
+    final songMixMeta:SongMetadata = accessibleSongs[curSelected].metadata.get(currentMix);
+    difficultyStars.setDifficulty((songMixMeta.freeplay?.ratings != null) ? (songMixMeta.freeplay.ratings.get(currentDifficulty) ?? 0) : 0);
 }
 
 function changeSelection(?by:Int, ?force:Bool) {
@@ -307,6 +363,11 @@ function changeSelection(?by:Int, ?force:Bool) {
     });
     if(!force)
         FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
+
+    final songMixMeta:ChartMetadata = (accessibleSongs[curSelected].metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
+    curAlbum = (songMixMeta?.freeplay != null) ? songMixMeta?.freeplay.album : "vol1";
+    updateAlbumDisplay();
+    updateDifficultyStars();
 }
 
 function changeFilter(?by:Int, ?force:Bool) {
@@ -328,7 +389,7 @@ function changeFilter(?by:Int, ?force:Bool) {
         else
             category.anim.resume();
         
-        category.setPosition(grpCategories.x + (i * 80) + 70, grpCategories.y + 35);
+        category.setPosition(grpCategories.x + (i * 80) + 10, grpCategories.y + -28);
         category.updateHitbox();
     }
     changeDifficulty(0, true);
@@ -399,6 +460,11 @@ function changeMix(?by:Int = 0, ?force:Bool = false):Void {
     diffDisplay.y = 115 - 15;
     FlxTween.completeTweensOf(diffDisplay);
     FlxTween.tween(diffDisplay, {y: 115}, 0.1, {ease: FlxEase.cubeOut});
+
+    curAlbum = (songMixMeta?.freeplay != null) ? songMixMeta.freeplay.album : "vol1";
+    updateAlbumDisplay();
+
+    updateDifficultyStars();
     
     if(diffs.length > 1)
         regenCapsules(songFilters[curSongFilter]);
@@ -461,6 +527,121 @@ function loadIntoSong():Void {
 function callOntoDJ(method:String, ?args:Array<Dynamic>) {
     if(djScript != null)
         djScript.call(method, args);
+}
+
+function makeDifficultyStars(x:Float, y:Float):DifficultyStars {
+    final flameX:Float = 917;
+    final flameY:Float = 103;
+
+    final flameSpreadX = 29;
+    final flameSpreadY = 6;
+
+    final flameTimer:Float = 0.25;
+
+    final ret:DifficultyStars = {
+        grp: new FlxSpriteGroup(x, y), // containing the next 2 variables
+
+        flames: null,
+        stars: null,
+
+        difficulty: 1,
+        curDifficulty: 0,
+
+        flameCount: 0,
+        timers: [],
+
+        flameX: flameX,
+        flameY: flameY,
+
+        flameSpreadX: flameSpreadX,
+        flameSpreadY: flameSpreadY,
+
+        positionedFlames: false
+    };
+    ret.setFlameCount = (value:Int) -> {
+        // Stop all existing timers.
+		// This fixes a bug where quickly switching difficulties would show flames.
+		for(timer in ret.timers.copy()) {
+			timer.cancel();
+			ret.timers.remove(timer);
+		}
+		ret.flameCount = value;
+
+		var visibleCount:Int = 0;
+		for(i in 0...5) {
+			if(ret.flames.members[i] == null)
+				continue;
+
+			var flame:FlxSprite = ret.flames.members[i];
+			if(i < ret.flameCount) {
+				if(!flame.exists) {
+					var nextTimer:FlxTimer = new FlxTimer().start(flameTimer * visibleCount, (currentTimer:FlxTimer) -> {
+						if(i >= ret.flameCount)
+							return;
+						
+						ret.timers.remove(currentTimer);
+						flame.animation.play("flame", true);
+						flame.exists = true;
+					});
+					ret.timers.push(nextTimer);
+					visibleCount++;
+				}
+			}
+            else
+				flame.exists = false;
+		}
+    };
+    ret.flameCheck = () -> {
+        if(ret.difficulty > 10)
+            ret.setFlameCount(ret.difficulty - 10);
+        else
+            ret.setFlameCount(0);
+    };
+    ret.flames = new FlxSpriteGroup();
+    for(i in 0...5) {
+        var flame:FlxSprite = new FlxSprite(flameX + (flameSpreadX * i), flameY + (flameSpreadY * i));
+        flame.frames = Paths.getSparrowAtlas("menus/freeplay/flame");
+        flame.animation.addByPrefix("flame", "fire loop full instance 1", FlxG.random.int(23, 25), false);
+        flame.animation.play("flame");
+        // flame.makeSolid(50, 50, FlxColor.WHITE);
+        flame.exists = false;
+        ret.setFlameCount(0);
+
+        // sets the loop... maybe better way to do this lol!
+        flame.animation.onFinish.add((_) -> {
+            flame.animation.play("flame", true, false, 2);
+        });
+        ret.flames.add(flame);
+    }
+    ret.grp.add(ret.flames);
+
+    ret.stars = new FunkinSprite();
+    ret.stars.loadAnimateFrames("menus/freeplay/stars");
+    ret.stars.anim.addBySymbol("stars", "diff stars", 24, false);
+    ret.stars.anim.play("stars");
+    ret.grp.add(ret.stars);
+
+    ret.setDifficulty = (value:Int) -> {
+        if(value <= 0) {
+            ret.difficulty = 0;
+			ret.curDifficulty = 15;
+		} else if(value <= 15) {
+            ret.difficulty = value;
+			ret.curDifficulty = ret.difficulty - 1;
+		} else {
+			ret.difficulty = 15;
+			ret.curDifficulty = ret.difficulty - 1;
+		}
+        if(ret.curDifficulty == 15) {
+            ret.stars.anim.play("stars", true, false, 1500);
+            ret.stars.anim.pause();
+        } else {
+            ret.stars.anim.play("stars", true, false, Std.int(ret.curDifficulty * 100));
+            ret.stars.anim.curAnim.curFrame = Std.int(ret.curDifficulty * 100);
+        }
+		ret.flameCheck();
+    };
+    return ret;
 }
 
 function onAccept() {
@@ -526,6 +707,10 @@ function onExit() {
     
     // right side
     FlxTween.tween(dadCover, {x: FlxG.width}, 0.5, {ease: FlxEase.cubeIn});
+
+    FlxTween.tween(albumCover, {x: albumCover.x + dadCover.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(albumTitle, {x: albumTitle.x + dadCover.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(difficultyStars.grp, {x: difficultyStars.grp.x + dadCover.width}, 0.5, {ease: FlxEase.cubeIn});
 
     // top
     FlxTween.tween(header, {y: -(header.height * 2)}, 0.5, {ease: FlxEase.cubeIn});
@@ -620,6 +805,23 @@ function onCreate() {
     dadCover.color = FlxColor.BLACK;
     add(dadCover);
 
+    albumCover = new FunkinSprite(FlxG.width - 330, 0);
+    albumCover.loadGraphic(Paths.image("menus/freeplay/album/vol1/album"));
+    albumCover.screenCenter(FlxAxes.Y);
+    albumCover.angle = 10;
+    albumCover.y += 55;
+    albumCover.kill();
+    add(albumCover);
+
+    albumTitle = new FunkinSprite(albumCover.x - 25, albumCover.y + 216);
+    albumTitle.loadGraphic(Paths.image("menus/freeplay/album/vol1/title"));
+    albumTitle.kill();
+    add(albumTitle);
+
+    difficultyStars = makeDifficultyStars(955, 220);
+    difficultyStars.grp.visible = false;
+    add(difficultyStars.grp);
+
     grpCapsules = new FlxTypedGroup();
     add(grpCapsules);
 
@@ -673,8 +875,6 @@ function onCreate() {
         grpCategorySeparators.add(sep);
     }
     for(i in 0...5) {
-        // using raw ass FlxAnimate since you can't add
-        // these animations through labels (they don't exist?!?)
         final category:FunkinSprite = new FunkinSprite();
         category.loadAnimateFrames("menus/freeplay/categories");
         category.setPosition((i * 80) + 70, 35);
@@ -762,6 +962,30 @@ function onCreate() {
         grpCategorySeparators.revive();
         grpCategories.revive();
 
+        albumCover.revive();
+        albumCover.x = FlxG.width - 50;
+        albumCover.angle = 15;
+
+        // this is messy and stupid and not fully accurate
+        // but i don't care it's good enough
+        new FlxTimer().start((1 / 12) * 1, (_) -> {
+            albumCover.x = FlxG.width - 350;
+            albumCover.angle = 5;
+        });
+        new FlxTimer().start((1 / 12) * 2, (_) -> {
+            albumCover.x = FlxG.width - 330;
+            albumCover.angle = 10;
+
+            difficultyStars.grp.visible = true;
+            updateDifficultyStars();
+        });
+        new FlxTimer().start((1 / 12) * 4, (_) -> {
+            albumTitle.revive();
+            albumTitle.scale.set(1.1, 0.9);
+        });
+        new FlxTimer().start((1 / 12) * 5, (_) -> {
+            albumTitle.scale.set(1, 1);
+        });
         dadCover.colorTransform.redMultiplier = 0;
         dadCover.colorTransform.greenMultiplier = 0;
         dadCover.colorTransform.blueMultiplier = 0;
@@ -837,6 +1061,19 @@ function onUpdatePre(dt:Float) {
             onAccept();
     }
     grpCapsules.forEach(updateCapsule);
+}
+
+function onUpdatePost(dt:Float) {
+    if(difficultyStars.curDifficulty < 15 && difficultyStars.stars.anim.curAnim.curFrame >= (difficultyStars.curDifficulty + 1) * 100)
+		difficultyStars.stars.anim.play("stars", true, false, difficultyStars.curDifficulty * 100);
+
+    if(!difficultyStars.positionedFlames) {
+        for(i in 0...5) {
+            difficultyStars.flames.members[i].x = difficultyStars.flameX + (difficultyStars.flameSpreadX * i);
+            difficultyStars.flames.members[i].y = difficultyStars.flameY + (difficultyStars.flameSpreadY * i);
+        }
+        difficultyStars.positionedFlames = true;
+    }
 }
 
 function onDestroy() {

@@ -22,7 +22,11 @@
         "tracks": null
     },
     "freeplay": {
-        "ratings": {},
+        "ratings": {
+            "easy": 0,
+            "normal": 0,
+            "hard": 1
+        },
         "icon": "gf",
         "album": "vol1"
     },

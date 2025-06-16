@@ -29,9 +29,12 @@
         }
     },
     "freeplay": {
-        "ratings": {},
+        "ratings": {
+            "erect": 6,
+            "nightmare": 7
+        },
         "icon": "dad",
-        "album": "vol1"
+        "album": "vol3"
     },
     "game": {
         "characters": {

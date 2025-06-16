@@ -1,8 +1,11 @@
 {
 	"freeplay": {
-		"album": "vol1",
+		"album": "vol3",
 		"icon": "dad",
-		"ratings": {}
+		"ratings": {
+			"erect": 7,
+			"nightmare": 8
+		}
 	},
 	"game": {
 		"stage": "stage",

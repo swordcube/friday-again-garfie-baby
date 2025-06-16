@@ -128,7 +128,7 @@ function onLoad() {
 }
 
 function initDJ() {
-    dj = new FunkinSprite(5, 290);
+    dj = new FunkinSprite(-55, -165);
     dj.loadAnimateFrames('menus/freeplay/dj/${djName}');
     dj.anim.addByFrameLabel("intro", "Intro", 24, false);
     dj.anim.addByFrameLabel("idle", "Idle", 24, false);

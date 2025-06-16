@@ -30,7 +30,11 @@
         }
     },
     "freeplay": {
-        "ratings": {},
+        "ratings": {
+            "easy": 1,
+            "normal": 2,
+            "hard": 3
+        },
         "icon": "dad",
         "album": "vol1"
     },
