@@ -54,7 +54,7 @@ function onLoad() {
     menu.add(glowDark);
     
     acceptText = new FunkinSprite();
-    acceptText.setPosition(640, 420);
+    acceptText.setPosition(-320, 170);
     acceptText.loadAnimateFrames('menus/freeplay/bgs/${djName}/backing-text-yeah');
     acceptText.anim.addBySymbol("text", "BF back card confirm raw", 24, false);
     acceptText.antialiasing = true;

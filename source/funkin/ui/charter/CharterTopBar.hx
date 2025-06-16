@@ -44,10 +44,6 @@ class CharterTopBar extends TopBar {
                 
                 Button("Save Chart As", [[UIUtil.correctModifierKey(CONTROL), SHIFT, S]], charter.saveChartAs),
                 Button("Save Meta As", [[UIUtil.correctModifierKey(CONTROL), ALT, SHIFT, S]], charter.saveMetaAs),
-                
-                Separator,
-
-                Button("Convert Chart", [[UIUtil.correctModifierKey(CONTROL), SHIFT, C]], () -> {trace("convert chart NOT IMPLEMENTED!!");}),
 
                 Separator,
 
