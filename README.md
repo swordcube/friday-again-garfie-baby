@@ -21,8 +21,7 @@ for linux, install luajit, vlc, and g++ if you don't have any of those already
 
 install hmm if not installed already:
 ```sh
-haxelib --never newrepo
-haxelib git hmm https://github.com/swordcube/hmm
+haxelib install hmm
 ```
 
 then use hmm to install the libs:
@@ -30,12 +29,10 @@ then use hmm to install the libs:
 haxelib run hmm install
 ```
 
-if this doesn't install the libraries correctly, try the normal version of hmm instead:
-```sh
-haxelib remove hmm
-haxelib install hmm
-haxelib run hmm install
-```
+this might take a while cuz hmm is stupid and clones
+the ENTIRE repo history for every git haxelib
+
+i tried to fix it but i don't care anymore actually
 
 ### **step 3:** making lime work
 this engine uses a custom lime fork, for extra features and patches
