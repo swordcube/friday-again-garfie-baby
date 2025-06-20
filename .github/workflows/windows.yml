@@ -29,6 +29,8 @@ jobs:
         
       - name: Installing/Updating libraries
         run: |
+          rm -r -fo export/
+          rm -r -fo .haxelib/
           haxelib --global --always install hmm
           haxelib run hmm install
           haxelib update --always
