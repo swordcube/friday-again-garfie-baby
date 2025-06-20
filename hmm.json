@@ -40,10 +40,8 @@
     },
     {
       "name": "hmm",
-      "type": "git",
-      "dir": null,
-      "ref": "funkin-patches",
-      "url": "https://github.com/swordcube/hmm"
+      "type": "haxelib",
+      "version": null
     },
     {
       "name": "hxcpp",
