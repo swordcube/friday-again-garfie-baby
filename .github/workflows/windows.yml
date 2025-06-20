@@ -31,7 +31,6 @@ jobs:
         run: |
           haxelib --global --always install hmm
           haxelib run hmm install
-          haxelib update --always
           haxelib set lime git
       
       - name: Building HXCPP
