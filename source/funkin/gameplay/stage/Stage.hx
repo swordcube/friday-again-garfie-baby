@@ -16,6 +16,15 @@ typedef CharacterSet = {
 }
 
 class Stage extends FlxContainer {
+    public static final DEFAULT_SPECTATOR_X:Float = 430;
+    public static final DEFAULT_SPECTATOR_Y:Float = 578;
+
+    public static final DEFAULT_OPPONENT_X:Float = -30;
+    public static final DEFAULT_OPPONENT_Y:Float = 642;
+
+    public static final DEFAULT_PLAYER_X:Float = 630;
+    public static final DEFAULT_PLAYER_Y:Float = 642;
+
     public var id:String;
 
     #if SCRIPTING_ALLOWED
@@ -84,8 +93,8 @@ class Stage extends FlxContainer {
                         
                     case SPECTATOR:
                         if(!spectatorAdded) {
-                            characters.spectator.x = propData.properties?.position[0] ?? 542.0;
-                            characters.spectator.y = propData.properties?.position[1] ?? 538.0;
+                            characters.spectator.x = propData.properties?.position[0] ?? DEFAULT_SPECTATOR_X;
+                            characters.spectator.y = propData.properties?.position[1] ?? DEFAULT_SPECTATOR_Y;
                             cameraOffsets.get("spectator").set(propData.properties?.camera[0] ?? 0.0, propData.properties?.camera[1] ?? 0.0);
 
                             var scroll:Array<Float> = cast propData.properties?.scroll;
@@ -100,8 +109,8 @@ class Stage extends FlxContainer {
                             
                     case OPPONENT:
                         if(!opponentAdded) {
-                            characters.opponent.x = propData.properties?.position[0] ?? 100.0;
-                            characters.opponent.y = propData.properties?.position[1] ?? 642.0;
+                            characters.opponent.x = propData.properties?.position[0] ?? DEFAULT_OPPONENT_X;
+                            characters.opponent.y = propData.properties?.position[1] ?? DEFAULT_OPPONENT_Y;
                             cameraOffsets.get("opponent").set(propData.properties?.camera[0] ?? 0.0, propData.properties?.camera[1] ?? 0.0);
 
                             var scroll:Array<Float> = cast propData.properties?.scroll;
@@ -116,8 +125,8 @@ class Stage extends FlxContainer {
                         
                     case PLAYER:
                         if(!playerAdded) {
-                            characters.player.x = propData.properties?.position[0] ?? 794.0;
-                            characters.player.y = propData.properties?.position[1] ?? 642.0;
+                            characters.player.x = propData.properties?.position[0] ?? DEFAULT_PLAYER_X;
+                            characters.player.y = propData.properties?.position[1] ?? DEFAULT_PLAYER_Y;
                             cameraOffsets.get("player").set(propData.properties?.camera[0] ?? 0.0, propData.properties?.camera[1] ?? 0.0);
 
                             var scroll:Array<Float> = cast propData.properties?.scroll;
@@ -142,17 +151,17 @@ class Stage extends FlxContainer {
             }
         }
         if(characters.spectator != null && !spectatorAdded) {
-            characters.spectator.setPosition(542.0, 538.0);
+            characters.spectator.setPosition(DEFAULT_SPECTATOR_X, DEFAULT_SPECTATOR_Y);
             addOnLastLayer(characters.spectator);
             spectatorAdded = true;
         }
         if(characters.opponent != null && !opponentAdded) {
-            characters.opponent.setPosition(100.0, 642.0);
+            characters.opponent.setPosition(DEFAULT_OPPONENT_X, DEFAULT_OPPONENT_Y);
             addOnLastLayer(characters.opponent);
             opponentAdded = true;
         }
         if(characters.player != null && !playerAdded) {
-            characters.player.setPosition(794.0, 642.0);
+            characters.player.setPosition(DEFAULT_PLAYER_X, DEFAULT_PLAYER_Y);
             addOnLastLayer(characters.player);
             playerAdded = true;
         }

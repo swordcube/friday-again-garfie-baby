@@ -511,7 +511,7 @@ class PlayState extends FunkinState {
 				opponent.scrollFactor.set(spectator.scrollFactor.x, spectator.scrollFactor.y);
 				spectator.kill();
 			}
-			if(spectator.characterID == null || spectator.characterID == "none" || spectator.characterID.length == 0)
+			if(rawCharacterIDs[0] == null || rawCharacterIDs[0] == "none" || rawCharacterIDs[0].length == 0)
 				spectator.kill();
 		}
 		else {
