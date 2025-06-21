@@ -6,7 +6,6 @@ import sys.io.File;
 import lime.system.System;
 
 import openfl.geom.Rectangle;
-import openfl.net.FileReference;
 import openfl.display.BitmapData;
 
 import flixel.math.FlxPoint;
@@ -24,6 +23,7 @@ import funkin.ui.charter.*;
 import funkin.ui.panel.*;
 import funkin.ui.topbar.*;
 import funkin.ui.dropdown.*;
+import funkin.ui.notification.*;
 
 import funkin.gameplay.HealthIcon;
 
@@ -37,6 +37,7 @@ import funkin.gameplay.song.VocalGroup;
 import funkin.states.menus.MainMenuState;
 
 import funkin.substates.charter.*;
+import funkin.substates.FileDialogMenu;
 import funkin.substates.UnsavedWarningSubState;
 
 import funkin.utilities.UndoList;
@@ -74,6 +75,7 @@ class ChartEditor extends UIState {
 
     public var undos:UndoList<ChartEditorChange>;
     public var selectedObjects:Array<ChartEditorObject> = [];
+    public var clipboard:Array<ChartEditorObject> = [];
     
     // note layer
 
@@ -110,6 +112,8 @@ class ChartEditor extends UIState {
 
     public var visualMetronome:CharterVisualMetronome;
     public var miniPerformers:CharterMiniPerformers;
+
+    public var notifications:NotificationContainer;
 
     public var topBar:CharterTopBar;
     public var playBar:CharterPlayBar;
@@ -470,6 +474,11 @@ class ChartEditor extends UIState {
         playBar.y = FlxG.height - playBar.bg.height;
         uiLayer.add(playBar);
 
+        notifications = new NotificationContainer(LEFT);
+        notifications.zIndex = 1;
+        notifications.y -= playBar.bg.height;
+        uiLayer.add(notifications);
+
         conductorInfoText = new FlxText(12, 0, 0, "Step: 0\nBeat: 0\nMeasure: 0");
         conductorInfoText.setFormat(Paths.font("fonts/montserrat/semibold"), 14, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
         conductorInfoText.y = FlxG.height - (conductorInfoText.height + playBar.bg.height + 16);
@@ -636,12 +645,12 @@ class ChartEditor extends UIState {
                         
                         Separator,
                         
-                        Button("Copy", [[UIUtil.correctModifierKey(CONTROL), C]], () -> {trace("copy NOT IMPLEMENTED!!");}),
-                        Button("Paste", [[UIUtil.correctModifierKey(CONTROL), V]], () -> {trace("paste NOT IMPLEMENTED!!");}),
+                        Button("Copy", [[UIUtil.correctModifierKey(CONTROL), C]], copy),
+                        Button("Paste", [[UIUtil.correctModifierKey(CONTROL), V]], paste),
                         
                         Separator,
                         
-                        Button("Cut", [[UIUtil.correctModifierKey(CONTROL), X]], () -> {trace("cut NOT IMPLEMENTED!!");}),
+                        Button("Cut", [[UIUtil.correctModifierKey(CONTROL), X]], cut),
                         Button("Delete", [[DELETE]], () -> deleteObjects(selectedObjects))
                     ]);
                     rightClickMenu.cameras = [uiCam];
@@ -1052,6 +1061,78 @@ class ChartEditor extends UIState {
         }
     }
 
+    public function cut():Void {
+        copy();
+        deleteObjects(selectedObjects);
+    }
+
+    public function copy():Void {
+        clipboard.clear();
+
+        var minStep:Float = Math.POSITIVE_INFINITY;
+        for(object in selectedObjects) {
+            switch(object) {
+                case CNote(note):
+                    if(note.step < minStep)
+                        minStep = note.step;
+                    else
+                        continue;
+
+                case CEvent(event):
+                    if(event.step < minStep)
+                        minStep = event.step;
+                    else
+                        continue;
+            }
+        }
+        for(object in selectedObjects) {
+            switch(object) {
+                case CNote(note):
+                    final clonedNote:ChartEditorNote = note.clone();
+                    clonedNote.step = note.step - minStep;
+                    clipboard.push(CNote(clonedNote));
+
+                case CEvent(event):
+                    final clonedEvent:ChartEditorEvent = event.clone();
+                    clonedEvent.step = event.step - minStep;
+                    clipboard.push(CEvent(clonedEvent));
+            }
+        }
+    }
+
+    public function paste():Void {
+        final newObjects:Array<ChartEditorObject> = [];
+        for(object in clipboard) {
+            switch(object) {
+                case CNote(note):
+                    final clonedNote:ChartEditorNote = note.clone();
+                    final snapMult:Float = CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
+
+                    final newStep:Float = (Conductor.instance.curStep + note.step) * CELL_SIZE;
+                    clonedNote.step = (Math.floor(newStep / snapMult) * snapMult) / CELL_SIZE;
+
+                    final newTime:Float = Conductor.instance.getTimeAtStep(clonedNote.step);
+                    clonedNote.data.time = newTime;
+
+                    newObjects.push(CNote(clonedNote));
+                
+                case CEvent(event):
+                    final clonedEvent:ChartEditorEvent = event.clone();    
+                    final snapMult:Float = CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
+                    
+                    final newStep:Float = (Conductor.instance.curStep + event.step) * CELL_SIZE;
+                    clonedEvent.step = (Math.floor(newStep / snapMult) * snapMult) / CELL_SIZE;
+                    
+                    final newTime:Float = Conductor.instance.getTimeAtStep(clonedEvent.step);
+                    for(e in clonedEvent.events)
+                        e.time = newTime;
+
+                    newObjects.push(CEvent(clonedEvent));
+            }
+        }
+        addObjects(newObjects);
+    }
+
     public function addSustainLength(objects:Array<ChartEditorObject>):Void {
         for(object in objects) {
             switch(object) {
@@ -1196,18 +1277,54 @@ class ChartEditor extends UIState {
             FlxTimer.wait(0.1, () -> saveMetaAs());
             return;
         }
-        File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/chart', lastParams.mod), ChartData.stringify(currentChart));
-        File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/metadata', lastParams.mod), SongMetadata.stringify(currentChart.meta));
+        try {
+            File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/chart', lastParams.mod), ChartData.stringify(currentChart));
+            File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/metadata', lastParams.mod), SongMetadata.stringify(currentChart.meta));
+            
+            final notif:Notification = notifications.send(SUCCESS, 'Successfully saved ${currentChart.meta.song.title} [${currentMix.toUpperCase()} - ${currentDifficulty.toUpperCase()}]');
+            notif.onButtonPress.add((button:String) -> {
+                if(button == "OK")
+                    notif.close();
+            });
+        } catch(e) {
+            final notif:Notification = notifications.send(ERROR, 'Failed to save ${currentChart.meta.song.title} [${currentMix.toUpperCase()} - ${currentDifficulty.toUpperCase()}]: ${e}');
+            notif.onButtonPress.add((button:String) -> {
+                if(button == "OK")
+                    notif.close();
+            });
+        }
     }
 
     public function saveChartAs():Void {
-        final fileRef:FileReference = new FileReference();
-        fileRef.save(ChartData.stringify(currentChart), 'chart.json');
+        try {
+            final file = new FileDialogMenu(Save, "Select a location to save the chart", ChartData.stringify(currentChart), {
+                defaultSaveFile: 'chart.json',
+                filters: ["json"]
+            });
+            openSubState(file);
+        } catch(e) {
+            final notif:Notification = notifications.send(ERROR, 'Failed to save chart: ${e}');
+            notif.onButtonPress.add((button:String) -> {
+                if(button == "OK")
+                    notif.close();
+            });
+        }
     }
 
     public function saveMetaAs():Void {
-        final fileRef:FileReference = new FileReference();
-        fileRef.save(SongMetadata.stringify(currentChart.meta), 'meta.json');
+        try {
+            final file = new FileDialogMenu(Save, "Select a location to save the metadata", SongMetadata.stringify(currentChart.meta), {
+                defaultSaveFile: 'meta.json',
+                filters: ["json"]
+            });
+            openSubState(file);
+        } catch(e) {
+            final notif:Notification = notifications.send(ERROR, 'Failed to save metadata: ${e}');
+            notif.onButtonPress.add((button:String) -> {
+                if(button == "OK")
+                    notif.close();
+            });
+        }
     }
 
     public function unsafeExit():Void {
@@ -1283,8 +1400,10 @@ class ChartEditor extends UIState {
                         
                         case CEvent(event):
                             event.step -= data.change.y;
+
+                            final newTime:Float = Conductor.instance.getTimeAtStep(event.step);
                             for(e in event.events)
-                                e.time = Conductor.instance.getTimeAtStep(event.step);
+                                e.time = newTime;
                     }
                 }
 
@@ -1319,8 +1438,10 @@ class ChartEditor extends UIState {
                         
                         case CEvent(event):
                             event.step += data.change.y;
+
+                            final newTime:Float = Conductor.instance.getTimeAtStep(event.step);
                             for(e in event.events)
-                                e.time = Conductor.instance.getTimeAtStep(event.step);
+                                e.time = newTime;
                     }
                 }
 
@@ -1413,6 +1534,17 @@ class ChartEditorNote {
     public var selected:Bool = false;
 
     public var lastDirection:Int = 0;
+
+    public function new(data:NoteData, step:Float, stepLength:Float) {
+        this.data = data;
+        this.step = step;
+        this.stepLength = stepLength;
+    }
+
+    public function clone():ChartEditorNote {
+        final clone:ChartEditorNote = new ChartEditorNote(data.clone(), step, stepLength);
+        return clone;
+    }
 }
 
 @:structInit
@@ -1424,6 +1556,16 @@ class ChartEditorEvent {
 
     public var wasHit:Bool = false;
     public var selected:Bool = false;
+
+    public function new(step:Float, events:Array<EventData>) {
+        this.step = step;
+        this.events = events;
+    }
+
+    public function clone():ChartEditorEvent {
+        final clone:ChartEditorEvent = new ChartEditorEvent(step, [for(e in events) e.clone()]);
+        return clone;
+    }
 }
 
 @:structInit

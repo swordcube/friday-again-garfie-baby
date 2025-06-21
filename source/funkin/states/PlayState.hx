@@ -511,6 +511,8 @@ class PlayState extends FunkinState {
 				opponent.scrollFactor.set(spectator.scrollFactor.x, spectator.scrollFactor.y);
 				spectator.kill();
 			}
+			if(spectator.characterID == null || spectator.characterID == "none" || spectator.characterID.length == 0)
+				spectator.kill();
 		}
 		else {
 			final bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menus/bg_desat"));

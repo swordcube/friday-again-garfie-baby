@@ -55,12 +55,12 @@ class CharterTopBar extends TopBar {
                 
                 Separator,
                 
-                Button("Copy", [[UIUtil.correctModifierKey(CONTROL), C]], () -> {trace("copy NOT IMPLEMENTED!!");}),
-                Button("Paste", [[UIUtil.correctModifierKey(CONTROL), V]], () -> {trace("paste NOT IMPLEMENTED!!");}),
+                Button("Copy", [[UIUtil.correctModifierKey(CONTROL), C]], charter.copy),
+                Button("Paste", [[UIUtil.correctModifierKey(CONTROL), V]], charter.paste),
                 
                 Separator,
                 
-                Button("Cut", [[UIUtil.correctModifierKey(CONTROL), X]], () -> {trace("cut NOT IMPLEMENTED!!");}),
+                Button("Cut", [[UIUtil.correctModifierKey(CONTROL), X]], charter.cut),
                 Button("Delete", [[DELETE]], () -> charter.deleteObjects(charter.selectedObjects))
             ]),
             DropDown("Chart", [

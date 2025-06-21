@@ -27,11 +27,13 @@ var parent:MainMenuState;
 var capsuleData = {
     offsetX: 0.0
 };
-var grpCapsules:FlxTypedGroup<FunkinSprite>;
-var grpSongNames:FlxTypedGroup<FlxText>;
+var grpCapsules:FlxTypedGroup<TrackingSprite>;
+var grpSongNames:FlxTypedGroup<TrackingSprite>;
 
-var grpSongIcons:FlxTypedGroup<FunkinSprite>;
-var grpCapsuleExtras:FlxTypedGroup<FunkinSprite>;
+var grpSongIcons:FlxTypedGroup<TrackingSprite>;
+var grpCapsuleExtras:FlxTypedGroup<TrackingSprite>;
+
+var capsuleBadges:Array<Array<TrackingSprite>> = [];
 
 // groups for category stuff!
 var grpCategoryArrows:FlxTypedSpriteGroup<FunkinSprite>;
@@ -82,6 +84,9 @@ var curSongFilter:Int = 2;
 var currentDifficulty:String = "normal";
 var currentMix:String = "default";
 
+var lastDifficulty:String = "normal";
+var lastMix:String = "default";
+
 var currentAlbum:String = "vol1";
 var lastAlbum:String = "vol1";
 
@@ -95,6 +100,7 @@ var headerOSTText:FlxText;
 var dj:FunkinSprite;
 var djScript:FunkinScript;
 
+var totalTime:Float = 0;
 var playingIntro:Bool = true;
 
 function new(_parent:MainMenuState, ?menuSkin:String) {
@@ -141,7 +147,7 @@ function addSongsToCategory(categoryID:String, ?songIDs:Array<String>, ?contentP
 
 function regenCapsules(filter:String) {
     var songsToFilter:Array<FreeplaySongData> = songs.filter((song:FreeplaySongData) -> {
-        return song.metadata.exists(currentMix) && song.metadata.get(currentMix).song.difficulties.contains(currentDifficulty);
+        return song.metadata.exists(currentMix);
     });
     var filteredSongs:Array<FreeplaySongData> = null;
     switch(filter) {
@@ -150,7 +156,7 @@ function regenCapsules(filter:String) {
             filteredSongs = songsToFilter.filter((data:FreeplaySongData) -> {
                 final meta:SongMetadata = data.metadata.get("default");
                 for(i in 0...nums.length) {
-                    if(meta.song.title.contains(nums.charAt(i)))
+                    if(meta != null && StringTools.contains(meta.song.title, nums.charAt(i)))
                         return true;
                 }
                 return false;
@@ -188,10 +194,12 @@ function regenCapsules(filter:String) {
         }
     }
     final blur:BlurFilter = new BlurFilter();
+    capsuleBadges = [];
+    
     for(i in 0...filteredSongs.length) {
         // get song metadata
         final songData:FreeplaySongData = filteredSongs[i];
-        final songMeta:SongMetadata = (songData.metadata != null) ? songData.metadata.get("default") : null;
+        final songMeta:SongMetadata = (songData.metadata != null) ? songData.metadata.get(currentMix) : null;
 
         var displayedName:String = null;
         switch(songData.id) {
@@ -245,6 +253,7 @@ function regenCapsules(filter:String) {
         text.trackingMode = 4; // 4 = DIRECT
         text.trackingOffset.set(88, 26);
         text.copyAlpha = false;
+        text.clipRect = new FlxRect();
         Reflect.setProperty(text, "ID", i);
         // text.kill();
         text.update(0);
@@ -272,6 +281,35 @@ function regenCapsules(filter:String) {
             Reflect.setProperty(songIcon, "ID", i); // rulescript.
             grpSongIcons.add(songIcon);
         }
+
+        // make the rank icon (along with it's sparkle if it's a golden P rank icon)
+        final rankIcon:TrackingSprite = new TrackingSprite();
+        rankIcon.tracked = capsule;
+        rankIcon.trackingMode = 4; // 4 = DIRECT
+        rankIcon.trackingOffset.set(356, 28);
+        rankIcon.copyAlpha = false;
+        rankIcon.loadSparrowFrames('menus/freeplay/rank_badges');
+        rankIcon.anim.addByPrefix('idle', 'GOLD rank', 24, false);
+        rankIcon.anim.play('idle');
+        rankIcon.anim.finish();
+        rankIcon.setScale(0.9, FlxAxes.XY);
+        Reflect.setProperty(rankIcon, "ID", i); // rulescript
+        grpCapsuleExtras.add(rankIcon);
+        
+        // make the favorite icon
+        final favIcon:TrackingSprite = new TrackingSprite();
+        favIcon.tracked = capsule;
+        favIcon.trackingMode = 4; // 4 = DIRECT
+        favIcon.trackingOffset.set(316, 28);
+        favIcon.copyAlpha = false;
+        favIcon.loadSparrowFrames('menus/freeplay/favorite');
+        favIcon.anim.addByPrefix('idle', 'favorite heart', 24, false);
+        favIcon.anim.play('idle');
+        favIcon.anim.finish();
+        Reflect.setProperty(favIcon, "ID", i); // rulescript
+        grpCapsuleExtras.add(favIcon);
+
+        capsuleBadges.push([rankIcon, favIcon]);
         
         // we don't need the text object from earlier anymore,
         // KILL IT WITH FIRE 🔥🔥🔥
@@ -341,8 +379,36 @@ function updateDifficultyStars() {
         difficultyStars.setDifficulty(0);
         return;
     }
-    final songMixMeta:SongMetadata = accessibleSongs[curSelected].metadata.get(currentMix);
-    difficultyStars.setDifficulty((songMixMeta.freeplay?.ratings != null) ? (songMixMeta.freeplay.ratings.get(currentDifficulty) ?? 0) : 0);
+    final songMixMeta:SongMetadata = (accessibleSongs[curSelected]?.metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
+    difficultyStars.setDifficulty((songMixMeta?.freeplay?.ratings != null) ? (songMixMeta.freeplay.ratings.get(currentDifficulty) ?? 0) : 0);
+}
+
+function updateDiscordRPC() {
+    final lastSongData:FreeplaySongData = accessibleSongs[curSelected];
+    final songMixMeta:SongMetadata = (accessibleSongs[curSelected]?.metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
+    DiscordRPC.changePresence("Freeplay Menu", '${(songMixMeta?.song != null) ? songMixMeta.song.title : ((lastSongData?.id != null) ? lastSongData.id : "Unknown")} [${currentDifficulty.toUpperCase()} - ${currentMix.toUpperCase()}]');
+    
+    vsliceFreeplay_lastSelected = curSelected;
+    vsliceFreeplay_lastSongFilter = curSongFilter;
+    vsliceFreeplay_lastDifficulty = currentDifficulty;
+    vsliceFreeplay_lastMix = currentMix;
+}
+
+function updateOtherShit() {
+    updateDifficultyDisplay();
+    
+    if(lastDifficulty != currentDifficulty || lastMix != currentMix) {
+        diffDisplay.y = 115 - 15;
+        FlxTween.completeTweensOf(diffDisplay);
+        FlxTween.tween(diffDisplay, {y: 115}, 0.1, {ease: FlxEase.cubeOut});
+        
+        lastDifficulty = currentDifficulty;
+        lastMix = currentMix;
+    }
+    final songMixMeta:SongMetadata = (accessibleSongs[curSelected]?.metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
+    curAlbum = (songMixMeta?.freeplay != null) ? songMixMeta.freeplay.album : "vol1";
+    updateAlbumDisplay();
+    updateDifficultyStars();
 }
 
 function changeSelection(?by:Int, ?force:Bool) {
@@ -365,13 +431,18 @@ function changeSelection(?by:Int, ?force:Bool) {
         else
             text.alpha = 0.6;
     });
+    grpCapsuleExtras.forEach((obj) -> {
+        if(obj.ID == curSelected)
+            obj.alpha = 1;
+        else
+            obj.alpha = 0.6;
+    });
+    totalTime = 0;
+    changeDifficulty(0, true);
+    updateDiscordRPC();
+
     if(!force)
         FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
-
-    final songMixMeta:ChartMetadata = (accessibleSongs[curSelected].metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
-    curAlbum = (songMixMeta?.freeplay != null) ? songMixMeta?.freeplay.album : "vol1";
-    updateAlbumDisplay();
-    updateDifficultyStars();
 }
 
 function changeFilter(?by:Int, ?force:Bool) {
@@ -396,7 +467,21 @@ function changeFilter(?by:Int, ?force:Bool) {
         category.setPosition(grpCategories.x + (i * 80) + 10, grpCategories.y + -28);
         category.updateHitbox();
     }
+    regenCapsules(songFilters[curSongFilter]);
+    if(accessibleSongs.length <= 1) {
+        curSelected = 0;
+        changeSelection(0, true);
+    }
+    var updateSel:Bool = false;
+    while(curSelected >= accessibleSongs.length) {
+        curSelected--;
+        updateSel = true;
+    }
+    if(updateSel)
+        changeSelection(0, true);
+
     changeDifficulty(0, true);
+    changeMix(0, true);
 }
 
 function changeDifficulty(?by:Int, ?force:Bool) {
@@ -406,33 +491,40 @@ function changeDifficulty(?by:Int, ?force:Bool) {
     if(by == 0 && !force)
         return;
 
+    final selectedRandom:Bool = curSelected == 0;
+    if(selectedRandom)
+        curSelected = (accessibleSongs.length > 1) ? 1 : 0; // assume first song if possible
+
     final capsule:SongCapsule = grpCapsules.members[curSelected];
-    final songMeta:ChartMetadata = (accessibleSongs[curSelected].metadata != null) ? accessibleSongs[curSelected].metadata.get("default") : null;
+    final songMeta:ChartMetadata = (accessibleSongs[curSelected]?.metadata != null) ? accessibleSongs[curSelected].metadata.get("default") : null;
     
     var currentMixIndex:Int = (songMeta?.song != null) ? songMeta.song.mixes.indexOf(currentMix) : -1;
     currentMix = (songMeta?.song != null) ? songMeta.song.mixes[currentMixIndex] : "default";
 
-    final songMixMeta:ChartMetadata = (accessibleSongs[curSelected].metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
+    final songMixMeta:ChartMetadata = (accessibleSongs[curSelected]?.metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
     final diffs:Array<String> = (songMixMeta?.song != null) ? songMixMeta.song.difficulties : ["easy", "normal", "hard"];
     
     var currentDifficultyIndex:Int = diffs.indexOf(currentDifficulty);
     currentDifficultyIndex += by;
     currentDifficulty = diffs[currentDifficultyIndex];
 
+    if(selectedRandom)
+        curSelected = 0;
+
     if(currentDifficultyIndex < 0) {
         changeMix(-1);
-        final songMixMeta:ChartMetadata = accessibleSongs[curSelected].metadata.get(currentMix);
+        final songMixMeta:ChartMetadata = (accessibleSongs[curSelected]?.metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
         final variantDiffs:Array<String> = (songMixMeta?.song != null) ? songMixMeta.song.difficulties : diffs;
         currentDifficulty = variantDiffs[variantDiffs.length - 1];
     }
     else if(currentDifficultyIndex > diffs.length - 1) {
         changeMix(1);
-        final songMixMeta:ChartMetadata = accessibleSongs[curSelected].metadata.get(currentMix);
+        final songMixMeta:ChartMetadata = (accessibleSongs[curSelected]?.metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
         final variantDiffs:Array<String> = (songMixMeta?.song != null) ? songMixMeta.song.difficulties : diffs;
         currentDifficulty = variantDiffs[0];
     }
-    changeMix(0, true);
-    FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
+    updateOtherShit();
+    updateDiscordRPC();
 }
 
 function changeMix(?by:Int = 0, ?force:Bool = false):Void {
@@ -452,27 +544,17 @@ function changeMix(?by:Int = 0, ?force:Bool = false):Void {
 
     currentMix = (songMeta?.song != null) ? songMeta.song.mixes[currentMixIndex] : "default";
     
-    final songMixMeta:ChartMetadata = (accessibleSongs[curSelected].metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
+    final songMixMeta:ChartMetadata = (accessibleSongs[curSelected]?.metadata != null) ? accessibleSongs[curSelected].metadata.get(currentMix) : null;
     final diffs:Array<String> = (songMixMeta?.song != null) ? songMixMeta.song.difficulties : ["easy", "normal", "hard"];
     
     var currentDifficultyIndex:Int = diffs.indexOf(currentDifficulty);
     currentDifficultyIndex = FlxMath.wrap(currentDifficultyIndex + by, 0, diffs.length - 1);
     currentDifficulty = diffs[currentDifficultyIndex];
-
-    updateDifficultyDisplay();
     
-    diffDisplay.y = 115 - 15;
-    FlxTween.completeTweensOf(diffDisplay);
-    FlxTween.tween(diffDisplay, {y: 115}, 0.1, {ease: FlxEase.cubeOut});
-
-    curAlbum = (songMixMeta?.freeplay != null) ? songMixMeta.freeplay.album : "vol1";
-    updateAlbumDisplay();
-
-    updateDifficultyStars();
-    
-    if(diffs.length > 1)
+    if(lastMix != currentMix)
         regenCapsules(songFilters[curSongFilter]);
     
+    updateOtherShit();
     for(i in 0...accessibleSongs.length) {
         final songData:FreeplaySongData = accessibleSongs[i];
         if(songData.id == lastSongData.id) {
@@ -481,6 +563,7 @@ function changeMix(?by:Int = 0, ?force:Bool = false):Void {
         }
     }
     changeSelection(0, true);
+    updateDiscordRPC();
 }
 
 function updateCapsule(capsule:FunkinSprite) {
@@ -494,6 +577,22 @@ function updateCapsule(capsule:FunkinSprite) {
         FlxMath.lerp(capsule.y, 250 + (index * 115) - (index < -1 ? 100 : 0), lerpAmountY)
     );
     capsule.x += capsuleData.offsetX;
+}
+
+function updateSongName(songName:TrackingSprite) {
+    var visibleBadges:Int = 0;
+    for(b in capsuleBadges[songName.ID]) {
+        if(b.exists && b.visible)
+            visibleBadges++;
+    }
+    final textWidth:Float = 366 - (visibleBadges * 70);
+    if(visibleBadges > 0) {
+        songName.trackingOffset.x = 88 - ((curSelected == songName.ID && songName.width > textWidth) ? (Math.sin(totalTime * 0.9) * (songName.width - textWidth) * 0.5) + ((songName.width - textWidth) * 0.5) : 0);
+        songName.clipRect.set(-(songName.trackingOffset.x - 88), 0, textWidth, songName.frameHeight);
+    } else {
+        songName.trackingOffset.x = 88;
+        songName.clipRect.set(0, 0, 366, songName.frameHeight);
+    }
 }
 
 function switchState(nextState:NextState) {
@@ -736,9 +835,10 @@ function onExit() {
 
             remove(members[0], true);
             super.destroy();
-        } else
+        } else {
+            FlxG.state.updateDiscordRPC();
             close();
-        
+        }
         CoolUtil.playMenuMusic();
     });
     FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
@@ -924,7 +1024,11 @@ function onCreate() {
     headerOSTText.kill();
     add(headerOSTText);
 
-    regenCapsules("ALL");
+    curSelected = vsliceFreeplay_lastSelected;
+    curSongFilter = vsliceFreeplay_lastSongFilter;
+    currentDifficulty = vsliceFreeplay_lastDifficulty;
+    currentMix = vsliceFreeplay_lastMix;
+
     changeFilter(0, true);
     difficultyStars.grp.visible = false;
 
@@ -980,7 +1084,7 @@ function onCreate() {
             albumCover.x = FlxG.width - 330;
             albumCover.angle = 10;
 
-            difficultyStars.grp.visible = true;
+            difficultyStars.grp.visible = curSelected != 0;
             updateDifficultyStars();
         });
         new FlxTimer().start((1 / 12) * 4, (_) -> {
@@ -1065,6 +1169,8 @@ function onUpdatePre(dt:Float) {
             onAccept();
     }
     grpCapsules.forEach(updateCapsule);
+    grpSongNames.forEach(updateSongName);
+    totalTime += dt;
 }
 
 function onUpdatePost(dt:Float) {

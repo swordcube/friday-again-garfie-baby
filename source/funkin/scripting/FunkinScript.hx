@@ -46,7 +46,9 @@ class FunkinScript {
 
         setClass(FlxSprite);
         setClass(FlxCamera);
+        
         setClass(flixel.text.FlxText);
+        setClass(flixel.text.FlxText.FlxTextFormat);
 
         setClass(FlxState);
         setClass(FlxSubState);

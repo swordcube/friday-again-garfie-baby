@@ -22,6 +22,11 @@ class EventData {
 		this.type = type;
 	}
 
+	public function clone():EventData {
+		final clone:EventData = new EventData(time, params, type);
+		return clone;
+	}
+
     public function toString():String {
         return 'EventData(time: ${time}, params: ${params}, type: ${type})';
     }

@@ -146,6 +146,11 @@ class MainMenuState extends FunkinState {
         }
     }
 
+    public function updateDiscordRPC():Void {
+        final option:MainMenuOption = options[curSelected];
+        DiscordRPC.changePresence("Main Menu", '${option.rpcName ?? option.name}');
+    }
+
     public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
         if(by == 0 && !force)
             return;
@@ -165,8 +170,7 @@ class MainMenuState extends FunkinState {
                 item.centerOffsets();
             }
         }
-        final option:MainMenuOption = options[curSelected];
-        DiscordRPC.changePresence("Main Menu", '${option.rpcName ?? option.name}');
+        updateDiscordRPC();
         FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
     }
     

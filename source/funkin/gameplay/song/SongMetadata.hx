@@ -87,6 +87,6 @@ class SongMetadata {
 
 	public static function stringify(chart:SongMetadata):String {
 		final writer:JsonWriter<SongMetadata> = new JsonWriter<SongMetadata>();
-		return writer.write(chart);
+		return writer.write(chart, "\t");
 	}
 }

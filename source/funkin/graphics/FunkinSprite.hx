@@ -18,6 +18,8 @@ import flixel.math.FlxAngle;
  */
 @:access(animate.FlxAnimate)
 class FunkinSprite extends FlxAnimate {
+	public var extra:Map<String, Dynamic> = [];
+
     public function loadFrames(frames:FlxFramesCollection):FunkinSprite {
         this.frames = frames;
         return this;

@@ -24,6 +24,11 @@ class NoteData {
 		this.type = type;
 	}
 
+	public function clone():NoteData {
+		final clone:NoteData = new NoteData(time, direction, length, type);
+		return clone;
+	}
+
     public function toString():String {
         return 'NoteData(time: ${time}, direction: ${direction}, length: ${length}, type: ${type})';
     }

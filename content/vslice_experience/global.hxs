@@ -1,5 +1,10 @@
 import openfl.system.Capabilities;
 
+static var vsliceFreeplay_lastSelected = 1;
+static var vsliceFreeplay_lastSongFilter = 2;
+static var vsliceFreeplay_lastDifficulty = "normal";
+static var vsliceFreeplay_lastMix = "default";
+
 var stateRedirects = [
     FreeplayState => () -> new ScriptedSubState("VSliceFreeplay"),
 ];
