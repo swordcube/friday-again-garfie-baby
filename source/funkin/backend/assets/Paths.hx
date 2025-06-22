@@ -559,6 +559,18 @@ class Paths {
         }
     }
 
+    public static function isDirectory(path:String):Bool {
+        return FileSystem.isDirectory(path);
+    }
+
+    public static function withoutDirectory(path:String):String {
+        return Path.withoutDirectory(path);
+    }
+
+    public static function withoutExtension(path:String):String {
+        return Path.withoutExtension(path);
+    }
+
     public static function getContentFolderFromPath(path:String, ?includeContainerFolders:Bool = false):String {
         final contentDir:String = getContentDirectory();
         path = path.replace("\\", "/"); // go fuck yourself windows

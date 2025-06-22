@@ -1,12 +1,11 @@
 package funkin.backend;
 
-import sys.io.Process;
+import sys.thread.Thread;
 
 import haxe.CallStack;
 import haxe.io.BytesOutput;
 
 import openfl.display.Sprite;
-import flixel.FlxGame;
 
 import funkin.backend.InitState;
 import funkin.backend.StatsDisplay;
@@ -19,6 +18,7 @@ import funkin.backend.native.HiddenProcess;
 @:access(flixel.FlxGame)
 class Main extends Sprite {
 	public static var instance(default, null):Main;
+	public static var gameThreads:Array<Thread> = [];
 
 	public static var changeID:Int = 0;
     public static var audioDisconnected:Bool = false;
@@ -30,6 +30,9 @@ class Main extends Sprite {
 	public function new() {
 		super();
 
+		for(i in 0...4)
+			gameThreads.push(Thread.createWithEventLoop(() -> Thread.current().events.promise()));
+
 		instance = this;
 		addChild(new FunkinGame(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, InitState.new, Constants.MAX_FPS, Constants.MAX_FPS, true));
 		
@@ -38,6 +41,11 @@ class Main extends Sprite {
 		
 		statsDisplay = new StatsDisplay(10, 3);
 		addChild(statsDisplay);
+	}
+
+	public static function execASync(func:Void->Void) {
+		var thread = gameThreads[(_threadCycle++) % gameThreads.length];
+		thread.events.run(func);
 	}
 
 	public static function callstackToString(callstack:Array<StackItem>):String {
@@ -88,4 +96,6 @@ class Main extends Sprite {
 		return retVal;
 	}
 	#end
+
+	private static var _threadCycle:Int = 0;
 }

@@ -20,7 +20,7 @@ import funkin.states.PlayState;
 import funkin.states.menus.StoryMenuState;
 import funkin.states.menus.FreeplayState;
 
-import funkin.substates.transition.FadeTransition;
+import funkin.substates.transition.TransitionSubState;
 
 class GameOverSubState extends FunkinSubState {
     public var game:PlayState = PlayState.instance;
@@ -218,9 +218,9 @@ class GameOverSubState extends FunkinSubState {
             transitionCam.bgColor = 0;
             FlxG.cameras.add(transitionCam, false);
 
-            FadeTransition.nextCamera = transitionCam;
+            TransitionSubState.nextCamera = transitionCam;
             FlxG.signals.postStateSwitch.addOnce(() -> {
-                FlxG.cameras.remove(FadeTransition.nextCamera);
+                FlxG.cameras.remove(TransitionSubState.nextCamera);
             });
             final wasMusicPlaying:Bool = FlxG.sound.music.playing;
             FlxG.sound.music.onComplete = null;

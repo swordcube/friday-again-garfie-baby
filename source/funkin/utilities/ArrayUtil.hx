@@ -105,6 +105,17 @@ class ArrayUtil {
         return unsafeGet(arr, arr.length - 1);
     }
 
+    /**
+     * Returns a random item from a given array.
+     * 
+     * Returns `null` if unsuccessful.
+     * 
+     * @param  array  The array to pick an item from.
+     */
+    public static function pickRandom<T>(array:Array<T>):T {
+        return (array.length != 0) ? array.unsafeGet(FlxG.random.int(0, array.length - 1)) : null;
+    }
+
     public static function removeDuplicates<T>(array:Array<T>):Array<T> {
         final l:Array<T> = [];
         for(v in array) {

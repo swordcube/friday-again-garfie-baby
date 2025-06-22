@@ -4,14 +4,19 @@ import openfl.geom.Matrix;
 import openfl.display.BitmapData;
 import openfl.filters.BlurFilter;
 
+import openfl.media.Sound;
+
 import flixel.graphics.FlxGraphic;
 import animate.internal.FilterRenderer;
 
+import funkin.backend.Main;
 import funkin.scripting.FunkinScript;
 
 import funkin.states.TransitionableState;
 import funkin.states.editors.ChartEditor;
 import funkin.states.menus.FreeplayState.FreeplaySongData;
+
+import funkin.utilities.MemoryUtil;
 
 final ext:String = "menus/freeplay/";
 
@@ -71,6 +76,9 @@ var songFilters:Array<String> = [
 ];
 var accessibleSongs:Array<VSliceFreeplaySongData> = [];
 
+// key is songName:songMix:difficulty:contentPack
+var songScoreRecords:Map<String, ScoreRecord> = ["" => null]; 
+
 var pinkBG:FlxSprite;
 var dadCover:FlxSprite;
 
@@ -101,7 +109,17 @@ var dj:FunkinSprite;
 var djScript:FunkinScript;
 
 var totalTime:Float = 0;
-var playingIntro:Bool = true;
+var busy:Bool = true;
+
+var badgeBlurs:Array<CustomShader> = [
+    new CustomShader("blur"), // 1 amount, used for rank badges
+    new CustomShader("blur"), // 1.2 amount, used for favorite badges
+];
+badgeBlurs[0].setFloat("amount", 1);
+badgeBlurs[1].setFloat("amount", 1.2);
+
+var loadedSongs:Map<String, BGMData> = ["" => null];
+var currentBGM:String = null;
 
 function new(_parent:MainMenuState, ?menuSkin:String) {
     parent = _parent;
@@ -134,6 +152,12 @@ function addSongsToCategory(categoryID:String, ?songIDs:Array<String>, ?contentP
             for(mix in metadata.song.mixes)
                 difficultyMap.set(mix, metadataMap.get(mix).song.difficulties);
         }
+        for(mix => diffs in difficultyMap) {
+            for(diff in diffs) {
+                final recordID:String = Highscore.getScoreRecordID(song, diff, mix, contentPack);
+                songScoreRecords.set('${song}:${mix}:${diff}:${contentPack}', Highscore.getScoreRecord(recordID));
+            }
+        }
         final songData:VSliceFreeplaySongData = {
             metadata: metadataMap,
             id: song,
@@ -146,14 +170,14 @@ function addSongsToCategory(categoryID:String, ?songIDs:Array<String>, ?contentP
 }
 
 function regenCapsules(filter:String) {
-    var songsToFilter:Array<FreeplaySongData> = songs.filter((song:FreeplaySongData) -> {
+    var songsToFilter:Array<VSliceFreeplaySongData> = songs.filter((song:VSliceFreeplaySongData) -> {
         return song.metadata.exists(currentMix);
     });
-    var filteredSongs:Array<FreeplaySongData> = null;
+    var filteredSongs:Array<VSliceFreeplaySongData> = null;
     switch(filter) {
         case "#":
             final nums:String = "0123456789";
-            filteredSongs = songsToFilter.filter((data:FreeplaySongData) -> {
+            filteredSongs = songsToFilter.filter((data:VSliceFreeplaySongData) -> {
                 final meta:SongMetadata = data.metadata.get("default");
                 for(i in 0...nums.length) {
                     if(meta != null && StringTools.contains(meta.song.title, nums.charAt(i)))
@@ -163,7 +187,9 @@ function regenCapsules(filter:String) {
             });
 
         case "fav":
-            filteredSongs = []; // TODO: favorite songs
+            filteredSongs = songsToFilter.filter((data:VSliceFreeplaySongData) -> {
+                return isSongFavorited(data.id, data.contentPack);
+            });
         
         case "ALL":
             filteredSongs = songsToFilter;
@@ -183,7 +209,7 @@ function regenCapsules(filter:String) {
                 });
             }
     }
-    filteredSongs.insert(0, new FreeplaySongData(null, "CUSTOM://random", null));
+    filteredSongs.insert(0, {metadata: null, id: "CUSTOM://random", difficulties: null, contentPack: null});
     accessibleSongs = filteredSongs;
 
     for(grp in [grpCapsules, grpSongNames, grpSongIcons, grpCapsuleExtras]) {
@@ -218,6 +244,7 @@ function regenCapsules(filter:String) {
         capsule.anim.play('idle');
         capsule.setPosition(335 + Math.sin((i - curSelected) + 1) * 60 + FlxG.width, -200 + ((i - curSelected) * 115));
         capsule.setScale(0.8, FlxAxes.XY);
+        capsule.extra.set("doLerp", true);
         Reflect.setProperty(capsule, "ID", i); // rulescript.
         grpCapsules.add(capsule);
 
@@ -282,34 +309,77 @@ function regenCapsules(filter:String) {
             grpSongIcons.add(songIcon);
         }
 
-        // make the rank icon (along with it's sparkle if it's a golden P rank icon)
-        final rankIcon:TrackingSprite = new TrackingSprite();
-        rankIcon.tracked = capsule;
-        rankIcon.trackingMode = 4; // 4 = DIRECT
-        rankIcon.trackingOffset.set(356, 28);
-        rankIcon.copyAlpha = false;
-        rankIcon.loadSparrowFrames('menus/freeplay/rank_badges');
-        rankIcon.anim.addByPrefix('idle', 'GOLD rank', 24, false);
-        rankIcon.anim.play('idle');
-        rankIcon.anim.finish();
-        rankIcon.setScale(0.9, FlxAxes.XY);
-        Reflect.setProperty(rankIcon, "ID", i); // rulescript
-        grpCapsuleExtras.add(rankIcon);
-        
-        // make the favorite icon
-        final favIcon:TrackingSprite = new TrackingSprite();
-        favIcon.tracked = capsule;
-        favIcon.trackingMode = 4; // 4 = DIRECT
-        favIcon.trackingOffset.set(316, 28);
-        favIcon.copyAlpha = false;
-        favIcon.loadSparrowFrames('menus/freeplay/favorite');
-        favIcon.anim.addByPrefix('idle', 'favorite heart', 24, false);
-        favIcon.anim.play('idle');
-        favIcon.anim.finish();
-        Reflect.setProperty(favIcon, "ID", i); // rulescript
-        grpCapsuleExtras.add(favIcon);
+        // make the rank badge (along with it's sparkle if it's a golden P rank)
+        function initRankBadge(b:TrackingSprite) {
+            b.tracked = capsule;
+            b.trackingMode = 4; // 4 = DIRECT
+            b.trackingOffset.set(356, 28);
+            b.copyAlpha = false;
+            b.loadSparrowFrames('menus/freeplay/rank_badges');
+            
+            for(rank in Highscore.ALL_RANKS) {
+                if(rank == "unknown") continue; // skip this one
+                b.anim.addByPrefix(rank, '${rank.toUpperCase()} rank', 24, false);
+            }
+            b.anim.play('loss');
+            b.anim.finish();
+            b.setScale(0.9, FlxAxes.XY);
+            Reflect.setProperty(b, "ID", i); // rulescript.
+        }
+        final rankBadgeBlurred:TrackingSprite = new TrackingSprite();
+        initRankBadge(rankBadgeBlurred);
+        rankBadgeBlurred.shader = badgeBlurs[0];
+        grpCapsuleExtras.add(rankBadgeBlurred);
 
-        capsuleBadges.push([rankIcon, favIcon]);
+        final rankBadge:TrackingSprite = new TrackingSprite();
+        initRankBadge(rankBadge);
+        rankBadge.extra.set("blurredBadge", rankBadgeBlurred);
+        grpCapsuleExtras.add(rankBadge);
+        
+        final scoreRecord:ScoreRecord = songScoreRecords.get('${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}');
+        rankBadge.exists = rankBadgeBlurred.exists = scoreRecord != null && scoreRecord.rank != "unknown";
+        // rankBadge.exists = false;
+
+        if(rankBadge.exists) {
+            rankBadgeBlurred.anim.play(scoreRecord.rank);
+            rankBadgeBlurred.anim.finish();
+
+            rankBadge.anim.play(scoreRecord.rank);
+            rankBadge.anim.finish();
+        }
+        // make the favorite badge
+        function initFavBadge(b:TrackingSprite) {
+            b.tracked = capsule;
+            b.trackingMode = 4; // 4 = DIRECT
+            b.trackingOffset.set(316, 22);
+            b.copyAlpha = false;
+            b.loadSparrowFrames('menus/freeplay/favorite');
+            b.anim.addByPrefix('fav', 'favorite heart', 24, false);
+            b.anim.addByPrefix('unfav', 'favorite heart', 24, false);
+            b.anim.play('fav');
+            b.anim.finish();
+            b.setGraphicSize(50, 50);
+            b.updateHitbox();
+            b.anim.onFinish.add((name:String) -> {
+                if(name == "unfav")
+                    b.exists = false;
+            });
+            b.frameOffset.x = 5;
+            Reflect.setProperty(b, "ID", i); // rulescript.
+        }
+        final favBadgeBlurred:TrackingSprite = new TrackingSprite();
+        initFavBadge(favBadgeBlurred);
+        favBadgeBlurred.shader = badgeBlurs[1];
+        favBadgeBlurred.exists = isSongFavorited(songData.id, songData.contentPack);
+        grpCapsuleExtras.add(favBadgeBlurred);
+        
+        final favBadge:TrackingSprite = new TrackingSprite();
+        initFavBadge(favBadge);
+        favBadge.extra.set("blurredBadge", favBadgeBlurred);
+        favBadge.exists = favBadgeBlurred.exists;
+        grpCapsuleExtras.add(favBadge);
+
+        capsuleBadges.push([rankBadge, favBadge]);
         
         // we don't need the text object from earlier anymore,
         // KILL IT WITH FIRE 🔥🔥🔥
@@ -409,6 +479,71 @@ function updateOtherShit() {
     curAlbum = (songMixMeta?.freeplay != null) ? songMixMeta.freeplay.album : "vol1";
     updateAlbumDisplay();
     updateDifficultyStars();
+
+    for(i in 0...capsuleBadges.length) {
+        final rankBadge:FlxSprite = capsuleBadges[i][0];
+        final songData:FreeplaySongData = accessibleSongs[i];
+        
+        final scoreRecord:ScoreRecord = songScoreRecords.get('${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}');
+        rankBadge.exists = scoreRecord != null && scoreRecord.rank != "unknown";
+        
+        if(rankBadge.exists) {
+            rankBadge.anim.play(scoreRecord.rank);
+            rankBadge.anim.finish();
+        }
+    }
+    // TODO: figure out functional multithreading for this
+    // i cannot for the life of me get multithreading to work
+    // correctly at all within the context of a script
+    
+    // TODO: bring this code back when multithreading is fixed
+    
+    // final songData:FreeplaySongData = accessibleSongs[curSelected];
+    // final bgmID:String = '${songData.id}:${currentMix}:${songData.contentPack}';
+    // if(loadedSongs.get(bgmID) == null) {
+    //     loadedSongs.set(bgmID, {
+    //         id: bgmID,
+    //         sound: FlxG.assets.getSound(Paths.sound((curSelected == 0) ? "menus/music/freeplayRandom/music" : 'gameplay/songs/${songData.id}/${currentMix}/music/inst'), false),
+    //         path: (curSelected == 0) ? "menus/music/freeplayRandom" : null
+    //     });
+    // }
+}
+
+function isSongFavorited(songID:String, contentPack:String) {
+    if(vsliceExperience_save.data.favorited == null)
+        vsliceExperience_save.data.favorited = {};
+
+    return Reflect.field(vsliceExperience_save.data.favorited, '${songID}:${contentPack}') == true;
+}
+
+function favoriteSong(songID:String, contentPack:String) {
+    if(vsliceExperience_save.data.favorited == null)
+        vsliceExperience_save.data.favorited = {};
+    
+    Reflect.setField(vsliceExperience_save.data.favorited, '${songID}:${contentPack}', true);
+    vsliceExperience_save.flush();
+
+    final favBadge:TrackingSprite = capsuleBadges[curSelected][1];
+    for(spr in [favBadge, favBadge.extra.get("blurredBadge")]) {
+        spr.exists = true;
+        spr.anim.play('fav', true);
+    }
+    FlxG.sound.play(Paths.sound("menus/freeplay/sfx/fav"));
+}
+
+function unfavoriteSong(songID:String, contentPack:String) {
+    if(vsliceExperience_save.data.favorited == null)
+        vsliceExperience_save.data.favorited = {};
+
+    Reflect.setField(vsliceExperience_save.data.favorited, '${songID}:${contentPack}', false);
+    vsliceExperience_save.flush();
+
+    final favBadge:TrackingSprite = capsuleBadges[curSelected][1];
+    for(spr in [favBadge, favBadge.extra.get("blurredBadge")]) {
+        spr.exists = true;
+        spr.anim.play('unfav', true, true);
+    }
+    FlxG.sound.play(Paths.sound("menus/freeplay/sfx/unfav"));
 }
 
 function changeSelection(?by:Int, ?force:Bool) {
@@ -432,10 +567,15 @@ function changeSelection(?by:Int, ?force:Bool) {
             text.alpha = 0.6;
     });
     grpCapsuleExtras.forEach((obj) -> {
-        if(obj.ID == curSelected)
+        if(obj.ID == curSelected) {
             obj.alpha = 1;
-        else
+            if(obj.extra.exists("blurredBadge"))
+                obj.extra.get("blurredBadge").alpha = 1;
+        } else {
             obj.alpha = 0.6;
+            if(obj.extra.exists("blurredBadge"))
+                obj.extra.get("blurredBadge").alpha = 0;
+        }
     });
     totalTime = 0;
     changeDifficulty(0, true);
@@ -567,6 +707,9 @@ function changeMix(?by:Int = 0, ?force:Bool = false):Void {
 }
 
 function updateCapsule(capsule:FunkinSprite) {
+    if(!capsule.extra.get("doLerp"))
+        return;
+
     final index:Int = capsule.ID - curSelected;
 
     final lerpAmountX:Float = FlxMath.getElapsedLerp(0.3, FlxG.elapsed);
@@ -585,13 +728,17 @@ function updateSongName(songName:TrackingSprite) {
         if(b.exists && b.visible)
             visibleBadges++;
     }
-    final textWidth:Float = 366 - (visibleBadges * 70);
-    if(visibleBadges > 0) {
+    final baseTextWidth:Float = (visibleBadges > 1) ? 300 : 305;
+    final textWidth:Float = (visibleBadges > 0) ? baseTextWidth - (visibleBadges * 40) : baseTextWidth;
+    if(curSelected == songName.ID) {
         songName.trackingOffset.x = 88 - ((curSelected == songName.ID && songName.width > textWidth) ? (Math.sin(totalTime * 0.9) * (songName.width - textWidth) * 0.5) + ((songName.width - textWidth) * 0.5) : 0);
         songName.clipRect.set(-(songName.trackingOffset.x - 88), 0, textWidth, songName.frameHeight);
+
+        if(textWidth == baseTextWidth)
+            totalTime = 0;
     } else {
         songName.trackingOffset.x = 88;
-        songName.clipRect.set(0, 0, 366, songName.frameHeight);
+        songName.clipRect.set(0, 0, textWidth, songName.frameHeight);
     }
 }
 
@@ -601,7 +748,7 @@ function switchState(nextState:NextState) {
         openSubState(shit);
 
         shit.finishCallback = () -> FlxG.switchState(nextState);
-        shit.start(0);
+        shit.start(1);
     } else
         FlxG.switchState(nextState);
 }
@@ -793,6 +940,7 @@ function onAccept() {
 }
 
 function onExit() {
+    bgmThreadActive = false;
     FlxG.state.persistentDraw = true;
     callOntoDJ("onExit");
     callOntoDJ("onCancel");
@@ -1048,7 +1196,7 @@ function onCreate() {
         FlxTween.tween(obj, {y: obj.y + header.height}, 0.5, {ease: FlxEase.cubeOut});
 
     FlxTimer.wait(0.5, () -> {
-        playingIntro = false;
+        busy = false;
 
         if(parent != null)
             parent.persistentDraw = false;
@@ -1101,6 +1249,12 @@ function onCreate() {
         FlxTween.tween(dadCover.colorTransform, {redMultiplier: 1, greenMultiplier: 1, blueMultiplier: 1}, 0.25, {ease: FlxEase.cubeOut});
         callOntoDJ("showBackingCard");
     });
+    // TODO: remove this when i can get
+    // the actual bgm of each song to play
+    // with threading and shit properly
+    
+    CoolUtil.playMusic("menus/music/freeplayRandom", 0, true);
+    FlxG.sound.music.fadeIn(2, 0.0, 1.0);
 }
 
 function onCreatePost() {
@@ -1114,7 +1268,7 @@ function onCreatePost() {
         state.openSubState(shit);
 
         shit.finishCallback = shit.close;
-        shit.start(1);
+        shit.start(0);
     }
 }
 
@@ -1129,7 +1283,7 @@ function onUpdatePre(dt:Float) {
 
         close();
     }
-    if(!accepted && !playingIntro) {
+    if(!accepted && !busy) {
         final wheel:Float = -FlxG.mouse.wheel;
         if(controls.justPressed.check(Control.UI_UP) || wheel < 0)
             changeSelection(-1);
@@ -1167,10 +1321,67 @@ function onUpdatePre(dt:Float) {
         }
         if(controls.justPressed.check(Control.ACCEPT))
             onAccept();
+
+        // TODO: custom keybind?
+        if(FlxG.keys.justPressed.F) {
+            busy = true;
+
+            final songData:VSliceFreeplaySongData = accessibleSongs[curSelected];
+            if(isSongFavorited(songData.id, songData.contentPack))
+                unfavoriteSong(songData.id, songData.contentPack);
+            else
+                favoriteSong(songData.id, songData.contentPack);
+            
+            final capsule:SongCapsule = grpCapsules.members[curSelected];
+            capsule.extra.set("doLerp", false);
+            FlxTween.tween(capsule, {y: capsule.y - 5}, 0.1, {ease: FlxEase.expoOut});
+            FlxTween.tween(capsule, {y: capsule.y + 5}, 0.1, {ease: FlxEase.expoIn, startDelay: 0.1, onComplete: () -> {
+                capsule.extra.set("doLerp", true);
+                busy = false;
+            }});
+        }
     }
     grpCapsules.forEach(updateCapsule);
     grpSongNames.forEach(updateSongName);
+
+    for(arr in capsuleBadges) {
+        var x:Int = 0;
+        for(badge in arr) {
+            if(!badge.exists || !badge.visible)
+                continue;
+
+            badge.trackingOffset.x = 356 - (x++ * 40);
+            badge.extra.get("blurredBadge").trackingOffset.x = badge.trackingOffset.x;
+        }
+    }
     totalTime += dt;
+    
+    // TODO: bring this code back when a solution
+    // for multithreading in scripts is found
+    
+    // final songData:FreeplaySongData = accessibleSongs[curSelected];
+    // final bgmID:String = '${songData.id}:${currentMix}:${songData.contentPack}';
+    // 
+    // final bgmData:BGMData = loadedSongs.get(bgmID);
+    // if(currentBGM != bgmID && bgmData != null && bgmData.id != null && bgmData.sound != null) {
+    //     currentBGM = bgmID;
+
+    //     if(bgmData.path != null)
+    //         CoolUtil.playMusic(bgmData.path, 0, true, bgmData.sound); // random button
+    //     else {
+    //         // song capsule
+    //         final songData:FreeplaySongData = accessibleSongs[curSelected];
+    //         FlxG.sound.playMusic(bgmData.sound, 0, true);
+            
+    //         final songMeta:ChartMetadata = (songData?.metadata != null) ? songData.metadata.get(currentMix) : null;
+    //         Conductor.instance.music = FlxG.sound.music;
+    //         Conductor.instance.reset((songMeta?.song?.timingPoints != null) ? songMeta.song.timingPoints[0].bpm : 100);
+
+    //         if((songMeta?.song?.timingPoints != null))
+    //             Conductor.instance.setupTimingPoints(songMeta.song.timingPoints);
+    //     }
+    //     FlxG.sound.music.fadeIn(2, 0.0, 1.0);
+    // }
 }
 
 function onUpdatePost(dt:Float) {
@@ -1187,5 +1398,15 @@ function onUpdatePost(dt:Float) {
 }
 
 function onDestroy() {
+    // TODO: bring this code back when a solution
+    // for multithreading in scripts is found
+
+    // for(bgmData in loadedSongs) {
+    //     if(bgmData?.sound != null)
+    //         bgmData.sound.close();
+    // }
+    // loadedSongs.clear();
+
+    MemoryUtil.clearAll();
     FlxG.cameras.remove(camera);
 }

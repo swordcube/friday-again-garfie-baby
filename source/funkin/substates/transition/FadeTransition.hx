@@ -10,9 +10,6 @@ import flixel.util.FlxTimer;
 import flixel.addons.transition.FlxTransitionSprite.TransitionStatus;
 
 class FadeTransition extends TransitionSubState {
-    public static var defaultCamera:FlxCamera;
-	public static var nextCamera:FlxCamera;
-    
 	public var curStatus:TransitionStatus;
     
 	public var gradient:FlxSprite;
@@ -21,10 +18,10 @@ class FadeTransition extends TransitionSubState {
 	public var updateFunc:Null<Void->Void> = null;
 
 	override function start(status:TransitionStatus):Void {
-		var cam = (nextCamera != null) ? nextCamera : ((defaultCamera != null) ? defaultCamera : FlxG.cameras.list[FlxG.cameras.list.length - 1]);
+		var cam = (TransitionSubState.nextCamera != null) ? TransitionSubState.nextCamera : ((TransitionSubState.defaultCamera != null) ? TransitionSubState.defaultCamera : FlxG.cameras.list[FlxG.cameras.list.length - 1]);
 		cameras = [cam];
 
-		nextCamera = null;
+		TransitionSubState.nextCamera = null;
 		curStatus = status;
 
 		var duration:Float = .48;
@@ -37,12 +34,12 @@ class FadeTransition extends TransitionSubState {
 
 		switch (status) {
 			case IN:
-				updateFunc = () -> gradientFill.y = gradient.y - gradient.height;
-            
-			case OUT:
 				angle = 270;
 				updateFunc = () -> gradientFill.y = gradient.y + gradient.height;
 				duration = 0.6;
+				
+			case OUT:
+				updateFunc = () -> gradientFill.y = gradient.y - gradient.height;
 			
             default:
 		}

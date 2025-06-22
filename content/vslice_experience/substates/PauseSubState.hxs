@@ -1,0 +1,19 @@
+function onRegenerateItems(page) {
+    if(page != "Main")
+        return;
+
+    grpItems.callbacks.get("Exit to Menu").onAccept = (_, _) -> {
+        // don't play any music on exit
+        canPlayExitMusic = false;
+
+        // signal the game to use a scripted transition
+        game.transIn = game.transOut = ScriptedTransition;
+        TransitionableState.setDefaultTransitions(game.transOut);
+
+        // signal the scripted transition class to use a specific script
+        ScriptedTransition.scriptName = "sticker-vse"; // vse = v-slice experience
+
+        // then do the usual logic, it'll handle everything else automatically
+        exitToMenu();
+    };
+}

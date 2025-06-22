@@ -25,7 +25,6 @@ import funkin.states.PlayState;
 import funkin.states.menus.TitleState;
 
 import funkin.states.TransitionableState;
-import funkin.substates.transition.FadeTransition;
 
 class InitState extends FlxState {
     private static var _lastState:Class<FlxState>;
@@ -100,8 +99,7 @@ class InitState extends FlxState {
         #end
 
         // init the transition shit stuff
-        TransitionableState.defaultTransIn = FadeTransition;
-        TransitionableState.defaultTransOut = FadeTransition;
+        TransitionableState.resetDefaultTransitions();
 
         // init cursor, discord rpc, and vlc
         Cursor.init();

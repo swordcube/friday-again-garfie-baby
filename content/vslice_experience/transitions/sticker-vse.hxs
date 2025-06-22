@@ -1,0 +1,192 @@
+import flixel.util.FlxArrayUtil;
+
+var stickerDataArray:Array<StickerSpriteData> = [];
+
+var stickerAtlas:FlxAtlas;
+var grpStickers:FlxTypedGroup;
+
+function shuffleArray(array) {
+    var maxValidIndex = array.length - 1;
+    for (i in 0...maxValidIndex) {
+        var j = FlxG.random.int(i, maxValidIndex);
+        var tmp = array[i];
+        array[i] = array[j];
+        array[j] = tmp;
+    }
+}
+
+function onStartOut() {
+    trace("out of current state");
+
+    final prevForcedPack:String = Paths.forceContentPack;
+    Paths.forceContentPack = null;
+
+    grpStickers = new FlxTypedGroup();
+    add(grpStickers);
+
+    final foundSets:Array<String> = [];
+    Paths.iterateDirectory("transitions/sticker-vse/sets", (path) -> {
+        if(Paths.isDirectory(path))
+            foundSets.push(Paths.withoutDirectory(path));
+    });
+    trace('found sticker sets: ' + foundSets);
+
+    final chosenSet:String = ArrayUtil.pickRandom(foundSets);
+    vsliceExperience_tempStorage.set("stickerTransition", {
+        stickers: stickerDataArray,
+        set: chosenSet
+    });
+    final atlas:FlxAtlas = new FlxAtlas('#_VSLICE_EXPERIENCE_STICKER_ATLAS_${chosenSet}', false, 3, false, FlxPoint.get(), FlxPoint.get());
+    stickerAtlas = atlas;
+    
+    var stickerCount:Int = 0;
+    Paths.iterateDirectory('transitions/sticker-vse/sets/${chosenSet}', (path) -> {
+        if(Paths.isDirectory(path))
+            return;
+        
+        trace('preloading sticker: ' + Paths.withoutDirectory(path));
+        atlas.addNode(path, 'sticker${stickerCount++}0000');
+    });
+    final frames:FlxFramesCollection = atlas.getAtlasFrames();
+    for(f in frames.frames.copy()) {
+        if(!StringTools.endsWith(f.name, "0000"))
+            frames.frames.remove(f);
+    }
+    // keep making stickers until the end of the screen width
+    // to ensure the screen gets mostly covered
+
+    // this isn't 100% perfect, small gaps will appear sometimes
+    // but it's perfectly fine most of the time
+    var xPos:Float = -100;
+    var yPos:Float = -100;
+    var stickersCreated:Int = 0;
+
+    while(xPos <= FlxG.width && stickersCreated < 500) { // if 500 stickers are created then something has gone wrong and idfk what
+        final stickyID:Int = FlxG.random.int(0, stickerCount - 1);
+
+        final sticky:FunkinSprite = new FunkinSprite();
+        sticky.extra.set("id", stickyID);
+        sticky.frames = frames;
+        sticky.animation.addByPrefix('idle', 'sticker${stickyID}', 0, false);
+        sticky.animation.play("idle");
+        sticky.visible = false;
+
+        sticky.x = xPos;
+        sticky.y = yPos;
+        xPos += sticky.frameWidth * 0.5;
+
+        if(xPos >= FlxG.width) {
+            if(yPos <= FlxG.height) {
+                xPos = -100;
+                yPos += FlxG.random.float(70, 120);
+            }
+        }
+        sticky.angle = FlxG.random.int(-60, 70);
+        grpStickers.add(sticky);
+
+        stickersCreated++;
+    }
+    shuffleArray(grpStickers.members);
+    
+    var sticky:FunkinSprite = new FunkinSprite();
+    sticky.extra.set("id", FlxG.random.int(0, stickerCount - 1));
+    sticky.frames = frames;
+    sticky.animation.addByPrefix('idle', 'sticker${sticky.extra.get("id")}', 0, false);
+    sticky.animation.play("idle");
+    sticky.updateHitbox();
+    sticky.screenCenter();
+    sticky.visible = false;
+    grpStickers.add(sticky);
+    
+    for(i in 0...grpStickers.length) {
+        final sticker:FunkinSprite = grpStickers.members[i];
+        final randomScale:Float = FlxG.random.float(0.97, 1.02);
+        stickerDataArray.push({
+            id: sticker.extra.get("id"),
+            x: sticker.x,
+            y: sticker.y,
+            scaleX: randomScale,
+            scaleY: randomScale,
+            angle: sticker.angle
+        });
+        final timing:Float = FlxMath.remapToRange(i, 0, grpStickers.length, 0, 0.9);
+        FlxTimer.wait(timing, () -> {
+            sticker.visible = true;
+
+            final prevForcedPack:String = Paths.forceContentPack;
+            Paths.forceContentPack = null;
+            
+            FlxG.sound.play(Paths.sound('transitions/sticker-vse/sfx/keyClick${FlxG.random.int(1, 8)}'));
+            Paths.forceContentPack = prevForcedPack;
+
+            final frameTimer:Int = FlxG.random.int(0, 2);
+            FlxTimer.wait((1 / 24) * frameTimer, () -> {
+                sticker.scale.x = sticker.scale.y = randomScale; 
+
+                if(i == grpStickers.length - 1)
+                    FlxTimer.wait((1 / 24) * 2, finish);
+            });
+        });
+    }
+    Paths.forceContentPack = prevForcedPack;
+}
+
+function onStartIn() {
+    trace("in to new state");
+
+    final prevForcedPack:String = Paths.forceContentPack;
+    Paths.forceContentPack = null;
+
+    grpStickers = new FlxTypedGroup();
+    add(grpStickers);
+
+    final data = vsliceExperience_tempStorage.get("stickerTransition");
+    final chosenSet:String = data.set;
+
+    final atlas:FlxAtlas = new FlxAtlas('#_VSLICE_EXPERIENCE_STICKER_ATLAS_${chosenSet}', false, 3, false, FlxPoint.get(), FlxPoint.get());
+    stickerAtlas = atlas;
+    
+    var stickerCount:Int = 0;
+    Paths.iterateDirectory('transitions/sticker-vse/sets/${chosenSet}', (path) -> {
+        if(Paths.isDirectory(path))
+            return;
+        
+        trace('preloading sticker: ' + Paths.withoutDirectory(path));
+        atlas.addNode(path, 'sticker${stickerCount++}0000');
+    });
+    final frames:FlxFramesCollection = atlas.getAtlasFrames();
+    for(f in frames.frames.copy()) {
+        if(!StringTools.endsWith(f.name, "0000"))
+            frames.frames.remove(f);
+    }
+    for(i in 0...data.stickers.length) {
+        final stickerData = data.stickers[i];
+        final timing:Float = FlxMath.remapToRange(i, 0, data.stickers.length, 0, 0.9);
+
+        var sticky:FunkinSprite = new FunkinSprite(stickerData.x, stickerData.y);
+        sticky.frames = frames;
+        sticky.animation.addByPrefix('idle', 'sticker${stickerData.id}', 0, false);
+        sticky.animation.play("idle");
+        sticky.angle = stickerData.angle;
+        sticky.scale.set(stickerData.scaleX, stickerData.scaleY); 
+        grpStickers.add(sticky);
+
+        FlxTimer.wait(timing, () -> {
+            sticky.visible = false;
+
+            final prevForcedPack:String = Paths.forceContentPack;
+            Paths.forceContentPack = null;
+            
+            FlxG.sound.play(Paths.sound('transitions/sticker-vse/sfx/keyClick${FlxG.random.int(1, 8)}'));
+            Paths.forceContentPack = prevForcedPack;
+
+            if(i == grpStickers.length - 1)
+                finish(); 
+        });
+    }
+    Paths.forceContentPack = prevForcedPack;
+}
+
+function onDestroy() {
+    // stickerAtlas.clear();
+}

@@ -3,13 +3,48 @@ package funkin.states;
 import flixel.FlxState;
 import flixel.FlxSubState;
 
+import funkin.substates.transition.FadeTransition;
 import funkin.substates.transition.TransitionSubState;
+
+import flixel.addons.transition.FlxTransitionSprite.TransitionStatus;
 
 // i did not feel like coding all of this entirely on my own
 // so i stole code! (the original source is in the @see part of the documentation)
 
 // might do it later for more flexability in scripts
 // but this will do for now
+
+enum abstract TransitionStatusString(String) from String to String {
+	final IN = "in";
+	final OUT = "out";
+	final EMPTY = "empty";
+	final FULL = "full";
+	final NULL = "null";
+
+	@:from
+	public static function fromFlixelTransitionStatus(status:TransitionStatus):TransitionStatusString {
+		switch(status) {
+			case TransitionStatus.IN:    return IN;
+			case TransitionStatus.OUT:   return OUT;
+			case TransitionStatus.EMPTY: return EMPTY;
+			case TransitionStatus.FULL:  return FULL;
+			case TransitionStatus.NULL:  return NULL;
+		}
+		return NULL;
+	}
+
+	@:to
+	public function toFlixelTransitionStatus():TransitionStatus {
+		switch(this) {
+			case IN:    return TransitionStatus.IN;
+			case OUT:   return TransitionStatus.OUT;
+			case EMPTY: return TransitionStatus.EMPTY;
+			case FULL:  return TransitionStatus.FULL;
+			case NULL:  return TransitionStatus.NULL;
+		}
+		return TransitionStatus.NULL;
+	}
+}
 
 /**
  * A state that can be transitioned into and out of.
@@ -55,6 +90,15 @@ class TransitionableState extends FlxState {
 		super();
 	}
 
+	public static function setDefaultTransitions(inClass:Class<TransitionSubState>, ?outClass:Class<TransitionSubState>):Void {
+		defaultTransIn = inClass;
+		defaultTransOut = outClass ?? inClass;
+	}
+
+	public static function resetDefaultTransitions():Void {
+		setDefaultTransitions(FadeTransition);
+	}
+
 	override function createPost():Void {
 		super.createPost();
 		transitionIn();
@@ -81,7 +125,7 @@ class TransitionableState extends FlxState {
 			_finishTransIn();
 			return;
 		}
-		var trans = Type.createInstance(transIn, []);
+		var trans:TransitionSubState = Type.createInstance(transIn, []);
 		if(overrideSubState)
 			openSubState(trans);
 		else {
@@ -92,7 +136,7 @@ class TransitionableState extends FlxState {
 			state.openSubState(trans);
 		}
 		trans.finishCallback = _finishTransIn;
-		trans.start(OUT);
+		trans.start(IN);
 
 		overrideSubState = true;
 	}
@@ -104,7 +148,7 @@ class TransitionableState extends FlxState {
 		_onExit = OnExit;
 
 		if(hasTransOut) {
-			var trans = Type.createInstance(transOut, []);
+			var trans:TransitionSubState = Type.createInstance(transIn, []);
 			if(overrideSubState)
 				openSubState(trans);
 			else {
@@ -115,7 +159,7 @@ class TransitionableState extends FlxState {
 				state.openSubState(trans);
 			}
 			trans.finishCallback = _finishTransOut;
-			trans.start(IN);
+			trans.start(OUT);
 		} else
 			_onExit();
 

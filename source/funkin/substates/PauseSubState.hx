@@ -22,7 +22,7 @@ import funkin.states.menus.StoryMenuState;
 import funkin.states.menus.FreeplayState;
 import funkin.states.menus.OptionsState;
 
-import funkin.substates.transition.FadeTransition;
+import funkin.substates.transition.TransitionSubState;
 
 import funkin.ui.AtlasText;
 import funkin.ui.AtlasTextList;
@@ -211,6 +211,8 @@ class PauseSubState extends FunkinSubState {
                 }
                 grpItems.addItem("Back", {onAccept: (_, _) -> regenerateItems(MAIN)});
         }
+        call("onRegenerateItems", [page]);
+
         grpItems.curSelected = 0;
         grpItems.changeSelection(0, true);
     }
@@ -264,9 +266,9 @@ class PauseSubState extends FunkinSubState {
             Cache.noteSkinCache.clear();
             Cache.characterCache.clear();
 
-            FadeTransition.nextCamera = transitionCam;
+            TransitionSubState.nextCamera = transitionCam;
             FlxG.signals.postStateSwitch.addOnce(() -> {
-                FlxG.cameras.remove(FadeTransition.nextCamera);
+                FlxG.cameras.remove(TransitionSubState.nextCamera);
             });
             FlxG.timeScale = 1;
             FlxG.sound.music.onComplete = null;
@@ -312,10 +314,10 @@ class PauseSubState extends FunkinSubState {
             FlxG.cameras.add(transitionCam, false);
 
             FlxG.timeScale = 1;
-            FadeTransition.nextCamera = transitionCam;
+            TransitionSubState.nextCamera = transitionCam;
 
             FlxG.signals.postStateSwitch.addOnce(() -> {
-                FlxG.cameras.remove(FadeTransition.nextCamera);
+                FlxG.cameras.remove(TransitionSubState.nextCamera);
             });
             final wasMusicPlaying:Bool = FlxG.sound.music.playing;
             FlxG.sound.music.onComplete = null;
@@ -376,10 +378,10 @@ class PauseSubState extends FunkinSubState {
             FlxG.cameras.add(transitionCam, false);
 
             FlxG.timeScale = 1;
-            FadeTransition.nextCamera = transitionCam;
+            TransitionSubState.nextCamera = transitionCam;
 
             FlxG.signals.postStateSwitch.addOnce(() -> {
-                FlxG.cameras.remove(FadeTransition.nextCamera);
+                FlxG.cameras.remove(TransitionSubState.nextCamera);
             });
             final wasMusicPlaying:Bool = FlxG.sound.music.playing;
             FlxG.sound.music.onComplete = null;
@@ -503,8 +505,8 @@ class PauseSubState extends FunkinSubState {
 }
 
 enum abstract PageType(String) from String to String {
-    final MAIN = "main";
-    final CHANGE_DIFF = "change_diff";
+    final MAIN = "Main";
+    final CHANGE_DIFF = "Change Difficulty";
 }
 
 typedef PauseMenuStat = {

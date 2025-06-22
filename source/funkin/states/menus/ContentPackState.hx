@@ -6,7 +6,7 @@ import flixel.text.FlxText;
 import flixel.util.FlxSort;
 
 import funkin.ui.AtlasText;
-import funkin.substates.transition.FadeTransition;
+import funkin.substates.transition.TransitionSubState;
 
 class ContentPackState extends FunkinState {
     public var bg:FlxSprite;
@@ -34,7 +34,7 @@ class ContentPackState extends FunkinState {
         transitionCam.bgColor = 0;
         FlxG.cameras.add(transitionCam, false);
 
-        FadeTransition.nextCamera = transitionCam;
+        TransitionSubState.nextCamera = transitionCam;
         super.create();
 
         DiscordRPC.changePresence("Managing Content Packs", null);

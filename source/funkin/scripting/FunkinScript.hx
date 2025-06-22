@@ -71,6 +71,7 @@ class FunkinScript {
         setClass(flixel.addons.display.FlxTiledSprite);
 
         setClass(flixel.effects.FlxFlicker);
+        setClass(flixel.graphics.atlas.FlxAtlas);
 
         setClass(Paths);
         setClass(Cache);
@@ -155,6 +156,7 @@ class FunkinScript {
 
         setClass(funkin.states.ScriptedState);
         setClass(funkin.states.ScriptedUIState);
+        setClass(funkin.states.TransitionableState);
 
         setClass(funkin.states.menus.TitleState);
         setClass(funkin.states.menus.MainMenuState);
@@ -174,6 +176,10 @@ class FunkinScript {
         
         setClass(funkin.substates.GameplayModifiersMenu);
         setClass(funkin.substates.UnsavedWarningSubState);
+
+        setClass(funkin.substates.transition.FadeTransition);
+        setClass(funkin.substates.transition.ScriptedTransition);
+        setClass(funkin.substates.transition.TransitionSubState);
 
         setClass(funkin.ui.ImageBar);
         setClass(funkin.ui.AtlasFont);
@@ -209,7 +215,8 @@ class FunkinScript {
         set("FlxTextAlign", funkin.scripting.helpers.FlxTextAlignHelper);
         set("FlxTextBorderStyle", funkin.scripting.helpers.FlxTextBorderStyleHelper);
         set("FlxTweenType", funkin.scripting.helpers.FlxTweenTypeHelper);
-        set("FlxBarFillDirection", flixel.ui.FlxBar.FlxBarFillDirection); // using a helper doesn't work, but using the enum directly does
+        set("FlxBarFillDirection", flixel.ui.FlxBar.FlxBarFillDirection); // using a helper doesn't work, but using the enum directly does???
+        set("Thread", funkin.scripting.helpers.ThreadHelper); // haxe.
 
         set("platform", Constants.CURRENT_OS);
         set("osName", Constants.CURRENT_OS);

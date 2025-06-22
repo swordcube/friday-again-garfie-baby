@@ -72,23 +72,23 @@ class CoolUtil {
         return list;
     }
 
-    /**
-     * Returns a random item from a given array.
-     * 
-     * Returns `null` if unsuccessful.
-     * 
-     * @param  array  The array to pick an item from.
-     */
-    public static function pickRandom<T>(array:Array<T>):T {
-        return (array.length != 0) ? array[FlxG.random.int(0, array.length - 1)] : null;
-    }
-
     public static function createASyncFuture<T>(job:Void->T):Future<T> {
         return new Future(job, true);
+    }
+
+    public static function createASyncFutureWithResult(job:Void->Dynamic):Future<ScriptedFutureResult> {
+        return new Future<ScriptedFutureResult>(() -> {
+            return {data: job()};
+        }, true);
     }
 }
 
 @:structInit
 class MusicConfig {
     public var timingPoints:Array<TimingPoint>;
+}
+
+@:structInit
+class ScriptedFutureResult {
+    public var data:Dynamic;
 }

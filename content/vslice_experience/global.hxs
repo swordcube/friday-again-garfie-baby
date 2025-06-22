@@ -1,13 +1,22 @@
 import openfl.system.Capabilities;
+import flixel.util.FlxSave;
 
 static var vsliceFreeplay_lastSelected = 1;
 static var vsliceFreeplay_lastSongFilter = 2;
 static var vsliceFreeplay_lastDifficulty = "normal";
 static var vsliceFreeplay_lastMix = "default";
 
+static var vsliceExperience_save:FlxSave;
+static var vsliceExperience_tempStorage:Map<String, Dynamic> = ["" => null]; // for transferring data between states (useful for sticker transition!)
+
 var stateRedirects = [
     FreeplayState => () -> new ScriptedSubState("VSliceFreeplay"),
 ];
+
+function new() {
+    vsliceExperience_save = new FlxSave();
+    vsliceExperience_save.bind("vsliceExperience", '${Constants.SAVE_DIR}/custom');
+}
 
 function onStateCreate(state) {
     var redirect = stateRedirects.get(Type.getClass(state));
@@ -26,4 +35,9 @@ function onStateCreate(state) {
         FlxG.game._state = newState;
         FlxG.game._nextState = null; // just in case
     }
+}
+
+function onClose() {
+    vsliceExperience_save.close();
+    vsliceExperience_save = null;
 }

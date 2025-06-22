@@ -6,7 +6,7 @@ import funkin.ui.AtlasText;
 import funkin.states.editors.*;
 import funkin.states.TransitionableState;
 
-import funkin.substates.transition.FadeTransition;
+import funkin.substates.transition.TransitionSubState;
 
 class EditorPickerSubState extends FunkinSubState {
     public var bg:FlxSprite;
@@ -37,7 +37,7 @@ class EditorPickerSubState extends FunkinSubState {
             transitionCam.bgColor = 0;
             FlxG.cameras.add(transitionCam, false);
 
-            FadeTransition.nextCamera = transitionCam;
+            TransitionSubState.nextCamera = transitionCam;
             FlxG.switchState(ChartEditor.new.bind({
                 song: null,
                 difficulty: null
@@ -53,7 +53,7 @@ class EditorPickerSubState extends FunkinSubState {
             transitionCam.bgColor = 0;
             FlxG.cameras.add(transitionCam, false);
 
-            FadeTransition.nextCamera = transitionCam;
+            TransitionSubState.nextCamera = transitionCam;
             FlxG.switchState(CharacterEditor.new);
         });
         call("onAddItems");
