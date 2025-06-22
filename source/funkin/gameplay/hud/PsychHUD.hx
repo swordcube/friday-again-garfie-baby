@@ -9,6 +9,7 @@ import funkin.states.PlayState;
 
 class PsychHUD extends BaseHUD {
     public function new(playField:PlayField) {
+        this.name = "Psych";
         super(playField);
     }
 
@@ -40,7 +41,7 @@ class PsychHUD extends BaseHUD {
 
     override function generateHealthBar():Void {
         final game:PlayState = PlayState.instance;
-        final barY:Float = (Options.downscroll) ? 72 : FlxG.height * 0.9;
+        final barY:Float = (Options.downscroll) ? 72 : FlxG.height * 0.89;
 
         healthBarBG = new FlxSprite(0, barY);
         healthBarBG.loadGraphic(Paths.image("gameplay/healthBar"));

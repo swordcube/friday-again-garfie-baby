@@ -5,23 +5,16 @@ import funkin.scripting.FunkinScript;
 import funkin.states.PlayState;
 
 class ScriptedHUD extends BaseHUD {
-    public var skin(default, null):String;
     public var script(default, null):FunkinScript;
 
-    public function new(playField:PlayField, skin:String) {
-        this.skin = skin;
+    public function new(playField:PlayField, name:String) {
+        this.name = name;
 
-        final scriptPath:String = Paths.script('gameplay/hudskins/${skin}/script');
+        final scriptPath:String = Paths.script('gameplay/hudskins/${this.name}/script');
         final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
         
         script = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
         script.setParent(this);
-        script.set("getHUDImage", (name:String) -> {
-            return Paths.image('gameplay/hudskins/${skin}/images/${name}');
-        });
-        script.set("getHUDAtlas", (name:String) -> {
-            return Paths.getSparrowAtlas('gameplay/hudskins/${skin}/images/${name}');
-        });
         script.execute();
         script.call("new");
         script.call("onLoad");

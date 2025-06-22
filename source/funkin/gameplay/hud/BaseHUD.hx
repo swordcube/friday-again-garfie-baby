@@ -1,8 +1,10 @@
 package funkin.gameplay.hud;
 
+import flixel.graphics.frames.FlxAtlasFrames;
 import funkin.backend.Conductor.IBeatReceiver;
 
 class BaseHUD extends FlxGroup implements IBeatReceiver {
+    public var name:String;
     public var playField:PlayField;
     
     public var iconP2:HealthIcon;
@@ -26,6 +28,14 @@ class BaseHUD extends FlxGroup implements IBeatReceiver {
         final func:Dynamic = Reflect.field(this, method);
         if(func != null && Reflect.isFunction(func))
             func(args);
+    }
+
+    public function getHUDImage(name:String):String {
+        return Paths.image('gameplay/hudskins/${this.name}/images/${name}');
+    }
+
+    public function getHUDAtlas(name:String):FlxAtlasFrames {
+        return Paths.getSparrowAtlas('gameplay/hudskins/${this.name}/images/${name}');
     }
 
     public function generateHealthBar():Void {}

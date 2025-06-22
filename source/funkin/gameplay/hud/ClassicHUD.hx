@@ -8,6 +8,7 @@ import funkin.states.PlayState;
 
 class ClassicHUD extends BaseHUD {
     public function new(playField:PlayField) {
+        this.name = "Classic";
         super(playField);
     }
 

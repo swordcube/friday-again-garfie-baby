@@ -636,6 +636,9 @@ class PlayState extends FunkinState {
 		// already been initialized by the code directly above this
 		if(playField.hud == null) {
 			switch(event.hudType) {
+				case "Classic+":
+					playField.hud = new ClassicPlusHUD(playField);
+
 				case "Psych":
 					playField.hud = new PsychHUD(playField);
 	

@@ -1,6 +1,7 @@
 package funkin.gameplay.stage;
 
 import flixel.math.FlxPoint;
+import flixel.graphics.frames.FlxAtlasFrames;
 
 import funkin.gameplay.stage.props.*;
 import funkin.gameplay.character.Character;
@@ -179,6 +180,10 @@ class Stage extends FlxContainer {
 
     public function getStageImage(id:String):String {
         return Paths.image('${data.getImageFolder()}/${id}');
+    }
+
+    public function getStageAtlas(id:String):FlxAtlasFrames {
+        return Paths.getSparrowAtlas('${data.getImageFolder()}/${id}');
     }
 
     public function getStageSFX(id:String):String {
