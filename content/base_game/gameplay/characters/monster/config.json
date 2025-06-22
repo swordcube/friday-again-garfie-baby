@@ -1,0 +1,109 @@
+{
+	"healthIcon": {
+		"isPixel": false,
+		"scale": 1,
+		"flipX": false,
+		"flipY": false,
+		"offset": [
+			0,
+			0
+		],
+		"color": "#F3FF6E"
+	},
+	"atlas": {
+		"type": "sparrow",
+		"path": "sprite",
+		"gridSize": null
+	},
+	"gridSize": [
+		0,
+		0
+	],
+	"animations": {
+		"idle": {
+			"prefix": "monster idle",
+			"texture": null,
+			"indices": [			],
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				0,
+				0
+			]
+		},
+		"singDOWN": {
+			"prefix": "monster down",
+			"texture": null,
+			"indices": [			],
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				-46,
+				-81
+			]
+		},
+		"singRIGHT": {
+			"prefix": "Monster left note",
+			"texture": null,
+			"indices": [			],
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				-29,
+				8
+			]
+		},
+		"singUP": {
+			"prefix": "monster up note",
+			"texture": null,
+			"indices": [			],
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				-29,
+				90
+			]
+		},
+		"singLEFT": {
+			"prefix": "Monster Right note",
+			"texture": null,
+			"indices": [			],
+			"fps": 24,
+			"looped": false,
+			"offset": [
+				-57,
+				14
+			]
+		}
+	},
+	"position": [
+		0,
+		-135
+	],
+	"camera": [
+		80,
+		-15
+	],
+	"scale": 1,
+	"flipX": false,
+	"flipY": false,
+	"isPlayer": false,
+	"antialiasing": true,
+	"singDuration": 6,
+	"deathCharacter": "bf-dead",
+	"danceSteps": [
+		"idle"
+	],
+	"singSteps": [
+		"singLEFT",
+		"singDOWN",
+		"singUP",
+		"singRIGHT"
+	],
+	"missSteps": [
+		"singLEFTmiss",
+		"singDOWNmiss",
+		"singUPmiss",
+		"singRIGHTmiss"
+	]
+}
