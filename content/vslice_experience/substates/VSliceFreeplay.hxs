@@ -1,6 +1,8 @@
 // TODO: figure out how to properly optimize capsule updating
 // removing the code brings the up to 700fps, with updating it drops to 200fps
 
+// TODO: add dj easter eggs
+
 import openfl.geom.Point;
 import openfl.geom.Matrix;
 

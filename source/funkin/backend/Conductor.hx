@@ -169,8 +169,13 @@ class Conductor extends FlxBasic {
         _latestTimingPoint = timingPoints[0];
 
         curStep = -1;
+        curDecStep = -1;
+        
         curBeat = -1;
+        curDecBeat = -1;
+
         curMeasure = -1;
+        curDecMeasure = -1;
 
         rawTime = 0;
         rawPlayhead = 0;
@@ -301,6 +306,18 @@ class Conductor extends FlxBasic {
 
     override function update(elapsed:Float) {
         if(music != null && music.playing) {
+            if(music.time < rawTime) {
+                // we've probably looped the music or something
+                // so reset the beats so the first one doesn't get skipped
+                curStep = -1;
+                curDecStep = -1;
+                
+                curBeat = -1;
+                curDecBeat = -1;
+
+                curMeasure = -1;
+                curDecMeasure = -1;
+            }
             @:bypassAccessor rawTime = music.time;
 
             if(_lastPlayhead != rawTime)
@@ -418,6 +435,18 @@ class Conductor extends FlxBasic {
 
     @:noCompletion
     private inline function set_rawTime(newTime:Float):Float {
+        if(newTime < rawTime) {
+            // we've probably looped the music or something
+            // so reset the beats so the first one doesn't get skipped
+            curStep = -1;
+            curDecStep = -1;
+            
+            curBeat = -1;
+            curDecBeat = -1;
+
+            curMeasure = -1;
+            curDecMeasure = -1;
+        }
         rawTime = rawPlayhead = _lastPlayhead = newTime;
         _latestTimingPoint = getTimingPointAtTime(time);
         return rawTime;
