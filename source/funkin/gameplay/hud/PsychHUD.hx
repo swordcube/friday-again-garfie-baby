@@ -73,7 +73,7 @@ class PsychHUD extends BaseHUD {
         add(iconP2);
 
         iconP1 = new HealthIcon(playerIcon, 1);
-        iconP1.flipX = true;
+        iconP1.flipX = !iconP1.flipX;
         add(iconP1);
 
         scoreText = new FlxText(healthBarBG.x + (healthBarBG.width - 190), healthBarBG.y + 40, 0, "");

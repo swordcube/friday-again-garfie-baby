@@ -306,7 +306,7 @@ class Conductor extends FlxBasic {
 
     override function update(elapsed:Float) {
         if(music != null && music.playing) {
-            if(music.time < rawTime) {
+            if(music.time < rawTime && music.time <= 20) {
                 // we've probably looped the music or something
                 // so reset the beats so the first one doesn't get skipped
                 curStep = -1;
@@ -435,7 +435,7 @@ class Conductor extends FlxBasic {
 
     @:noCompletion
     private inline function set_rawTime(newTime:Float):Float {
-        if(newTime < rawTime) {
+        if(music != null && music.playing && music.time <= 20 && newTime < rawTime) {
             // we've probably looped the music or something
             // so reset the beats so the first one doesn't get skipped
             curStep = -1;

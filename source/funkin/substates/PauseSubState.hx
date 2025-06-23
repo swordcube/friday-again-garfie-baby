@@ -256,10 +256,6 @@ class PauseSubState extends FunkinSubState {
                 FlxG.signals.preStateCreate.addOnce((_) -> {
                     Cache.clearAll();
                     Paths.reloadContent();
-
-                    #if SCRIPTING_ALLOWED
-                    GlobalScript.reloadScripts();
-                    #end
                 });
             }
             Cache.uiSkinCache.clear();

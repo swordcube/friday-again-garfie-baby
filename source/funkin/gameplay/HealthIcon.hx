@@ -133,6 +133,11 @@ class HealthIcon extends TrackingSprite {
     public var characterID(default, set):String = null;
 
     /**
+     * The character data used to load this icon.
+     */
+    public var characterData(default, null):CharacterData = null;
+
+    /**
      * Controls whether or not this health icon
      * should automatically lerp back to initial scale.
      * 
@@ -168,6 +173,9 @@ class HealthIcon extends TrackingSprite {
 
     public var health:Float = 0.5;
 
+    public var offsetX:Float = 0;
+    public var offsetY:Float = 0;
+
     public var bopTween:FlxTween;
 
     /**
@@ -177,6 +185,18 @@ class HealthIcon extends TrackingSprite {
         super();
         this.characterID = character;
         this.iconType = iconType;
+
+        animation.onFinish.add((name:String) -> {
+            final state:HealthIconState = cast name;
+            if(state == FROM_WINNING || state == FROM_LOSING)
+                playIconAnim(IDLE);
+
+            if(state == TO_WINNING)
+                playIconAnim(WINNING);
+
+            else if(state == TO_LOSING)
+                playIconAnim(LOSING);
+        });
     }
 
     override function update(elapsed:Float):Void {
@@ -196,6 +216,8 @@ class HealthIcon extends TrackingSprite {
         super.updateHitbox();
         if(centered)
             offset.set(-0.5 * ((frameWidth * size.x) - frameWidth), -0.5 * ((frameHeight * size.y) - frameHeight));
+
+        offset.add(offsetX, offsetY);
     }
 
     public function bop():Void {
@@ -261,13 +283,20 @@ class HealthIcon extends TrackingSprite {
      * Note that this is looking for SPECIFIC animation names, so you may need to modify the XML.
      */
     private function _loadAnimationNew():Void {
-        animation.addByPrefix(IDLE, IDLE, 24, true);
-        animation.addByPrefix(WINNING, WINNING, 24, true);
-        animation.addByPrefix(LOSING, LOSING, 24, true);
-        animation.addByPrefix(TO_WINNING, TO_WINNING, 24, false);
-        animation.addByPrefix(TO_LOSING, TO_LOSING, 24, false);
-        animation.addByPrefix(FROM_WINNING, FROM_WINNING, 24, false);
-        animation.addByPrefix(FROM_LOSING, FROM_LOSING, 24, false);
+        if(characterData.healthIcon?.animations != null) {
+            // load animations from character json
+            for(name => data in characterData.healthIcon.animations)
+                animation.addByPrefix(name, data.prefix, data.fps, data.looped);
+        } else {
+            // fallback to hardcoded animations at 24fps
+            animation.addByPrefix(IDLE, IDLE, 24, true);
+            animation.addByPrefix(WINNING, WINNING, 24, true);
+            animation.addByPrefix(LOSING, LOSING, 24, true);
+            animation.addByPrefix(TO_WINNING, TO_WINNING, 24, false);
+            animation.addByPrefix(TO_LOSING, TO_LOSING, 24, false);
+            animation.addByPrefix(FROM_WINNING, FROM_WINNING, 24, false);
+            animation.addByPrefix(FROM_LOSING, FROM_LOSING, 24, false);
+        }
     }
   
     /**
@@ -283,9 +312,9 @@ class HealthIcon extends TrackingSprite {
 
     private function _loadCharacter(charID:Null<String>):Void {
         charID = _correctCharacterID(charID);
-        final charData:CharacterData = CharacterData.load(charID);
+        characterData = CharacterData.load(charID);
 
-        isPixel = charData?.healthIcon?.isPixel ?? false;
+        isPixel = characterData?.healthIcon?.isPixel ?? false;
         isLegacyStyle = !_isNewSpritesheet(charID);
 
         if(!isLegacyStyle) {
@@ -297,8 +326,14 @@ class HealthIcon extends TrackingSprite {
             _loadAnimationOld();
         }
         this.antialiasing = !isPixel;
+
+        flipX = characterData?.healthIcon?.flipX ?? false;
+        flipY = characterData?.healthIcon?.flipY ?? false;
+
+        offsetX = characterData?.healthIcon?.offset[0] ?? 0.0;
+        offsetY = characterData?.healthIcon?.offset[1] ?? 0.0;
         
-        final leScale:Float = charData?.healthIcon?.scale ?? 1.0;
+        final leScale:Float = characterData?.healthIcon?.scale ?? 1.0;
         size.set(leScale, leScale);
         
         if(width > height)
@@ -308,13 +343,6 @@ class HealthIcon extends TrackingSprite {
         
         updateHitbox();
 
-        flipX = charData?.healthIcon?.flipX ?? false;
-        flipY = charData?.healthIcon?.flipY ?? false;
-
-        frameOffset.set(
-            charData?.healthIcon?.offset[0] ?? 0,
-            charData?.healthIcon?.offset[1] ?? 0
-        );
         health = 0.5;
         _updateHealthIcon(health);
     }
@@ -327,24 +355,20 @@ class HealthIcon extends TrackingSprite {
 			case IDLE:
                 if(health < LOSING_THRESHOLD)
                     playIconAnim(TO_LOSING, LOSING);
-
                 else if(health > WINNING_THRESHOLD)
                     playIconAnim(TO_WINNING, WINNING);
-
                 else
                     playIconAnim(IDLE);
             
             case WINNING:
-                if (health < WINNING_THRESHOLD)
+                if(health < WINNING_THRESHOLD)
                     playIconAnim(FROM_WINNING, IDLE);
-                
                 else
                     playIconAnim(WINNING, IDLE);
 
             case LOSING:
-                if (health > LOSING_THRESHOLD)
+                if(health > LOSING_THRESHOLD)
                     playIconAnim(FROM_LOSING, IDLE);
-
                 else
                     playIconAnim(LOSING, IDLE);
                 
@@ -353,7 +377,7 @@ class HealthIcon extends TrackingSprite {
                     playIconAnim(LOSING, IDLE);
             
             case TO_WINNING:
-                if (animation.finished)
+                if(animation.finished)
                     playIconAnim(WINNING, IDLE);
             
             case FROM_LOSING, FROM_WINNING:

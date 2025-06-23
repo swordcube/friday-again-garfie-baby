@@ -126,6 +126,14 @@ class CharacterData {
     
                 data = parser.fromJson(FlxG.assets.getText(confPath));
                 data.id = charID;
+                data.healthIcon = {
+                    isPixel: false,
+                    scale: 1,
+                    flipX: false,
+                    flipY: false,
+                    offset: [0, 0],
+                    color: "#FFFFFF"
+                };
             }
             catch(e) {
                 data = getDefaultData();
@@ -168,4 +176,7 @@ class HealthIconData {
 	@:optional
 	@:default("#FFFFFF")
 	public var color:String = "#FFFFFF";
+
+    @:optional
+    public var animations:Map<String, AnimationData>;
 }

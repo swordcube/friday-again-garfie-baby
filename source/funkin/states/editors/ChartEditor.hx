@@ -428,14 +428,14 @@ class ChartEditor extends UIState {
         uiLayer.add(iconP2);
         
         iconP1 = new HealthIcon(currentChart.meta.game.getCharacter("player"), PLAYER);
-        iconP1.flipX = true;
+        iconP1.flipX = !iconP1.flipX;
         uiLayer.add(iconP1);
 
         for(icon in [iconP1, iconP2]) {
+            icon.centered = true;
             icon.size.scale(0.5);
             icon.scale.scale(0.5);
             icon.updateHitbox();
-            icon.centered = true;
             icon.cameras = [uiCam];
             icon.scrollFactor.set();
         }

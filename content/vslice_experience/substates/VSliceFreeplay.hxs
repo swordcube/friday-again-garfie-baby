@@ -1151,11 +1151,11 @@ function onExit() {
     FlxTween.tween(albumTitle, {x: albumTitle.x + dadCover.width}, 0.5, {ease: FlxEase.cubeIn});
     FlxTween.tween(difficultyStars.grp, {x: difficultyStars.grp.x + dadCover.width}, 0.5, {ease: FlxEase.cubeIn});
 
-    FlxTween.tween(highScoreText, {x: FlxG.width}, 0.5, {ease: FlxEase.cubeIn});
-    FlxTween.tween(scoreDisplay.grp, {x: FlxG.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(highScoreText, {x: highScoreText.x + dadCover.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(scoreDisplay.grp, {x: scoreDisplay.grp.x + dadCover.width}, 0.5, {ease: FlxEase.cubeIn});
 
-    FlxTween.tween(clearBox, {x: FlxG.width}, 0.5, {ease: FlxEase.cubeIn});
-    FlxTween.tween(percentDisplay.grp, {x: FlxG.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(clearBox, {x: clearBox.x + dadCover.width}, 0.5, {ease: FlxEase.cubeIn});
+    FlxTween.tween(percentDisplay.grp, {x: percentDisplay.grp.x + dadCover.width}, 0.5, {ease: FlxEase.cubeIn});
 
     // top
     FlxTween.tween(header, {y: -(header.height * 2)}, 0.5, {ease: FlxEase.cubeIn});
