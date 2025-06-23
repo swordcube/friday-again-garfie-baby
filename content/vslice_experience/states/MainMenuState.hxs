@@ -22,7 +22,14 @@ function onInitOptions(options) {
                 FlxFlicker.flicker(item, 1.1, 0.06, false, false, (_) -> {
                     FlxTimer.wait(0.1, () -> {
                         persistentUpdate = false;
-                        openSubState(new ScriptedSubState("VSliceFreeplay", [FlxG.state]));
+
+                        if(FlxG.keys.pressed.CONTROL)
+                            FlxG.switchState(new FreeplayState()); // open new freeplay as a state
+                        else if(FlxG.keys.pressed.SHIFT) {
+                            vsliceExperience_skipNextRedirects.push(FreeplayState);
+                            FlxG.switchState(new FreeplayState()); // open old freeplay
+                        } else
+                            openSubState(new ScriptedSubState("VSliceFreeplay", [FlxG.state])); // open new freeplay as a substate
     
                         FlxTimer.wait(0.5, () -> {
                             transitioning = false;

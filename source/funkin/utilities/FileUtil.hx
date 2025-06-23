@@ -36,10 +36,11 @@ class FileUtil {
     /**
 	 * Creates eventual missing folders to the specified `path`
 	 *
-	 * WARNING: eventual files in `path` will be considered as folders! Just to make possible folders be named as `songs.json` for example
+	 * WARNING: Eventual files in `path` will be considered as folders! Just to make possible
+	 * folders be named as `songs.json` for example.
 	 *
-	 * @param path Path to check.
-	 * @return The initial Path.
+	 * @param  path  Path to check.
+	 * @return The initial file path.
 	 */
 	@:noUsing
     public static function addMissingFolders(path:String):String {
@@ -57,9 +58,11 @@ class FileUtil {
 	}
 
     /**
-	 * Safe saves a file (even adding eventual missing folders) and shows a warning box instead of making the program crash
-	 * @param path Path to save the file at.
-	 * @param content Content of the file to save (as String or Bytes).
+	 * Safe saves a file (even adding eventual missing folders) and shows a warning box instead
+	 * of making the program crash in the case of an error.
+	 * 
+	 * @param  path     Path to save the file at.
+	 * @param  content  Content of the file to save (as String or Bytes).
 	 */
 	@:noUsing
     public static function safeSaveFile(path:String, content:OneOfTwo<String, Bytes>, showErrorBox:Bool = true) {
@@ -76,7 +79,7 @@ class FileUtil {
 			Logs.error(errMsg);
 
 			if(showErrorBox)
-                NativeAPI.showMessageBox("Codename Engine Warning", errMsg, MessageBoxIcon.WARNING);
+                NativeAPI.showMessageBox("Garfie Baby Warning", errMsg, MessageBoxIcon.WARNING); // yes, i did take this from codename. yes, i did forget to remove the codename text. Fuck.
 		}
 		#end
 	}

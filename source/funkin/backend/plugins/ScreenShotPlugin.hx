@@ -5,6 +5,10 @@ import haxe.io.Path;
 import sys.io.File;
 import sys.FileSystem;
 
+import sys.thread.Deque;
+import sys.thread.Thread;
+
+import lime.graphics.Image;
 import openfl.events.MouseEvent;
 
 import openfl.display.Sprite;
@@ -30,15 +34,20 @@ class ScreenShotPlugin extends FlxBasic {
 
         tweenManager = new FlxTweenManager();
         FlxG.signals.preStateSwitch.remove(tweenManager.clear);
+
+        Thread.create(_screenshotWorker_loop);
     }
 
     override function update(elapsed:Float) {
         tweenManager.update(elapsed);
         
-        if(Controls.instance.justPressed.SCREENSHOT) {
-            var bitmap = BitmapData.fromImage(FlxG.stage.window.readPixels());
-            var preview = new ScreenShotPreview(bitmap);
-            Main.instance.addChildAt(preview, Main.instance.getChildIndex(Main.statsDisplay));
+        if(Controls.instance.justPressed.SCREENSHOT)
+            _messageQueue.push(FlxG.stage.window.readPixels());
+
+        final p:ScreenShotPreview = _previewQueue.pop(false);
+        if(p != null) {
+            p.create();
+            Main.instance.addChildAt(p, Main.instance.getChildIndex(Main.statsDisplay));
         }
         if(previews.length == 0 && FlxG.mouse.cursorContainer.visible && !FlxG.mouse.visible) {
             @:privateAccess
@@ -46,9 +55,46 @@ class ScreenShotPlugin extends FlxBasic {
         }
     }
 
+    override function destroy():Void {
+        super.destroy();
+        _messageQueue.push(null);
+    }
+
     //----------- [ Private API ] -----------//
 
     private var _container:Sprite;
+    
+    // some operations are very slow so we're offloading them to a separate thread.
+	// we use this deque to send screenshot pixels to be processed by the thread.
+	private var _messageQueue: Deque<Image> = new Deque();
+	private var _previewQueue: Deque<ScreenShotPreview> = new Deque();
+
+    private function _screenshotWorker_loop(): Void {
+		while(true) {
+			final pixels: Image = _messageQueue.pop(true);
+			if(pixels == null) {
+				// we told the thread to stop, so break the loop.
+				break;
+			}
+            // generate bitmapdata from the pixels
+            final bitmap = BitmapData.fromImage(pixels);
+
+            // setup image path & folder
+            final dateNow:String = Date.now().toString().replace(" ", "_").replace(":", "'");
+            final imagePath:String = './screenshots/screenshot-${dateNow}.png';
+
+            // create the in-game preview
+            var preview = new ScreenShotPreview(bitmap);
+            preview.imagePath = imagePath;
+            _previewQueue.push(preview);
+            
+            // save the file to disk
+            if(!FileSystem.exists("./screenshots"))
+                FileSystem.createDirectory("./screenshots");
+            
+            File.saveBytes(imagePath, bitmap.encode(bitmap.rect, new PNGEncoderOptions()));
+        }
+    }
 }
 
 class ScreenShotPreview extends Sprite {
@@ -57,18 +103,14 @@ class ScreenShotPreview extends Sprite {
 
     public function new(bitmapData:BitmapData) {
         super();
+        this.bitmapData = bitmapData;
         buttonMode = true;
+    }
 
+    public function create():Void {
         bitmap = new Bitmap(bitmapData, null, true);
         bitmap.scaleX = bitmap.scaleY = 0.3;
         addChild(bitmap);
-
-        // setup image path & folder
-        var dateNow:String = Date.now().toString().replace(" ", "_").replace(":", "'");
-        imagePath = './screenshots/screenshot-${dateNow}.png';
-
-        if(!FileSystem.exists("./screenshots"))
-            FileSystem.createDirectory("./screenshots");
 
         // position the shit
         y -= 10;
@@ -83,15 +125,21 @@ class ScreenShotPreview extends Sprite {
         flashBitmap.scaleX = FlxG.stage.stageWidth;
         flashBitmap.scaleY = FlxG.stage.stageHeight;
         Main.instance.addChildAt(flashBitmap, Main.instance.getChildIndex(Main.statsDisplay));
-        ScreenShotPlugin.tweenManager.tween(flashBitmap, {alpha: 0}, 0.15, {ease: FlxEase.quadOut, onComplete: (_) -> Main.instance.removeChild(flashBitmap)});
+        ScreenShotPlugin.tweenManager.tween(flashBitmap, {alpha: 0}, 0.15, {ease: FlxEase.quadOut, onComplete: (_) -> {
+            @:privateAccess {
+                if(flashBitmap.bitmapData.__texture != null)
+                    flashBitmap.bitmapData.__texture.dispose();
+            }
+            flashBitmap.bitmapData.disposeImage();
+            flashBitmap.bitmapData.dispose();
+
+            Main.instance.removeChild(flashBitmap);
+        }});
 
         // mouse events :D
 		addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 		addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
 		addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
-
-        // save the file to disk
-        File.saveBytes(imagePath, bitmapData.encode(bitmapData.rect, new PNGEncoderOptions()));
 
         // play fumny camera sound
         FlxG.sound.play(Paths.sound("ui/sfx/screenshot"));
@@ -124,6 +172,7 @@ class ScreenShotPreview extends Sprite {
     // --------------- //
 
     private var bitmap:Bitmap;
+    private var bitmapData:BitmapData;
 
     override function __enterFrame(deltaTime:Float):Void {
         alpha = FlxMath.lerp(alpha, (hovering) ? 0.6 : 1, FlxMath.getElapsedLerp(0.35, deltaTime / 1000));

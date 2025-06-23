@@ -12,6 +12,7 @@ static var vsliceExperience_tempStorage:Map<String, Dynamic> = ["" => null]; // 
 var stateRedirects = [
     FreeplayState => () -> new ScriptedSubState("VSliceFreeplay"),
 ];
+static var vsliceExperience_skipNextRedirects = [];
 
 function new() {
     vsliceExperience_save = new FlxSave();
@@ -19,8 +20,10 @@ function new() {
 }
 
 function onStateCreate(state) {
-    var redirect = stateRedirects.get(Type.getClass(state));
-    if(redirect != null) {
+    final redirectKey = Type.getClass(state);
+    final redirect = stateRedirects.get(redirectKey);
+
+    if(redirect != null && !vsliceExperience_skipNextRedirects.contains(redirectKey)) {
         var constructor:Function = null;
         if(redirect is String)
             constructor = () -> return new ScriptedState(redirect);
@@ -35,6 +38,7 @@ function onStateCreate(state) {
         FlxG.game._state = newState;
         FlxG.game._nextState = null; // just in case
     }
+    vsliceExperience_skipNextRedirects = [];
 }
 
 function onClose() {
