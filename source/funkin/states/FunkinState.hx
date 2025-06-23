@@ -82,6 +82,13 @@ class FunkinState extends TransitionableState implements IBeatReceiver {
         call("onUpdate", [elapsed]);
     }
 
+    override function draw():Void {
+        call("onDraw", []);
+        call("onDrawPre", []);
+        super.draw();
+        call("onDrawPost", []);
+    }
+
     override function destroy():Void {
         call("onDestroy");
         #if SCRIPTING_ALLOWED

@@ -85,6 +85,17 @@ class StoryCharacter extends FlxSprite implements IBeatReceiver {
         #end
     }
 
+    override function draw():Void {
+        #if SCRIPTING_ALLOWED
+        scripts.call("onDraw", []);
+        scripts.call("onDrawPre", []);
+        #end
+        super.draw();
+        #if SCRIPTING_ALLOWED
+        scripts.call("onDrawPost", []);
+        #end
+    }
+
     public function applyData(data:StoryCharacterData):Void {
         switch(data.atlas.type) {
             case SPARROW:

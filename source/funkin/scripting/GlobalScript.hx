@@ -39,12 +39,17 @@ class GlobalScript {
 		});
 		FlxG.signals.preUpdate.add(() -> {
 			scripts.call("onUpdate", [FlxG.elapsed]);
+			scripts.call("onUpdatePre", [FlxG.elapsed]);
 		});
 		FlxG.signals.postUpdate.add(() -> {
 			scripts.call("onUpdatePost", [FlxG.elapsed]);
         });
         FlxG.signals.preDraw.add(() -> {
 			scripts.call("onDraw");
+			scripts.call("onDrawPre");
+		});
+		FlxG.signals.postDraw.add(() -> {
+			scripts.call("onDrawPost");
 		});
 		FlxG.signals.preGameReset.add(() -> {
 			scripts.call("onGameReset");

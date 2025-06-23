@@ -83,6 +83,13 @@ class ScriptedTransition extends TransitionSubState {
 			finish();
     }
 
+	override function draw():Void {
+        call("onDraw", []);
+        call("onDrawPre", []);
+        super.draw();
+        call("onDrawPost", []);
+    }
+
     public function call(method:String, ?args:Array<Dynamic>):Void {
         subStateScripts.call(method, args);
     }

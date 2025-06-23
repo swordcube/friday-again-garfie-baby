@@ -1,3 +1,6 @@
+// TODO: figure out how to properly optimize capsule updating
+// removing the code brings the up to 700fps, with updating it drops to 200fps
+
 import openfl.geom.Point;
 import openfl.geom.Matrix;
 
@@ -38,6 +41,7 @@ var grpSongNames:FlxTypedGroup<TrackingSprite>;
 var grpSongIcons:FlxTypedGroup<TrackingSprite>;
 var grpCapsuleExtras:FlxTypedGroup<TrackingSprite>;
 
+var capsuleIcons:Array<Array<TrackingSprite>> = [];
 var capsuleBadges:Array<Array<TrackingSprite>> = [];
 
 // groups for category stuff!
@@ -83,7 +87,10 @@ var pinkBG:FlxSprite;
 var dadCover:FlxSprite;
 
 var albumCover:FunkinSprite;
+
 var albumTitle:FunkinSprite;
+var albumTitleShader:ColorGradientShader;
+
 var difficultyStars:DifficultyStars;
 
 var curSelected:Int = 1;
@@ -125,6 +132,8 @@ badgeBlurs[1].setFloat("amount", 1.2);
 
 var loadedSongs:Map<String, BGMData> = ["" => null];
 var currentBGM:String = null;
+
+var optimizeCapsuleUpdating:Bool = false;
 
 function new(_parent:MainMenuState, ?menuSkin:String) {
     parent = _parent;
@@ -224,9 +233,10 @@ function regenCapsules(filter:String) {
             memb.destroy();
         }
     }
-    final blur:BlurFilter = new BlurFilter();
+    capsuleIcons = [];
     capsuleBadges = [];
     
+    final blur:BlurFilter = new BlurFilter();
     for(i in 0...filteredSongs.length) {
         // get song metadata
         final songData:FreeplaySongData = filteredSongs[i];
@@ -312,7 +322,9 @@ function regenCapsules(filter:String) {
             songIcon.setScale(2, FlxAxes.XY);
             Reflect.setProperty(songIcon, "ID", i); // rulescript.
             grpSongIcons.add(songIcon);
-        }
+            capsuleIcons.push(songIcon);
+        } else
+            capsuleIcons.push(null);
 
         // make the rank badge (along with it's sparkle ifit's a golden P rank)
         function initRankBadge(b:TrackingSprite) {
@@ -417,16 +429,20 @@ function updateAlbumDisplay():Void {
         albumTitle.visible = true;
 
         difficultyStars.visible = true;
-
-        new FlxTimer().start((1 / 12) * 1, (_) -> {
-            difficultyStars.stars.y = difficultyStars.grp.y;
-            
-            for(i in 0...difficultyStars.flames.length) {
-                final flame:FlxSprite = difficultyStars.flames.members[i];
-                flame.frameOffset.y = 0;
-            }
-            albumCover.frameOffset.y = 0;
-            albumTitle.frameOffset.y = 0;
+        albumTitleShader.setBlackColor(0xFF4B97F3);
+        
+        FlxTimer.wait(0.001, () -> {
+            FlxTimer.wait((1 / 12) * 1, () -> {
+                albumTitleShader.setBlackColor(0xFF000000);
+                difficultyStars.stars.y = difficultyStars.grp.y;
+                
+                for(i in 0...difficultyStars.flames.length) {
+                    final flame:FlxSprite = difficultyStars.flames.members[i];
+                    flame.frameOffset.y = 0;
+                }
+                albumCover.frameOffset.y = 0;
+                albumTitle.frameOffset.y = 0;
+            });
         });
     } else {
         albumCover.visible = false;
@@ -475,7 +491,9 @@ function updateOtherShit() {
         final curScoreRecord:ScoreRecord = songScoreRecords.get('${curSongData.id}:${currentMix}:${currentDifficulty}:${curSongData.contentPack}');
         if(curScoreRecord != null) {
             scoreDisplay.tweenNumber(curScoreRecord.score, 0.8);
-            percentDisplay.tweenNumber(Math.ceil(curScoreRecord.accuracy * 100), 0.8);
+
+            final ceilAcc:Int = Math.ceil(curScoreRecord.accuracy * 100);
+            percentDisplay.tweenNumber((ceilAcc >= 100) ? ceilAcc : Math.floor(curScoreRecord.accuracy * 100), 0.8);
         } else {
             scoreDisplay.tweenNumber(0, 0.8);
             percentDisplay.tweenNumber(0, 0.8);
@@ -577,29 +595,33 @@ function changeSelection(?by:Int, ?force:Bool) {
         return;
 
     curSelected = FlxMath.wrap(curSelected + by, 0, grpCapsules.length - 1);
-    grpCapsules.forEach((capsule) -> {
-        if(capsule.ID == curSelected)
+    for(i in 0...grpCapsules.length) {
+        final capsule:SongCapsule = grpCapsules.members[i];
+        if(i == curSelected)
             capsule.anim.play('selected');
         else
             capsule.anim.play('idle');
-    });
-    grpSongNames.forEach((text) -> {
-        if(text.ID == curSelected)
-            text.alpha = 1;
+
+        final songName:TrackingSprite = grpSongNames.members[i];
+        if(i == curSelected)
+            songName.alpha = 1;
         else
-            text.alpha = 0.6;
-    });
-    grpCapsuleExtras.forEach((obj) -> {
-        if(obj.ID == curSelected) {
-            obj.alpha = 1;
-            if(obj.extra.exists("blurredBadge"))
-                obj.extra.get("blurredBadge").alpha = 1;
-        } else {
-            obj.alpha = 0.6;
-            if(obj.extra.exists("blurredBadge"))
-                obj.extra.get("blurredBadge").alpha = 0;
+            songName.alpha = 0.6;
+        
+        final badges:Array<TrackingSprite> = capsuleBadges[i];
+        for(j in 0...badges.length) {
+            final badge:TrackingSprite = badges[j];
+            if(i == curSelected) {
+                badge.alpha = 1;
+                if(badge.extra.exists("blurredBadge"))
+                    badge.extra.get("blurredBadge").alpha = 1;
+            } else {
+                badge.alpha = 0.6;
+                if(badge.extra.exists("blurredBadge"))
+                    badge.extra.get("blurredBadge").alpha = 0;
+            }
         }
-    });
+    }
     totalTime = 0;
     changeDifficulty(0, true);
     updateDiscordRPC();
@@ -727,42 +749,6 @@ function changeMix(?by:Int = 0, ?force:Bool = false):Void {
     }
     changeSelection(0, true);
     updateDiscordRPC();
-}
-
-function updateCapsule(capsule:FunkinSprite) {
-    if(!capsule.extra.get("doLerp"))
-        return;
-
-    final index:Int = capsule.ID - curSelected;
-
-    final lerpAmountX:Float = FlxMath.getElapsedLerp(0.3, FlxG.elapsed);
-    final lerpAmountY:Float = FlxMath.getElapsedLerp(0.4, FlxG.elapsed);
-
-    capsule.setPosition(
-        FlxMath.lerp(capsule.x - capsuleData.offsetX, 335 + Math.sin(index + 1) * 60 - (index > 3 ? 50 : 0), lerpAmountX),
-        FlxMath.lerp(capsule.y, 250 + (index * 115) - (index < -1 ? 100 : 0), lerpAmountY)
-    );
-    capsule.x += capsuleData.offsetX;
-}
-
-function updateSongName(songName:TrackingSprite) {
-    var visibleBadges:Int = 0;
-    for(b in capsuleBadges[songName.ID]) {
-        if(b.exists && b.visible)
-            visibleBadges++;
-    }
-    final baseTextWidth:Float = (visibleBadges > 1) ? 300 : 305;
-    final textWidth:Float = (visibleBadges > 0) ? baseTextWidth - (visibleBadges * 40) : baseTextWidth;
-    if(curSelected == songName.ID) {
-        songName.trackingOffset.x = 88 - ((curSelected == songName.ID && songName.width > textWidth) ? (Math.sin(totalTime * 0.9) * (songName.width - textWidth) * 0.5) + ((songName.width - textWidth) * 0.5) : 0);
-        songName.clipRect.set(-(songName.trackingOffset.x - 88), 0, textWidth, songName.frameHeight);
-
-        if(textWidth == baseTextWidth)
-            totalTime = 0;
-    } else {
-        songName.trackingOffset.x = 88;
-        songName.clipRect.set(0, 0, textWidth, songName.frameHeight);
-    }
 }
 
 function switchState(nextState:NextState) {
@@ -1065,6 +1051,26 @@ function makeDigitDisplay(_x:Float, _y:Float, _path:String, _digitCount:Int, ?_s
     return ret;
 }
 
+function makeColorGradientShader(?_blackColor:FlxColor, ?_whiteColor:FlxColor) {
+    _blackColor ??= FlxColor.BLACK;
+    _whiteColor ??= FlxColor.WHITE;
+
+    final ret = {
+        shader: new CustomShader("color_gradient")
+    };
+    ret.setBlackColor = (color:FlxColor) -> {
+        final realColor:FlxColor = new FlxColor(color); // makes a wrapper usable in hscript
+        ret.shader.setFloatArray("blackColor", [realColor.redFloat, realColor.greenFloat, realColor.blueFloat, realColor.alphaFloat]);
+    };
+    ret.setWhiteColor = (color:FlxColor) -> {
+        final realColor:FlxColor = new FlxColor(color); // makes a wrapper usable in hscript
+        ret.shader.setFloatArray("whiteColor", [realColor.redFloat, realColor.greenFloat, realColor.blueFloat, realColor.alphaFloat]);
+    };
+    ret.setBlackColor(_blackColor);
+    ret.setWhiteColor(_whiteColor);
+    return ret;
+}
+
 function onAccept() {
     if(curSelected == 0) {
         // 1st entry is always "Random", so select a random song!
@@ -1112,10 +1118,10 @@ function onAccept() {
                 FlxG.sound.music.fadeOut(0.16, 0);
         });
     });
-    grpSongIcons.forEach((icon) -> {
-        if(icon.ID == curSelected)
-            icon.anim.play("confirm");
-    });
+    final icon:TrackingSprite = capsuleIcons[curSelected];
+    if(icon != null)
+        icon.anim.play("confirm");
+
     FlxG.sound.play(Paths.sound("menus/sfx/select"));
 }
 
@@ -1255,6 +1261,9 @@ function onCreate() {
     albumTitle.loadGraphic(Paths.image("menus/freeplay/album/vol1/title"));
     albumTitle.kill();
     add(albumTitle);
+
+    albumTitleShader = makeColorGradientShader();
+    albumTitle.shader = albumTitleShader.shader;
 
     difficultyStars = makeDifficultyStars(955, 220);
     add(difficultyStars.grp);
@@ -1409,6 +1418,7 @@ function onCreate() {
 
     FlxTimer.wait(0.5, () -> {
         busy = false;
+        optimizeCapsuleUpdating = true; // non-functional, need to make it functional later!
 
         if(parent != null)
             parent.persistentDraw = false;
@@ -1559,13 +1569,44 @@ function onUpdatePre(dt:Float) {
             }});
         }
     }
-    grpCapsules.forEach(updateCapsule);
-    grpSongNames.forEach(updateSongName);
-
+    for(i in 0...grpCapsules.length) {
+        final capsule:SongCapsule = grpCapsules.members[i];
+        final songName:TrackingSprite = grpSongNames.members[i];
+        
+        if(capsule.extra.get("doLerp")) {
+            final index:Int = capsule.ID - curSelected;
+    
+            final lerpAmountX:Float = FlxMath.getElapsedLerp(0.3, FlxG.elapsed);
+            final lerpAmountY:Float = FlxMath.getElapsedLerp(0.4, FlxG.elapsed);
+    
+            capsule.setPosition(
+                FlxMath.lerp(capsule.x - capsuleData.offsetX, 335 + Math.sin(index + 1) * 60 - (index > 3 ? 50 : 0), lerpAmountX),
+                FlxMath.lerp(capsule.y, 250 + (index * 115) - (index < -1 ? 100 : 0), lerpAmountY)
+            );
+            capsule.x += capsuleData.offsetX;
+        }
+        var visibleBadges:Int = 0;
+        for(b in capsuleBadges[songName.ID]) {
+            if(b.exists)
+                visibleBadges++;
+        }
+        final baseTextWidth:Float = (visibleBadges > 1) ? 300 : 305;
+        final textWidth:Float = (visibleBadges > 0) ? baseTextWidth - (visibleBadges * 40) : baseTextWidth;
+        if(curSelected == songName.ID) {
+            songName.trackingOffset.x = 88 - ((curSelected == songName.ID && songName.width > textWidth) ? (Math.sin(totalTime * 0.9) * (songName.width - textWidth) * 0.5) + ((songName.width - textWidth) * 0.5) : 0);
+            songName.clipRect.set(-(songName.trackingOffset.x - 88), 0, textWidth, songName.frameHeight);
+            
+            if(textWidth == baseTextWidth)
+                totalTime = 0;
+        } else {
+            songName.trackingOffset.x = 88;
+            songName.clipRect.set(0, 0, textWidth, songName.frameHeight);
+        }
+    }
     for(arr in capsuleBadges) {
         var x:Int = 0;
         for(badge in arr) {
-            if(!badge.exists || !badge.visible)
+            if(!badge.exists)
                 continue;
 
             badge.trackingOffset.x = 356 - (x++ * 40);
