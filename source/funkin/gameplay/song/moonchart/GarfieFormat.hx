@@ -132,9 +132,6 @@ class GarfieFormat extends BasicFormat<ChartData, SongMetadata> {
         if(timeSig.getDenominator() <= 0)
             timeSig.setDenominator(4);
 
-        var timingPointTime:Float = 0;
-        var timingPointStep:Float = 0;
-
         for(i in 1...basicMeta.bpmChanges.length) {
             final bpmChange = basicMeta.bpmChanges[i];
             final curTimeSig:TimeSignature = [

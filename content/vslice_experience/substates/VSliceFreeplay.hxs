@@ -1598,7 +1598,7 @@ function onUpdatePre(dt:Float) {
             songName.trackingOffset.x = 88 - ((curSelected == songName.ID && songName.width > textWidth) ? (Math.sin(totalTime * 0.9) * (songName.width - textWidth) * 0.5) + ((songName.width - textWidth) * 0.5) : 0);
             songName.clipRect.set(-(songName.trackingOffset.x - 88), 0, textWidth, songName.frameHeight);
             
-            if(textWidth == baseTextWidth)
+            if(songName.width <= textWidth)
                 totalTime = 0;
         } else {
             songName.trackingOffset.x = 88;
