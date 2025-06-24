@@ -44,6 +44,12 @@ haxelib run lime rebuild <platform>
 replace `<platform>` with whatever OS you're running on, such as
 `windows`, `mac`, `linux`, etc
 
+note that you may have to update lime along with the other haxelibs
+installed earlier sometimes, which means you might have to do this step again when you update your haxelibs!
+
+if ***absolutely nothing*** happens when running the command, it's just because
+there's nothing to recompile yet!
+
 ### **step 4:** actually compiling the thing
 if you wanna compile a build WITHOUT the assets in it, instead
 pointing to the source assets folder (for quicker testing):
@@ -51,8 +57,8 @@ pointing to the source assets folder (for quicker testing):
 haxelib run lime test <platform> -DTEST_BUILD
 ```
 
-if you wanna compile a build WITH the assets in it, instead of
-pointing to the source assets folder (for quicker testing):
+if you wanna compile a build WITH the assets in it, instead
+pointing to the export assets folder (meant for release builds of mods and such):
 ```sh
 haxelib run lime test <platform>
 ```
