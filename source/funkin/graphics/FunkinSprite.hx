@@ -101,7 +101,7 @@ class FunkinSprite extends FlxAnimate {
 		if (!useLegacyBounds)
 		{
 			@:privateAccess
-			var bounds = timeline.__bounds;
+			var bounds = timeline._bounds;
 			_point.add(-bounds.x, -bounds.y);
 		}
 
@@ -110,6 +110,7 @@ class FunkinSprite extends FlxAnimate {
 		if (renderStage)
 			drawStage(camera);
 
+		timeline.currentFrame = animation.frameIndex;
 		timeline.draw(camera, _matrix, colorTransform, blend, antialiasing, shader);
 	}
 }
