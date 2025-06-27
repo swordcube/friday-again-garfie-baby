@@ -32,7 +32,6 @@ enum abstract AssetPreloadType(String) from String to String {
 typedef AssetPreload = {
 	var path:String;
 	@:optional var type:AssetPreloadType;
-	@:optional var library:Null<String>; // unused
 }
 
 class Cache {
@@ -117,7 +116,7 @@ class Cache {
                         }
                     
                     case SOUND:
-                        if(FlxG.assets.exists(asset.path))
+                        if(FlxG.assets.exists(asset.path) && !OpenFLAssets.cache.hasSound(asset.path))
                             OpenFLAssets.cache.setSound(asset.path, Sound.fromFile(asset.path));
                 }
             }
@@ -205,7 +204,7 @@ class Cache {
                                 if (result != null) loadedGraphics.set(result.path, result.graphic);
                             
                             case SOUND:
-                                var result = {path: ass.path, sound: Sound.fromFile(ass.path)};
+                                var result = {path: ass.path, sound: (OpenFLAssets.cache.hasSound(ass.path)) ? OpenFLAssets.cache.getSound(ass.path) : Sound.fromFile(ass.path)};
                                 if (result != null) loadedSounds.set(result.path, result.sound);
                         }
                     }

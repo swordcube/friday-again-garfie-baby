@@ -39,7 +39,7 @@ class Highscore {
     }
 
     public static function getRankFromStats(stats:PlayerStats):Rank {
-        final acc:Int = Math.round(stats.accuracy * 100);
+        final acc:Int = Math.floor(stats.accuracy * 100);
         return switch(acc) {
             case (_ >= 100 && stats.misses == 0) => true:
                 GOLD;

@@ -23,6 +23,7 @@ class Options {
     public static var autoPause:Bool = true;
     public static var verboseLogging:Bool = false;
     public static var multicoreLoading:Bool = false;
+    public static var loadingScreen:Bool = true;
     public static var frameRate:Int = 360;
 
     // GAMEPLAY MODIFIERS //

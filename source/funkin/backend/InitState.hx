@@ -86,9 +86,9 @@ class InitState extends FlxState {
         
         FlxG.scaleMode = new RatioScaleModeEx();
         FlxG.signals.preStateCreate.add((newState:FlxState) -> {
-            if(Type.getClass(newState) != _lastState) {
+            if(Type.getClass(newState) != _lastState)
                 Cache.clearAll();
-            }
+            
             _lastState = Type.getClass(newState);
         });
         WindowUtil.init();

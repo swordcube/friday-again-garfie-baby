@@ -500,12 +500,13 @@ class FreeplayState extends FunkinState {
         final songData:FreeplaySongData = songListMap.get(categoryID)[curSelected];
 
         PlayState.deathCounter = 0;
-        FlxG.switchState(PlayState.new.bind({
+        PlayState.lastParams = {
             song: songData.id,
             difficulty: currentDifficulty,
             mix: currentMix,
             mod: categoryID.split(":").first()
-        }));
+        };
+        LoadingState.loadIntoState(PlayState.new.bind(PlayState.lastParams));
     }
 
     override function destroy():Void {

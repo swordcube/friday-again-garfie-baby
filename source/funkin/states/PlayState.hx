@@ -1,6 +1,9 @@
 package funkin.states;
 
 import haxe.io.Path;
+import lime.system.System;
+
+import openfl.utils.AssetCache as OpenFLAssetCache;
 
 import flixel.text.FlxText;
 import flixel.math.FlxPoint;
@@ -284,6 +287,13 @@ class PlayState extends FunkinState {
 		if(hudSkin == "default")
 			currentChart.meta.game.hudSkin = hudSkin = Options.hudType;
 
+		inline function now():Float {
+			return System.getTimerPrecise();
+		}
+		var startTime:Float = now();
+		inline function getElapsedTime():Float {
+			return FlxMath.roundDecimal((now() - startTime) / 1000, 3);
+		}
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
 			scripts = new FunkinScriptGroup();
@@ -344,6 +354,7 @@ class PlayState extends FunkinState {
 				addSingleScript(loader, 'gameplay/uiskins/${uiSkin}/script');
 			}
 		}
+		Logs.verbose('Loading scripts took ${getElapsedTime()}s');
 		#end
 		if(lastParams.startTime != null && lastParams.startTime > 0) {
 			FlxTimer.wait((Conductor.instance.beatLength * 5) / 1000, () -> {
@@ -356,6 +367,7 @@ class PlayState extends FunkinState {
 		songTracksToLoad.push({path: instPath, type: SOUND});
 		scripts.call("onPreloadSong", [songTracksToLoad]);
 		
+		startTime = now();
 		if(currentChart.meta.song.tracks != null) {
 			final trackSet = currentChart.meta.song.tracks;
 			final spectatorTrackPaths:Array<String> = [];
@@ -385,31 +397,45 @@ class PlayState extends FunkinState {
 			});
 			add(vocals);
 		} else {
-			final vocalTrackPaths:Array<String> = [
-                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("spectator")}'),
-                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("opponent")}'),
-                Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals-${currentChart.meta.game.characters.get("player")}')
-            ];
-			final mainVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/vocals');
-			if(FlxG.assets.exists(mainVocals))
-				songTracksToLoad.push({path: mainVocals, type: SOUND});
-			
-			for(path in vocalTrackPaths)
-				songTracksToLoad.push({path: path, type: SOUND});
-	
+			var chosenMainVocals:String = null;
+			final vocalTrackPaths:Array<String> = [null, null, null];
+
+			for(fileName in ['vocals', 'Vocals', 'voices', 'Voices']) {
+				final localVocalTrackPaths:Array<String> = [
+					Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${fileName}-${currentChart.meta.game.characters.get("spectator")}'),
+					Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${fileName}-${currentChart.meta.game.characters.get("opponent")}'),
+					Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${fileName}-${currentChart.meta.game.characters.get("player")}')
+				];
+				for(i => path in localVocalTrackPaths) {
+					if(FlxG.assets.exists(path))
+						vocalTrackPaths[i] = path;
+				}
+				final mainVocals:String = Paths.sound('gameplay/songs/${currentSong}/${currentMix}/music/${fileName}');
+				if(chosenMainVocals == null && FlxG.assets.exists(mainVocals)) {
+					chosenMainVocals = mainVocals;
+					songTracksToLoad.push({path: mainVocals, type: SOUND});
+				}
+			}
+			for(path in vocalTrackPaths) {
+				if(FlxG.assets.exists(path))
+					songTracksToLoad.push({path: path, type: SOUND});
+			}
 			Cache.preloadAssets(songTracksToLoad);
 	
 			vocals = new VocalGroup({
 				spectator: (FlxG.assets.exists(vocalTrackPaths[0])) ? [vocalTrackPaths[0]] : null,
 				opponent: (FlxG.assets.exists(vocalTrackPaths[1])) ? [vocalTrackPaths[1]] : null,
 				player: (FlxG.assets.exists(vocalTrackPaths[2])) ? [vocalTrackPaths[2]] : null,
-				mainVocals: (FlxG.assets.exists(mainVocals)) ? mainVocals : null
+				mainVocals: (FlxG.assets.exists(chosenMainVocals)) ? chosenMainVocals : null
 			});
 			add(vocals);
 		}
-
+		Logs.verbose('Loading vocal tracks took ${getElapsedTime()}s');
+		
+		startTime = now();
 		FlxG.sound.playMusic(instPath, 0, false);
 		inst = FlxG.sound.music;
+		Logs.verbose('Loading inst took ${getElapsedTime()}s');
 
 		Conductor.instance.music = null;
 		Conductor.instance.offset = Options.songOffset + inst.latency;
@@ -486,8 +512,12 @@ class PlayState extends FunkinState {
 					stageAssetsToPreload.push(asset);
 				}
 			}
+			startTime = now();
 			Cache.preloadAssets(charactersToLoad);
+			Logs.verbose('Loading characters took ${getElapsedTime()}s');
+			
 			Cache.preloadAssets(stageAssetsToPreload);
+			Logs.verbose('Loading stage took ${getElapsedTime()}s');
 
 			final rawCharacterIDs:Array<String> = [
 				currentChart.meta.game.getCharacter("spectator"),
@@ -526,8 +556,11 @@ class PlayState extends FunkinState {
 		eventRunner.onExecutePost.add(onEventPost);
 		add(eventRunner);
 
+		startTime = now();
 		Cache.preloadAssets(notesToPreload.concat(uiToPreload));
+		Logs.verbose('Loading notes & UI took ${getElapsedTime()}s');
 
+		startTime = now();
 		final assetsToPreload:Array<AssetPreload> = [];
 		scripts.call("onPreloadAssets", [assetsToPreload]);
 		
@@ -535,6 +568,7 @@ class PlayState extends FunkinState {
 			assetsToPreload.push({path: Paths.sound('gameplay/sfx/missnote${i + 1}'), type: SOUND});
 		
 		Cache.preloadAssets(assetsToPreload);
+		Logs.verbose('Loading misc assets took ${getElapsedTime()}s');
 
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {

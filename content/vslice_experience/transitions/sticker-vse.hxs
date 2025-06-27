@@ -16,8 +16,6 @@ function shuffleArray(array) {
 }
 
 function onStartOut() {
-    trace("out of current state");
-
     final prevForcedPack:String = Paths.forceContentPack;
     Paths.forceContentPack = null;
 
@@ -29,8 +27,6 @@ function onStartOut() {
         if(Paths.isDirectory(path))
             foundSets.push(Paths.withoutDirectory(path));
     });
-    trace('found sticker sets: ' + foundSets);
-
     final chosenSet:String = ArrayUtil.pickRandom(foundSets);
     vsliceExperience_tempStorage.set("stickerTransition", {
         stickers: stickerDataArray,
@@ -44,7 +40,6 @@ function onStartOut() {
         if(Paths.isDirectory(path))
             return;
         
-        trace('preloading sticker: ' + Paths.withoutDirectory(path));
         atlas.addNode(path, 'sticker${stickerCount++}0000');
     });
     final frames:FlxFramesCollection = atlas.getAtlasFrames();
@@ -132,8 +127,6 @@ function onStartOut() {
 }
 
 function onStartIn() {
-    trace("in to new state");
-
     final prevForcedPack:String = Paths.forceContentPack;
     Paths.forceContentPack = null;
 
@@ -151,7 +144,6 @@ function onStartIn() {
         if(Paths.isDirectory(path))
             return;
         
-        trace('preloading sticker: ' + Paths.withoutDirectory(path));
         atlas.addNode(path, 'sticker${stickerCount++}0000');
     });
     final frames:FlxFramesCollection = atlas.getAtlasFrames();

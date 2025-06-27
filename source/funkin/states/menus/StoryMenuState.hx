@@ -470,13 +470,15 @@ class StoryMenuState extends FunkinState {
                 PlayState.storyPlaylist = pendingPlaylist;
                 PlayState.storyLevel = '${Paths.forceContentPack}:${levels[curSelected].id}';
                 
-                FlxG.switchState(PlayState.new.bind({
+                PlayState.lastParams = {
                     song: PlayState.storyPlaylist.shift(),
                     difficulty: currentDifficulty,
                     mix: currentMix,
                     mod: Paths.forceContentPack,
                     isStoryMode: true
-                }));
+                };
+                LoadingState.loadIntoState(PlayState.new.bind(PlayState.lastParams));
+
                 FlxG.sound.music.fadeOut(0.16, 0);
                 grpLevelTitles.members[curSelected].stopFlashing();
             });

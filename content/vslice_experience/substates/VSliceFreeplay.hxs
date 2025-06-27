@@ -7,7 +7,10 @@ import openfl.geom.Point;
 import openfl.geom.Matrix;
 
 import openfl.display.BitmapData;
+import openfl.geom.ColorTransform;
+
 import openfl.filters.BlurFilter;
+import openfl.filters.GlowFilter;
 
 import openfl.media.Sound;
 
@@ -20,6 +23,7 @@ import funkin.scripting.FunkinScript;
 import funkin.states.TransitionableState;
 import funkin.states.editors.ChartEditor;
 import funkin.states.menus.FreeplayState.FreeplaySongData;
+import funkin.substates.ResetScoreSubState;
 
 import funkin.utilities.MemoryUtil;
 
@@ -135,7 +139,10 @@ badgeBlurs[1].setFloat("amount", 1.2);
 var loadedSongs:Map<String, BGMData> = ["" => null];
 var currentBGM:String = null;
 
+var blur:BlurFilter = new BlurFilter();
 var optimizeCapsuleUpdating:Bool = false;
+
+var flickerState:Int = 0;
 
 function new(_parent:MainMenuState, ?menuSkin:String) {
     parent = _parent;
@@ -238,7 +245,6 @@ function regenCapsules(filter:String) {
     capsuleIcons = [];
     capsuleBadges = [];
     
-    final blur:BlurFilter = new BlurFilter();
     for(i in 0...filteredSongs.length) {
         // get song metadata
         final songData:FreeplaySongData = filteredSongs[i];
@@ -276,28 +282,45 @@ function regenCapsules(filter:String) {
         textGraphic.regenGraphic();
         
         // generate the blurred part of the text
-        final textGlowBitmap:BitmapData = new BitmapData(textGraphic.pixels.width + 12, textGraphic.pixels.height + 12, true, FlxColor.RED);
-        final bmd1:BitmapData = new BitmapData(textGlowBitmap.width, textGlowBitmap.height, true, FlxColor.RED);
+        final textGlowBitmap:BitmapData = new BitmapData(textGraphic.pixels.width + 12, textGraphic.pixels.height + 12, true, FlxColor.TRANSPARENT);
+        final bmd1:BitmapData = new BitmapData(textGlowBitmap.width, textGlowBitmap.height, true, FlxColor.TRANSPARENT);
         FilterRenderer.__applyFilter(textGlowBitmap, bmd1, null, textGraphic.pixels, [blur], new Point(6, 6));
         
-        // make the text white and regen graphic
         textGraphic.color = FlxColor.WHITE;
         textGraphic.regenGraphic();
         
+        final textFlashGlowBitmap:BitmapData = new BitmapData(textGraphic.pixels.width + 12, textGraphic.pixels.height + 12, true, FlxColor.TRANSPARENT);
+        final bmd1:BitmapData = new BitmapData(textFlashGlowBitmap.width, textFlashGlowBitmap.height, true, FlxColor.TRANSPARENT);
+        FilterRenderer.__applyFilter(textFlashGlowBitmap, bmd1, null, textGraphic.pixels, [blur], new Point(6, 6));
+        
+        final matrix:Matrix = new Matrix();
+        
+        final ct:ColorTransform = new ColorTransform();
+        ct.alphaMultiplier = 0.45;
+
+        textFlashGlowBitmap.draw(textFlashGlowBitmap, matrix, ct);
+        textFlashGlowBitmap.draw(textFlashGlowBitmap, matrix, ct);
+
+        // make the text white and regen graphic
+        // textGraphic.color = FlxColor.WHITE;
+        // textGraphic.regenGraphic();
+        
         // then draw that on-top of the blurred text
         // basically giving it a glow effect
-        final matrix:Matrix = new Matrix();
         matrix.translate(6, 6);
         textGlowBitmap.draw(textGraphic.pixels, matrix);
+        textFlashGlowBitmap.draw(textGraphic.pixels, matrix);
 
         // then finally, use that bitmap on a sprite
         final text:TrackingSprite = new TrackingSprite();
+        text.loadGraphic(FlxGraphic.fromBitmapData(textFlashGlowBitmap)); // stuff this into flixel cache so it will be auto-destroyed later!
         text.loadGraphic(FlxGraphic.fromBitmapData(textGlowBitmap));
         text.tracked = capsule;
         text.trackingMode = 4; // 4 = DIRECT
         text.trackingOffset.set(88, 26);
         text.copyAlpha = false;
         text.clipRect = new FlxRect();
+        text.extra.set("bitmaps", [textGlowBitmap, textFlashGlowBitmap]);
         Reflect.setProperty(text, "ID", i);
         // text.kill();
         text.update(0);
@@ -487,15 +510,13 @@ function updateDiscordRPC() {
     vsliceFreeplay_lastMix = currentMix;
 }
 
-function updateOtherShit() {
+function updateHighscore() {
     final curSongData:VSliceFreeplaySongData = accessibleSongs[curSelected];
     if(curSongData != null) {
         final curScoreRecord:ScoreRecord = songScoreRecords.get('${curSongData.id}:${currentMix}:${currentDifficulty}:${curSongData.contentPack}');
         if(curScoreRecord != null) {
             scoreDisplay.tweenNumber(curScoreRecord.score, 0.8);
-
-            final ceilAcc:Int = Math.ceil(curScoreRecord.accuracy * 100);
-            percentDisplay.tweenNumber((ceilAcc >= 100) ? ceilAcc : Math.floor(curScoreRecord.accuracy * 100), 0.8);
+            percentDisplay.tweenNumber(Math.floor(curScoreRecord.accuracy * 100), 0.8);
         } else {
             scoreDisplay.tweenNumber(0, 0.8);
             percentDisplay.tweenNumber(0, 0.8);
@@ -504,6 +525,10 @@ function updateOtherShit() {
         scoreDisplay.tweenNumber(0, 0.8);
         percentDisplay.tweenNumber(0, 0.8);
     }
+}
+
+function updateOtherShit() {
+    updateHighscore();
     updateDifficultyDisplay();
     
     if(lastDifficulty != currentDifficulty || lastMix != currentMix) {
@@ -754,6 +779,7 @@ function changeMix(?by:Int = 0, ?force:Bool = false):Void {
 }
 
 function switchState(nextState:NextState) {
+    persistentUpdate = false;
     if(FlxG.state == super) {
         final shit = Type.createInstance(TransitionableState.defaultTransOut, []);
         openSubState(shit);
@@ -762,6 +788,18 @@ function switchState(nextState:NextState) {
         shit.start(1);
     } else
         FlxG.switchState(nextState);
+}
+
+function loadIntoGameplay(nextState:NextState) {
+    persistentUpdate = false;
+    if(FlxG.state == super) {
+        final shit = Type.createInstance(TransitionableState.defaultTransOut, []);
+        openSubState(shit);
+
+        shit.finishCallback = () -> LoadingState.loadIntoGameplay(nextState);
+        shit.start(1);
+    } else
+        LoadingState.loadIntoGameplay(nextState);
 }
 
 function loadIntoCharter():Void {
@@ -777,12 +815,13 @@ function loadIntoCharter():Void {
 function loadIntoSong():Void {
     final songData:FreeplaySongData = accessibleSongs[curSelected];
     PlayState.deathCounter = 0;
-    switchState(() -> new PlayState({
+    PlayState.lastParams = {
         song: songData.id,
         difficulty: currentDifficulty,
         mix: currentMix,
         mod: songData.contentPack
-    }));
+    };
+    loadIntoGameplay(() -> new PlayState(PlayState.lastParams));
 }
 
 function callOntoDJ(method:String, ?args:Array<Dynamic>) {
@@ -1120,6 +1159,13 @@ function onAccept() {
                 FlxG.sound.music.fadeOut(0.16, 0);
         });
     });
+    FlxTimer.loop(1 / 24, () -> {
+        flickerState = (flickerState + 1) % 2;
+
+        final songName:TrackingSprite = grpSongNames.members[curSelected];
+        songName.loadGraphic(songName.extra.get("bitmaps")[flickerState]);
+    }, 32);
+
     final icon:TrackingSprite = capsuleIcons[curSelected];
     if(icon != null)
         icon.anim.play("confirm");
@@ -1129,7 +1175,9 @@ function onAccept() {
 
 function onExit() {
     bgmThreadActive = false;
-    FlxG.state.persistentDraw = true;
+    if(parent != null)
+        parent.persistentDraw = true;
+    
     callOntoDJ("onExit");
     callOntoDJ("onCancel");
 
@@ -1552,6 +1600,26 @@ function onUpdatePre(dt:Float) {
         if(controls.justPressed.check(Control.ACCEPT))
             onAccept();
 
+        if(controls.justPressed.check(Control.RESET)) {
+            final songData:VSliceFreeplaySongData = accessibleSongs[curSelected];
+
+            final meta:SongMetadata = accessibleSongs[curSelected].metadata.get(currentMix);
+            persistentUpdate = false;
+
+            final subState:ResetScoreSubState = new ResetScoreSubState(meta.song.title);
+            subState.onAccept.add(() -> {
+                final recordID:String = Highscore.getScoreRecordID(songData.id, currentDifficulty, currentMix, songData.contentPack);
+                Highscore.resetScoreRecord(recordID);
+
+                final badge:TrackingSprite = capsuleBadges[curSelected][0];
+                for(b in [badge, badge.extra.get("blurredBadge")])
+                    b.exists = false;
+                
+                songScoreRecords.set('${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}', Highscore.getScoreRecord(recordID));
+                updateHighscore();
+            });
+            openSubState(subState);
+        }
         // TODO: custom keybind?
         if(FlxG.keys.justPressed.F) {
             busy = true;
@@ -1594,7 +1662,7 @@ function onUpdatePre(dt:Float) {
         }
         final baseTextWidth:Float = (visibleBadges > 1) ? 300 : 305;
         final textWidth:Float = (visibleBadges > 0) ? baseTextWidth - (visibleBadges * 40) : baseTextWidth;
-        if(curSelected == songName.ID) {
+        if(curSelected == songName.ID && !accepted) {
             songName.trackingOffset.x = 88 - ((curSelected == songName.ID && songName.width > textWidth) ? (Math.sin(totalTime * 0.9) * (songName.width - textWidth) * 0.5) + ((songName.width - textWidth) * 0.5) : 0);
             songName.clipRect.set(-(songName.trackingOffset.x - 88), 0, textWidth, songName.frameHeight);
             

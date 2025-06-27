@@ -153,6 +153,7 @@ class FunkinScript {
 
         setClass(funkin.states.PlayState);
         setClass(funkin.states.FunkinState);
+        setClass(funkin.states.LoadingState);
 
         setClass(funkin.states.ScriptedState);
         setClass(funkin.states.ScriptedUIState);

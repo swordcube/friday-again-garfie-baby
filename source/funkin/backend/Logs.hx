@@ -71,7 +71,8 @@ class Logs {
 	}
 
 	public static function verbose(text:String):Void {
-		traceColored([{text: text}], VERBOSE);
+		if(Options.verboseLogging)
+			traceColored([{text: text}], VERBOSE);
 	}
 
 	public static function traceColored(chunks:Array<LogChunk>, ?level:LogLevel = TRACE):Void {
