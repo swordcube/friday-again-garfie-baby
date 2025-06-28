@@ -1356,7 +1356,7 @@ class PlayState extends FunkinState {
 			for(character in event.characters) {
 				character.playSingAnim(event.direction, event.singAnimSuffix, true);
 				character.holdTimer += event.length;
-				character.holdingPose = isPlayer && !event.note.strumLine.botplay;
+				character.holdingPose = event.note.strumLine == playField.playerStrumLine && !event.note.strumLine.botplay;
 			}
 		}
 	}
@@ -1424,7 +1424,7 @@ class PlayState extends FunkinState {
 		if(event.playMissAnim) {
 			for(character in event.characters) {
 				character.playMissAnim(event.direction, event.missAnimSuffix, true);
-				character.holdingPose = isPlayer && !event.note.strumLine.botplay;
+				character.holdingPose = event.note.strumLine == playField.playerStrumLine && !event.note.strumLine.botplay;
 			}
 		}
 	}

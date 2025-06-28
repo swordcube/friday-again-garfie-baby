@@ -64,6 +64,7 @@ function onStartOut() {
         sticky.frames = frames;
         sticky.animation.addByPrefix('idle', 'sticker${stickyID}', 0, false);
         sticky.animation.play("idle");
+        sticky.updateHitbox();
         sticky.visible = false;
 
         sticky.x = xPos;
@@ -93,37 +94,39 @@ function onStartOut() {
     sticky.visible = false;
     grpStickers.add(sticky);
     
-    for(i in 0...grpStickers.length) {
-        final sticker:FunkinSprite = grpStickers.members[i];
-        final randomScale:Float = FlxG.random.float(0.97, 1.02);
-        stickerDataArray.push({
-            id: sticker.extra.get("id"),
-            x: sticker.x,
-            y: sticker.y,
-            scaleX: randomScale,
-            scaleY: randomScale,
-            angle: sticker.angle
-        });
-        final timing:Float = FlxMath.remapToRange(i, 0, grpStickers.length, 0, 0.9);
-        FlxTimer.wait(timing, () -> {
-            sticker.visible = true;
-
-            final prevForcedPack:String = Paths.forceContentPack;
-            Paths.forceContentPack = null;
-            
-            FlxG.sound.play(Paths.sound('transitions/sticker-vse/sfx/keyClick${FlxG.random.int(1, 8)}'));
-            Paths.forceContentPack = prevForcedPack;
-
-            final frameTimer:Int = FlxG.random.int(0, 2);
-            FlxTimer.wait((1 / 24) * frameTimer, () -> {
-                sticker.scale.x = sticker.scale.y = randomScale; 
-
-                if(i == grpStickers.length - 1)
-                    FlxTimer.wait((1 / 24) * 2, finish);
+    FlxTimer.wait(0.001, () -> {
+        for(i in 0...grpStickers.length) {
+            final sticker:FunkinSprite = grpStickers.members[i];
+            final randomScale:Float = FlxG.random.float(0.97, 1.02);
+            stickerDataArray.push({
+                id: sticker.extra.get("id"),
+                x: sticker.x,
+                y: sticker.y,
+                scaleX: randomScale,
+                scaleY: randomScale,
+                angle: sticker.angle
             });
-        });
-    }
-    Paths.forceContentPack = prevForcedPack;
+            final timing:Float = FlxMath.remapToRange(i, 0, grpStickers.length, 0, 0.9);
+            FlxTimer.wait(timing, () -> {
+                sticker.visible = true;
+    
+                final prevForcedPack:String = Paths.forceContentPack;
+                Paths.forceContentPack = null;
+                
+                FlxG.sound.play(Paths.sound('transitions/sticker-vse/sfx/keyClick${FlxG.random.int(1, 8)}'));
+                Paths.forceContentPack = prevForcedPack;
+    
+                final frameTimer:Int = FlxG.random.int(0, 2);
+                FlxTimer.wait((1 / 24) * frameTimer, () -> {
+                    sticker.scale.x = sticker.scale.y = randomScale; 
+    
+                    if(i == grpStickers.length - 1)
+                        FlxTimer.wait((1 / 24) * 2, finish);
+                });
+            });
+        }
+        Paths.forceContentPack = prevForcedPack;
+    });
 }
 
 function onStartIn() {
@@ -159,6 +162,7 @@ function onStartIn() {
         sticky.frames = frames;
         sticky.animation.addByPrefix('idle', 'sticker${stickerData.id}', 0, false);
         sticky.animation.play("idle");
+        sticky.updateHitbox();
         sticky.angle = stickerData.angle;
         sticky.scale.set(stickerData.scaleX, stickerData.scaleY); 
         grpStickers.add(sticky);
