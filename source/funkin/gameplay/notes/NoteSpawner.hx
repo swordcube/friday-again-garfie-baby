@@ -35,7 +35,7 @@ class NoteSpawner extends FlxBasic {
 
         while(curNoteIndex < pendingNotes.length) {
             final noteData:NoteData = pendingNotes[curNoteIndex];
-            final strumLine:StrumLine = (noteData.direction < Constants.KEY_COUNT) ? playField.opponentStrumLine : playField.playerStrumLine;
+            final strumLine:StrumLine = (noteData.direction < Constants.KEY_COUNT) ? playField.getFirstStrumLine() : playField.getSecondStrumLine();
             
             if(playField.attachedConductor.time < noteData.time - (2500 / (strumLine.scrollSpeed / FlxG.timeScale)))
                 break;

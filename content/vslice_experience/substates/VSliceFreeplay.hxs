@@ -23,7 +23,9 @@ import funkin.scripting.FunkinScript;
 import funkin.states.TransitionableState;
 import funkin.states.editors.ChartEditor;
 import funkin.states.menus.FreeplayState.FreeplaySongData;
+
 import funkin.substates.ResetScoreSubState;
+import funkin.substates.GameplayModifiersMenu;
 
 import funkin.utilities.MemoryUtil;
 
@@ -143,6 +145,7 @@ var blur:BlurFilter = new BlurFilter();
 var optimizeCapsuleUpdating:Bool = false;
 
 var flickerState:Int = 0;
+var cachedOpponentMode:Bool = null;
 
 function new(_parent:MainMenuState, ?menuSkin:String) {
     parent = _parent;
@@ -179,6 +182,12 @@ function addSongsToCategory(categoryID:String, ?songIDs:Array<String>, ?contentP
             for(diff in diffs) {
                 final recordID:String = Highscore.getScoreRecordID(song, diff, mix, contentPack);
                 songScoreRecords.set('${song}:${mix}:${diff}:${contentPack}', Highscore.getScoreRecord(recordID));
+
+                final recordIDOpponentMode:String = Highscore.getScoreRecordID(
+                    song, diff, mix, contentPack,
+                    Options.gameplayModifiers.get("opponentMode") == true && metadataMap.get(mix).game.allowOpponentMode
+                );
+                songScoreRecords.set('${song}:${mix}:${diff}:${contentPack}:opponent', Highscore.getScoreRecord(recordIDOpponentMode));
             }
         }
         final songData:VSliceFreeplaySongData = {
@@ -378,9 +387,12 @@ function regenCapsules(filter:String) {
         rankBadge.extra.set("blurredBadge", rankBadgeBlurred);
         grpCapsuleExtras.add(rankBadge);
         
-        final scoreRecord:ScoreRecord = songScoreRecords.get('${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}');
+        var key:String = '${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}';
+        if(cachedOpponentMode)
+            key += ":opponent";
+
+        final scoreRecord:ScoreRecord = songScoreRecords.get(key);
         rankBadge.exists = rankBadgeBlurred.exists = scoreRecord != null && scoreRecord.rank != "unknown";
-        // rankBadge.exists = false;
 
         if(rankBadge.exists) {
             rankBadgeBlurred.anim.play(scoreRecord.rank);
@@ -513,7 +525,11 @@ function updateDiscordRPC() {
 function updateHighscore() {
     final curSongData:VSliceFreeplaySongData = accessibleSongs[curSelected];
     if(curSongData != null) {
-        final curScoreRecord:ScoreRecord = songScoreRecords.get('${curSongData.id}:${currentMix}:${currentDifficulty}:${curSongData.contentPack}');
+        var key:String = '${curSongData.id}:${currentMix}:${currentDifficulty}:${curSongData.contentPack}';
+        if(cachedOpponentMode)
+            key += ":opponent";
+
+        final curScoreRecord:ScoreRecord = songScoreRecords.get(key);
         if(curScoreRecord != null) {
             scoreDisplay.tweenNumber(curScoreRecord.score, 0.8);
             percentDisplay.tweenNumber(Math.floor(curScoreRecord.accuracy * 100), 0.8);
@@ -545,11 +561,16 @@ function updateOtherShit() {
     updateDifficultyStars();
 
     for(i in 0...capsuleBadges.length) {
+        final songData:FreeplaySongData = accessibleSongs[i];
+
         final rankBadge:FlxSprite = capsuleBadges[i][0];
         final blurredRankBadge:TrackingSprite = rankBadge.extra.get("blurredBadge");
+
+        var key:String = '${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}';
+        if(cachedOpponentMode)
+            key += ":opponent";
         
-        final songData:FreeplaySongData = accessibleSongs[i];
-        final scoreRecord:ScoreRecord = songScoreRecords.get('${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}');
+        final scoreRecord:ScoreRecord = songScoreRecords.get(key);
         rankBadge.exists = blurredRankBadge.exists = scoreRecord != null && scoreRecord.rank != "unknown";        
 
         if(rankBadge.exists) {
@@ -1608,17 +1629,26 @@ function onUpdatePre(dt:Float) {
 
             final subState:ResetScoreSubState = new ResetScoreSubState(meta.song.title);
             subState.onAccept.add(() -> {
-                final recordID:String = Highscore.getScoreRecordID(songData.id, currentDifficulty, currentMix, songData.contentPack);
+                final recordID:String = Highscore.getScoreRecordID(songData.id, currentDifficulty, currentMix, songData.contentPack, cachedOpponentMode);
                 Highscore.resetScoreRecord(recordID);
 
                 final badge:TrackingSprite = capsuleBadges[curSelected][0];
                 for(b in [badge, badge.extra.get("blurredBadge")])
                     b.exists = false;
+
+                var key:String = '${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}';
+                if(cachedOpponentMode)
+                    key += ":opponent";
                 
-                songScoreRecords.set('${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}', Highscore.getScoreRecord(recordID));
+                songScoreRecords.set(key, Highscore.getScoreRecord(recordID));
                 updateHighscore();
             });
             openSubState(subState);
+        }
+        final pressedCtrl:Bool = #if (mac || macos) FlxG.keys.justPressed.WINDOWS #else FlxG.keys.justPressed.CONTROL #end;
+        if(pressedCtrl) {
+            persistentUpdate = false;
+            openSubState(new GameplayModifiersMenu());
         }
         // TODO: custom keybind?
         if(FlxG.keys.justPressed.F) {
@@ -1684,6 +1714,30 @@ function onUpdatePre(dt:Float) {
         }
     }
     totalTime += dt;
+
+    final songData:VSliceFreeplaySongData = accessibleSongs[curSelected];
+    final meta:SongMetadata = (songData?.metadata != null) ? songData.metadata.get(currentMix) : null;
+    
+    final opponentMode:Bool = Options.gameplayModifiers.get("opponentMode") == true && ((meta?.game != null) ? meta.game.allowOpponentMode : true);
+    if(cachedOpponentMode != opponentMode) {
+        cachedOpponentMode = opponentMode;
+        
+        for(i => arr in capsuleBadges) {
+            final badge:TrackingSprite = arr[0];
+            final songData:VSliceFreeplaySongData = accessibleSongs[i];
+            
+            var key:String = '${songData.id}:${currentMix}:${currentDifficulty}:${songData.contentPack}';
+            if(cachedOpponentMode)
+                key += ":opponent";
+
+            final rank:String = songScoreRecords.get(key)?.rank ?? "unknown";
+            for(b in [badge, badge.extra.get("blurredBadge")]) {
+                b.exists = rank != "unknown";
+                b.anim.play(rank);
+            }
+        }
+        updateHighscore();
+    }
     
     // TODO: bring this code back when a solution
     // for multithreading in scripts is found

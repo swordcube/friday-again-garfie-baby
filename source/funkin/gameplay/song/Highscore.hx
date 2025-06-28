@@ -71,11 +71,15 @@ class Highscore {
         return cast record;
     }
 
-    public static function getScoreRecordID(song:String, difficulty:String, ?mix:String, ?contentPack:String):String {
+    public static function getScoreRecordID(song:String, difficulty:String, ?mix:String, ?contentPack:String, ?opponentMode:Bool = false):String {
         if(contentPack == null || contentPack.length == 0)
             contentPack = Paths.forceContentPack;
 
-        return '${song.toLowerCase()}:${difficulty.toLowerCase()}:${mix.getDefaultString("default")}:${contentPack.getDefaultString("default")}';
+        var result:String = '${song.toLowerCase()}:${difficulty.toLowerCase()}:${mix.getDefaultString("default")}:${contentPack.getDefaultString("default")}';
+        if(opponentMode)
+            result += ":opponent";
+        
+        return result;
     }
 
     public static function getLevelRecordID(level:String, difficulty:String, ?contentPack:String):String {

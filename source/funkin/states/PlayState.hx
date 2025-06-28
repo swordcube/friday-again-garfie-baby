@@ -153,6 +153,8 @@ class PlayState extends FunkinState {
 	public var playerStrumLine(get, never):StrumLine;
 	public var playerStrums(get, never):StrumLine;
 
+	public var opponentMode(get, set):Bool;
+
 	public var countdown:Countdown;
 	public var eventRunner:EventRunner;
 
@@ -634,6 +636,7 @@ class PlayState extends FunkinState {
 		camGame.snapToTarget();
 
 		playField = new PlayField(currentChart, currentDifficulty);
+		scripts.call("onGeneratePlayField", [playField]);
 		
 		playField.noteSpawner.onNoteSpawn.add(onNoteSpawn);
 		playField.noteSpawner.onNoteSpawnPost.add(onNoteSpawnPost);
@@ -651,11 +654,23 @@ class PlayState extends FunkinState {
 		playField.onDisplayComboPost.add(onDisplayComboPost);
 
 		playField.onUpdateStats.add(updateDiscordRPC);
-		playField.playerStrumLine.onBotplayToggle.add(onBotplayToggle);
+
+		for(strumLine in playField.strumLines) {
+			strumLine.onBotplayToggle.add((value:Bool) -> {
+				if(strumLine == playField.playerStrumLine)
+					onBotplayToggle(value);
+			});
+		}
+		playField.strumLines.memberAdded.add(strumLineAdded);
 
 		playField.cameras = [camHUD];
 		add(playField);
+
+		if(Options.gameplayModifiers.get("opponentMode") == true && currentChart.meta.game.allowOpponentMode)
+			opponentMode = true;
 		
+		scripts.call("onGeneratePlayFieldPost", [playField]);
+
 		final event:HUDGenerationEvent = cast Events.get(HUD_GENERATION);
 		event.recycle(hudSkin);
 
@@ -1118,7 +1133,10 @@ class PlayState extends FunkinState {
 		playField.hud.call("onSongEnd");
 
 		if(_saveScore) {
-			final recordID:String = Highscore.getScoreRecordID(currentSong, currentDifficulty, currentMix);
+			final recordID:String = Highscore.getScoreRecordID(
+				currentSong, currentDifficulty, currentMix, null,
+				Options.gameplayModifiers.get("opponentMode") == true && currentChart.meta.game.allowOpponentMode
+			);
 			Highscore.saveScoreRecord(recordID, {
 				score: playField.stats.score,
 				misses: playField.stats.misses,
@@ -1279,7 +1297,7 @@ class PlayState extends FunkinState {
 	private function onNoteSpawnPost(event:NoteSpawnEvent):Void {
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
-			final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
+			final isPlayer:Bool = event.note.strumLine == playField.getSecondStrumLine();
 			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
 			scripts.event("onNoteSpawnPost", event, excludedScripts);
 			scripts.event((isPlayer) ? "onPlayerNoteSpawnPost" : "onOpponentNoteSpawnPost", event, excludedScripts);
@@ -1296,7 +1314,7 @@ class PlayState extends FunkinState {
 	}
 
 	private function onNoteHit(event:NoteHitEvent):Void {
-		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
+		final isPlayer:Bool = event.note.strumLine == playField.getSecondStrumLine();
 		if(!minimalMode) {
 			if(isPlayer)
 				event.characters = [player];
@@ -1346,7 +1364,7 @@ class PlayState extends FunkinState {
 	private function onNoteHitPost(event:NoteHitEvent):Void {
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
-			final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
+			final isPlayer:Bool = event.note.strumLine == playField.getSecondStrumLine();
 			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
 			scripts.event("onNoteHitPost", event, excludedScripts);
 			scripts.event((isPlayer) ? "onPlayerNoteHitPost" : "onOpponentNoteHitPost", event, excludedScripts);
@@ -1365,7 +1383,7 @@ class PlayState extends FunkinState {
 	}
 	
 	private function onNoteMiss(event:NoteMissEvent):Void {
-		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
+		final isPlayer:Bool = event.note.strumLine == playField.getSecondStrumLine();
 		if(!minimalMode) {
 			if(isPlayer)
 				event.characters = [player];
@@ -1412,7 +1430,7 @@ class PlayState extends FunkinState {
 	}
 
 	private function onNoteMissPost(event:NoteMissEvent):Void {
-		final isPlayer:Bool = event.note.strumLine == playField.playerStrumLine;
+		final isPlayer:Bool = event.note.strumLine == playField.getSecondStrumLine();
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {
 			final excludedScripts:Array<FunkinScript> = noteTypeScriptsArray;
@@ -1507,11 +1525,20 @@ class PlayState extends FunkinState {
 		#end
 	}
 
+	private function strumLineAdded(strumLine:StrumLine):Void {
+		strumLine.onBotplayToggle.add((value:Bool) -> {
+			if(strumLine == playField.playerStrumLine)
+				onBotplayToggle(value);
+		});
+	}
+
 	private function onBotplayToggle(value:Bool):Void {
 		if(value && _saveScore) {
 			_saveScore = false;
-			scoreWarningText.text = "/!\\ - Player activated botplay, score will not be saved";
-			scoreWarningText.visible = true;
+			if(scoreWarningText != null) {
+				scoreWarningText.text = "/!\\ - Player activated botplay, score will not be saved";
+				scoreWarningText.visible = true;
+			}
 		}
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed)
@@ -1582,6 +1609,22 @@ class PlayState extends FunkinState {
 	@:noCompletion
 	private inline function get_playerStrums():StrumLine {
 		return playField.playerStrumLine;
+	}
+
+	@:noCompletion
+	private inline function get_opponentMode():Bool {
+		return playField.playerStrumLine == playField.getFirstStrumLine();
+	}
+
+	@:noCompletion
+	private inline function set_opponentMode(newValue:Bool):Bool {
+		playField.opponentStrumLine = (newValue) ? playField.getSecondStrumLine() : playField.getFirstStrumLine();
+		playField.playerStrumLine = (newValue) ? playField.getFirstStrumLine() : playField.getSecondStrumLine();
+
+		@:bypassAccessor playField.getFirstStrumLine().botplay = !newValue;
+		@:bypassAccessor playField.getSecondStrumLine().botplay = newValue;
+
+		return newValue;
 	}
 
 	@:noCompletion

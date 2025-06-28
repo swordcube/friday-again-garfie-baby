@@ -63,6 +63,8 @@ class FreeplayState extends FunkinState {
     public var lerpScore:Float = 0;
     public var intendedScore:Int = 0;
     public var curScoreRecord:ScoreRecord;
+
+    public var cachedOpponentMode:Null<Bool> = null;
     
     override function create():Void {
         super.create();
@@ -227,7 +229,10 @@ class FreeplayState extends FunkinState {
 
             final subState:ResetScoreSubState = new ResetScoreSubState(meta.song.title);
             subState.onAccept.add(() -> {
-                final recordID:String = Highscore.getScoreRecordID(song.id, currentDifficulty, currentMix);
+                final recordID:String = Highscore.getScoreRecordID(
+                    song.id, currentDifficulty, currentMix, null,
+                    Options.gameplayModifiers.get("opponentMode") == true && meta.game.allowOpponentMode
+                );
                 Highscore.resetScoreRecord(recordID);
                 updateHighscore();
             });
@@ -237,10 +242,23 @@ class FreeplayState extends FunkinState {
         if(pressedCtrl)
             openSubState(new GameplayModifiersMenu());
 
+        final curSongData:FreeplaySongData = songListMap.get(categories[curCategory].id)[curSelected];
+
+        var curSongMeta:SongMetadata = curSongData.metadata.get(currentMix);
+        if(curSongMeta == null)
+            curSongMeta = curSongData.metadata.get("default");
+
+        final opponentMode:Bool = Options.gameplayModifiers.get("opponentMode") == true && curSongMeta.game.allowOpponentMode;
+        if(cachedOpponentMode != opponentMode) {
+            cachedOpponentMode = opponentMode;
+            updateHighscore();
+        }
         #if TEST_BUILD
         if(FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.G) {
-            final song:FreeplaySongData = songListMap.get(categories[curCategory].id)[curSelected];
-            final recordID:String = Highscore.getScoreRecordID(song.id, currentDifficulty, currentMix);
+            final recordID:String = Highscore.getScoreRecordID(
+                curSongData.id, currentDifficulty, currentMix, null,
+                opponentMode
+            );
             Highscore.forceSaveScoreRecord(recordID, {
                 score: FlxG.random.int(0, 999999),
                 misses: 0,
@@ -258,12 +276,7 @@ class FreeplayState extends FunkinState {
                 version: Highscore.RECORD_VERSION
             });
             updateHighscore();
-
-            var meta:SongMetadata = song.metadata.get(currentMix);
-            if(meta == null)
-                meta = song.metadata.get("default");
-
-            Logs.success('Congrats! You cheated on ${meta.song.title} [${currentDifficulty.toUpperCase()} - ${currentMix.toUpperCase()}]! Fuck you');
+            Logs.success('Congrats! You cheated on ${curSongMeta.song.title} [${currentDifficulty.toUpperCase()} - ${currentMix.toUpperCase()}]! Fuck you');
         }
         #end
         if(tryingToListen)
@@ -425,8 +438,15 @@ class FreeplayState extends FunkinState {
     public function updateHighscore():Void {
         // update the score display
         final song:FreeplaySongData = songListMap.get(categories[curCategory].id)[curSelected];
-        final recordID:String = Highscore.getScoreRecordID(song.id, currentDifficulty, currentMix);
 
+        var meta:SongMetadata = song.metadata.get(currentMix);
+        if(meta == null)
+            meta = song.metadata.get("default");
+
+        final recordID:String = Highscore.getScoreRecordID(
+            song.id, currentDifficulty, currentMix, null,
+            Options.gameplayModifiers.get("opponentMode") == true && meta.game.allowOpponentMode
+        );
         curScoreRecord = Highscore.getScoreRecord(recordID);
         intendedScore = curScoreRecord.score;
 
@@ -434,9 +454,8 @@ class FreeplayState extends FunkinState {
         if(curScoreRecord.rank != UNKNOWN) {
             rankBadge.animation.play(curScoreRecord.rank, !rankBadge.visible);
             rankBadge.visible = true;
-
-            final ceilAcc:Int = Math.ceil(curScoreRecord.accuracy * 100);
-            accuracyText.text = '• ${(ceilAcc >= 100) ? ceilAcc : FlxMath.roundDecimal(curScoreRecord.accuracy * 100, 2)}%';
+            
+            accuracyText.text = '• ${FlxMath.roundDecimal(curScoreRecord.accuracy * 100, 2)}%';
             accuracyText.visible = true;
         } else {
             rankBadge.visible = false;

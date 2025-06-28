@@ -28,6 +28,8 @@ import modchart.engine.PlayField as PlayFieldRenderer;
 #end
 
 class PlayField extends FlxContainer {
+    public var strumLines:FlxTypedGroup<StrumLine>;
+
     public var opponentStrumLine:StrumLine;
     public var playerStrumLine:StrumLine;
     
@@ -68,18 +70,6 @@ class PlayField extends FlxContainer {
         currentChart = chart;
         currentDifficulty = difficulty;
 
-        memberAdded.add((m) -> {
-            if(m is StrumLine) {
-                final strumLine:StrumLine = cast m;
-                strumLine.playField = this;
-            }
-        });
-        memberRemoved.add((m) -> {
-            if(m is StrumLine) {
-                final strumLine:StrumLine = cast m;
-                strumLine.playField = null;
-            }
-        });
         var scrollSpeed:Float = currentChart.meta.game.scrollSpeed.get(currentDifficulty) ?? currentChart.meta.game.scrollSpeed.get("default");
         switch(Std.string(Options.gameplayModifiers.get("scrollType")).toLowerCase()) {
             case "multiplicative", "mult":
@@ -96,13 +86,23 @@ class PlayField extends FlxContainer {
         }
         final noteSkinData:NoteSkinData = NoteSkin.get(noteSkin ?? currentChart.meta.game.noteSkin);
 
+        strumLines = new FlxTypedGroup<StrumLine>();
+        strumLines.memberAdded.add((m) -> {
+            m.playField = this;
+        });
+        strumLines.memberRemoved.add((m) -> {
+            m.playField = null;
+        });
+        add(strumLines);
+
         opponentStrumLine = new StrumLine(FlxG.width * 0.25, noteSkinData.baseStrumY, Options.downscroll, true, noteSkin ?? currentChart.meta.game.noteSkin);
         opponentStrumLine.scrollSpeed = scrollSpeed;
-        add(opponentStrumLine);
+        strumLines.add(opponentStrumLine);
 
         playerStrumLine = new StrumLine(FlxG.width * 0.75, noteSkinData.baseStrumY, Options.downscroll, false, noteSkin ?? currentChart.meta.game.noteSkin);
         playerStrumLine.scrollSpeed = scrollSpeed;
-        add(playerStrumLine);
+        playerStrumLine.isPlayer = true;
+        strumLines.add(playerStrumLine);
         
         if(Options.centeredNotes) {
             opponentStrumLine.visible = false;
@@ -127,6 +127,15 @@ class PlayField extends FlxContainer {
         add(noteSpawner);
 
         stats = new PlayerStats();
+        stats.playField = this;
+    }
+
+    public inline function getFirstStrumLine():StrumLine {
+        return strumLines.members[0];
+    }
+
+    public inline function getSecondStrumLine():StrumLine {
+        return (strumLines.length > 1) ? strumLines.members[1] : strumLines.members[0];
     }
 
     public function hitNote(note:Note):Void {
@@ -293,17 +302,19 @@ class PlayField extends FlxContainer {
     }
 
     override function update(elapsed:Float) {
-        if(!playerStrumLine.botplay) {
-            final controls:Controls = Controls.instance;
-            for(i in 0...this.controls.length) {
-                final control:Control = this.controls[i];
-                if(controls.justPressed.check(control))
-                    onNotePress(i);
-                
-                if(controls.justReleased.check(control))
-                    onNoteRelease(i);
-
-                strumsPressed[i] = controls.pressed.check(control);
+        for(strumLine in strumLines) {
+            if(!strumLine.botplay) {
+                final controls:Controls = Controls.instance;
+                for(i in 0...this.controls.length) {
+                    final control:Control = this.controls[i];
+                    if(controls.justPressed.check(control))
+                        onNotePress(strumLine, i);
+                    
+                    if(controls.justReleased.check(control))
+                        onNoteRelease(strumLine, i);
+    
+                    strumsPressed[i] = controls.pressed.check(control);
+                }
             }
         }
         super.update(elapsed);
@@ -346,11 +357,11 @@ class PlayField extends FlxContainer {
 
     //----------- [ Private API ] -----------//
 
-    private function onNotePress(direction:Int):Void {
-        final strum:Strum = playerStrumLine.strums.members[direction];
+    private function onNotePress(strumLine:StrumLine, direction:Int):Void {
+        final strum:Strum = strumLine.strums.members[direction];
         strum.animation.play('${Constants.NOTE_DIRECTIONS[direction]} press');
 
-        final validNotes:Array<Note> = playerStrumLine.notes.members.filter((note:Note) -> {
+        final validNotes:Array<Note> = strumLine.notes.members.filter((note:Note) -> {
             return note.exists && note.alive && !note.wasHit && !note.wasMissed && note.direction == direction && note.isInRange();
         });
         if(validNotes.length == 0)
@@ -360,11 +371,11 @@ class PlayField extends FlxContainer {
         hitNote(validNotes[0]);
     }
     
-    private function onNoteRelease(direction:Int):Void {
-        final strum:Strum = playerStrumLine.strums.members[direction];
+    private function onNoteRelease(strumLine:StrumLine, direction:Int):Void {
+        final strum:Strum = strumLine.strums.members[direction];
         strum.animation.play('${Constants.NOTE_DIRECTIONS[direction]} static');
 
-        final validNotes:Array<Note> = playerStrumLine.notes.members.filter((note:Note) -> {
+        final validNotes:Array<Note> = strumLine.notes.members.filter((note:Note) -> {
             return note.exists && note.alive && note.wasHit && !note.wasMissed && note.direction == direction && note.time > attachedConductor.time - (note.length - 200);
         });
         if(validNotes.length == 0)

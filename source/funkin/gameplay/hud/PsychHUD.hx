@@ -57,7 +57,7 @@ class PsychHUD extends BaseHUD {
             (game.opponent?.healthColor != null) ? game.opponent.healthColor : 0xFFFF0000,
             (game.player?.healthColor != null) ? game.player.healthColor : 0xFF66FF33
         );
-        healthBar.value = playField.stats.health;
+        healthBar.value = playField.stats.displayedHealth;
         healthBar.numDivisions = 0;
         add(healthBar);
 
@@ -199,7 +199,7 @@ class PsychHUD extends BaseHUD {
             botplayText.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
         }
         healthBar.setRange(playField.stats.minHealth, playField.stats.maxHealth);
-        healthBar.value = playField.stats.health;
+        healthBar.value = playField.stats.displayedHealth;
 
         final iconSpeed:Float = Math.exp(-elapsed * 9);
         iconP2.scale.set(

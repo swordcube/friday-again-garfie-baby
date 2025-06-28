@@ -108,8 +108,6 @@ class LoadingState extends FunkinState {
         // prepare gameplay assets to load
         // this assumes goingToGameplay was set, along with PlayState.lastParams!
         if(params.goingToGameplay) {
-            trace("we goin to gameplay");
-
             // cache some vars up here for convenience
             final songName:String = PlayState.lastParams.song;
             final songMix:String = PlayState.lastParams.mix ?? "default";

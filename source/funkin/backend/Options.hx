@@ -39,6 +39,7 @@ class Options {
         // GENERAL MODIFIERS //
         "practiceMode" => false,
         "botplay" => false,
+        "opponentMode" => false,
         "playbackRate" => 1
     ];
 

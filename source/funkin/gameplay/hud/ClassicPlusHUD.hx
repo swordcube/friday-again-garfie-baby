@@ -44,7 +44,7 @@ class ClassicPlusHUD extends BaseHUD {
             null, null, playField.stats.minHealth, playField.stats.maxHealth
         );
         healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33); // using direct 0xFF codes doesn't work in lua, must use FlxColor.fromString there instead
-        healthBar.value = playField.stats.health;
+        healthBar.value = playField.stats.displayedHealth;
         healthBar.numDivisions = 0;
         add(healthBar);
 
@@ -108,7 +108,7 @@ class ClassicPlusHUD extends BaseHUD {
     
     override function update(elapsed:Float):Void {
         healthBar.setRange(playField.stats.minHealth, playField.stats.maxHealth);
-        healthBar.value = FlxMath.lerp(healthBar.value, playField.stats.health, FlxMath.getElapsedLerp(0.25, elapsed));
+        healthBar.value = FlxMath.lerp(healthBar.value, playField.stats.displayedHealth, FlxMath.getElapsedLerp(0.25, elapsed));
 
         positionIcons();
         super.update(elapsed);

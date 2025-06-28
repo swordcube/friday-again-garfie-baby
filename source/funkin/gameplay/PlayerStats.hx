@@ -92,6 +92,20 @@ class PlayerStats {
     public var health(default, set):Float = 0.5;
 
     /**
+     * The current displayed health value for the player.
+     * 
+     * Use this if you want to account for opponent mode scripts!
+     */
+    @:ignoreReset
+    public var displayedHealth(get, never):Float;
+
+    /**
+     * The playfield that these stats belong to.
+     */
+    @:ignoreReset
+    public var playField:PlayField;
+
+    /**
      * Constructs a new `PlayerStats`.
      */
     public function new() {}
@@ -113,6 +127,14 @@ class PlayerStats {
             return 0;
 
         return accuracyScore / (totalNotesHit + misses);
+    }
+
+    @:noCompletion
+    private function get_displayedHealth():Float {
+        if(playField == null || playField.playerStrumLine == playField.getSecondStrumLine())
+            return health;
+
+        return maxHealth - health;
     }
 
     @:noCompletion

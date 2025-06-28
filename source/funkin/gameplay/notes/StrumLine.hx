@@ -18,6 +18,8 @@ class StrumLine extends FlxSpriteGroup {
 
     public var downscroll:Bool = false;
     public var botplay(default, set):Bool = false;
+
+    public var isPlayer:Bool = false;
     
     public var scrollSpeed:Float = 1;
     public var playField:PlayField;

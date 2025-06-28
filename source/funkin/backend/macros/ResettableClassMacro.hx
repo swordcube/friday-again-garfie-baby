@@ -41,14 +41,14 @@ class ResettableClassMacro {
             var canContinue:Bool = true;
             for (meta in field.meta) {
                 switch (meta.name) {
-                    case ":ignoreReset":
+                    case "ignoreReset", ":ignoreReset":
                         canContinue = false;
                 }
             }
             if(canContinue) {
                 switch(field.kind) {
                     case FVar(t, e):
-                        var cValue:Dynamic = ExprTools.getValue(e);
+                        var cValue:Dynamic = (e == null) ? null : ExprTools.getValue(e);
                         switch(func.expr.expr) {
                             case EBlock(exprs):
                                 exprs.push(macro {
@@ -60,7 +60,7 @@ class ResettableClassMacro {
                         }
                         
                     case FProp(getter, setter, t, e):
-                        var cValue:Dynamic = ExprTools.getValue(e);
+                        var cValue:Dynamic = (e == null) ? null : ExprTools.getValue(e);
                         switch(func.expr.expr) {
                             case EBlock(exprs):
                                 exprs.push(macro {

@@ -121,7 +121,7 @@ class Note extends SkinnableSprite {
     }
 
     public function isInRange():Bool {
-        return Math.abs(time - (strumLine?.playField.attachedConductor.time ?? Conductor.instance.time)) <= (Options.hitWindow * FlxG.timeScale);
+        return Math.abs(time - (strumLine?.playField.attachedConductor?.time ?? Conductor.instance.time)) <= (Options.hitWindow * FlxG.timeScale);
     }
 
     override function loadSkin(newSkin:String) {

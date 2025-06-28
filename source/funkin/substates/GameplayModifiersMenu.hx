@@ -53,6 +53,13 @@ class GameplayModifiersPage extends OptionPage {
             type: TCheckbox
         });
         addGameplayModifier({
+            name: "Opponent Mode",
+            description: "Swaps your inputs to hit opponent notes instead of the player notes.\nYour scores will save separately while this is enabled!\n\nThis may be disabled for some songs, be warned!",
+
+            id: "opponentMode",
+            type: TCheckbox
+        });
+        addGameplayModifier({
             name: "Scroll Type",
             description: "Changes how scroll speed is applied to the notes.\n\nMultiplicative multiplies the chart's scroll speed with your multiplier.\nConstant sets the scroll speed directly.\nXMod sets the scroll speed based on song BPM.",
 

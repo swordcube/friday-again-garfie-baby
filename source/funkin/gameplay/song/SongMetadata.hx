@@ -41,6 +41,10 @@ class GameplayData {
 	public var scrollSpeed:Map<String, Float>;//DynamicAccess<Float>;
 
 	@:optional
+	@:default(true)
+	public var allowOpponentMode:Bool;
+
+	@:optional
 	@:default("stage")
 	public var stage:String;
 
