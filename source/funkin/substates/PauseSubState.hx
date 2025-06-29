@@ -1,6 +1,5 @@
 package funkin.substates;
 
-import funkin.backend.events.ActionEvent;
 import lime.app.Future;
 import lime.system.System;
 
@@ -14,7 +13,9 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxTimer;
 import flixel.util.FlxDestroyUtil;
 
+import funkin.backend.InitState;
 import funkin.backend.events.Events;
+import funkin.backend.events.ActionEvent;
 import funkin.backend.events.MenuEvents;
 
 import funkin.states.PlayState;
@@ -318,8 +319,14 @@ class PauseSubState extends FunkinSubState {
             final wasMusicPlaying:Bool = FlxG.sound.music.playing;
             FlxG.sound.music.onComplete = null;
 
+            // trick the game into not clearing assets
+            // on switch back to gameplay
+            @:privateAccess
+            InitState._lastState = OptionsState;
+            
             FlxG.switchState(OptionsState.new.bind({
-                exitState: PlayState.new.bind(PlayState.lastParams)
+                exitState: PlayState.new.bind(PlayState.lastParams),
+                fromGameplay: true
             }));
             FlxTimer.wait(0.001, () -> {
                 if(wasMusicPlaying)
