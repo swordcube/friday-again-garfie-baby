@@ -309,7 +309,8 @@ class PlayField extends FlxContainer {
             if(sound != null) {
                 sound.volume = event.missVolume;
                 sound.play();
-            }
+            } else
+                FlxG.sound.play(Paths.sound(event.missSound), event.missVolume);
         }
         // the note is now cum colored
         event.note.colorTransform.redOffset = event.note.colorTransform.greenOffset = event.note.colorTransform.blueOffset = 200;
