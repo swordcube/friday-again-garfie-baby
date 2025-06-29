@@ -147,6 +147,8 @@ var optimizeCapsuleUpdating:Bool = false;
 var flickerState:Int = 0;
 var cachedOpponentMode:Bool = null;
 
+var instPreviewTimer:FlxTimer = null;
+
 function new(_parent:MainMenuState, ?menuSkin:String) {
     parent = _parent;
     curCharacter = menuSkin ?? "bf";
@@ -581,21 +583,29 @@ function updateOtherShit() {
             blurredRankBadge.anim.finish();
         }
     }
-    // TODO: figure out functional multithreading for this
-    // i cannot for the life of me get multithreading to work
-    // correctly at all within the context of a script
+    if(instPreviewTimer != null)
+        instPreviewTimer.cancel();
     
-    // TODO: bring this code back when multithreading is fixed
-    
-    // final songData:FreeplaySongData = accessibleSongs[curSelected];
-    // final bgmID:String = '${songData.id}:${currentMix}:${songData.contentPack}';
-    // if(loadedSongs.get(bgmID) == null) {
-    //     loadedSongs.set(bgmID, {
-    //         id: bgmID,
-    //         sound: FlxG.assets.getSound(Paths.sound((curSelected == 0) ? "menus/music/freeplayRandom/music" : 'gameplay/songs/${songData.id}/${currentMix}/music/inst'), false),
-    //         path: (curSelected == 0) ? "menus/music/freeplayRandom" : null
-    //     });
-    // }
+    instPreviewTimer = FlxTimer.wait(0.5, () -> {
+        final songData:FreeplaySongData = accessibleSongs[curSelected];
+        final bgmID:String = '${songData.id}:${currentMix}:${songData.contentPack}';
+        if(loadedSongs.get(bgmID) == null) {
+            loadedSongs.set(bgmID, {
+                id: bgmID,
+                sound: null,
+                path: null
+            });
+            final sndPath:String = Paths.sound((curSelected == 0) ? "menus/music/freeplayRandom/music" : 'gameplay/songs/${songData.id}/${currentMix}/music/inst');
+            final result:ScriptedThreadResult = CoolUtil.loadSoundASync(sndPath, [bgmID]);
+            result.onComplete.add((snd:Sound, args:Array<Dynamic>) -> {
+                loadedSongs.set(args[0], {
+                    id: bgmID,
+                    sound: snd,
+                    path: (curSelected == 0) ? "menus/music/freeplayRandom" : null
+                });
+            });
+        }
+    });
 }
 
 function isSongFavorited(songID:String, contentPack:String) {
@@ -671,6 +681,11 @@ function changeSelection(?by:Int, ?force:Bool) {
         }
     }
     totalTime = 0;
+
+    if(instPreviewTimer != null) {
+        instPreviewTimer.cancel();
+        instPreviewTimer = null;
+    }
     changeDifficulty(0, true);
     updateDiscordRPC();
 
@@ -1548,12 +1563,6 @@ function onCreate() {
         FlxTween.tween(dadCover.colorTransform, {redMultiplier: 1, greenMultiplier: 1, blueMultiplier: 1}, 0.25, {ease: FlxEase.cubeOut});
         callOntoDJ("showBackingCard");
     });
-    // TODO: remove this when i can get
-    // the actual bgm of each song to play
-    // with threading and shit properly
-    
-    CoolUtil.playMusic("menus/music/freeplayRandom", 0, true);
-    FlxG.sound.music.fadeIn(2, 0.0, 1.0);
 }
 
 function onCreatePost() {
@@ -1738,33 +1747,29 @@ function onUpdatePre(dt:Float) {
         }
         updateHighscore();
     }
+    final songData:FreeplaySongData = accessibleSongs[curSelected];
+    final bgmID:String = '${songData.id}:${currentMix}:${songData.contentPack}';
     
-    // TODO: bring this code back when a solution
-    // for multithreading in scripts is found
-    
-    // final songData:FreeplaySongData = accessibleSongs[curSelected];
-    // final bgmID:String = '${songData.id}:${currentMix}:${songData.contentPack}';
-    // 
-    // final bgmData:BGMData = loadedSongs.get(bgmID);
-    // if(currentBGM != bgmID && bgmData != null && bgmData.id != null && bgmData.sound != null) {
-    //     currentBGM = bgmID;
+    final bgmData:BGMData = loadedSongs.get(bgmID);
+    if(currentBGM != bgmID && bgmData != null && bgmData.id != null && bgmData.sound != null) {
+        currentBGM = bgmID;
 
-    //     if(bgmData.path != null)
-    //         CoolUtil.playMusic(bgmData.path, 0, true, bgmData.sound); // random button
-    //     else {
-    //         // song capsule
-    //         final songData:FreeplaySongData = accessibleSongs[curSelected];
-    //         FlxG.sound.playMusic(bgmData.sound, 0, true);
+        if(bgmData.path != null)
+            CoolUtil.playMusic(bgmData.path, 0, true, bgmData.sound); // random button
+        else {
+            // song capsule
+            final songData:FreeplaySongData = accessibleSongs[curSelected];
+            FlxG.sound.playMusic(bgmData.sound, 0, true);
             
-    //         final songMeta:ChartMetadata = (songData?.metadata != null) ? songData.metadata.get(currentMix) : null;
-    //         Conductor.instance.music = FlxG.sound.music;
-    //         Conductor.instance.reset((songMeta?.song?.timingPoints != null) ? songMeta.song.timingPoints[0].bpm : 100);
+            final songMeta:ChartMetadata = (songData?.metadata != null) ? songData.metadata.get(currentMix) : null;
+            Conductor.instance.music = FlxG.sound.music;
+            Conductor.instance.reset((songMeta?.song?.timingPoints != null) ? songMeta.song.timingPoints[0].bpm : 100);
 
-    //         if((songMeta?.song?.timingPoints != null))
-    //             Conductor.instance.setupTimingPoints(songMeta.song.timingPoints);
-    //     }
-    //     FlxG.sound.music.fadeIn(2, 0.0, 1.0);
-    // }
+            if((songMeta?.song?.timingPoints != null))
+                Conductor.instance.setupTimingPoints(songMeta.song.timingPoints);
+        }
+        FlxG.sound.music.fadeIn(2, 0.0, 1.0);
+    }
 }
 
 function onUpdatePost(dt:Float) {
@@ -1781,14 +1786,11 @@ function onUpdatePost(dt:Float) {
 }
 
 function onDestroy() {
-    // TODO: bring this code back when a solution
-    // for multithreading in scripts is found
-
-    // for(bgmData in loadedSongs) {
-    //     if(bgmData?.sound != null)
-    //         bgmData.sound.close();
-    // }
-    // loadedSongs.clear();
+    for(bgmData in loadedSongs) {
+        if(bgmData?.sound != null)
+            bgmData.sound.close();
+    }
+    loadedSongs.clear();
 
     MemoryUtil.clearAll();
     FlxG.cameras.remove(camera);

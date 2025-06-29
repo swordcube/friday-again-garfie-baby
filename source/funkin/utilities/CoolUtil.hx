@@ -1,7 +1,13 @@
 package funkin.utilities;
 
+import haxe.Timer;
+import sys.thread.Thread;
+
 import lime.app.Future;
 import openfl.media.Sound;
+
+import flixel.util.FlxTimer;
+import flixel.util.FlxSignal.FlxTypedSignal;
 
 class CoolUtil {
     /**
@@ -81,6 +87,18 @@ class CoolUtil {
             return {data: job()};
         }, true);
     }
+
+    public static function loadBitmapDataASync(path:String, ?args:Array<Dynamic>):ScriptedThreadResult {
+        final result:ScriptedThreadResult = new ScriptedThreadResult();
+        result.run(() -> FlxG.assets.getBitmapData(path, false), args);
+        return result;
+    }
+
+    public static function loadSoundASync(path:String, ?args:Array<Dynamic>):ScriptedThreadResult {
+        final result:ScriptedThreadResult = new ScriptedThreadResult();
+        result.run(() -> FlxG.assets.getSound(path, false), args);
+        return result;
+    }
 }
 
 @:structInit
@@ -91,4 +109,33 @@ class MusicConfig {
 @:structInit
 class ScriptedFutureResult {
     public var data:Dynamic;
+}
+
+class ScriptedThreadResult {
+    public var onComplete:FlxTypedSignal<(data:Dynamic, args:Array<Dynamic>)->Void>;
+    public var onError:FlxTypedSignal<(data:Dynamic, args:Array<Dynamic>)->Void>;
+
+    public function new() {
+        this.onComplete = new FlxTypedSignal<(data:Dynamic, args:Array<Dynamic>)->Void>();
+        this.onError = new FlxTypedSignal<(data:Dynamic, args:Array<Dynamic>)->Void>();
+    }
+
+    public function run(job:Void->Dynamic, ?args:Array<Dynamic>):Void {
+        if(args == null)
+            args = [];
+
+        // wait until approx next frame to allow the user
+        // to setup the signals first
+        FlxTimer.wait(0.001, () -> {
+            Thread.create(() -> {
+                try {
+                    final result:Dynamic = job();
+                    Timer.delay(() -> this.onComplete.dispatch(result, args), 0); // relay result to main thread
+                } catch(e) {
+                    // relay error to main thread
+                    Timer.delay(() -> this.onError.dispatch(e, args), 0);
+                }
+            });
+        });
+    }
 }
