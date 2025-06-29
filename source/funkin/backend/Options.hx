@@ -11,6 +11,9 @@ class Options {
     public static var missSounds:Bool = true;
     public static var songOffset:Float = 0;
     public static var hitWindow:Float = 180;
+
+    public static var hitsoundBehavior:String = "Note Hit";
+    public static var hitsoundVolume:Float = 0;
     
     // APPEARANCE //
     public static var antialiasing:Bool = true;

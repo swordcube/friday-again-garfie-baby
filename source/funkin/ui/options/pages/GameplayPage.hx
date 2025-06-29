@@ -1,5 +1,7 @@
 package funkin.ui.options.pages;
 
+import funkin.states.menus.OffsetCalibrationState;
+
 class GameplayPage extends OptionPage {
     public function new() {
         super("Gameplay");
@@ -34,19 +36,41 @@ class GameplayPage extends OptionPage {
             id: "missSounds",
             type: TCheckbox
         });
-        addOption({
+        final songOffsetOption:Option = addOption({
             name: "Song Offset",
-            description: "Changes how offset the music is from notes (in MS).\nMainly useful for headphones with lots of latency.",
+            description: "Changes how offset the music is from notes (in MS).\nMainly useful for headphones with lots of latency.\n\nPress ACCEPT to start calibrating offsets\ninstead of manually inputting them.",
 
             id: "songOffset",
             type: TInt(-5000, 5000, 5)
         });
+        songOffsetOption.acceptCallback = () -> {
+            if(FlxG.sound.music != null && FlxG.sound.music.playing) {
+                FlxG.sound.music.fadeOut(0.16, 0, (_) -> {
+                    FlxG.sound.music.pause();
+                });
+            }
+            FlxG.switchState(OffsetCalibrationState.new);
+        };
         addOption({
             name: "Hit Window",
             description: "Changes how early and late you can hit notes (in MS).",
 
             id: "hitWindow",
             type: TInt(5, 180, 5)
+        });
+        addOption({
+            name: "Hitsound Behavior",
+            description: "Changes how the hitsounds behave during gameplay.",
+
+            id: "hitsoundBehavior",
+            type: TList(["Note Hit", "Key Press"])
+        });
+        addOption({
+            name: "Hitsound Volume",
+            description: "Changes how loud the hitsounds are during gameplay.",
+
+            id: "hitsoundVolume",
+            type: TPercent
         });
         super.initOptions();
     }

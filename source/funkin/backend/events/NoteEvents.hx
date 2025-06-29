@@ -129,6 +129,11 @@ class NoteHitEvent extends ActionEvent {
     public var singAnimSuffix:String;
 
     /**
+     * Whether or not to play a hitsound when the note is hit.
+     */
+    public var playHitSound:Bool;
+
+    /**
      * Whether or not to jitter the strum animation
      * on holds, like older versions of Funkin' (pre 0.3).
      */

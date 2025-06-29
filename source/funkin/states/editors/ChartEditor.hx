@@ -8,8 +8,9 @@ import lime.system.System;
 import openfl.geom.Rectangle;
 import openfl.display.BitmapData;
 
-import flixel.math.FlxPoint;
 import flixel.text.FlxText;
+import flixel.math.FlxPoint;
+import flixel.sound.FlxSound;
 
 import flixel.util.FlxTimer;
 import flixel.util.FlxDestroyUtil;
@@ -101,6 +102,8 @@ class ChartEditor extends UIState {
 
     public var strumLine:FlxSprite; // this will actually be a line 💥
     public var noteCam:FlxCamera;
+
+    public var hitSound:FlxSound;
 
     // ui layer
 
@@ -246,6 +249,10 @@ class ChartEditor extends UIState {
         noteCam.bgColor = 0;
         FlxG.cameras.add(noteCam, false);
 
+        hitSound = new FlxSound();
+        hitSound.loadEmbedded(Paths.sound('editors/charter/sfx/hitsound'));
+        FlxG.sound.list.add(hitSound);
+
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_desat"));
         bg.scale.set(1.1, 1.1);
         bg.updateHitbox();
@@ -356,15 +363,19 @@ class ChartEditor extends UIState {
                 miniPerformers.opponent.sing(note.data.direction % Constants.KEY_COUNT, Math.max(note.data.length, 0.0) + (Conductor.instance.stepLength * 4));
                 opponentStrumLine.glowStrum(note.data.direction % Constants.KEY_COUNT, Math.max(note.data.length, Conductor.instance.stepLength));
                 
-                if(editorSettings.opponentHitsounds)
-                    FlxG.sound.play(Paths.sound('editors/charter/sfx/hitsound'));
+                if(editorSettings.opponentHitsounds) {
+                    hitSound.time = 0;
+                    hitSound.play(true);
+                }
             }
             else {
                 miniPerformers.player.sing(note.data.direction % Constants.KEY_COUNT, Math.max(note.data.length, 0.0) + (Conductor.instance.stepLength * 4));
                 playerStrumLine.glowStrum(note.data.direction % Constants.KEY_COUNT, Math.max(note.data.length, Conductor.instance.stepLength));
                 
-                if(editorSettings.playerHitsounds)
-                    FlxG.sound.play(Paths.sound('editors/charter/sfx/hitsound'));
+                if(editorSettings.playerHitsounds) {
+                    hitSound.time = 0;
+                    hitSound.play(true);
+                }
             }
         });
 		objectGroup.notes = [for (n in rawNotes) {
@@ -778,7 +789,7 @@ class ChartEditor extends UIState {
         seekToTime(inst.length);
     }
 
-    public function unsafePlayTest():Void {
+    public function unsafePlayTest(?opponentMode:Null<Bool>):Void {
         lastParams = null;
         Conductor.instance.music = null;
         PlayState.deathCounter = 0;
@@ -794,7 +805,9 @@ class ChartEditor extends UIState {
     
                 song: currentSong,
                 difficulty: currentDifficulty,
-                mix: currentMix
+                mix: currentMix,
+
+                forceOpponentMode: opponentMode
             }));
         } else {
             persistentDraw = true;
@@ -807,6 +820,7 @@ class ChartEditor extends UIState {
                 mod: Paths.forceContentPack,
 
                 chartingMode: true,
+                forceOpponentMode: opponentMode,
 
                 _chart: currentChart,
                 _unsaved: undos.unsaved
@@ -821,7 +835,7 @@ class ChartEditor extends UIState {
         unsafePlayTest();
     }
 
-    public function unsafePlayTestHere():Void {
+    public function unsafePlayTestHere(?opponentMode:Null<Bool>):Void {
         lastParams = null;
         Conductor.instance.music = null;
         PlayState.deathCounter = 0;
@@ -839,6 +853,7 @@ class ChartEditor extends UIState {
                 difficulty: currentDifficulty,
                 mix: currentMix,
 
+                forceOpponentMode: opponentMode,
                 startTime: Conductor.instance.time
             }));
         } else {
@@ -851,8 +866,9 @@ class ChartEditor extends UIState {
                 mix: currentMix,
                 mod: Paths.forceContentPack,
 
-                startTime: Conductor.instance.time,
                 chartingMode: true,
+                forceOpponentMode: opponentMode,
+                startTime: Conductor.instance.time,
 
                 _chart: currentChart,
                 _unsaved: undos.unsaved
@@ -865,6 +881,20 @@ class ChartEditor extends UIState {
             return;
 
         unsafePlayTestHere();
+    }
+
+    public function playTestAsOpponent():Void {
+        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
+            return;
+        
+        unsafePlayTest(true);
+    }
+
+    public function playTestAsOpponentHere():Void {
+        if(UIUtil.isAnyComponentFocused([grid, selectionBox]))
+            return;
+
+        unsafePlayTestHere(true);
     }
 
     public function zoomIn():Void {

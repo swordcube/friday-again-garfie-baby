@@ -69,6 +69,11 @@ class CharterTopBar extends TopBar {
 
                 Separator,
 
+                Button("Playtest as opponent", [[UIUtil.correctModifierKey(CONTROL), ENTER]], charter.playTestAsOpponent),
+                Button("Playtest as opponent here", [[UIUtil.correctModifierKey(CONTROL), SHIFT, ENTER]], charter.playTestAsOpponentHere),
+
+                Separator,
+
                 Checkbox("Minimal playtesting", (value:Bool) -> charter.toggleMinimalPlaytest(value), () -> return ChartEditor.editorSettings.minimalPlaytest),
 
                 Separator,

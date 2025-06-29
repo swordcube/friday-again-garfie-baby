@@ -166,6 +166,7 @@ class FunkinScript {
         setClass(funkin.states.menus.CreditsState);
         setClass(funkin.states.menus.OptionsState);
         setClass(funkin.states.menus.ContentPackState);
+        setClass(funkin.states.menus.OffsetCalibrationState);
         
         setClass(funkin.substates.FunkinSubState);
         setClass(funkin.substates.GameOverSubState);

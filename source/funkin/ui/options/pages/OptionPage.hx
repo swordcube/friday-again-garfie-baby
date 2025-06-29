@@ -76,7 +76,7 @@ class OptionPage extends Page {
         for(i => option in grpOptions.members) {
             var y:Float = ((FlxG.height - OPTION_HEIGHT) * 0.5) + ((i - curSelected) * OPTION_HEIGHT);
 			option.y = FlxMath.lerp(option.y, y, FlxMath.getElapsedLerp(0.16, elapsed));
-			option.x = -50 + (Math.abs(Math.cos((option.y + (OPTION_HEIGHT * 0.5) - (getDefaultCamera().scroll.y + (FlxG.height * 0.5))) / (FlxG.height * 1.25) * Math.PI)) * 150);
+			option.x = -80 + (Math.abs(Math.cos((option.y + (OPTION_HEIGHT * 0.5) - (getDefaultCamera().scroll.y + (FlxG.height * 0.5))) / (FlxG.height * 1.25) * Math.PI)) * 150);
         }
         final wheel:Float = -FlxG.mouse.wheel;
         if(controls.justPressed.UI_UP || wheel < 0)
@@ -152,6 +152,11 @@ class OptionPage extends Page {
                 grpOptions.add(o);
                 return o;
 
+            case TPercent:
+                final o:PercentOption = new PercentOption(data.id, data.name, data.description, data.callback, isGameplayModifier);
+                grpOptions.add(o);
+                return o;
+
             case TList(values):
                 final o:ListOption = new ListOption(data.id, data.name, data.description, data.callback, isGameplayModifier, values);
                 grpOptions.add(o);
@@ -191,6 +196,7 @@ enum OptionType {
     TCheckbox;
     TFloat(min:Float, max:Float, step:Float, ?decimals:Int);
     TInt(min:Int, max:Int, step:Int);
+    TPercent;
     TList(values:Array<String>);
 }
 

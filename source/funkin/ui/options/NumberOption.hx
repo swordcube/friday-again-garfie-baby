@@ -49,5 +49,6 @@ class NumberOption extends Option {
             if(holdTimer >= 0.5)
                 holdTimer = 0.45;
         }
+        super.handleInputs();
     }
 }

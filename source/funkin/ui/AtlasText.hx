@@ -24,6 +24,7 @@ class AtlasText extends FlxTypedSpriteContainer<FlxSpriteContainer> {
 	public var text(default, set):String;
 	public var alignment(default, set):AtlasTextAlignment;
 	public var size(default, set):Float = 1;
+	public var fieldWidth(default, set):Float = 0;
 
 	public var isMenuItem:Bool = false;
 	public var targetY:Int = 0;
@@ -97,6 +98,12 @@ class AtlasText extends FlxTypedSpriteContainer<FlxSpriteContainer> {
         return alignment;
 	}
 
+	private function set_fieldWidth(width:Float):Float {
+		fieldWidth = width;
+		_updateAlignment(alignment);
+		return fieldWidth;
+	}
+
 	private function set_size(size:Float):Float {
 		var lastSize:Float = this.size;
 		this.size = size;
@@ -119,13 +126,13 @@ class AtlasText extends FlxTypedSpriteContainer<FlxSpriteContainer> {
 	}
 
 	private function _regenGlyphs():Void {
-		while (members.length > 0) {
-			var actor:FlxSpriteContainer = members[0];
+		while(length > 0) {
+			final actor:FlxSpriteContainer = members.unsafeFirst();
 			remove(actor, true);
             actor.destroy();
 		}
 
-		var textLength:Int = text.length;
+		final textLength:Int = text.length;
 		if (textLength == 0)
 			return;
 
@@ -136,7 +143,7 @@ class AtlasText extends FlxTypedSpriteContainer<FlxSpriteContainer> {
 		line.directAlpha = true;
 
 		for (i in 0...textLength) {
-			var char:String = text.charAt(i);
+			final char:String = text.charAt(i);
 			if (char == "\n") {
 				add(line);
 				line = new FlxSpriteContainer();
@@ -145,8 +152,7 @@ class AtlasText extends FlxTypedSpriteContainer<FlxSpriteContainer> {
 				glyphY += fontData.lineHeight * fontData.scale * size;
 				continue;
 			}
-
-			var glyph:Glyph = new Glyph(glyphX, glyphY, this, char);
+			final glyph:Glyph = new Glyph(glyphX, glyphY, this, char);
 			glyph.scale.set(fontData.scale * size, fontData.scale * size);
             glyph.updateHitbox();
 			glyph.updateOffset();
@@ -154,7 +160,7 @@ class AtlasText extends FlxTypedSpriteContainer<FlxSpriteContainer> {
 			glyph.alpha = alpha;
 			line.add(glyph);
 
-			var glyphData:AtlasFontGlyph = fontData.glyphs[char];
+			final glyphData:AtlasFontGlyph = fontData.glyphs[char];
 			if (glyphData != null && glyphData.visible == false)
 				glyphX += glyphData.width * fontData.scale * size;
 			else
@@ -165,7 +171,7 @@ class AtlasText extends FlxTypedSpriteContainer<FlxSpriteContainer> {
 	}
 
 	private function _updateAlignment(alignment:AtlasTextAlignment):Void {
-		var totalWidth:Float = width;
+		final totalWidth:Float = (fieldWidth > 0) ? fieldWidth : width;
 		for (line in members) {
 			switch (alignment) {
 				case LEFT:

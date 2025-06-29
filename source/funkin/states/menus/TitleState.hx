@@ -70,6 +70,7 @@ class TitleState extends FunkinState {
         Conductor.instance.music = FlxG.sound.music;
         
         quoteText = new AtlasText(0, 200, "bold", CENTER, "");
+        quoteText.fieldWidth = FlxG.width;
         add(quoteText);
 
         ngSpr = new FlxSprite(0, FlxG.height * 0.52);
@@ -219,8 +220,6 @@ class TitleState extends FunkinState {
                 final step:IntroStep = introSequence.get(beat);
                 if(step != null) {
                     quoteText.text = step.lines.join("\n");
-                    quoteText.screenCenter(X);
-    
                     if(step.callback != null)
                         step.callback();
                 }

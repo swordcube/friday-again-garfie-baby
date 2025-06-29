@@ -28,5 +28,6 @@ class CheckboxOption extends Option {
             setValue(!checked);
             FlxG.sound.play(Paths.sound("menus/sfx/select"));
         }
+        super.handleInputs();
     }
 }

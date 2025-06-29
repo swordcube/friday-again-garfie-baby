@@ -142,6 +142,13 @@ class CharterPlaytest extends FunkinSubState {
 
         add(playField);
 
+        if(lastParams.forceOpponentMode == true) {
+            playField.opponentStrumLine = playField.getSecondStrumLine();
+            playField.playerStrumLine = playField.getFirstStrumLine();
+
+            @:bypassAccessor playField.getFirstStrumLine().botplay = false;
+            @:bypassAccessor playField.getSecondStrumLine().botplay = true;
+        }
         playField.hud = new ClassicHUD(playField);
         add(playField.hud);
 
@@ -206,6 +213,8 @@ typedef CharterPlaytestParams = {
 	 * Equivalent to song variants in V-Slice
 	 */
 	var ?mix:String;
+    
+    var ?forceOpponentMode:Bool;
 
     var ?startTime:Float;
 }

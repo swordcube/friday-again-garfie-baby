@@ -32,5 +32,6 @@ class ListOption extends Option {
 
             FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
         }
+        super.handleInputs();
     }
 }

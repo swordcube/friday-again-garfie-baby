@@ -124,4 +124,15 @@ class ArrayUtil {
         }
         return l;
     }
+
+    public static function getAverage(array:Array<Float>):Null<Float> {
+        if(array.length == 0)
+            return null;
+
+        var sum:Float = 0;
+        for(i in 0...array.length)
+            sum += array.unsafeGet(i);
+        
+        return sum / array.length;
+    }
 }

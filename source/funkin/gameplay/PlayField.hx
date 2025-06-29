@@ -40,6 +40,9 @@ class PlayField extends FlxContainer {
     public var stats:PlayerStats;
     public var hud:BaseHUD;
 
+    public var hitSound:FlxSound;
+    public var missSounds:Map<String, FlxSound> = [];
+
     public var comboDisplay:ComboDisplay;
 
     public var currentChart:ChartData;
@@ -108,6 +111,21 @@ class PlayField extends FlxContainer {
             opponentStrumLine.visible = false;
             playerStrumLine.x = FlxG.width * 0.5;
         }
+        hitSound = new FlxSound();
+        hitSound.loadEmbedded(Paths.sound('editors/charter/sfx/hitsound'));
+        hitSound.volume = Options.hitsoundVolume;
+        FlxG.sound.list.add(hitSound);
+
+        for(i in 0...3) {
+            final sndKey:String = 'gameplay/sfx/missnote${i + 1}';
+            final sndPath:String = Paths.sound(sndKey);
+            if(FlxG.assets.exists(sndPath)) {
+                final sound:FlxSound = new FlxSound();
+                sound.loadEmbedded(sndPath);
+                FlxG.sound.list.add(sound);
+                missSounds.set(sndKey, sound);
+            }
+        }
         comboDisplay = new ComboDisplay(FlxG.width * 0.474, (FlxG.height * 0.45) - 60, uiSkin ?? currentChart.meta.game.uiSkin);
         add(comboDisplay);
 
@@ -152,7 +170,8 @@ class PlayField extends FlxContainer {
             note, note.time, note.direction, note.length, note.type,
             isPlayer, false, judgement, isPlayer && Scoring.splashAllowed(judgement), true, true, isPlayer, isPlayer,
             (savedRate >= 1) ? score : Std.int(score * savedRate), Scoring.getAccuracyScore(judgement), 0.0115,
-            Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(), true, true, true, null, ""
+            Scoring.holdHealthIncreasingAllowed(), Scoring.holdScoreIncreasingAllowed(),
+            true, true, true, null, "", isPlayer && (Options.hitsoundBehavior == "Note Hit" || (playerStrumLine.botplay && Options.hitsoundBehavior == "Key Press"))
         ));
         if(event.cancelled)
             return;
@@ -203,6 +222,10 @@ class PlayField extends FlxContainer {
         if(event.showSplash)
             event.note.strumLine.showSplash(event.direction);
 
+        if(event.playHitSound && Options.hitsoundVolume > 0) {
+            hitSound.time = 0;
+            hitSound.play(true);
+        }
         if(event.showHoldCovers && event.length > 0)
             event.note.strumLine.showHoldCover(event.direction);
         else
@@ -281,9 +304,13 @@ class PlayField extends FlxContainer {
                 onDisplayComboPost.dispatch(cast e.flagAsPost());
             }
         }
-        if(event.playMissSound)
-            FlxG.sound.play(Paths.sound(event.missSound), event.missVolume);
-
+        if(event.playMissSound) {
+            final sound:FlxSound = missSounds.get(event.missSound);
+            if(sound != null) {
+                sound.volume = event.missVolume;
+                sound.play();
+            }
+        }
         // the note is now cum colored
         event.note.colorTransform.redOffset = event.note.colorTransform.greenOffset = event.note.colorTransform.blueOffset = 200;
 
@@ -361,6 +388,10 @@ class PlayField extends FlxContainer {
         final strum:Strum = strumLine.strums.members[direction];
         strum.animation.play('${Constants.NOTE_DIRECTIONS[direction]} press');
 
+        if(Options.hitsoundBehavior == "Key Press" && Options.hitsoundVolume > 0) {
+            hitSound.time = 0;
+            hitSound.play(true);
+        }
         final validNotes:Array<Note> = strumLine.notes.members.filter((note:Note) -> {
             return note.exists && note.alive && !note.wasHit && !note.wasMissed && note.direction == direction && note.isInRange();
         });

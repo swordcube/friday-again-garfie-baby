@@ -5,6 +5,8 @@ class Option extends FlxSpriteContainer {
     public var description:String;
 
     public var callback:Dynamic->Option->Void;
+    public var acceptCallback:Void->Void;
+
     public var isGameplayModifier:Bool = false;
 
     public var text:AtlasText;
@@ -55,5 +57,8 @@ class Option extends FlxSpriteContainer {
      * Handle inputs for this option by
      * overriding this function!
      */
-    public function handleInputs():Void {}
+    public function handleInputs():Void {
+        if(controls.justPressed.ACCEPT && acceptCallback != null)
+            acceptCallback();
+    }
 }

@@ -666,7 +666,10 @@ class PlayState extends FunkinState {
 		playField.cameras = [camHUD];
 		add(playField);
 
-		if(Options.gameplayModifiers.get("opponentMode") == true && currentChart.meta.game.allowOpponentMode)
+		if(lastParams.forceOpponentMode != null)
+			opponentMode = lastParams.forceOpponentMode;
+		
+		else if(Options.gameplayModifiers.get("opponentMode") == true && currentChart.meta.game.allowOpponentMode)
 			opponentMode = true;
 		
 		scripts.call("onGeneratePlayFieldPost", [playField]);
@@ -1735,6 +1738,8 @@ typedef PlayStateParams = {
 	var ?minimalMode:Bool;
 
 	var ?scriptsAllowed:Bool;
+
+	var ?forceOpponentMode:Bool;
 
 	@:noCompletion
 	var ?_chart:ChartData;
