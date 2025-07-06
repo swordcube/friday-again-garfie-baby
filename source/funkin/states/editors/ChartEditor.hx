@@ -988,8 +988,17 @@ class ChartEditor extends UIState {
             addObjects([object]);
         }
         else if(direction > -3 && direction < 0) {
-           // TODO: show a menu for this
-           trace("event adding NOT implemented!!!");
+            persistentDraw = true;
+
+            final menu:CharterEventMenu = new CharterEventMenu(new ChartEditorEvent(Conductor.instance.getTimeAtStep(newStep), []));
+            menu.onClose.add((event:ChartEditorEvent) -> {
+                if(event.events.length == 0)
+                    return; // don't add event pack if it has no events in
+
+                final object:ChartEditorObject = CEvent(event);
+                addObjects([object]);
+            });
+            openSubState(menu);
         }
     }
 
@@ -1079,8 +1088,10 @@ class ChartEditor extends UIState {
 
                 case CEvent(event):
                     rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
-                        Button("Edit", null, () -> trace("edit event NOT IMPLEMENTED!!")),
-
+                        Button("Edit", null, () -> {
+                            final menu:CharterEventMenu = new CharterEventMenu(event);
+                            openSubState(menu);
+                        }),
                         Separator,
 
                         Button("Delete", [[DELETE]], () -> deleteObjects([object])),

@@ -91,6 +91,7 @@ class ScriptedTransition extends TransitionSubState {
     }
 
     public function call(method:String, ?args:Array<Dynamic>):Void {
+		if(subStateScripts == null) return;
         subStateScripts.call(method, args);
     }
 

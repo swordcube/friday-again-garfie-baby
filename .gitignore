@@ -5,7 +5,7 @@ export/
 
 # this file is used for quicker development
 # of the UI system, prevents me from having to recomp the game over and over again
-assets/dev.hxs
+assets/temp.hxs
 
 # i'm not leaking my personal content packs!
 content/personal

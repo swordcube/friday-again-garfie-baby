@@ -41,6 +41,7 @@ class Window extends UIComponent {
         add(collapseIcon);
 
         separator = new FlxSprite(4, 32).loadGraphic(Paths.image("ui/images/separator"));
+        separator.antialiasing = false;
         add(separator);
 
         contents = new FlxSpriteContainer(4, 34);

@@ -278,6 +278,9 @@ class CharterObjectGroup extends FlxObject {
 
         for(i in begin...end) {
             event = events[i];
+            if(event.events.length == 0)
+                continue;
+
             final offsetX:Float = -1;
 
             // draw bg

@@ -31,11 +31,13 @@ class StatsDisplay extends Sprite {
         
         mainFPSText = new TextField();
         mainFPSText.setupTextField(Paths.font("fonts/montserrat/semibold"), 16, FlxColor.WHITE, LEFT, "0");
+        mainFPSText.selectable = false;
         addChild(mainFPSText);
-
+        
         subFPSText = new TextField();
         subFPSText.y = 4;
         subFPSText.setupTextField(Paths.font("fonts/montserrat/semibold"), 12, FlxColor.WHITE, LEFT, "FPS");
+        subFPSText.selectable = false;
         addChild(subFPSText);
 
         visible = Options.fpsCounter;

@@ -44,9 +44,9 @@ class CharterMetadataMenu extends UISubState {
 class CharterMetadataWindow extends Window {
     public var charter(default, null):ChartEditor;
 
-    public function new(x:Float = 0, y:Float = 0) {
+    public function new() {
         charter = cast FlxG.state;
-        super(x, y, "Edit chart metadata", false, 510, 370);
+        super(0, 0, "Edit chart metadata", false, 510, 370);
     }
 
     override function initContents():Void {

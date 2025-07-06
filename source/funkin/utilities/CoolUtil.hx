@@ -82,33 +82,63 @@ class CoolUtil {
         return new Future(job, true);
     }
 
-    public static function createASyncFutureWithResult(job:Void->Dynamic):Future<ScriptedFutureResult> {
-        return new Future<ScriptedFutureResult>(() -> {
-            return {data: job()};
-        }, true);
+    /**
+     * Meant for running jobs/methods asyncronously
+     * while in the context of a script.
+     * 
+     * In order to obtain the result of the job, you must
+     * use the `onComplete` and/or `onError` signals of the
+     * returned `ScriptedThreadResult` object.
+     * 
+     * @param  job   The job/method to run. 
+     * @param  args  Arguments to pass to the `onComplete` or `onError` signals when they are dispatched.
+     * 
+     * @return ScriptedThreadResult
+     */
+    public static function runScriptedASyncJob(job:Void->Dynamic, ?args:Array<Dynamic>):ScriptedThreadResult {
+        final result:ScriptedThreadResult = new ScriptedThreadResult();
+        result.run(job, args);
+        return result;
     }
 
+    /**
+     * Meant for loading bitmap data asyncronously
+     * while in the context of a script.
+     * 
+     * In order to obtain the resulting bitmap data, you must
+     * use the `onComplete` and/or `onError` signals of the
+     * returned `ScriptedThreadResult` object.
+     * 
+     * @param  path  File path to the bitmap data.
+     * @param  args  Arguments to pass to the `onComplete` or `onError` signals when they are dispatched.
+     * 
+     * @return ScriptedThreadResult
+     */
     public static function loadBitmapDataASync(path:String, ?args:Array<Dynamic>):ScriptedThreadResult {
-        final result:ScriptedThreadResult = new ScriptedThreadResult();
-        result.run(() -> FlxG.assets.getBitmapData(path, false), args);
-        return result;
+        return runScriptedASyncJob(() -> FlxG.assets.getBitmapData(path, false), args);
     }
 
+    /**
+     * Meant for loading sound data asyncronously
+     * while in the context of a script.
+     * 
+     * In order to obtain the resulting sound data, you must
+     * use the `onComplete` and/or `onError` signals of the
+     * returned `ScriptedThreadResult` object.
+     * 
+     * @param  path  File path to the sound data.
+     * @param  args  Arguments to pass to the `onComplete` or `onError` signals when they are dispatched.
+     * 
+     * @return ScriptedThreadResult
+     */
     public static function loadSoundASync(path:String, ?args:Array<Dynamic>):ScriptedThreadResult {
-        final result:ScriptedThreadResult = new ScriptedThreadResult();
-        result.run(() -> FlxG.assets.getSound(path, false), args);
-        return result;
+        return runScriptedASyncJob(() -> FlxG.assets.getSound(path, false), args);
     }
 }
 
 @:structInit
 class MusicConfig {
     public var timingPoints:Array<TimingPoint>;
-}
-
-@:structInit
-class ScriptedFutureResult {
-    public var data:Dynamic;
 }
 
 class ScriptedThreadResult {
