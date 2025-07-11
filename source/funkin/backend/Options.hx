@@ -27,6 +27,11 @@ class Options {
     public static var verboseLogging:Bool = false;
     public static var multicoreLoading:Bool = false;
     public static var loadingScreen:Bool = true;
+
+    #if LINUX_CASE_INSENSITIVE_FILES
+    public static var caseInsensitiveFiles:Bool = true;
+    #end
+
     public static var frameRate:Int = 360;
 
     // GAMEPLAY MODIFIERS //

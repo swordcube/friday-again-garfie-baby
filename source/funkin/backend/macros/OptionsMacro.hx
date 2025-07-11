@@ -53,16 +53,14 @@ class OptionsMacro {
                             Reflect.setField(Options._save.data, $v{cID}, value);
                             return value;
                         }
-                        
-                        // funcs
                         final getterFunc:Function = {
-                            ret: TPath({name: "Dynamic", params: [], pack: []}),
+                            ret: t,
                             params: [],
                             expr: getterExpr,
                             args: []
                         };
                         final setterFunc:Function = {
-                            ret: TPath({name: "Dynamic", params: [], pack: []}),
+                            ret: t,
                             params: [],
                             expr: setterExpr,
                             args: [{name: "value", value: null}]

@@ -36,6 +36,15 @@ class MiscellanousPage extends OptionPage {
             id: "loadingScreen",
             type: TCheckbox
         });
+        #if LINUX_CASE_INSENSITIVE_FILES
+        addOption({
+            name: "Case Insensitive Files",
+            description: "Whether or not the game should use case insensitive file paths.\n\nLeaving this on may cause loading times to be a bit worse, but will\nensure mods load their assets correctly.",
+        
+            id: "caseInsensitiveFiles",
+            type: TCheckbox
+        });
+        #end
         final fpsOption:NumberOption = cast addOption({
             name: "Framerate",
             description: "Changes the target FPS the game will try to run at.",
