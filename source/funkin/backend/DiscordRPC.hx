@@ -102,7 +102,7 @@ class DiscordRPC {
         }
         if(appID != newAppID) {
             if(appID != null)
-                shutdown();
+                Discord.Shutdown();
             
             appID = newAppID;
             

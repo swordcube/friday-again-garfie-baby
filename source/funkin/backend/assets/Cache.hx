@@ -124,7 +124,10 @@ class Cache {
     }
 
     public static function clearAll():Void {
+        Logs.verbose('Clearing cache... (0/5)');
+        
         // Clear atlases
+        Logs.verbose('- Clearing atlases... (1/5)');
         final pendingAtlasGraphics:Map<String, FlxGraphic> = [];
         for(atlas in atlasCache) {
             if(atlas.parent != null) {
@@ -134,8 +137,9 @@ class Cache {
             atlas.destroy();
         }
         atlasCache.clear();
-
+        
         // Clear graphics
+        Logs.verbose('- Clearing graphics... (2/5)');
         @:privateAccess {
             for(key => graph in FlxG.bitmap._cache) {
                 // I check for destroyOnNoUse because if i don't, interacting
@@ -156,6 +160,7 @@ class Cache {
             }
         }
         // Clear fonts
+        Logs.verbose('- Clearing fonts... (3/5)');
         @:privateAccess {
             final cache:OpenFLAssetCache = (OpenFLAssets.cache is OpenFLAssetCache) ? cast OpenFLAssets.cache : null;
             if(cache != null) {
@@ -164,6 +169,7 @@ class Cache {
             }
         }
         // Clear sounds
+        Logs.verbose('- Clearing sounds... (4/5)');
         @:privateAccess {
             final cache:OpenFLAssetCache = (OpenFLAssets.cache is OpenFLAssetCache) ? cast OpenFLAssets.cache : null;
             if(cache != null) {
@@ -177,6 +183,7 @@ class Cache {
             }
         }
         // Clear gameplay related caches
+        Logs.verbose('- Clearing gameplay caches... (5/5)');
         uiSkinCache.clear();
         noteSkinCache.clear();
         characterCache.clear();
@@ -207,10 +214,14 @@ class Cache {
                                 var result = {path: ass.path, sound: (OpenFLAssets.cache.hasSound(ass.path)) ? OpenFLAssets.cache.getSound(ass.path) : Sound.fromFile(ass.path)};
                                 if (result != null) loadedSounds.set(result.path, result.sound);
                         }
+                        Logs.verbose('- Loaded ${ass.type} asset at ${ass.path}');
                     }
 					mainThread.sendMessage(Loaded(thisThread));
 
 				case Finish:
+                    final total:Int = Lambda.count(loadedGraphics) + Lambda.count(loadedSounds);
+                    Logs.verbose('Finished loading ${total} asset${(total == 1) ? '' : 's'}');
+
 					// send back everything loaded by this thread
 					mainThread.sendMessage(Finished(thisThread, loadedGraphics, loadedSounds));
 					break;

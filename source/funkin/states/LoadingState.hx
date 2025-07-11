@@ -41,6 +41,7 @@ class LoadingState extends FunkinState {
     public var totalAssetCount:Int = 0;
 
     public var spinner:FlxSprite;
+    public var mainText:FlxText;
     public var statusText:FlxText;
     public var pressEnter:FlxSprite;
 
@@ -76,6 +77,8 @@ class LoadingState extends FunkinState {
 
     override function create():Void {
         super.create();
+
+        Logs.verbose('Loading assets...');
         persistentUpdate = true;
 
         // setup the sprites
@@ -89,9 +92,15 @@ class LoadingState extends FunkinState {
         );
         add(spinner);
 
-        statusText = new FlxText(30, 0, 'Loading...');
-        statusText.setFormat(Paths.font("fonts/vcr"), 20, FlxColor.WHITE, LEFT);
-        statusText.setPosition(30, FlxG.height - statusText.height - 30);
+        mainText = new FlxText(20, 20, 0, 'Loading...');
+        mainText.setFormat(Paths.font("fonts/vcr"), 18, FlxColor.WHITE, RIGHT);
+        mainText.setPosition(FlxG.width - mainText.width - 20, 20);
+        mainText.setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
+        add(mainText);
+
+        statusText = new FlxText(20, 40, 100, '0%');
+        statusText.setFormat(Paths.font("fonts/vcr"), 18, FlxColor.WHITE, RIGHT);
+        statusText.setPosition(FlxG.width - 120, 20);
         statusText.setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
         add(statusText);
 
@@ -117,6 +126,10 @@ class LoadingState extends FunkinState {
             final chart:ChartData = ChartData.load(songName, songMix, contentPack);
             chart.meta = SongMetadata.load(songName, songMix, contentPack);
             PlayState.lastParams._chart = chart;
+
+            mainText.text = '${chart.meta.song.title ?? songName}';
+            mainText.x = FlxG.width - mainText.width - 20;
+            statusText.y = mainText.y + mainText.height;
             
             // init the array, we don't want no null object references in this house!
             final extras:Array<AssetPreload> = params.assetsToLoad ?? new Array<AssetPreload>();
@@ -245,6 +258,10 @@ class LoadingState extends FunkinState {
         for(asset in params.assetsToLoad)
             _preloadQueue.push(asset);
 
+        // play a lil tune while you wait :p
+        CoolUtil.playMusic("menus/music/artisticExpression", 0);
+        FlxG.sound.music.fadeIn(1, 0, 1);
+
         // init the thread for loading assets
         FlxTimer.wait(0.7, () -> {
             Thread.create(_loadingScreen_workerLoop);
@@ -257,8 +274,6 @@ class LoadingState extends FunkinState {
         final status:String = _statusQueue.pop(false);
         if(status != null) {
             statusText.text = status;
-            statusText.y = FlxG.height - statusText.height - 30;
-
             if(status != "Finished!")
                 FlxG.sound.play(Paths.sound('menus/sfx/scroll'));
         }
@@ -272,7 +287,10 @@ class LoadingState extends FunkinState {
             if(msg != null) {
                 switch(msg) {
                     case Loaded(asset, data):
-                        switch(asset.type) {
+                        final contentFolder:String = Paths.getContentFolderFromPath(asset.path, true);
+                        Logs.verbose('- Loaded ${asset.type} asset at ${asset.path.substr('${Paths.getContentDirectory()}/${contentFolder}/'.length)}');
+                        
+                            switch(asset.type) {
                             case IMAGE:
                                 final graph:FlxGraphic = cast data;
                                 FlxG.bitmap.addGraphic(graph);
@@ -297,6 +315,8 @@ class LoadingState extends FunkinState {
     }
 
     public function finishLoading():Void {
+        Logs.verbose('Finished loading ${totalAssetCount} asset${(totalAssetCount == 1) ? '' : 's'}');
+        
         finished = true;
         FlxTween.tween(spinner, {alpha: 0}, 0.5);
         FlxTween.tween(spinner, {y: FlxG.height}, 0.5, {ease: FlxEase.backOut});
@@ -306,7 +326,7 @@ class LoadingState extends FunkinState {
         FlxTween.tween(pressEnter, {y: FlxG.height - pressEnter.height - 30}, 0.5, {ease: FlxEase.backOut, startDelay: 0.5});
 
         FlxG.sound.play(Paths.sound('menus/sfx/select'));
-        _statusQueue.push("Finished!");
+        _statusQueue.push('100%\nDone!');
     }
 
     public function fadeToNextState():Void {
@@ -322,6 +342,7 @@ class LoadingState extends FunkinState {
                 FlxG.switchState(params.nextState);
             });
         });
+        FlxG.sound.music.fadeOut(1, 0);
     }
 
     //----------- [ Private API ] -----------//
@@ -337,7 +358,7 @@ class LoadingState extends FunkinState {
     private function _loadingScreen_workerLoop():Void {
         while(true) {
             if(_finished) {
-                _statusQueue.push('Finished!');
+                _statusQueue.push('100%\nDone!');
                 _messageQueue.push(Finished);
                 break;
             }
@@ -346,7 +367,7 @@ class LoadingState extends FunkinState {
                 continue;
 
             final contentFolder:String = Paths.getContentFolderFromPath(msg.path, true);
-            _statusQueue.push('Loading ${msg.path.substr('${Paths.getContentDirectory()}/${contentFolder}/'.length)} (${(totalAssetCount - _assetCounter) + 1}/${totalAssetCount})');
+            _statusQueue.push('${Math.floor(((totalAssetCount - _assetCounter) / totalAssetCount) * 100)}%');
             
             switch(msg.type) {
                 case IMAGE:

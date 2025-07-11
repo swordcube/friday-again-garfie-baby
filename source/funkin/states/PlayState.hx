@@ -235,6 +235,8 @@ class PlayState extends FunkinState {
 
 	override function create():Void {
 		super.create();
+		
+		Logs.verbose('Loading into gameplay...');
 		persistentUpdate = true;
 		
 		if(FlxG.sound.music != null)
@@ -356,7 +358,7 @@ class PlayState extends FunkinState {
 				addSingleScript(loader, 'gameplay/uiskins/${uiSkin}/script');
 			}
 		}
-		Logs.verbose('Loading scripts took ${getElapsedTime()}s');
+		Logs.verbose('- Loading scripts took ${getElapsedTime()}s');
 		#end
 		if(lastParams.startTime != null && lastParams.startTime > 0) {
 			FlxTimer.wait((Conductor.instance.beatLength * 5) / 1000, () -> {
@@ -432,12 +434,12 @@ class PlayState extends FunkinState {
 			});
 			add(vocals);
 		}
-		Logs.verbose('Loading vocal tracks took ${getElapsedTime()}s');
+		Logs.verbose('- Loading vocal tracks took ${getElapsedTime()}s');
 		
 		startTime = now();
 		FlxG.sound.playMusic(instPath, 0, false);
 		inst = FlxG.sound.music;
-		Logs.verbose('Loading inst took ${getElapsedTime()}s');
+		Logs.verbose('- Loading inst took ${getElapsedTime()}s');
 
 		Conductor.instance.music = null;
 		Conductor.instance.offset = Options.songOffset + inst.latency;
@@ -516,10 +518,10 @@ class PlayState extends FunkinState {
 			}
 			startTime = now();
 			Cache.preloadAssets(charactersToLoad);
-			Logs.verbose('Loading characters took ${getElapsedTime()}s');
+			Logs.verbose('- Loading characters took ${getElapsedTime()}s');
 			
 			Cache.preloadAssets(stageAssetsToPreload);
-			Logs.verbose('Loading stage took ${getElapsedTime()}s');
+			Logs.verbose('- Loading stage took ${getElapsedTime()}s');
 
 			final rawCharacterIDs:Array<String> = [
 				currentChart.meta.game.getCharacter("spectator"),
@@ -560,7 +562,7 @@ class PlayState extends FunkinState {
 
 		startTime = now();
 		Cache.preloadAssets(notesToPreload.concat(uiToPreload));
-		Logs.verbose('Loading notes & UI took ${getElapsedTime()}s');
+		Logs.verbose('- Loading notes & UI took ${getElapsedTime()}s');
 
 		startTime = now();
 		final assetsToPreload:Array<AssetPreload> = [];
@@ -570,7 +572,7 @@ class PlayState extends FunkinState {
 			assetsToPreload.push({path: Paths.sound('gameplay/sfx/missnote${i + 1}'), type: SOUND});
 		
 		Cache.preloadAssets(assetsToPreload);
-		Logs.verbose('Loading misc assets took ${getElapsedTime()}s');
+		Logs.verbose('- Loading misc assets took ${getElapsedTime()}s');
 
 		#if SCRIPTING_ALLOWED
 		if(scriptsAllowed) {

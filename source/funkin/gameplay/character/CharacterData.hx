@@ -114,7 +114,7 @@ class CharacterData {
                 }
                 return data;
             }
-            Logs.error('Config for character "${charID}" doesn\'t exist!');
+            // Logs.error('Config for character "${charID}" doesn\'t exist!');
             
             charID = Constants.DEFAULT_CHARACTER;
             confPath = Paths.json('gameplay/characters/${charID}/config');

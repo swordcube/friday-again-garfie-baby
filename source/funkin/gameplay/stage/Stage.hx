@@ -50,7 +50,6 @@ class Stage extends FlxContainer {
         
         this.id = id;
         this.characters = characters;
-        Logs.verbose('Loading stage: ${id}');
         
         data = StageData.load(id);
 
