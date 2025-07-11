@@ -128,6 +128,14 @@
 	-->
 	<define name="MODCHARTING_ALLOWED" unless="NO_MODCHARTING || NO_MODCHARTING_ALLOWED" />
 
+	<!--
+		Comment/delete this line below to disable case-insensitive file paths on Linux
+		Or compile with the NO_MODCHARTING define, like so:
+
+		lime test platform -DNO_MODCHARTING
+	-->
+	<define name="LINUX_CASE_INSENSITIVE_FILES" if="linux" unless="NO_LINUX_CASE_INSENSITIVE_FILES || LINUX_CASE_SENSITIVE_FILES" />
+
 	<!-- _____________________________ Path Settings ____________________________ -->
 	
 	<!--

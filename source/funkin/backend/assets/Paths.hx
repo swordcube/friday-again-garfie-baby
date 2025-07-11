@@ -101,6 +101,8 @@ class Paths {
         }
         @:privateAccess
         FlxG.assets.getAssetUnsafe = (id:String, type:FlxAssetType, useCache = true) -> {
+            id = sanitizePath(id); // just incase the path wasn't gotten from the functions in this class
+            
             if(FlxG.assets.useOpenflAssets(id))
                 return FlxG.assets.getOpenflAssetUnsafe(id, type, useCache);
             
@@ -385,6 +387,14 @@ class Paths {
         return enabledPacks;
     }
 
+    public static function sanitizePath(path:String):String {
+        var sanitizedPath:String = path.replace('\\', '/');
+        #if LINUX_CASE_INSENSITIVE_FILES
+        sanitizedPath = _getPathLike(sanitizedPath); // handles case-insensitive files
+        #end
+        return Path.normalize(sanitizedPath);
+    }
+
     public static function getAsset(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
         if(loaderID == null || loaderID.length == 0)
             loaderID = Paths.forceContentPack;
@@ -392,7 +402,7 @@ class Paths {
         if(loaderID == null || loaderID.length == 0) {
             final loaders:Array<AssetLoader> = _registeredAssetLoaders;
             for(i in 0...loaders.length) {
-                final path:String = Path.normalize(loaders[i].getPath(name));
+                var path:String = sanitizePath(loaders[i].getPath(name));
                 if(FlxG.assets.exists(path))
                     return path;
             }
@@ -400,7 +410,7 @@ class Paths {
             // try to load from specified loader id (usually the name of a content pack)
             final loader:AssetLoader = _registeredAssetLoadersMap.get(loaderID);
             if(loader != null) {
-                final path:String = Path.normalize(loader.getPath(name));
+                final path:String = sanitizePath(loader.getPath(name));
                 if(FlxG.assets.exists(path))
                     return path;
     
@@ -413,7 +423,7 @@ class Paths {
                         if(contentMetadata != null && !contentMetadata.runGlobally && Paths.forceContentPack != loaders[i].id)
                             continue;
         
-                        final path:String = Path.normalize(loaders[i].getPath(name));
+                        final path:String = sanitizePath(loaders[i].getPath(name));
                         if(FlxG.assets.exists(path))
                             return path;
                     }
@@ -545,7 +555,7 @@ class Paths {
 
     public static function iterateDirectory(dir:String, callback:String->Void, ?recursive:Bool = false):Void {
         for(loader in _registeredAssetLoaders) {
-            final dirPath:String = Path.normalize(loader.getPath(dir));
+            final dirPath:String = sanitizePath(loader.getPath(dir));
             if(!FileSystem.exists(dirPath))
                 continue;
             
@@ -598,4 +608,72 @@ class Paths {
     private static function get_registeredAssetLoaders():ReadOnlyArray<AssetLoader> {
         return cast _registeredAssetLoaders.copy();
     }
+    
+    #if LINUX_CASE_INSENSITIVE_FILES
+    // Case-insensitive files on Linux builds
+    
+    // Windows and macOS both have case-sensitive files by default already,
+    // hence the linux specific define
+
+    // Original code is from Polymod: https://github.com/larsiusprime/polymod/blob/experimental/polymod/fs/SysFileSystem.hx#L172
+
+    /**
+    * Returns a path to the existing file similar to the given one.
+    * (For instance "mod/lasagnaday" and  "Mod/LasagnaDay" are *similar* paths)
+    *
+    * @param path
+    */
+    private static function _getPathLike(path:String):Null<String> {
+        if(FlxG.assets.exists(path))
+            return path;
+        
+        final baseParts:Array<String> = path.replace('\\', '/').split('/');
+        if(baseParts.length == 0)
+            return null;
+        
+        final keyParts:Array<String> = [];
+        while(!FlxG.assets.exists(baseParts.join("/")) && baseParts.length != 0)
+            keyParts.insert(0, baseParts.pop());
+        
+        return _findFile(baseParts.join("/"), keyParts);
+    }
+
+    private static function _findFile(basePath:String, keys:Array<String>):Null<String> {
+        var nextDir:String = basePath;
+        for(part in keys) {
+            if(part == '')
+                continue;
+            
+            final foundNode = _findNode(nextDir, part);
+            if(foundNode == null)
+                return null;
+            
+            nextDir += '/${foundNode}';
+        }	return nextDir;
+    }
+
+    /**
+    * Searches a given directory and returns a name of the existing file/directory
+    * *similar* to the **key**
+    * 
+    * @param dir Base directory to search
+    * @param key The file/directory you want to find
+    * 
+    * @return Either a file name, or null if the file doesn't exist
+    */
+    private static function _findNode(dir:String, key:String):Null<String> {
+        try {
+            final allFiles:Array<String> = FileSystem.readDirectory(dir);
+            
+            final fileMap:Map<String, String> = [];
+            for(file in allFiles)
+                fileMap.set(file.toLowerCase(), file);
+            
+            return fileMap.get(key.toLowerCase());
+        }
+        catch(e:Dynamic) {
+            return null;
+        }
+    }
+    #end
 }
