@@ -102,7 +102,7 @@ class Paths {
         @:privateAccess
         FlxG.assets.getAssetUnsafe = (id:String, type:FlxAssetType, useCache = true) -> {
             id = sanitizePath(id); // just incase the path wasn't gotten from the functions in this class
-            
+
             if(FlxG.assets.useOpenflAssets(id))
                 return FlxG.assets.getOpenflAssetUnsafe(id, type, useCache);
             
@@ -388,11 +388,11 @@ class Paths {
     }
 
     public static function sanitizePath(path:String):String {
-        var sanitizedPath:String = path.replace('\\', '/');
+        var sanitizedPath:String = Path.normalize(path);
         #if LINUX_CASE_INSENSITIVE_FILES
         sanitizedPath = _getPathLike(sanitizedPath); // handles case-insensitive files
         #end
-        return Path.normalize(sanitizedPath);
+        return sanitizedPath;
     }
 
     public static function getAsset(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
