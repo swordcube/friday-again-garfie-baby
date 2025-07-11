@@ -40,6 +40,8 @@ class LoadingState extends FunkinState {
     public var assetsLoaded:Int = 0;
     public var totalAssetCount:Int = 0;
 
+    public var runningFellas:FlxTypedContainer<RunningFella>;
+
     public var spinner:FlxSprite;
     public var mainText:FlxText;
     public var statusText:FlxText;
@@ -82,6 +84,9 @@ class LoadingState extends FunkinState {
         persistentUpdate = true;
 
         // setup the sprites
+        runningFellas = new FlxTypedContainer<RunningFella>();
+        add(runningFellas);
+
         spinner = new FunkinSprite();
         spinner.loadGraphic(Paths.image('menus/loading/spinner'));
         spinner.setGraphicSize(48, 48);
@@ -345,6 +350,26 @@ class LoadingState extends FunkinState {
         FlxG.sound.music.fadeOut(1, 0);
     }
 
+    override function beatHit(beat:Int):Void {
+        super.beatHit(beat);
+        if(beat % 2 == 0) {
+            final fella:RunningFella = runningFellas.recycle(RunningFella);
+            fella.alpha = 0.45;
+            fella.x = FlxG.width;
+            fella.y = FlxG.height * 0.4;
+            fella.setScale(0.2, XY);
+            fella.doAFlip(true);
+            fella.velocity.x *= 0.85;
+            
+            final fella:RunningFella = runningFellas.recycle(RunningFella);
+            fella.alpha = 1;
+            fella.x = -fella.width;
+            fella.y = FlxG.height * 0.6;
+            fella.setScale(0.25, XY);
+            fella.doAFlip(false);
+        }
+    }
+
     //----------- [ Private API ] -----------//
 
     private var _preloadQueue:Deque<AssetPreload> = new Deque<AssetPreload>(); // to be accessed by worker thread ONLY >:(
@@ -384,6 +409,28 @@ class LoadingState extends FunkinState {
             }
             _assetCounter--;
         }
+    }
+}
+
+class RunningFella extends FunkinSprite {
+    public function new() {
+        super();
+        
+        loadFromSheet('menus/loading/sword_carrying_a_box', 'running', 14);
+        setScale(0.25, XY);
+
+        velocity.x = 300;
+    }
+
+    public function doAFlip(yes:Bool):Void {
+        flipX = yes;
+        velocity.x = 300 * ((yes) ? -1 : 1);
+    }
+
+    override function update(elapsed:Float):Void {
+        super.update(elapsed);
+        if((x >= FlxG.width && !flipX) || (x <= -width && flipX))
+            kill();
     }
 }
 
