@@ -29,18 +29,20 @@ class Main extends Sprite {
 
 	public function new() {
 		super();
+		instance = this;
 
 		for(i in 0...4)
 			gameThreads.push(Thread.createWithEventLoop(() -> Thread.current().events.promise()));
 
-		instance = this;
-		addChild(new FunkinGame(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, InitState.new, Constants.MAX_FPS, Constants.MAX_FPS, true));
+		statsDisplay = new StatsDisplay(10, 3);
+		addChild(statsDisplay);
 		
+		addChildAt(new FunkinGame(Constants.GAME_WIDTH, Constants.GAME_HEIGHT, InitState.new, Constants.MAX_FPS, Constants.MAX_FPS, true), 0);
+		statsDisplay.visible = Options.fpsCounter;
+
 		sideBars = new SideBars();
 		FlxG.game.addChildAt(sideBars, FlxG.game.getChildIndex(FlxG.game._inputContainer));
 		
-		statsDisplay = new StatsDisplay(10, 3);
-		addChild(statsDisplay);
 	}
 
 	public static function execASync(func:Void->Void) {

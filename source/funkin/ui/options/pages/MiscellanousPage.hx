@@ -23,13 +23,6 @@ class MiscellanousPage extends OptionPage {
             type: TCheckbox
         });
         addOption({
-            name: "Multicore Preloading",
-            description: "Whether or not the game should use multiple threads to preload gameplay assets.\nTurn this back off if you're experiencing issues preloading images/sounds.\n\nThis is only effective if Loading Screen is disabled!",
-        
-            id: "multicoreLoading",
-            type: TCheckbox
-        });
-        addOption({
             name: "Loading Screen",
             description: "Whether or not the game should display\na loading screen while loading into gameplay.",
         

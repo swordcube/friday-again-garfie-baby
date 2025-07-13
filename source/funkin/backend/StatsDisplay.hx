@@ -40,7 +40,6 @@ class StatsDisplay extends Sprite {
         subFPSText.selectable = false;
         addChild(subFPSText);
 
-        visible = Options.fpsCounter;
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 

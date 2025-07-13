@@ -188,10 +188,7 @@ function addSongsToCategory(categoryID:String, ?songIDs:Array<String>, ?contentP
                 final recordID:String = Highscore.getScoreRecordID(song, diff, mix, contentPack);
                 songScoreRecords.set('${song}:${mix}:${diff}:${contentPack}', Highscore.getScoreRecord(recordID));
 
-                final recordIDOpponentMode:String = Highscore.getScoreRecordID(
-                    song, diff, mix, contentPack,
-                    Options.gameplayModifiers.get("opponentMode") == true && metadataMap.get(mix).game.allowOpponentMode
-                );
+                final recordIDOpponentMode:String = Highscore.getScoreRecordID(song, diff, mix, contentPack, true);
                 songScoreRecords.set('${song}:${mix}:${diff}:${contentPack}:opponent', Highscore.getScoreRecord(recordIDOpponentMode));
             }
         }
@@ -677,11 +674,11 @@ function updateOtherShit() {
         final newBPM:Float = (songMixMeta?.song?.timingPoints != null) ? songMixMeta.song.timingPoints[0].bpm : 0;
         final newRating:Int = (songMixMeta?.freeplay?.ratings != null) ? (songMixMeta.freeplay.ratings.get(currentDifficulty) ?? 0) : 0;
 
-        var shiftX:Float = 114;
+        var shiftX:Float = 125;
         var tempShift = 0;
 
-        if(Math.floor(newBPM / 100) == 1)
-            shiftX += 11;
+        if(newBPM < 100)
+            shiftX -= 11;
         
         final bpmNumbers:Array<TrackingSprite> = capsuleSmallNumbers[i];
         for(i in 0...bpmNumbers.length) {
@@ -689,6 +686,7 @@ function updateOtherShit() {
             switch(i) {
                 case 0:
                     bpmNumbers[i].exists = newBPM >= 100;
+              
                     if(newBPM < 100)
                         bpmNumbers[i].anim.play("0");
                     else
@@ -730,6 +728,15 @@ function updateOtherShit() {
                 
                 default:
                     trace('why the fuck is this being called');
+            }
+        }
+        if(diffNumbers.length != 0) {
+            if(diffNumbers[0].anim.name == "1") {
+                diffNumbers[0].trackingOffset.x = 405;
+                diffNumbers[1].trackingOffset.x = 425;
+            } else {
+                diffNumbers[0].trackingOffset.x = 400;
+                diffNumbers[1].trackingOffset.x = 430;
             }
         }
         // update badge

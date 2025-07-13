@@ -78,7 +78,7 @@ function onLoad() {
 
     scrollingTextList.push({
         text: "HOT BLOODED IN MORE WAYS THAN ONE ",
-        font: Paths.font("fonts/5by7"),
+        font: Paths.font("fonts/5by7_b"),
         size: 43,
         color: 0xFFFFF383,
         position: new FlxPoint(0, 168),
@@ -94,7 +94,7 @@ function onLoad() {
     });
     scrollingTextList.push({
         text: "PROTECT YO NUTS ",
-        font: Paths.font("fonts/5by7"),
+        font: Paths.font("fonts/5by7_b"),
         size: 43,
         color: 0xFFFFFFFF,
         position: new FlxPoint(0, 285),
@@ -110,7 +110,7 @@ function onLoad() {
     });
     scrollingTextList.push({
         text: "HOT BLOODED IN MORE WAYS THAN ONE ",
-        font: Paths.font("fonts/5by7"),
+        font: Paths.font("fonts/5by7_b"),
         size: 43,
         color: 0xFFFFF383,
         position: new FlxPoint(0, 397),

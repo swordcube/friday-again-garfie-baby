@@ -44,81 +44,22 @@ class Cache {
     // takenm from troll engine   🪵
     // https://github.com/riconuts/FNF-Troll-Engine/blob/a4a1933284b1be0ff6becb4e5af52f84f760c9eb/source/funkin/data/Cache.hx#L36
     public static function preloadAssets(assetsToLoad:Array<AssetPreload>):Void {
-        final threadLimit:Int = FlxMath.minInt(processorCores, assetsToLoad.length);
-        if(Options.multicoreLoading && threadLimit > 1) {
-            // clear duplicates
-			var uniqueMap:Map<String, AssetPreload> = [
-				for(shit in assetsToLoad)
-					shit.path + "_" + shit.type => shit
-			];
-
-			// idk what advantages this brings over just using arrays but yolo lol
-			var assetsToLoad = new List<AssetPreload>();
-			for (k => v in uniqueMap)
-				assetsToLoad.push(v);
-
-            final mainThread = Thread.current();
-			final makeThread = Thread.create.bind(_loadingThreadFunc.bind(mainThread));
-			
-			var threadArray:Array<Thread> = [for (_ in 0...threadLimit){				
-				var thread = makeThread();
-				thread.sendMessage(Load(assetsToLoad.pop()));
-				thread;
-			}];
-            while (true) {
-				var msg:SlaveMessage = Thread.readMessage(true);
-
-				switch (msg){
-					case Loaded(thread):
-						if (assetsToLoad.length > 0)
-							thread.sendMessage(Load(assetsToLoad.pop()));
-						else
-							thread.sendMessage(Finish);
-						
-					case Finished(thread, loadedGraphics, loadedSounds):
-						if (loadedGraphics != null)
-							for (key => value in loadedGraphics) {
-                                final graphic:FlxGraphic = FlxG.bitmap.add(value);
-                                if(FlxG.state is FunkinState) {
-                                    // most states are FunkinStates, so this probably
-                                    // doesn't matter, but you just never know!
-                                    final state:FunkinState = cast FlxG.state;
-                                    state.graphicCache.cache(graphic);
-                                }
-                            }
-						
-						if (loadedSounds != null)
-							for (key => value in loadedSounds){
-								final cache:OpenFLAssetCache = (OpenFLAssets.cache is OpenFLAssetCache) ? cast OpenFLAssets.cache : null;
-                                if(cache != null)
-                                    cache.setSound(key, value);
-							}
-						
-						threadArray.remove(thread);
-						if (threadArray.length < 1)
-							break;
-                        
-					default:
-				}
-			}
-        } else {
-            for(asset in assetsToLoad) {
-                switch(asset.type) {
-                    case IMAGE:
-                        if(FlxG.assets.exists(asset.path)) {
-                            final graphic:FlxGraphic = FlxG.bitmap.add(asset.path);
-                            if(FlxG.state is FunkinState) {
-                                // most states are FunkinStates, so this probably
-                                // doesn't matter, but you just never know!
-                                final state:FunkinState = cast FlxG.state;
-                                state.graphicCache.cache(graphic);
-                            }
+        for(asset in assetsToLoad) {
+            switch(asset.type) {
+                case IMAGE:
+                    if(FlxG.assets.exists(asset.path)) {
+                        final graphic:FlxGraphic = FlxG.bitmap.add(asset.path);
+                        if(FlxG.state is FunkinState) {
+                            // most states are FunkinStates, so this probably
+                            // doesn't matter, but you just never know!
+                            final state:FunkinState = cast FlxG.state;
+                            state.graphicCache.cache(graphic);
                         }
-                    
-                    case SOUND:
-                        if(FlxG.assets.exists(asset.path) && !OpenFLAssets.cache.hasSound(asset.path))
-                            OpenFLAssets.cache.setSound(asset.path, Sound.fromFile(asset.path));
-                }
+                    }
+                
+                case SOUND:
+                    if(FlxG.assets.exists(asset.path) && !OpenFLAssets.cache.hasSound(asset.path))
+                        OpenFLAssets.cache.setSound(asset.path, Sound.fromFile(asset.path));
             }
         }
     }

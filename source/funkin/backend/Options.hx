@@ -25,7 +25,6 @@ class Options {
     // MISCELLANOUS //
     public static var autoPause:Bool = true;
     public static var verboseLogging:Bool = false;
-    public static var multicoreLoading:Bool = false;
     public static var loadingScreen:Bool = true;
 
     #if LINUX_CASE_INSENSITIVE_FILES
