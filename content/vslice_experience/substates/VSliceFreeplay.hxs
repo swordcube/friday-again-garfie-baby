@@ -49,6 +49,9 @@ var grpSongNames:FlxTypedGroup<TrackingSprite>;
 var grpSongIcons:FlxTypedGroup<TrackingSprite>;
 var grpCapsuleExtras:FlxTypedGroup<TrackingSprite>;
 
+var capsuleSmallNumbers:Array<Array<TrackingSprite>> = [];
+var capsuleBigNumbers:Array<Array<TrackingSprite>> = [];
+
 var capsuleIcons:Array<Array<TrackingSprite>> = [];
 var capsuleBadges:Array<Array<TrackingSprite>> = [];
 
@@ -255,6 +258,8 @@ function regenCapsules(filter:String) {
     }
     capsuleIcons = [];
     capsuleBadges = [];
+    capsuleSmallNumbers = [];
+    capsuleBigNumbers = [];
     
     for(i in 0...filteredSongs.length) {
         // get song metadata
@@ -336,6 +341,106 @@ function regenCapsules(filter:String) {
         // text.kill();
         text.update(0);
         grpSongNames.add(text);
+
+        // add the bpm & difficulty display shit
+        final smallNumbers:Array<TrackingSprite> = [];
+        final bigNumbers:Array<TrackingSprite> = [];
+        
+        if(songData.id != "CUSTOM://random") {
+            final bpmLabel:TrackingSprite = new TrackingSprite().loadGraphic(Paths.image('menus/freeplay/capsule/bpm_text'));
+            bpmLabel.tracked = capsule;
+            bpmLabel.trackingMode = 4; // 4 = DIRECT
+            bpmLabel.trackingOffset.set(82, 75);
+            bpmLabel.setScale(0.9, FlxAxes.XY);
+            grpCapsuleExtras.add(bpmLabel);
+
+            for(i in 0...3) {
+                final smallNumber:TrackingSprite = new TrackingSprite();
+                smallNumber.loadSparrowFrames('menus/freeplay/capsule/small_numbers');
+    
+                for(i => str in ["ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE"])
+                    smallNumber.anim.addByPrefix(Std.string(i), str, 0, false);
+                
+                smallNumber.anim.play("0");
+                smallNumber.tracked = capsule;
+                smallNumber.trackingMode = 4; // 4 = DIRECT
+                smallNumber.trackingOffset.set(125 + (i * 11), 75);
+                smallNumber.setScale(0.9, FlxAxes.XY);
+                grpCapsuleExtras.add(smallNumber);
+    
+                smallNumbers.push(smallNumber);
+            }
+            final difficultyLabel:TrackingSprite = new TrackingSprite().loadGraphic(Paths.image('menus/freeplay/capsule/difficulty_text'));
+            difficultyLabel.tracked = capsule;
+            difficultyLabel.trackingMode = 4; // 4 = DIRECT
+            difficultyLabel.trackingOffset.set(354, 75);
+            difficultyLabel.setScale(0.9, FlxAxes.XY);
+            grpCapsuleExtras.add(difficultyLabel);
+
+            for(i in 0...2) {
+                final bigNumber:TrackingSprite = new TrackingSprite();
+                bigNumber.loadSparrowFrames('menus/freeplay/capsule/big_numbers');
+    
+                for(i => str in ["ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE"])
+                    bigNumber.anim.addByPrefix(Std.string(i), str, 0, false);
+                
+                bigNumber.anim.play("0");
+                bigNumber.tracked = capsule;
+                bigNumber.trackingMode = 4; // 4 = DIRECT
+                bigNumber.trackingOffset.set(400 + (i * 30), 18);
+                bigNumber.setScale(0.9, FlxAxes.XY);
+                grpCapsuleExtras.add(bigNumber);
+    
+                bigNumbers.push(bigNumber);
+            }
+            var weekID:Int = 0;
+            var weekCounter:Int = 0;
+
+            var isWeekend:Bool = false;
+            for(level in Paths.contentMetadata.get(songData.contentPack).levels) {
+                if(level.songs.contains(songData.id)) {
+                    isWeekend = StringTools.startsWith(level.id, "weekend");
+                    if(isWeekend) {
+                        if(weekCounter > 0) weekCounter = -1;
+                        weekID = Std.int(Math.abs(weekCounter));
+                    } else
+                        weekID = weekCounter;
+                    
+                    break;
+                }
+                if(isWeekend)
+                    weekCounter--;
+                else
+                    weekCounter++;
+            }
+            if(weekID != 0) {
+                final weekLabel:TrackingSprite = new TrackingSprite();
+                weekLabel.loadSparrowFrames('menus/freeplay/capsule/week_types');
+                weekLabel.anim.addByPrefix('week', 'WEEK0', 0, false);
+                weekLabel.anim.addByPrefix('weekend', 'WEEKEND0', 0, false);
+                weekLabel.anim.play("week");
+                weekLabel.tracked = capsule;
+                weekLabel.trackingMode = 4; // 4 = DIRECT
+                weekLabel.trackingOffset.set(230, 75);
+                weekLabel.setScale(0.9, FlxAxes.XY);
+                grpCapsuleExtras.add(weekLabel);
+
+                final weekNumber:TrackingSprite = new TrackingSprite();
+                weekNumber.loadSparrowFrames('menus/freeplay/capsule/small_numbers');
+    
+                for(i => str in ["ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE"])
+                    weekNumber.anim.addByPrefix(Std.string(i), str, 0, false);
+                
+                weekNumber.anim.play(Std.string(weekID));
+                weekNumber.tracked = capsule;
+                weekNumber.trackingMode = 4; // 4 = DIRECT
+                weekNumber.trackingOffset.set(195 + ((weekLabel.anim.name == "weekend") ? 133 : 96), 75);
+                weekNumber.setScale(0.9, FlxAxes.XY);
+                grpCapsuleExtras.add(weekNumber);
+            }
+        }
+        capsuleSmallNumbers.push(smallNumbers);
+        capsuleBigNumbers.push(bigNumbers);
 
         // make the character icon for this song
         var chosenIcon:String = "none";
@@ -562,9 +667,72 @@ function updateOtherShit() {
     updateAlbumDisplay();
     updateDifficultyStars();
 
+    // length should be the same on capsuleBadges, capsuleSmallNumbers, etc
+    // so this should be fine
     for(i in 0...capsuleBadges.length) {
         final songData:FreeplaySongData = accessibleSongs[i];
+        final songMixMeta:SongMetadata = (songData?.metadata != null) ? songData.metadata.get(currentMix) : null;
 
+        // update bpm and diff numbers
+        final newBPM:Float = (songMixMeta?.song?.timingPoints != null) ? songMixMeta.song.timingPoints[0].bpm : 0;
+        final newRating:Int = (songMixMeta?.freeplay?.ratings != null) ? (songMixMeta.freeplay.ratings.get(currentDifficulty) ?? 0) : 0;
+
+        var shiftX:Float = 114;
+        var tempShift = 0;
+
+        if(Math.floor(newBPM / 100) == 1)
+            shiftX += 11;
+        
+        final bpmNumbers:Array<TrackingSprite> = capsuleSmallNumbers[i];
+        for(i in 0...bpmNumbers.length) {
+            bpmNumbers[i].trackingOffset.x = shiftX + (i * 11);
+            switch(i) {
+                case 0:
+                    bpmNumbers[i].exists = newBPM >= 100;
+                    if(newBPM < 100)
+                        bpmNumbers[i].anim.play("0");
+                    else
+                        bpmNumbers[i].anim.play(Std.string(Math.floor(newBPM / 100) % 10));
+
+                case 1:
+                    if(newBPM < 10)
+                        bpmNumbers[i].anim.play("0");
+                    else {
+                        bpmNumbers[i].anim.play(Std.string(Math.floor(newBPM / 10) % 10));
+                        if(Math.floor(newBPM / 10) % 10 == 1)
+                            tempShift = -4;
+                    }
+                
+                case 2:
+                    bpmNumbers[i].anim.play(Std.string(newBPM % 10));
+                
+                default:
+                    trace('why the fuck is this being called');
+            }
+            bpmNumbers[i].trackingOffset.x += tempShift;
+        }
+        final firstDigit:Int = (newBPM >= 100) ? 0 : 1;
+        if(bpmNumbers.length != 0 && bpmNumbers[firstDigit].anim.name == "1")
+            bpmNumbers[firstDigit].trackingOffset.x += 4;
+        
+        final diffNumbers:Array<TrackingSprite> = capsuleBigNumbers[i];
+        final ratingPadded:String = (newRating < 10) ? '0${newRating}' : '${newRating}';
+        for(i in 0...diffNumbers.length) {
+            switch(i) {
+                case 0:
+                    if(newRating < 10)
+                        diffNumbers[i].anim.play("0");
+                    else
+                        diffNumbers[i].anim.play(Std.string(Math.floor(newRating / 10)));
+                    
+                case 1:
+                    diffNumbers[i].anim.play(Std.string(newRating % 10));
+                
+                default:
+                    trace('why the fuck is this being called');
+            }
+        }
+        // update badge
         final rankBadge:FlxSprite = capsuleBadges[i][0];
         final blurredRankBadge:TrackingSprite = rankBadge.extra.get("blurredBadge");
 
