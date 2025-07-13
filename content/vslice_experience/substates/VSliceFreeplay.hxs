@@ -875,12 +875,13 @@ function changeFilter(?by:Int, ?force:Bool) {
         category.anim.addBySymbol("move", songFilters[FlxMath.wrap(curSongFilter + (i - 2), 0, songFilters.length - 1)] + " move", 24, false);
         category.anim.play("move");
         
-        if(i != 2)
+        if(i != 2) {
             category.anim.pause();
-        else
+            category.setPosition(grpCategories.x + (i * 80) + 26, grpCategories.y + -18);
+        } else {
             category.anim.resume();
-        
-        category.setPosition(grpCategories.x + (i * 80) + 10, grpCategories.y + -28);
+            category.setPosition(grpCategories.x + (i * 80) + 10, grpCategories.y + -28);
+        }
         category.updateHitbox();
     }
     regenCapsules(songFilters[curSongFilter]);
