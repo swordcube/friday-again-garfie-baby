@@ -43,6 +43,9 @@ class CharterObjectGroup extends FlxObject {
 	public var onEventClick(default, null):FlxTypedSignal<ChartEditorEvent->Void> = new FlxTypedSignal<ChartEditorEvent->Void>();
 	public var onEventRightClick(default, null):FlxTypedSignal<ChartEditorEvent->Void> = new FlxTypedSignal<ChartEditorEvent->Void>(); 
 
+    public var objectMoveSounds:Array<FlxSound> = [];
+    public var curObjectMoveSound:Int = 0;
+
     /**
      * The notes from the chart that will directly
      * be rendered onto this object.
@@ -73,6 +76,12 @@ class CharterObjectGroup extends FlxObject {
 
         _addEventSprite = new FlxSprite();
         _addEventSprite.loadGraphic(Paths.image("editors/charter/images/event_add_bg"));
+
+        for(i in 0...5) {
+            // 5 is probably enough of these sounds to continuously re-use 
+            final sound:FlxSound = FlxG.sound.play(Paths.sound("editors/charter/sfx/object_move"), 0, false, null, false);
+            objectMoveSounds.push(sound);
+        }
     }
 
     override function update(elapsed:Float) {
@@ -85,18 +94,34 @@ class CharterObjectGroup extends FlxObject {
             for(object in charter.selectedObjects) {
                 switch(object) {
                     case CNote(note):
+                        final lastStep:Float = note.step;
+                        final lastDirection:Int = note.data.direction;
                         note.data.direction = FlxMath.boundInt(note.lastDirection + (direction - _lastDirection), 0, (Constants.KEY_COUNT * 2) - 1);
-                        
+
                         final newStep:Float = note.lastStep + (charter._mousePos.y - _lastMouseY);
                         note.step = Math.max((FlxG.keys.pressed.SHIFT) ? (newStep / ChartEditor.CELL_SIZE) : (Math.floor(newStep / snapMult) * snapMult) / ChartEditor.CELL_SIZE, 0);
 
+                        if(note.step != lastStep || note.data.direction != lastDirection) {
+                            final sound:FlxSound = (objectMoveSounds[curObjectMoveSound]);
+                            sound.volume = 1;
+                            sound.play(true);
+                            curObjectMoveSound = (curObjectMoveSound + 1) % objectMoveSounds.length;
+                        }
                         if(!_movingObjects)
                             note.data.time = Conductor.instance.getTimeAtStep(note.step);
 
                     case CEvent(event):
+                        final lastStep:Float = event.step;
+
                         final newStep:Float = event.lastStep + (charter._mousePos.y - _lastMouseY);
                         event.step = Math.max((FlxG.keys.pressed.SHIFT) ? (newStep / ChartEditor.CELL_SIZE) : (Math.floor(newStep / snapMult) * snapMult) / ChartEditor.CELL_SIZE, 0);
 
+                        if(event.step != lastStep) {
+                            final sound:FlxSound = (objectMoveSounds[curObjectMoveSound]);
+                            sound.volume = 1;
+                            sound.play(true);
+                            curObjectMoveSound = (curObjectMoveSound + 1) % objectMoveSounds.length;
+                        }
                         if(!_movingObjects) {
                             final time:Float = Conductor.instance.getTimeAtStep(event.step);
                             for(e in event.events)
@@ -337,7 +362,7 @@ class CharterObjectGroup extends FlxObject {
 		_addEventSprite.alpha = 0.3;
 
         final offsetX:Float = -1;
-        _addEventSprite.setPosition((x - _addEventSprite.width) + offsetX, snapY);
+        _addEventSprite.setPosition((x - _addEventSprite.width) + offsetX, snapY - (_addEventSprite.height * 0.5));
         _addEventSprite.draw();
     }
 

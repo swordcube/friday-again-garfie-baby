@@ -31,3 +31,33 @@ class EventData {
         return 'EventData(time: ${time}, params: ${params}, type: ${type})';
     }
 }
+
+enum EventParameterType {
+	Bool;
+    String;
+    Int(min:Int, max:Int, step:Int);
+    Float(min:Float, max:Float, step:Float, decimals:Int);
+    Dropdown(values:Array<String>);
+    ColorWheel;
+}
+
+typedef EventConfig = {
+	var params:Array<RawEventParameterConfig>;
+	var useNamedParams:Bool;
+}
+
+typedef RawEventParameterConfig = {
+	var id:String;
+	var title:String;
+	
+	var type:String;
+	var defaultValue:Dynamic;
+}
+
+typedef EventParameterConfig = {
+	var id:String;
+	var title:String;
+	
+	var type:EventParameterType;
+	var defaultValue:Dynamic;
+}

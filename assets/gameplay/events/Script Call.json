@@ -1,0 +1,19 @@
+{
+    "params": [
+        {
+            "id": "method",
+            "title": "Method to Call",
+
+            "type": "String",
+            "defaultValue": "myMethod"
+        },
+        {
+            "id": "args",
+            "title": "Method Arguments (comma separated)",
+
+            "type": "String",
+            "defaultValue": ""
+        }
+    ],
+    "useNamedEvents": true
+}

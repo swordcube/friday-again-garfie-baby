@@ -1,0 +1,19 @@
+{
+    "params": [
+        {
+            "id": "camera",
+            "title": "Camera to Zoom",
+
+            "type": "Dropdown('camGame', 'camHUD')",
+            "defaultValue": "camGame"
+        },
+        {
+            "id": "zoom",
+            "title": "Amount to Zoom",
+
+            "type": "Float(0.0, 1.25, 0.01, 3)",
+            "defaultValue": "camGame"
+        }
+    ],
+    "useNamedEvents": true
+}

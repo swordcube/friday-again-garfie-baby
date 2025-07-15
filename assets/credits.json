@@ -49,6 +49,16 @@
                     "url": "https://twitter.com/lufekaji"
                 },
                 {
+                    "name": "Toffee",
+                    "description": "Made sounds for adding, selecting, and deleting objects in the Chart Editor",
+
+                    "icon": "toffee",
+                    "color": "#ffb100",
+
+                    "roles": ["Composer"],
+                    "url": "https://www.youtube.com/channel/UCtWhSilvW3pIgjme61PWA5g"
+                },
+                {
                     "name": "You",
                     "description": "Thank you for trying out Garfie Engine!",
                     

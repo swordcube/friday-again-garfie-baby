@@ -565,6 +565,12 @@ class ChartEditor extends UIState {
         Conductor.instance.hasMetronome = editorSettings.metronome && inst.playing;
         conductorInfoText.text = 'Step: ${Conductor.instance.curStep}\nBeat: ${Conductor.instance.curBeat}\nMeasure: ${Conductor.instance.curMeasure}';
 
+        if(FlxG.mouse.justPressed)
+            FlxG.sound.play(Paths.sound("editors/charter/sfx/click_down"));
+        
+        else if(FlxG.mouse.justReleased)
+            FlxG.sound.play(Paths.sound("editors/charter/sfx/click_up"));
+
         final targetScrollY:Float = (CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.playhead)) - (FlxG.height * 0.5);
         if(inst.playing || isUIFocused)
             noteCam.scroll.y = targetScrollY;
@@ -961,6 +967,7 @@ class ChartEditor extends UIState {
         if(!unsafe) {
             undos.unsaved = true;
             undos.add(CAddObjects(objects));
+            FlxG.sound.play(Paths.sound("editors/charter/sfx/object_add"));
         }
     }
 
@@ -988,12 +995,15 @@ class ChartEditor extends UIState {
             addObjects([object]);
         }
         else if(direction > -3 && direction < 0) {
+            if(inst.playing)
+                playPause();
+
             persistentDraw = true;
 
             final menu:CharterEventMenu = new CharterEventMenu(new ChartEditorEvent(Conductor.instance.getTimeAtStep(newStep), []));
             menu.onClose.add((event:ChartEditorEvent) -> {
                 if(event.events.length == 0)
-                    return; // don't add event pack if it has no events in
+                    return; // don't add event pack if it has no events inside
 
                 final object:ChartEditorObject = CEvent(event);
                 addObjects([object]);
@@ -1041,6 +1051,7 @@ class ChartEditor extends UIState {
         if(!unsafe && filteredObjects.length != 0) {
             undos.unsaved = true;
             undos.add(CSelectObjects(filteredObjects, selectedObjects.copy()));
+            FlxG.sound.play(Paths.sound("editors/charter/sfx/object_select"));
         }
         selectedObjects = filteredObjects;
     }
@@ -1062,7 +1073,8 @@ class ChartEditor extends UIState {
         selectObjects([], true);
         if(!unsafe) {
             undos.unsaved = true;
-            undos.add(CRemoveObjects(objects)); 
+            undos.add(CRemoveObjects(objects));
+            FlxG.sound.play(Paths.sound("editors/charter/sfx/object_delete"));
         }
     }
 
@@ -1089,6 +1101,11 @@ class ChartEditor extends UIState {
                 case CEvent(event):
                     rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
                         Button("Edit", null, () -> {
+                            if(inst.playing)
+                                playPause();
+
+                            persistentDraw = true;
+                            
                             final menu:CharterEventMenu = new CharterEventMenu(event);
                             openSubState(menu);
                         }),
@@ -1455,6 +1472,7 @@ class ChartEditor extends UIState {
                 // do nothing           :p
         }
         undos.unsaved = true;
+        FlxG.sound.play(Paths.sound("editors/charter/sfx/undo"));
     }
 
     public function redo():Void {
@@ -1493,6 +1511,7 @@ class ChartEditor extends UIState {
                 // do nothing           :p
         }
         undos.unsaved = true;
+        FlxG.sound.play(Paths.sound("editors/charter/sfx/redo"));
     }
 
     //----------- [ Private API ] -----------//
