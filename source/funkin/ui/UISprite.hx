@@ -3,6 +3,7 @@ package funkin.ui;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 
 class UISprite extends FlxSprite implements IUIComponent {
+    public var parent:IUIComponent = null;
     public var cursorType:CursorType = DEFAULT;
 
     public function new(x:Float = 0, y:Float = 0, ?graphic:FlxGraphicAsset) {

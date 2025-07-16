@@ -22,8 +22,27 @@ class UIUtil {
         for(i in 0...allComponents.length) {
             c = allComponents[i];
             
+            var dead:Bool = false;
+            if(c is FlxBasic) {
+                var b:FlxBasic = cast c;
+                if(!b.exists || !b.alive) {
+                    dead = true;
+                    continue;
+                }
+            }
+            var p:IUIComponent = c.parent;
+            while(p != null) {
+                if(p is FlxBasic) {
+                    final b:FlxBasic = cast p;
+                    if(!b.exists || !b.alive) {
+                        dead = true;
+                        break;
+                    }
+                }
+                p = p.parent;
+            }
             @:privateAccess
-            if(c._checkingMouseOverlap || (hasIgnores && ignoreList.contains(c)))
+            if(dead || c._checkingMouseOverlap || (hasIgnores && ignoreList.contains(c)))
                 continue;
 
             if(c.checkMouseOverlap())
@@ -38,7 +57,27 @@ class UIUtil {
             var c:IUIComponent = null;
             for(i in 0...focusedComponents.length) {
                 c = focusedComponents[i];
-                if(ignoreList.contains(c))
+
+                var dead:Bool = false;
+                if(c is FlxBasic) {
+                    var b:FlxBasic = cast c;
+                    if(!b.exists || !b.alive) {
+                        dead = true;
+                        continue;
+                    }
+                }
+                var p:IUIComponent = c.parent;
+                while(p != null) {
+                    if(p is FlxBasic) {
+                        final b:FlxBasic = cast p;
+                        if(!b.exists || !b.alive) {
+                            dead = true;
+                            break;
+                        }
+                    }
+                    p = p.parent;
+                }
+                if(dead || ignoreList.contains(c))
                     continue;
                 
                 return true;

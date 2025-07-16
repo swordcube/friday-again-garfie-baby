@@ -58,6 +58,17 @@ class GameplayPage extends OptionPage {
             id: "hitWindow",
             type: TInt(5, 180, 5)
         });
+        final hitsoundTypeOption:ListOption = cast addOption({
+            name: "Hitsound Type",
+            description: "Change the kind of hitsounds to use during gameplay.",
+
+            id: "hitsoundType",
+            type: TList(["osu!", "tump"])
+        });
+        hitsoundTypeOption.updateValue = (value:Dynamic) -> {
+            hitsoundTypeOption.valueText.text = Std.string(value);
+            FlxG.sound.play(Options.getHitsoundPath());
+        };
         addOption({
             name: "Hitsound Behavior",
             description: "Changes how the hitsounds behave during gameplay.",
@@ -65,13 +76,17 @@ class GameplayPage extends OptionPage {
             id: "hitsoundBehavior",
             type: TList(["Note Hit", "Key Press"])
         });
-        addOption({
+        final hitsoundVolumeOption:PercentOption = cast addOption({
             name: "Hitsound Volume",
             description: "Changes how loud the hitsounds are during gameplay.",
 
             id: "hitsoundVolume",
             type: TPercent
         });
+        hitsoundVolumeOption.updateValue = (value:Dynamic) -> {
+            hitsoundVolumeOption.valueText.text = '${Math.floor(value * 100)}%';
+            FlxG.sound.play(Options.getHitsoundPath(), cast value);
+        };
         super.initOptions();
     }
 }

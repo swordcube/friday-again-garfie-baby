@@ -14,6 +14,8 @@ class UIState extends FunkinState {
 
             if(c is FlxBasic) {
                 final b:FlxBasic = cast c;
+                if(!b.exists || !b.alive)
+                    continue;
                 
                 // find the parent of the component
                 var isInState:Bool = false;
@@ -26,9 +28,8 @@ class UIState extends FunkinState {
                     }
                     container = container.container;
                 }
-                
-                // if the parent is not a state, continue
-                if(!isInState)
+                // if the parent is not a state, or the container is dead, continue
+                if(!isInState || !container.exists || !container.alive)
                     continue;
 
                 // if the parent is a state, continue if it has a substate open

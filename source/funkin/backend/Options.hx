@@ -12,6 +12,7 @@ class Options {
     public static var songOffset:Float = 0;
     public static var hitWindow:Float = 180;
 
+    public static var hitsoundType:String = "osu!";
     public static var hitsoundBehavior:String = "Note Hit";
     public static var hitsoundVolume:Float = 0;
     
@@ -148,6 +149,17 @@ class Options {
         }
     }
     
+    public static function getHitsoundFileName():String {
+        switch(hitsoundType) {
+            case "osu!": return "osu";
+        }
+        return hitsoundType;
+    }
+
+    public static function getHitsoundPath():String {
+        return Paths.sound('gameplay/sfx/hitsound_${getHitsoundFileName()}');
+    }
+
     public static function save():Void {
         _save.data.gameplayModifiers = gameplayModifiers;
         _save.data.toggledContentPacks = toggledContentPacks;

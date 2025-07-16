@@ -49,6 +49,12 @@ class CharterEventMenu extends UISubState {
         
         if(FlxG.mouse.justReleased && !window.checkMouseOverlap())
             FlxTimer.wait(0.001, window.close);
+
+        if(FlxG.mouse.justPressed)
+            FlxG.sound.play(Paths.sound("editors/charter/sfx/click_down"));
+        
+        else if(FlxG.mouse.justReleased)
+            FlxG.sound.play(Paths.sound("editors/charter/sfx/click_up"));
         
         super.update(elapsed);
     }

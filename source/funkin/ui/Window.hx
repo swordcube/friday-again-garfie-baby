@@ -1,12 +1,17 @@
 package funkin.ui;
 
+import flixel.math.FlxPoint;
+
 import flixel.util.FlxTimer;
+import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxSignal.FlxTypedSignal;
 
 import funkin.ui.panel.*;
 
 class Window extends UIComponent {
     public var bg:Panel;
+
+    public var titleBar:FlxSprite;
     public var titleLabel:Label;
 
     public var closeIcon:UISprite;
@@ -16,18 +21,30 @@ class Window extends UIComponent {
     public var contents:FlxSpriteContainer;
 
     public var closable:Bool = true;
+    
+    /**
+     * Whether or not the window should be destroyed when it is closed.
+     * If this is disabled, it will be killed instead.
+     */
+    public var destructivelyClose:Bool = true;
+
     public var collapsable:Bool = true;
 
     public var onClose:FlxTypedSignal<Void->Void> = new FlxTypedSignal<Void->Void>();
     public var collapsed:Bool = false;
 
     public var autoSize:Bool = false;
+    public var dragging:Bool = false;
 
     public function new(x:Float = 0, y:Float = 0, ?title:String, ?autoSize:Bool = false, ?width:Float = 100, ?height:Float = 100) {
         super(x, y);
 
         bg = new Panel(0, 0, 1, 1);
         add(bg);
+
+        titleBar = new FlxSprite().makeSolid(32, 32, FlxColor.BLUE);
+        titleBar.kill();
+        add(titleBar);
 
         titleLabel = new Label(10, 6, title ?? "");
         add(titleLabel);
@@ -75,17 +92,51 @@ class Window extends UIComponent {
         if(closeIcon.visible && closeIcon.checkMouseOverlap() && FlxG.mouse.justReleased)
             FlxTimer.wait(0.001, close);
 
+        if(FlxG.mouse.justPressed && FlxG.mouse.overlaps(titleBar, getDefaultCamera())) {
+            _lastPos.set(x, y);
+            FlxG.mouse.getViewPosition(getDefaultCamera(), _lastMousePos);
+            dragging = true;
+        }
+        if(dragging && FlxG.mouse.justReleased)
+            dragging = false;
+
+        if(dragging && FlxG.mouse.pressed && FlxG.mouse.justMoved) {
+            FlxG.mouse.getViewPosition(getDefaultCamera(), _mousePos);
+            x = _lastPos.x + (_mousePos.x - _lastMousePos.x);
+            y = _lastPos.y + (_mousePos.y - _lastMousePos.y);
+        }
         super.update(elapsed);
     }
 
+    public function show():Void {
+        @:bypassAccessor exists = true;
+    }
+
+    public function hide():Void {
+        @:bypassAccessor exists = false;
+    }
+
     public function close():Void {
-        destroy();
+        if(destructivelyClose)
+            destroy();
+        else {
+            onClose.dispatch();
+            hide();
+        }
     }
     
     override function destroy():Void {
+        _lastPos = FlxDestroyUtil.put(_lastPos);
+        _mousePos = FlxDestroyUtil.put(_mousePos);
+        _lastMousePos = FlxDestroyUtil.put(_lastMousePos);
+
         onClose.dispatch();
         super.destroy();
     }
+
+    private var _lastPos:FlxPoint = FlxPoint.get();
+    private var _mousePos:FlxPoint = FlxPoint.get();
+    private var _lastMousePos:FlxPoint = FlxPoint.get();
 
     private var _pendingComponents:Array<FlxSprite> = [];
 
@@ -101,6 +152,9 @@ class Window extends UIComponent {
             }
             bg.width = Value;
             
+            titleBar.setGraphicSize(Value, 32);
+            titleBar.updateHitbox();
+
             separator.setGraphicSize(Value - 8, separator.frameHeight);
             separator.updateHitbox();
         }

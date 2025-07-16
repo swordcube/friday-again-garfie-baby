@@ -124,6 +124,8 @@ class ChartEditor extends UIState {
     public var conductorInfoText:FlxText;
     public var rightClickMenu:DropDown;
 
+    public var chartPreviewWindow:CharterPreviewWindow;
+
     public function new(params:ChartEditorParams) {
         super();
         if(params == null)
@@ -250,7 +252,7 @@ class ChartEditor extends UIState {
         FlxG.cameras.add(noteCam, false);
 
         hitSound = new FlxSound();
-        hitSound.loadEmbedded(Paths.sound('editors/charter/sfx/hitsound'));
+        hitSound.loadEmbedded(Options.getHitsoundPath());
         FlxG.sound.list.add(hitSound);
 
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_desat"));
@@ -494,6 +496,11 @@ class ChartEditor extends UIState {
         conductorInfoText.setFormat(Paths.font("fonts/montserrat/semibold"), 14, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
         conductorInfoText.y = FlxG.height - (conductorInfoText.height + playBar.bg.height + 16);
         uiLayer.add(conductorInfoText);
+
+        chartPreviewWindow = new CharterPreviewWindow();
+        chartPreviewWindow.destructivelyClose = false;
+        chartPreviewWindow.hide();
+        uiLayer.add(chartPreviewWindow);
 
         // adjust a few lil things
 

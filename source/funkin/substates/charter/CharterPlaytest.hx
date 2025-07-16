@@ -167,6 +167,12 @@ class CharterPlaytest extends FunkinSubState {
 
         if(controls.justPressed.BACK)
             close();
+
+        if(FlxG.mouse.justPressed)
+            FlxG.sound.play(Paths.sound("editors/charter/sfx/click_down"));
+        
+        else if(FlxG.mouse.justReleased)
+            FlxG.sound.play(Paths.sound("editors/charter/sfx/click_up"));
     }
 
     public function startSong():Void {

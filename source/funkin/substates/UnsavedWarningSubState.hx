@@ -51,13 +51,13 @@ class UnsavedWarningSubState extends UISubState {
 }
 
 class UnsavedWarningWindow extends Window {
-    public var parent(default, null):UnsavedWarningSubState;
+    public var menu(default, null):UnsavedWarningSubState;
     public var charter(default, null):ChartEditor;
     public var easterEggActivated(default, null):Bool = false;
 
-    public function new(x:Float = 0, y:Float = 0, parent:UnsavedWarningSubState) {
+    public function new(x:Float = 0, y:Float = 0, menu:UnsavedWarningSubState) {
         charter = cast FlxG.state;
-        this.parent = parent;
+        this.menu = menu;
         super(x, y, "Hey! Listen!", false, 320, 130);
     }
 
@@ -72,10 +72,10 @@ class UnsavedWarningWindow extends Window {
         final text:Label = new Label(icon.x + icon.width + 10, icon.y, (easterEggActivated) ? "are you sure" : "Are you sure you want to exit?\nYou may lose unsaved progress!");
         addToContents(text);
 
-        final acceptBtn:Button = new Button(text.x, text.y + text.height + 10, "Yes", 0, 0, () -> parent.onAccept.dispatch());
+        final acceptBtn:Button = new Button(text.x, text.y + text.height + 10, "Yes", 0, 0, () -> menu.onAccept.dispatch());
         addToContents(acceptBtn);
 
-        final cancelBtn:Button = new Button(acceptBtn.x + acceptBtn.width + 10, acceptBtn.y, "No", acceptBtn.width, 0, () -> parent.onCancel.dispatch());
+        final cancelBtn:Button = new Button(acceptBtn.x + acceptBtn.width + 10, acceptBtn.y, "No", acceptBtn.width, 0, () -> menu.onCancel.dispatch());
         addToContents(cancelBtn);
 
         FlxG.sound.play(Paths.sound("menus/sfx/warning"));

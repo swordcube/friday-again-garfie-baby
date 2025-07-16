@@ -30,6 +30,25 @@ class Cursor {
             }
         ];
         type = DEFAULT;
+
+        FlxG.signals.preUpdate.add(() -> {
+            switch(type) {
+                case POINTER, GRABBING:
+                    final prev:CursorType = type;    
+                    if(FlxG.mouse.justPressed) {
+                        @:bypassAccessor type = null;
+                        type = GRABBING;
+                        @:bypassAccessor type = prev;
+                    }
+                    else if(FlxG.mouse.justReleased) {
+                        @:bypassAccessor type = null;
+                        type = POINTER; 
+                        @:bypassAccessor type = prev;
+                    }
+
+                default:
+            }
+        });
     }
 
     //----------- [ Private API ] -----------//

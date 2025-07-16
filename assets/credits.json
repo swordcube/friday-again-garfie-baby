@@ -1,7 +1,7 @@
 {
     "categories": [
         {
-            "name": "Engine Contributors",
+            "name": "Engine Developers",
             "items": [
                 {
                     "name": "swordcube",
@@ -16,18 +16,8 @@
             ]
         },
         {
-            "name": "Special Thanks",
+            "name": "Engine Contributors",
             "items": [
-                {
-                    "name": "The Funkin' Crew",
-                    "description": "Made the original game, you should go check it out!",
-                    
-                    "icon": "funkincrew",
-                    "color": "#26a6f8",
-                    
-                    "roles": ["Programmer", "Artist", "Composer"],
-                    "url": "https://github.com/FunkinCrew/Funkin"
-                },
                 {
                     "name": "TheConcealedCow",
                     "description": "Made the Killer!!! judgement asset",
@@ -57,6 +47,21 @@
 
                     "roles": ["Composer"],
                     "url": "https://www.youtube.com/channel/UCtWhSilvW3pIgjme61PWA5g"
+                }
+            ]
+        },
+        {
+            "name": "Special Thanks",
+            "items": [
+                {
+                    "name": "The Funkin' Crew",
+                    "description": "Made the original game, you should go check it out!",
+                    
+                    "icon": "funkincrew",
+                    "color": "#26a6f8",
+                    
+                    "roles": ["Programmer", "Artist", "Composer"],
+                    "url": "https://github.com/FunkinCrew/Funkin"
                 },
                 {
                     "name": "You",

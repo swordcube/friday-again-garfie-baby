@@ -104,7 +104,16 @@ class CharterTopBar extends TopBar {
                 Button("Select measure", [[UIUtil.correctModifierKey(CONTROL), SHIFT, A]], charter.selectMeasureNotes),
                 
                 Separator,
-            ].concat(noteTypeItems))
+            ].concat(noteTypeItems)),
+            DropDown("Window", [
+                Checkbox("Chart Preview", (value:Bool) -> {
+                    if(value)
+                        charter.chartPreviewWindow.show();
+                    else
+                        charter.chartPreviewWindow.hide();
+                },
+                () -> return charter.chartPreviewWindow.exists),
+            ])
         ];
     }
 

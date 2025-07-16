@@ -11,6 +11,7 @@ import flixel.system.FlxAssets.FlxGraphicAsset;
 import funkin.states.editors.ChartEditor;
 
 class CharterGrid extends FlxBackdrop implements IUIComponent {
+    public var parent:IUIComponent = null;
     public var cursorType:CursorType;
     public var charter(default, null):ChartEditor;
 
@@ -23,7 +24,12 @@ class CharterGrid extends FlxBackdrop implements IUIComponent {
     }
 
     override function update(elapsed:Float) {
-        cursorType = (charter.objectGroup.isHoveringNote || charter.objectGroup.isHoveringEvent) ? POINTER : CELL;
+        @:privateAccess
+        if(!charter.objectGroup._movingObjects)
+            cursorType = (charter.objectGroup.isHoveringNote || charter.objectGroup.isHoveringEvent) ? POINTER : CELL;
+        else
+            cursorType = GRABBING;
+        
         super.update(elapsed);
     }
 

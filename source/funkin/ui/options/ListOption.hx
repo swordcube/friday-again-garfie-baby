@@ -18,6 +18,7 @@ class ListOption extends Option {
 
         updateValue = (value:Dynamic) -> {
             valueText.text = Std.string(value);
+            FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
         };
         updateValue(value);
     } 
@@ -29,8 +30,6 @@ class ListOption extends Option {
 
             value = possibleValues[index];
             setValue(value);
-
-            FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
         }
         super.handleInputs();
     }

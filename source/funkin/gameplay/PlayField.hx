@@ -112,7 +112,7 @@ class PlayField extends FlxContainer {
             playerStrumLine.x = FlxG.width * 0.5;
         }
         hitSound = new FlxSound();
-        hitSound.loadEmbedded(Paths.sound('editors/charter/sfx/hitsound'));
+        hitSound.loadEmbedded(Options.getHitsoundPath());
         hitSound.volume = Options.hitsoundVolume;
         FlxG.sound.list.add(hitSound);
 

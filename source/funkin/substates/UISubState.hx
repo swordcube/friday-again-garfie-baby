@@ -15,14 +15,16 @@ class UISubState extends FunkinSubState {
             
             if(c is FlxBasic) {
                 final b:FlxBasic = cast c;
+                if(!b.exists || !b.alive)
+                    continue;
                 
                 // find the parent of the component
                 var container:FlxContainer = b.container;
                 while(container?.container != null)
                     container = container.container;
                 
-                // if the parent is not a state, continue
-                if(!(container is FlxState))
+                // if the parent is not a state, or the container is dead, continue
+                if(!(container is FlxState) || !container.exists || !container.alive)
                     continue;
 
                 // if the parent is a state, continue if it has a substate open
