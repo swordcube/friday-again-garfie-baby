@@ -146,6 +146,7 @@ class CharterObjectGroup extends FlxObject {
         isHoveringNote = false;
         isHoveringEvent = false;
 
+        final coveredUpByOtherUI:Bool = UIUtil.isHoveringAnyComponent([charter.grid, charter.selectionBox]) || UIUtil.isAnyComponentFocused([charter.grid, charter.selectionBox]);
 		if(direction < (Constants.KEY_COUNT * 2)) {
             final max:Float = FlxG.height / 70 / getDefaultCamera().zoom;
     
@@ -165,7 +166,7 @@ class CharterObjectGroup extends FlxObject {
                     final offsetX:Float = (note.data.direction < Constants.KEY_COUNT) ? -1 : 1;
                     sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + offsetX, y + (ChartEditor.CELL_SIZE * note.step));
     
-                    if (FlxG.mouse.overlaps(sprite, charter.noteCam)) {
+                    if (FlxG.mouse.overlaps(sprite, charter.noteCam) && !coveredUpByOtherUI) {
                         isHoveringNote = true;
                         if(FlxG.mouse.pressed && FlxG.mouse.justMoved && note.selected && !charter.selectionBox.exists) {
                             for(object in charter.selectedObjects) {
@@ -210,7 +211,7 @@ class CharterObjectGroup extends FlxObject {
                     _eventBGSprite.width = 70 + ((event.events.length - 1) * 30);
                     _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step) - (_eventBGSprite.height * 0.5));
 
-                    if (FlxG.mouse.overlaps(_eventBGSprite, charter.noteCam)) {
+                    if (FlxG.mouse.overlaps(_eventBGSprite, charter.noteCam) && !coveredUpByOtherUI) {
                         isHoveringEvent = true;
                         
                         if(FlxG.mouse.pressed && FlxG.mouse.justMoved && event.selected && !charter.selectionBox.exists) {

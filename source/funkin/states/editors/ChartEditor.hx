@@ -642,9 +642,9 @@ class ChartEditor extends UIState {
                 if(selectionBox.exists) {
 					var selected:Array<ChartEditorObject> = objectGroup.checkSelection();
                     if(UIUtil.isModifierKeyPressed(CTRL))
-                        selectObjects(selectedObjects.concat(selected));
+                        forceSelectObjects(selectedObjects.concat(selected));
                     else
-                        selectObjects(selected);
+                        forceSelectObjects(selected);
         
                     FlxTimer.wait(0.001, () -> {
                         selectionBox.setPosition(-99999, -99999);
@@ -654,7 +654,7 @@ class ChartEditor extends UIState {
                 else {
 					final direction:Int = Math.floor((_mousePos.x - objectGroup.x) / CELL_SIZE);
                     if(direction < 0 || direction >= (Constants.KEY_COUNT * 2))
-                        selectObjects([]);
+                        forceSelectObjects([]);
                 }
             }
             if(FlxG.mouse.justReleasedRight && !isUIActive && !objectGroup.isHoveringNote && !objectGroup.isHoveringEvent) {
@@ -970,7 +970,7 @@ class ChartEditor extends UIState {
                     // TODO: this shit
             }
         }
-        selectObjects(objects, true);
+        forceSelectObjects(objects, true);
         if(!unsafe) {
             undos.unsaved = true;
             undos.add(CAddObjects(objects));
@@ -1020,6 +1020,13 @@ class ChartEditor extends UIState {
     }
 
     public function selectObjects(objects:Array<ChartEditorObject>, ?unsafe:Bool = false):Void {
+        if(UIUtil.isHoveringAnyComponent([grid, selectionBox]) || UIUtil.isAnyComponentFocused([grid, selectionBox]))
+            return;
+
+        forceSelectObjects(objects, unsafe);
+    }
+
+    public function forceSelectObjects(objects:Array<ChartEditorObject>, ?unsafe:Bool = false):Void {
         // deselect previous objects
         for(object in selectedObjects) {
             switch(object) {
@@ -1077,7 +1084,7 @@ class ChartEditor extends UIState {
                     objectGroup.events.remove(event);
             }
         }
-        selectObjects([], true);
+        forceSelectObjects([], true);
         if(!unsafe) {
             undos.unsaved = true;
             undos.add(CRemoveObjects(objects));
@@ -1312,7 +1319,7 @@ class ChartEditor extends UIState {
         for(note in objectGroup.notes)
             selected.push(CNote(note));
 
-        selectObjects(selected);
+        forceSelectObjects(selected);
     }
 
     public function selectMeasureNotes():Void {
@@ -1332,7 +1339,7 @@ class ChartEditor extends UIState {
 
             selected.push(CNote(note));
         }
-        selectObjects(selected);
+        forceSelectObjects(selected);
     }
 
     public function save():Void {
@@ -1473,7 +1480,7 @@ class ChartEditor extends UIState {
                 }
 
             case CSelectObjects(_, lastSelectedObjects):
-                selectObjects(lastSelectedObjects.copy(), true);
+                forceSelectObjects(lastSelectedObjects.copy(), true);
 
             default:
                 // do nothing           :p
@@ -1512,7 +1519,7 @@ class ChartEditor extends UIState {
                 }
 
             case CSelectObjects(newObjects, _):
-                selectObjects(newObjects.copy(), true);
+                forceSelectObjects(newObjects.copy(), true);
 
             default:
                 // do nothing           :p
