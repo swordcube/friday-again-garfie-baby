@@ -44,6 +44,13 @@ class AppearancePage extends OptionPage {
             type: TCheckbox
         });
         addOption({
+            name: "Lasagna",
+            description: "Garfield's Dinner",
+        
+            id: "lasagna",
+            type: TCheckbox
+        });
+        addOption({
             name: "HUD Type",
             description: "Changes how the HUD looks during gameplay.\nThis only works if the song has the default HUD skin!",
 

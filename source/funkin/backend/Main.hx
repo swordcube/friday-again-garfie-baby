@@ -7,6 +7,7 @@ import haxe.io.BytesOutput;
 
 import openfl.display.Sprite;
 
+import funkin.backend.Lasagna;
 import funkin.backend.InitState;
 import funkin.backend.StatsDisplay;
 import funkin.backend.native.HiddenProcess;
@@ -43,6 +44,7 @@ class Main extends Sprite {
 		sideBars = new SideBars();
 		FlxG.game.addChildAt(sideBars, FlxG.game.getChildIndex(FlxG.game._inputContainer));
 		
+		addChild(new Lasagna());
 	}
 
 	public static function execASync(func:Void->Void) {

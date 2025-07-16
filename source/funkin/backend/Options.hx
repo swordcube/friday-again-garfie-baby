@@ -21,6 +21,7 @@ class Options {
     public static var flashingLights:Bool = true;
     public static var fpsCounter:Bool = true;
     public static var intensiveShaders:Bool = true;
+    public static var lasagna:Bool = false;
     public static var hudType:String = "Classic";
     
     // MISCELLANOUS //
