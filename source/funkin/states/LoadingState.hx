@@ -32,8 +32,6 @@ import funkin.gameplay.UISkin.UISkinData;
 import funkin.gameplay.notes.NoteSkin;
 import funkin.gameplay.notes.NoteSkin.NoteSkinData;
 
-// TODO: add the fucking lasagna asset.
-
 class LoadingState extends FunkinState {
     public var params:LoadingStateParams;
 
