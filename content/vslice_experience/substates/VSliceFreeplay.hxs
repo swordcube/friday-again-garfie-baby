@@ -1,6 +1,7 @@
 // TODO: figure out how to properly optimize capsule updating
 // removing the code brings the up to 700fps, with updating it drops to 200fps
 
+// TODO: add difficulty dots from the 0.7 update
 // TODO: add dj easter eggs
 
 import openfl.geom.Point;
@@ -879,7 +880,7 @@ function changeFilter(?by:Int, ?force:Bool) {
     for(i in 0...grpCategories.length) {
         final category:FunkinSprite = grpCategories.members[i];
 
-        category.anim.addBySymbol("move", songFilters[FlxMath.wrap(curSongFilter + (i - 2), 0, songFilters.length - 1)] + " move", 24, false);
+        category.anim.addBySymbol("move", songFilters[FlxMath.wrap(curSongFilter + (i - 2), 0, songFilters.length - 1)] + " move", 24, true);
         category.anim.play("move");
         
         if(i != 2) {

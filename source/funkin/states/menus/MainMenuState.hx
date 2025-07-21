@@ -104,7 +104,7 @@ class MainMenuState extends FunkinState {
         #if DEV_BUILD
         versionString += ' (${GitCommitMacro.getBranch()}/${GitCommitMacro.getCommitHash()})';
         #end
-        versionString += "\nFriday Night Funkin' v0.6.0";
+        versionString += "\nFriday Night Funkin' v0.7.0";
         
         versionText = new FlxText(5, FlxG.height - 2, 0, versionString + '\nPress ${InputFormatter.formatFlixel(Controls.getKeyFromInputType(controls.getCurrentMappings().get(Control.MANAGE_CONTENT)[0])).toUpperCase()} to manage content packs');
 		versionText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
