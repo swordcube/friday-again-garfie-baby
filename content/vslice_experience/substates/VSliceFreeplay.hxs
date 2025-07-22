@@ -441,9 +441,12 @@ function regenCapsules(filter:String) {
         capsuleBigNumbers.push(bigNumbers);
 
         // make the character icon for this song
-        var chosenIcon:String = "none";
+        var chosenIcon:String = "face";
         if(songMeta != null && songMeta.freeplay.icon != null)
             chosenIcon = songMeta.freeplay.icon;
+
+        if(songData.id == "CUSTOM://random")
+            chosenIcon = "none"; // hardcoded i don't care
         
         if(chosenIcon != "none") {
             final iconJsonPath:String = Paths.json('menus/freeplay/icons/${chosenIcon}');
