@@ -41,7 +41,8 @@ class PlayField extends FlxContainer {
     public var hud:BaseHUD;
 
     public var hitSound:FlxSound;
-    public var missSounds:Map<String, FlxSound> = [];
+    public var missSounds:Map<String, Array<FlxSound>> = [];
+    public var curMissSound:Int = 0;
 
     public var comboDisplay:ComboDisplay;
 
@@ -120,10 +121,14 @@ class PlayField extends FlxContainer {
             final sndKey:String = 'gameplay/sfx/missnote${i + 1}';
             final sndPath:String = Paths.sound(sndKey);
             if(FlxG.assets.exists(sndPath)) {
-                final sound:FlxSound = new FlxSound();
-                sound.loadEmbedded(sndPath);
-                FlxG.sound.list.add(sound);
-                missSounds.set(sndKey, sound);
+                final sounds:Array<FlxSound> = [];
+                for(i in 0...3) {
+                    final sound:FlxSound = new FlxSound();
+                    sound.loadEmbedded(sndPath);
+                    FlxG.sound.list.add(sound);
+                    sounds.push(sound);
+                }
+                missSounds.set(sndKey, sounds);
             }
         }
         comboDisplay = new ComboDisplay(FlxG.width * 0.474, (FlxG.height * 0.45) - 60, uiSkin ?? currentChart.meta.game.uiSkin);
@@ -261,7 +266,7 @@ class PlayField extends FlxContainer {
             note, note.time, note.direction, note.length, note.type,
             true, true, note.strumLine == playerStrumLine, note.strumLine == playerStrumLine,
             100, 0.02375 + (Math.min(note.length * 0.001, 0.25) * 0.5), true, true, null, "",
-            Options.missSounds && FlxG.state == PlayState.instance, 'gameplay/sfx/missnote${FlxG.random.int(1, 3)}', FlxG.random.float(0.7, 0.9)
+            Options.missSounds && FlxG.state == PlayState.instance, 'gameplay/sfx/missnote${FlxG.random.int(1, 3)}', FlxG.random.float(0.75, 0.9)
         ));
         if(event.cancelled)
             return;
@@ -305,10 +310,12 @@ class PlayField extends FlxContainer {
             }
         }
         if(event.playMissSound) {
-            final sound:FlxSound = missSounds.get(event.missSound);
+            final soundList:Array<FlxSound> = missSounds.get(event.missSound);
+            final sound:FlxSound = soundList[(curMissSound + 1) % soundList.length];
             if(sound != null) {
                 sound.volume = event.missVolume;
-                sound.play();
+                sound.time = 0;
+                sound.play(true);
             } else
                 FlxG.sound.play(Paths.sound(event.missSound), event.missVolume);
         }

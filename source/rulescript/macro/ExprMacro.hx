@@ -15,7 +15,7 @@ class ExprMacro
 		var pos = Context.currentPos();
 
 		for (field in fields)
-			if (field.name == 'EFor' || field.name == 'EVar' || field.name == 'EFunction')
+			if (field.name == 'EVar' || field.name == 'EFunction')
 				fields.remove(field);
 
 		var newFields:Map<String, Expr> = [
@@ -27,9 +27,10 @@ class ExprMacro
 			'EVar' => macro function(n:String, ?t:CType, ?e:Expr, ?global:Bool, ?isFinal:Bool, ?isPublic:Bool, ?isStatic:Bool) {},
 			'EFunction' => macro function(args:Array<Argument>, e:Expr, ?name:String, ?ret:CType, ?isPublic:Bool, ?isStatic:Bool) {},
 			'EProp' => macro function(n:String, g:String, s:String, ?t:CType, ?e:Expr, ?global:Bool, ?isPublic:Bool, ?isStatic:Bool) {},
-			'EFor' => macro function(key:String, it:Expr, e:Expr, ?value:String) {},
+			
 			'ETypeVarPath' => macro function(path:Array<String>) {},
 			'EUntyped' => macro function(e:Expr) {},
+			'ECast' => macro function(e:Expr, ?t:CType) {},
 			'EMapDecl' => macro function(exprs:Array<Expr>) {}
 
 		];
@@ -76,7 +77,8 @@ class ExprMacro
 			'DImport' => macro function(name:Array<String>, star:Bool, ?alias:String, ?func:String) {},
 			'DUsing' => macro function(name:String) {},
 			'DAbstract' => macro function(c:rulescript.types.decl.AbstractDecl) {},
-			'DEnum' => macro function(c:rulescript.types.decl.EnumDecl) {}
+			'DEnum' => macro function(c:rulescript.types.decl.EnumDecl) {},
+			'DField' => macro function(f:FieldDecl) {}
 		];
 
 		for (key => value in newFields)
@@ -145,7 +147,7 @@ class ExprMacro
 			});
 
 	public static function buildBytesDefaults():Array<Field>
-		return addDefaultPattern('doEncode');
+		return addDefaultPattern('doEncode', addDefaultPattern('exprIndex', macro - 1));
 
 	public static function buildCheckerDefaults():Array<Field>
 		return addDefaultPattern('typeExpr');

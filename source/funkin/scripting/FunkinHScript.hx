@@ -7,7 +7,7 @@ import haxe.PosInfos;
 import hscript.Interp;
 import hscript.Expr;
 
-import rulescript.Tools;
+import rulescript.Tools.getScriptProp;
 
 import rulescript.RuleScript;
 import rulescript.interps.RuleScriptInterp;
