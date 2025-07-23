@@ -43,7 +43,7 @@ jobs:
           haxelib run hmm install
 
           haxelib remove rulescript
-          haxelib git rulescript https://github.com/Kriptel/RuleScript.git 06747255e9463db3d4a529df3ebca129c308e694
+          haxelib git rulescript https://github.com/Kriptel/RuleScript.git dev
           
           haxelib set lime git
       
