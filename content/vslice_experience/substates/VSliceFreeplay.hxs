@@ -449,14 +449,22 @@ function regenCapsules(filter:String) {
             chosenIcon = "none"; // hardcoded i don't care
         
         if(chosenIcon != "none") {
-            final iconJsonPath:String = Paths.json('menus/freeplay/icons/${chosenIcon}');
+            var iconJsonPath:String = Paths.json('menus/freeplay/icons/${chosenIcon}');
+            if(!FlxG.assets.exists(iconJsonPath))
+                iconJsonPath = Paths.json('menus/freeplay/icons/face');
+            
             final iconConfig:Dynamic = (FlxG.assets.exists(iconJsonPath)) ? Json.parse(FlxG.assets.getText(iconJsonPath)) : {offset: [0, 0]};
 
             final songIcon:TrackingSprite = new TrackingSprite();
             songIcon.tracked = capsule;
             songIcon.trackingMode = 4; // 4 = DIRECT
             songIcon.trackingOffset.set(iconConfig.offset[0] - 4, iconConfig.offset[1] - 2);
-            songIcon.loadSparrowFrames('menus/freeplay/icons/${chosenIcon}');
+
+            if(FlxG.assets.exists(Paths.image('menus/freeplay/icons/${chosenIcon}')))
+                songIcon.loadSparrowFrames('menus/freeplay/icons/${chosenIcon}');
+            else
+                songIcon.loadSparrowFrames('menus/freeplay/icons/face');
+            
             songIcon.anim.addByPrefix('idle', 'idle', 12, true);
             songIcon.anim.addByPrefix('confirm', 'confirm0', 12, false);
             songIcon.anim.play('idle');
