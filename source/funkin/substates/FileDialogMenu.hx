@@ -1,11 +1,14 @@
 package funkin.substates;
 
 import funkin.utilities.FileUtil;
+
+#if desktop
 import cpp.RawPointer;
 import cpp.RawConstPointer;
 
 import hxnativefiledialog.NFD;
 import hxnativefiledialog.Types;
+#end
 
 import sys.io.File;
 import sys.FileSystem;
@@ -60,6 +63,7 @@ class FileDialogMenu extends UISubState {
         camera.bgColor = 0x80000000;
         FlxG.cameras.add(camera, false);
 
+        #if desktop
         FlxTimer.wait(0.25, () -> {
             final defaultSaveFile:String = dialogOptions?.defaultSaveFile;
             final filters:Array<String> = dialogOptions?.filters ?? new Array<String>();
@@ -131,6 +135,7 @@ class FileDialogMenu extends UISubState {
                     close();
             }
         });
+        #end
     }
 
     override function destroy():Void {

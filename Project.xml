@@ -168,7 +168,7 @@
 		like trying to fix it because Lime's codebase
 		is a massive headache
 	-->
-	<haxelib name="hxnativefiledialog" />
+	<haxelib name="hxnativefiledialog" if="desktop" />
 
 	<!-- HaxeFlixel -->
 	<haxelib name="flixel" />

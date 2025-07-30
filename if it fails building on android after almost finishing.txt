@@ -1,0 +1,4 @@
+mainly just a personal note:
+find ~/.gradle -type f -name "*.lock" | while read f; do rm $f; done
+
+run that if it almost finishes the compile then errors
