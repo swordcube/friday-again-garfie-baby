@@ -132,8 +132,9 @@ class FunkinScript {
         setClass(funkin.gameplay.cutscenes.Cutscene);
         setClass(funkin.gameplay.cutscenes.ScriptedCutscene);
         setClass(funkin.gameplay.cutscenes.ScriptedSongCutscene);
+        #if VIDEOS_ALLOWED
         setClass(funkin.gameplay.cutscenes.VideoCutscene);
-
+        #end
         setClass(funkin.gameplay.cutscenes.Timeline);
         setClass(funkin.gameplay.cutscenes.Timeline.TimelineAction);
         setClass(funkin.gameplay.cutscenes.Timeline.CallbackAction);
@@ -145,8 +146,9 @@ class FunkinScript {
         setClass(funkin.graphics.SkinnableUISprite);
 
         setClass(funkin.graphics.TrackingSprite);
+        #if VIDEOS_ALLOWED
         setClass(funkin.graphics.VideoSprite);
-
+        #end
         set("FlxRuntimeShader", funkin.graphics.shader.RuntimeShader);
         setClass(funkin.graphics.shader.RuntimeShader);
         setClass(funkin.graphics.shader.CustomShader);

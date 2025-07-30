@@ -1,6 +1,5 @@
 package funkin.substates;
 
-import funkin.graphics.VideoSprite;
 import lime.app.Future;
 import lime.system.System;
 
@@ -20,6 +19,10 @@ import funkin.states.PlayState;
 import funkin.states.menus.StoryMenuState;
 import funkin.states.menus.FreeplayState;
 
+#if VIDEOS_ALLOWED
+import funkin.graphics.VideoSprite;
+#end
+
 import funkin.substates.transition.TransitionSubState;
 
 class GameOverSubState extends FunkinSubState {
@@ -38,7 +41,9 @@ class GameOverSubState extends FunkinSubState {
     public var doFunnyDeath:Bool = false;
 
     override function create():Void {
+        #if VIDEOS_ALLOWED
         doFunnyDeath = FlxG.random.bool(5);
+        #end
         super.create();
 
         FlxTimer.globalManager.forEach((tmr:FlxTimer) -> {
@@ -71,6 +76,7 @@ class GameOverSubState extends FunkinSubState {
             return;
 
         if(doFunnyDeath) {
+            #if VIDEOS_ALLOWED
             final vidCam:FlxCamera = new FlxCamera();
             vidCam.bgColor = 0;
             FlxG.cameras.add(vidCam, false);
@@ -91,6 +97,7 @@ class GameOverSubState extends FunkinSubState {
 
             if(vid.load(shits[FlxG.random.int(0, shits.length - 1)]))
                 FlxTimer.wait(0.001, () -> vid.play());
+            #end
         } else {
             final musicThread:Future<Sound> = CoolUtil.createASyncFuture(() -> {
                 return FlxG.assets.getSound(Paths.sound('${_createEvent.music}/music'));

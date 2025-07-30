@@ -5,6 +5,7 @@
 	<!-- _________________________ Application Settings _________________________ -->
 
 	<app title="friday again garfie baby" file="Funkin" main="funkin.backend.Main" version="0.1.0" company="swordcube" />
+	<architecture name="x64" if="android" />
 
 	<!-- ____________________________ Window Settings ___________________________ -->
 
@@ -60,7 +61,7 @@
 
 		lime test platform -DNO_LUA
 	-->
-	<define name="LUA_ALLOWED" if="SCRIPTING_ALLOWED cpp" unless="NO_LUA || NO_LUA_ALLOWED" />
+	<define name="LUA_ALLOWED" if="SCRIPTING_ALLOWED cpp" unless="mobile || NO_LUA || NO_LUA_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable Discord RPC
@@ -76,7 +77,7 @@
 
 		lime test platform -DNO_VIDEOS
 	-->
-	<define name="VIDEOS_ALLOWED" if="cpp" unless="NO_VIDEOS || NO_VIDEOS_ALLOWED" />
+	<define name="VIDEOS_ALLOWED" if="cpp" unless="mobile || NO_VIDEOS || NO_VIDEOS_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable the crash handler
@@ -144,7 +145,7 @@
 	-->
 	<section unless="TEST_BUILD || display || macro">
 		<assets path="assets" />
-		<assets path="content"/>
+		<assets path="content" />
 	</section>
 
 	<!--
@@ -313,4 +314,9 @@
 	<icon path="art/icons/256x.png" size="512"  />
 	<icon path="art/icons/256x.png" size="768"  />
 	<icon path="art/icons/256x.png" size="1024"  />
+
+	<!-- _________________________________ Android Stuff _______________________________ -->
+	 
+	<config:android permission="android.permission.READ_EXTERNAL_STORAGE" if="android"/>
+	<config:android permission="android.permission.WRITE_EXTERNAL_STORAGE" if="android"/>
 </project>

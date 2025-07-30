@@ -1,5 +1,6 @@
 package funkin.gameplay.cutscenes;
 
+#if VIDEOS_ALLOWED
 import flixel.util.FlxTimer;
 import flixel.util.FlxDestroyUtil;
 
@@ -67,3 +68,4 @@ class VideoCutscene extends Cutscene {
         game.camGame.visible = true;
     }
 }
+#end
