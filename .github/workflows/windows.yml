@@ -1,7 +1,7 @@
 name: Windows Build
 on:
   push:
-    branches: [ main ]
+    branches: [ main, mobile-support ]
   workflow_dispatch:
 jobs:
   build:
