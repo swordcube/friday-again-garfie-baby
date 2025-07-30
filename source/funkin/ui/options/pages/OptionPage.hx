@@ -78,7 +78,7 @@ class OptionPage extends Page {
 			option.y = FlxMath.lerp(option.y, y, FlxMath.getElapsedLerp(0.16, elapsed));
 			option.x = -80 + (Math.abs(Math.cos((option.y + (OPTION_HEIGHT * 0.5) - (getDefaultCamera().scroll.y + (FlxG.height * 0.5))) / (FlxG.height * 1.25) * Math.PI)) * 150);
         }
-        final wheel:Float = -FlxG.mouse.wheel;
+        final wheel:Float = MouseUtil.getWheel();
         if(controls.justPressed.UI_UP || wheel < 0)
             changeSelection(-1);
 

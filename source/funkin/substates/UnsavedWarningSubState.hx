@@ -20,9 +20,10 @@ class UnsavedWarningSubState extends UISubState {
     override function create():Void {
         super.create();
         
+        #if FLX_MOUSE
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
-
+        #end
         camera = new FlxCamera();
         camera.bgColor = 0x80000000;
         FlxG.cameras.add(camera, false);
@@ -37,17 +38,19 @@ class UnsavedWarningSubState extends UISubState {
     }
 
     override function update(elapsed:Float):Void {
-        if(FlxG.mouse.justReleased && !window.checkMouseOverlap())
+        if(MouseUtil.isJustReleased() && !window.checkMouseOverlap())
             FlxTimer.wait(0.001, window.close);
         
         super.update(elapsed);
     }
 
+    #if FLX_MOUSE
     override function destroy():Void {
         FlxG.mouse.visible = lastMouseVisible;
         FlxG.cameras.remove(camera);
         super.destroy();
     }
+    #end
 }
 
 class UnsavedWarningWindow extends Window {

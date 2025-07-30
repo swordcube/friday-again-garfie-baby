@@ -56,15 +56,16 @@ class CharacterEditor extends UIState {
 
     override function create():Void {
         super.create();
-        
         FlxG.camera.bgColor = FlxColor.GRAY;
+        
+        #if FLX_MOUSE
         lastMouseVisible = FlxG.mouse.visible;
-
+        FlxG.mouse.visible = true;
+        #end
         camUI = new FlxCamera();
         camUI.bgColor = 0;
         FlxG.cameras.add(camUI, false);
 
-        FlxG.mouse.visible = true;
         Main.statsDisplay.visible = false; // it gets in the way
 
         camFollow = new FlxObject(0, 0, 1, 1);
@@ -146,39 +147,40 @@ class CharacterEditor extends UIState {
                     addOffsetToCurAnim(amount, 0);
             }
             // camera panning (via middle click dragging)
-            if(FlxG.mouse.justPressedMiddle) {
+            final pointer = MouseUtil.getPointer();
+            if(MouseUtil.isJustPressedMiddle()) {
                 panningCamera = true;
                 lastCamPos.set(camFollow.x, camFollow.y);
-                FlxG.mouse.getGamePosition(lastMousePos);
+                pointer.getGamePosition(lastMousePos);
             }
-            if(FlxG.mouse.justReleasedMiddle)
+            if(MouseUtil.isJustReleasedMiddle())
                 panningCamera = false;
             
-            if(panningCamera && FlxG.mouse.justMoved) {
-                FlxG.mouse.getGamePosition(curMousePos);
+            if(panningCamera && MouseUtil.wasJustMoved()) {
+                pointer.getGamePosition(curMousePos);
                 camFollow.setPosition(
                     lastCamPos.x - ((curMousePos.x - lastMousePos.x) / FlxG.camera.zoom),
                     lastCamPos.y - ((curMousePos.y - lastMousePos.y) / FlxG.camera.zoom)  
                 );
             } else {
                 // animation offsetting (via mouse dragging)
-                if(FlxG.mouse.justPressed) {
+                if(MouseUtil.isJustPressed()) {
                     draggingOffsets = true;
                     lastCamPos.set(character.animation.curAnim.offset.x, character.animation.curAnim.offset.y); // reuse lastCamPos because i don't care fuck you
-                    FlxG.mouse.getGamePosition(lastMousePos);
+                    pointer.getGamePosition(lastMousePos);
                 }
-                if(FlxG.mouse.justReleased)
+                if(MouseUtil.isJustReleased())
                     draggingOffsets = false;
                 
-                if(draggingOffsets && FlxG.mouse.justMoved) {
-                    FlxG.mouse.getGamePosition(curMousePos);
+                if(draggingOffsets && MouseUtil.wasJustMoved()) {
+                    pointer.getGamePosition(curMousePos);
                     setOffsetForCurAnim(
                         Std.int(lastCamPos.x - ((curMousePos.x - lastMousePos.x) / character.scale.x / FlxG.camera.zoom)),
                         Std.int(lastCamPos.y - ((curMousePos.y - lastMousePos.y) / character.scale.y / FlxG.camera.zoom))
                     );
                 }
                 // camera zooming (via mouse wheel)
-                FlxG.camera.zoom += FlxG.mouse.wheel * (0.1 * FlxG.camera.zoom);
+                FlxG.camera.zoom += MouseUtil.getWheel() * (0.1 * FlxG.camera.zoom);
             }
         }
         super.update(elapsed);
@@ -364,7 +366,9 @@ class CharacterEditor extends UIState {
         curMousePos = FlxDestroyUtil.put(curMousePos);
         lastMousePos = FlxDestroyUtil.put(lastMousePos);
 
+        #if FLX_MOUSE
         FlxG.mouse.visible = lastMouseVisible;
+        #end
         super.destroy();
     }
 }

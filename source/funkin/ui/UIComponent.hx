@@ -20,7 +20,8 @@ class UIComponent extends FlxSpriteContainer implements IUIComponent {
 
     public function checkMouseOverlap():Bool {
         _checkingMouseOverlap = true;
-        final ret:Bool = FlxG.mouse.overlaps(this, getDefaultCamera()) && UIUtil.allDropDowns.length == 0;
+        final pointer = MouseUtil.getPointer();
+        final ret:Bool = pointer.overlaps(this, getDefaultCamera()) && UIUtil.allDropDowns.length == 0;
         _checkingMouseOverlap = false;
         return ret;
     }

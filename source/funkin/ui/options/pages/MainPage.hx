@@ -71,7 +71,7 @@ class MainPage extends Page {
     override function update(elapsed:Float):Void {
         super.update(elapsed);
 
-        final wheel:Float = -FlxG.mouse.wheel;
+        final wheel:Float = MouseUtil.getWheel();
         if(controls.justPressed.UI_UP || wheel < 0)
             changeSelection(-1);
 

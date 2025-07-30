@@ -124,34 +124,42 @@ class InitState extends FlxState {
         FlxG.plugins.addPlugin(new ScreenShotPlugin());
 
         // hide cursor, we probably don't need it rn
+        #if FLX_MOUSE
         FlxG.mouse.visible = false;
+        #else
+        startGame();
+        #end
     }
 
+    #if FLX_MOUSE
     override function update(elapsed:Float):Void {
         super.update(elapsed);
         
         // for some reason i have to do this bullshittery
         // just for the cursor to be hidden on linux. what the fuck.
         if(!_started && !FlxG.mouse.visible) {
-            FlxTimer.wait(0.001, () -> {
-                // do starting logic shit
-                final args = Sys.args();
-                if(args.contains("--song")) {
-                    // if song arguments are passed, immediately go
-                    // to playstate with that song
-                    // 
-                    // NOTE: difficulty MUST be passed!!
-                    FlxG.switchState(PlayState.new.bind({
-                        song: args[args.indexOf("--song") + 1],
-                        difficulty: args[args.indexOf("--diff") + 1]
-                    }));    
-                } else {
-                    // otherwise do normal starting logic
-                    FlxG.switchState(TitleState.new);
-                }
-            });
+            FlxTimer.wait(0.001, startGame);
             _started = true;
         }
         FlxG.mouse.visible = false;
+    }
+    #end
+
+    private function startGame():Void {
+        // do starting logic shit
+        final args = Sys.args();
+        if(args.contains("--song")) {
+            // if song arguments are passed, immediately go
+            // to playstate with that song
+            // 
+            // NOTE: difficulty MUST be passed!!
+            FlxG.switchState(PlayState.new.bind({
+                song: args[args.indexOf("--song") + 1],
+                difficulty: args[args.indexOf("--diff") + 1]
+            }));    
+        } else {
+            // otherwise do normal starting logic
+            FlxG.switchState(TitleState.new);
+        }
     }
 }

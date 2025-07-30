@@ -38,6 +38,7 @@ import funkin.graphics.FunkinSprite;
 import funkin.utilities.Constants;
 import funkin.utilities.CoolUtil;
 import funkin.utilities.WindowUtil;
+import funkin.utilities.MouseUtil;
 
 import haxe.Json;
 import json2object.JsonParser;
@@ -53,5 +54,4 @@ using funkin.utilities.CoolUtil;
 #if SCRIPTING_ALLOWED
 import funkin.scripting.GlobalScript;
 #end
-
 #end

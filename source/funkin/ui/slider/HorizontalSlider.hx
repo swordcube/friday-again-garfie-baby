@@ -31,25 +31,27 @@ class HorizontalSlider extends Slider {
     }
 
     override function update(elapsed:Float) {
-        final thumbHovered:Bool = FlxG.mouse.overlaps(thumb);
+        final pointer = MouseUtil.getPointer();
+
+        final thumbHovered:Bool = pointer.overlaps(thumb);
         thumb.frame = thumb.frames.frames[(thumbHovered || dragging) ? 1 : 0];
 
-        if(checkMouseOverlap() && FlxG.mouse.pressed && !dragging) {
+        if(checkMouseOverlap() && MouseUtil.isPressed() && !dragging) {
             dragging = true;
 
             final thumbPosCap = width - (thumb.width - 1);
-            _lastThumbPos.x = FlxMath.bound(((thumbHovered) ? thumb.x : (FlxG.mouse.x - ((thumb.width + 1) * 0.5))) - x, 0, thumbPosCap) + 1;
-            FlxG.mouse.getWorldPosition(getDefaultCamera(), _lastMousePos);
+            _lastThumbPos.x = FlxMath.bound(((thumbHovered) ? thumb.x : (pointer.x - ((thumb.width + 1) * 0.5))) - x, 0, thumbPosCap) + 1;
+            pointer.getWorldPosition(getDefaultCamera(), _lastMousePos);
         }
-        else if(dragging && FlxG.mouse.justReleased)
+        else if(dragging && MouseUtil.isJustReleased())
             dragging = false;
 
         if(dragging) {
             final thumbPosCap:Float = width - (thumb.width - 1);
-            FlxG.mouse.getWorldPosition(getDefaultCamera(), _mousePos);
+            pointer.getWorldPosition(getDefaultCamera(), _mousePos);
         
             final oldValue:Float = value;
-            final newValue:Float = FlxMath.remapToRange(FlxMath.bound((_lastThumbPos.x + (FlxG.mouse.x - _lastMousePos.x)) / thumbPosCap, 0, 1), 0, 1, min, max);
+            final newValue:Float = FlxMath.remapToRange(FlxMath.bound((_lastThumbPos.x + (pointer.x - _lastMousePos.x)) / thumbPosCap, 0, 1), 0, 1, min, max);
         
             @:bypassAccessor value = (step > 0) ? Math.floor(newValue / step) * step : newValue;
             if(value != oldValue && callback != null)

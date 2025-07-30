@@ -40,9 +40,10 @@ class ContentPackState extends FunkinState {
         DiscordRPC.changePresence("Managing Content Packs", null);
         persistentUpdate = true;
 
+        #if FLX_MOUSE
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
-
+        #end
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_blue"));
         bg.screenCenter();
         bg.scrollFactor.set();
@@ -125,7 +126,7 @@ class ContentPackState extends FunkinState {
         final percent:Float = FlxMath.bound(packCam.scroll.y / ((grpItems.length * 40) - packCam.height), 0, 1);
         scrollBar.y = FlxMath.lerp(scrollBarBG.y, scrollBarBG.y + scrollBarBG.height - scrollBar.height, percent);
 
-        final wheel:Float = -FlxG.mouse.wheel;
+        final wheel:Float = MouseUtil.getWheel();
         if(controls.justPressed.UI_UP || wheel < 0) {
             if(FlxG.keys.pressed.SHIFT)
                 moveItem(true);
@@ -225,10 +226,12 @@ class ContentPackState extends FunkinState {
         FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
     }
 
+    #if FLX_MOUSE
     override function destroy():Void {
         FlxG.mouse.visible = lastMouseVisible;
         super.destroy();
     }
+    #end
 }
 
 class ContentPackItem extends FlxSpriteContainer {
@@ -288,13 +291,14 @@ class ContentPackItem extends FlxSpriteContainer {
     override function update(elapsed:Float):Void {
         super.update(elapsed);
 
-        final hovered:Bool = FlxG.mouse.overlaps(bg, getDefaultCamera());
-        if(hovered && FlxG.mouse.justPressed) {
+        final pointer = MouseUtil.getPointer();
+        final hovered:Bool = pointer.overlaps(bg, getDefaultCamera());
+        if(hovered && MouseUtil.isJustPressed()) {
             canDrag = true;
             if(onClick != null)
                 onClick();
         }
-        if(FlxG.mouse.justReleased) {
+        if(MouseUtil.isJustReleased()) {
             menu.grpItems.sort(sortByY, FlxSort.ASCENDING);
             for(i => item in menu.grpItems.members)
                 item.y = i * 40;
@@ -305,14 +309,14 @@ class ContentPackItem extends FlxSpriteContainer {
             canDrag = false;
             dragging = false;
         }
-        if(canDrag && !dragging && FlxG.mouse.justMoved) {
+        if(canDrag && !dragging && MouseUtil.wasJustMoved()) {
             dragging = true;
 
             _lastY = y;
-            _lastMouseY = FlxG.mouse.y;  
+            _lastMouseY = pointer.y;  
         }
-        if(dragging && FlxG.mouse.justMoved) {
-            final newY:Float = _lastY + (FlxG.mouse.y - _lastMouseY);
+        if(dragging && MouseUtil.wasJustMoved()) {
+            final newY:Float = _lastY + (pointer.y - _lastMouseY);
             y = newY;
 
             menu.grpItems.sort(sortByY, FlxSort.ASCENDING);
@@ -323,7 +327,7 @@ class ContentPackItem extends FlxSpriteContainer {
                 item.y = i * 40;
             }
         }
-        bg.alpha = FlxMath.lerp(bg.alpha, (hovered) ? ((FlxG.mouse.pressed) ? 0.6 : 0.4) : 0.0, FlxMath.getElapsedLerp(0.25, elapsed));
+        bg.alpha = FlxMath.lerp(bg.alpha, (hovered) ? ((MouseUtil.isPressed()) ? 0.6 : 0.4) : 0.0, FlxMath.getElapsedLerp(0.25, elapsed));
     }
 
     public static inline function sortByY(Order:Int, Obj1:FlxObject, Obj2:FlxObject):Int {

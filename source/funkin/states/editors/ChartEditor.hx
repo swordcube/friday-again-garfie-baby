@@ -504,7 +504,9 @@ class ChartEditor extends UIState {
 
         // adjust a few lil things
 
+        #if FLX_MOUSE
         FlxG.mouse.visible = true;
+        #end
         Main.statsDisplay.visible = false; // it gets in the way
         
         if(lastParams.startTime != null && lastParams.startTime > 0) {
@@ -547,10 +549,11 @@ class ChartEditor extends UIState {
     }
 
     override function update(elapsed:Float) {
+        final pointer = MouseUtil.getPointer();
         final isUIFocused:Bool = UIUtil.isAnyComponentFocused([grid, selectionBox]);
 
         FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY) && !isUIFocused;
-        FlxG.mouse.getWorldPosition(noteCam, _mousePos);
+        pointer.getWorldPosition(noteCam, _mousePos);
 
         super.update(elapsed);
 
@@ -572,18 +575,18 @@ class ChartEditor extends UIState {
         Conductor.instance.hasMetronome = editorSettings.metronome && inst.playing;
         conductorInfoText.text = 'Step: ${Conductor.instance.curStep}\nBeat: ${Conductor.instance.curBeat}\nMeasure: ${Conductor.instance.curMeasure}';
 
-        if(FlxG.mouse.justPressed)
+        if(MouseUtil.isJustPressed())
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_down"));
         
-        else if(FlxG.mouse.justReleased)
+        else if(MouseUtil.isJustReleased())
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_up"));
 
         final targetScrollY:Float = (CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.playhead)) - (FlxG.height * 0.5);
         if(inst.playing || isUIFocused)
             noteCam.scroll.y = targetScrollY;
         else {
-            if(FlxG.mouse.wheel != 0) {
-                final wheel:Float = -FlxG.mouse.wheel;
+            final wheel:Float = MouseUtil.getWheel();
+            if(wheel != 0) {
                 if(wheel < 0)
                     goBackABeat();
                 else
@@ -594,22 +597,22 @@ class ChartEditor extends UIState {
             else
                 noteCam.scroll.y = FlxMath.lerp(noteCam.scroll.y, targetScrollY, FlxMath.getElapsedLerp(0.32, elapsed));
 
-            if(FlxG.mouse.pressedMiddle && FlxG.mouse.justMoved && !_middleScrolling) {
+            if(MouseUtil.isPressedMiddle() && MouseUtil.wasJustMoved() && !_middleScrolling) {
                 _middleScrolling = true;
-                _lastMousePos.y = FlxG.mouse.y;
+                _lastMousePos.y = pointer.y;
             }
             if(_middleScrolling) {
-                seekToTime(FlxMath.bound(Conductor.instance.time + ((FlxG.mouse.y - _lastMousePos.y) * elapsed * 10), 0, inst.length));
-                if(FlxG.mouse.releasedMiddle)
+                seekToTime(FlxMath.bound(Conductor.instance.time + ((pointer.y - _lastMousePos.y) * elapsed * 10), 0, inst.length));
+                if(!MouseUtil.isPressedMiddle())
                     _middleScrolling = false;
             }
         }
 		if (!objectGroup._movingObjects) {
-            if(FlxG.mouse.justPressed && !isUIActive)
+            if(MouseUtil.isJustPressed() && !isUIActive)
                 _selectingObjects = true;
 
             if(_selectingObjects) {
-                if(FlxG.mouse.justMoved && !selectionBox.exists) {
+                if(MouseUtil.wasJustMoved() && !selectionBox.exists) {
                     _lastMousePos.copyFrom(_mousePos);
                     selectionBox.revive();
                 }
@@ -637,7 +640,7 @@ class ChartEditor extends UIState {
                     selectionBox.visible = (newWidthAbs > 5 && newHeightAbs > 5);
                 }
             }
-            if(FlxG.mouse.justReleased && !isUIActive) {
+            if(MouseUtil.isJustReleased() && !isUIActive) {
                 _selectingObjects = false;
                 if(selectionBox.exists) {
 					var selected:Array<ChartEditorObject> = objectGroup.checkSelection();
@@ -657,13 +660,13 @@ class ChartEditor extends UIState {
                         forceSelectObjects([]);
                 }
             }
-            if(FlxG.mouse.justReleasedRight && !isUIActive && !objectGroup.isHoveringNote && !objectGroup.isHoveringEvent) {
+            if(MouseUtil.isJustReleasedRight() && !isUIActive && !objectGroup.isHoveringNote && !objectGroup.isHoveringEvent) {
                 final direction:Int = Math.floor((_mousePos.x - objectGroup.x) / CELL_SIZE);
                 if(direction < 0 || direction >= (Constants.KEY_COUNT * 2)) {
                     if(rightClickMenu != null)
                         rightClickMenu.destroy();
 
-                    rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
+                    rightClickMenu = new DropDown(pointer.x, pointer.y, 0, 0, [
                         Button("Undo", [[UIUtil.correctModifierKey(CONTROL), Z]], undo),
                         Button("Redo", [[UIUtil.correctModifierKey(CONTROL), Y], [UIUtil.correctModifierKey(CONTROL), SHIFT, Z]], redo),
                         
@@ -698,8 +701,9 @@ class ChartEditor extends UIState {
         _lastMousePos = FlxDestroyUtil.put(_lastMousePos);
 
         Main.statsDisplay.visible = true;
+        #if FLX_MOUSE
         FlxG.mouse.visible = false;
-
+        #end
         Conductor.instance.rate = 1;
         Conductor.instance.music = null;
         Conductor.instance.hasMetronome = false;
@@ -1096,13 +1100,14 @@ class ChartEditor extends UIState {
         if(UIUtil.isModifierKeyPressed(CTRL))
             deleteObjects([object]);
         else {
+            final pointer = MouseUtil.getPointer();
             if(rightClickMenu != null) {
                 remove(rightClickMenu, true);
                 rightClickMenu.destroy();
             }
             switch(object) {
                 case CNote(note):
-                    rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
+                    rightClickMenu = new DropDown(pointer.x, pointer.y, 0, 0, [
                         Button("Edit", null, () -> trace("edit note NOT IMPLEMENTED!!")),
 
                         Separator,
@@ -1113,7 +1118,7 @@ class ChartEditor extends UIState {
                     add(rightClickMenu);
 
                 case CEvent(event):
-                    rightClickMenu = new DropDown(FlxG.mouse.x, FlxG.mouse.y, 0, 0, [
+                    rightClickMenu = new DropDown(pointer.x, pointer.y, 0, 0, [
                         Button("Edit", null, () -> {
                             if(inst.playing)
                                 playPause();

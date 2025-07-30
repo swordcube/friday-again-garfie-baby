@@ -64,7 +64,7 @@ class DropDown extends UIComponent {
     }
 
     override function update(elapsed:Float) {
-        if(_isInteractable && FlxG.mouse.justReleased) {
+        if(_isInteractable && MouseUtil.isJustReleased()) {
             FlxTimer.wait(0.001, () -> {
                 if(topBar != null)
                     topBar.dropdown = null;
@@ -72,7 +72,7 @@ class DropDown extends UIComponent {
                 destroy();
             });
         }
-        if(FlxG.mouse.justPressed)
+        if(MouseUtil.isJustPressed())
             _isInteractable = true;
         
         super.update(elapsed);

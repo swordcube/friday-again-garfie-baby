@@ -47,13 +47,13 @@ class CharterEventMenu extends UISubState {
         final isUIFocused:Bool = UIUtil.isAnyComponentFocused([window.charter.grid, window.charter.selectionBox]);
         FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY) && !isUIFocused;
         
-        if(FlxG.mouse.justReleased && !window.checkMouseOverlap())
+        if(MouseUtil.isJustReleased() && !window.checkMouseOverlap())
             FlxTimer.wait(0.001, window.close);
 
-        if(FlxG.mouse.justPressed)
+        if(MouseUtil.isJustPressed())
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_down"));
         
-        else if(FlxG.mouse.justReleased)
+        else if(MouseUtil.isJustReleased())
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_up"));
         
         super.update(elapsed);
@@ -121,9 +121,10 @@ class CharterEventWindow extends Window {
     override function update(elapsed:Float):Void {
         super.update(elapsed);
 
-        final p:FlxPoint = FlxG.mouse.getViewPosition(menu.camera);
+        final pointer = MouseUtil.getPointer();
+        final p:FlxPoint = pointer.getViewPosition(menu.camera);
         if(p.x >= eventIconCamera.x && p.y >= eventIconCamera.y && p.x <= eventIconCamera.x + eventIconCamera.width && p.y <= eventIconCamera.y + eventIconCamera.height) {
-            final wheel:Float = -FlxG.mouse.wheel;
+            final wheel:Float = MouseUtil.getWheel();
             if(wheel != 0)
                 eventIconCamera.scroll.y = FlxMath.bound(eventIconCamera.scroll.y + (wheel * 50), 0, Math.max(grpButtons.height - eventIconCamera.height, 0));
         }

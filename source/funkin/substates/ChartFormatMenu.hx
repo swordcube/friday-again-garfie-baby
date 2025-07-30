@@ -167,8 +167,10 @@ class ChartFormatMenu extends FunkinSubState {
 
         changeSelection(0, true);
 
+        #if FLX_MOUSE
         _mouseVisibility = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
+        #end
     }
 
     override function update(elapsed:Float):Void {
@@ -184,7 +186,7 @@ class ChartFormatMenu extends FunkinSubState {
             if(controls.justPressed.UI_DOWN)
                 changeSelection(1);
     
-            if(controls.justPressed.ACCEPT || FlxG.mouse.justPressed) {
+            if(controls.justPressed.ACCEPT || MouseUtil.isJustPressed()) {
                 if(onSelect != null)
                     onSelect(validFormats[curSelected]);
             }
@@ -192,10 +194,12 @@ class ChartFormatMenu extends FunkinSubState {
         selectionArrow.y = FlxMath.lerp(selectionArrow.y, grpFormats.members[curSelected].y, elapsed * 15);
     }
     
+    #if FLX_MOUSE
     override function destroy():Void {
         FlxG.mouse.visible = _mouseVisibility;
         super.destroy();
     }
+    #end
 
     public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
         if(by == 0 && !force)
@@ -349,9 +353,10 @@ class ChartFormatItem extends AtlasText {
         while(state.subState != null)
             state = state.subState;
 
-        if(FlxG.mouse.justMoved && state is ChartFormatMenu) {
+        final pointer = MouseUtil.getPointer();
+        if(MouseUtil.wasJustMoved() && state is ChartFormatMenu) {
             final menu:ChartFormatMenu = cast state;
-            final mousePos:FlxPoint = FlxG.mouse.getScreenPosition(menu.menuCam, _cachedPoint);
+            final mousePos:FlxPoint = pointer.getScreenPosition(menu.menuCam, _cachedPoint);
 
             if(menu != null && !menu.busy && (this.overlapsPoint(mousePos, true, menu.menuCam) || icon.overlapsPoint(mousePos, true, menu.menuCam))) {
                 if(menu.curSelected != ID) {

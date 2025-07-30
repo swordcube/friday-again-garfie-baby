@@ -121,7 +121,8 @@ class CharterPlayBar extends UIComponent {
         bpmText.text = '${Conductor.instance.bpm} BPM';
         bpmText.x = timeSigText.x - (bpmText.width - 2);
 
-        if(FlxG.mouse.justPressed && FlxG.mouse.overlaps(songTimeText)) {
+        final pointer = MouseUtil.getPointer();
+        if(pointer.justPressed && pointer.overlaps(songTimeText)) {
             if(FlxG.keys.pressed.S)
                 trace(Conductor.instance.getTimeAtStep(Conductor.instance.curStep));
 

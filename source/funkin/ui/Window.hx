@@ -89,19 +89,20 @@ class Window extends UIComponent {
             totalShit += icon.width + 14;
             icon.x = bg.x + (bg.width - totalShit) + 4;
         }
-        if(closeIcon.visible && closeIcon.checkMouseOverlap() && FlxG.mouse.justReleased)
+        final pointer = MouseUtil.getPointer();
+        if(closeIcon.visible && closeIcon.checkMouseOverlap() && MouseUtil.isJustReleased())
             FlxTimer.wait(0.001, close);
 
-        if(FlxG.mouse.justPressed && FlxG.mouse.overlaps(titleBar, getDefaultCamera())) {
+        if(MouseUtil.isJustPressed() && pointer.overlaps(titleBar, getDefaultCamera())) {
             _lastPos.set(x, y);
-            FlxG.mouse.getViewPosition(getDefaultCamera(), _lastMousePos);
+            pointer.getViewPosition(getDefaultCamera(), _lastMousePos);
             dragging = true;
         }
-        if(dragging && FlxG.mouse.justReleased)
+        if(dragging && MouseUtil.isJustReleased())
             dragging = false;
 
-        if(dragging && FlxG.mouse.pressed && FlxG.mouse.justMoved) {
-            FlxG.mouse.getViewPosition(getDefaultCamera(), _mousePos);
+        if(dragging && MouseUtil.isPressed() && MouseUtil.wasJustMoved()) {
+            pointer.getViewPosition(getDefaultCamera(), _mousePos);
             x = _lastPos.x + (_mousePos.x - _lastMousePos.x);
             y = _lastPos.y + (_mousePos.y - _lastMousePos.y);
         }
@@ -139,6 +140,10 @@ class Window extends UIComponent {
     private var _lastMousePos:FlxPoint = FlxPoint.get();
 
     private var _pendingComponents:Array<FlxSprite> = [];
+
+    #if FLX_TOUCH
+    private
+    #end
 
     override function set_width(Value:Float):Float {
         if(bg != null) {

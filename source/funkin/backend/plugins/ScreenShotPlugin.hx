@@ -49,10 +49,12 @@ class ScreenShotPlugin extends FlxBasic {
             p.create();
             Main.instance.addChildAt(p, Main.instance.getChildIndex(Main.statsDisplay));
         }
+        #if FLX_MOUSE
         if(previews.length == 0 && FlxG.mouse.cursorContainer.visible && !FlxG.mouse.visible) {
             @:privateAccess
             FlxG.mouse.hideCursor();
         }
+        #end
     }
 
     override function destroy():Void {
@@ -144,11 +146,13 @@ class ScreenShotPreview extends Sprite {
         // play fumny camera sound
         FlxG.sound.play(Paths.sound("ui/sfx/screenshot"));
 
+        #if FLX_MOUSE
         // force the cursor to show up
         if(!FlxG.mouse.visible) {
             @:privateAccess
             FlxG.mouse.showCursor();
         }
+        #end
         ScreenShotPlugin.previews.push(this);
     }
 

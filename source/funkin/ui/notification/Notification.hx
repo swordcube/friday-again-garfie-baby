@@ -62,7 +62,8 @@ class Notification extends UIComponent {
 
     override function checkMouseOverlap():Bool {
         _checkingMouseOverlap = true;
-        final ret:Bool = FlxG.mouse.overlaps(bg, getDefaultCamera()) && UIUtil.allDropDowns.length == 0;
+        final pointer = MouseUtil.getPointer();
+        final ret:Bool = pointer.overlaps(bg, getDefaultCamera()) && UIUtil.allDropDowns.length == 0;
         _checkingMouseOverlap = false;
         return ret;
     }

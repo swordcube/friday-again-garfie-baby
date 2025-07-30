@@ -49,12 +49,13 @@ class FileDialogMenu extends UISubState {
     override function create():Void {
         super.create();
         
+        #if FLX_MOUSE
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
 
         lastMouseSystemCursor = FlxG.mouse.useSystemCursor;
         FlxG.mouse.useSystemCursor = true;
-
+        #end
         camera = new FlxCamera();
         camera.bgColor = 0x80000000;
         FlxG.cameras.add(camera, false);
@@ -133,9 +134,10 @@ class FileDialogMenu extends UISubState {
     }
 
     override function destroy():Void {
+        #if FLX_MOUSE
         FlxG.mouse.useSystemCursor = lastMouseSystemCursor;
         FlxG.mouse.visible = lastMouseVisible;
-
+        #end
         FlxG.cameras.remove(camera);
         super.destroy();
     }

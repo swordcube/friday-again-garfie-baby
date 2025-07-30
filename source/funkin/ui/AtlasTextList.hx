@@ -45,7 +45,7 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
     }
 
     override function update(elapsed:Float):Void {
-        final wheel:Float = -FlxG.mouse.wheel;
+        final wheel:Float = MouseUtil.getWheel();
         final controls:Controls = Controls.instance;
 
         if(controls.justPressed.UI_UP || wheel < 0)

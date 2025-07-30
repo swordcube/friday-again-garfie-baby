@@ -1780,7 +1780,7 @@ function onUpdatePre(dt:Float) {
         close();
     }
     if(!accepted && !busy) {
-        final wheel:Float = -FlxG.mouse.wheel;
+        final wheel:Float = MouseUtil.getWheel();
         if(controls.justPressed.check(Control.UI_UP) || wheel < 0)
             changeSelection(-1);
     

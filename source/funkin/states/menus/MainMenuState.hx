@@ -120,7 +120,7 @@ class MainMenuState extends FunkinState {
         super.update(elapsed);
 
         if(!transitioning) {
-            final wheel:Float = -FlxG.mouse.wheel;
+            final wheel:Float = MouseUtil.getWheel();
             if(controls.justPressed.UI_UP || wheel < 0)
                 changeSelection(-1);
     

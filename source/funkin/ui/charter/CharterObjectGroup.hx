@@ -88,7 +88,7 @@ class CharterObjectGroup extends FlxObject {
         final direction:Int = Math.floor((charter._mousePos.x - x) / ChartEditor.CELL_SIZE);
         if(_movingObjects) {
             final snapMult:Float = ChartEditor.CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
-            if(FlxG.mouse.justReleased)
+            if(MouseUtil.isJustReleased())
                 _movingObjects = false;
             
             for(object in charter.selectedObjects) {
@@ -154,6 +154,8 @@ class CharterObjectGroup extends FlxObject {
             var isEmptyCell:Bool = true;
 
             if(direction > -1) {
+                final pointer = MouseUtil.getPointer();
+
                 // handle notes
                 final begin:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep - max, _getVarForEachNoteAdd);
                 final end:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep + max, _getVarForEachNoteRemove);
@@ -166,9 +168,9 @@ class CharterObjectGroup extends FlxObject {
                     final offsetX:Float = (note.data.direction < Constants.KEY_COUNT) ? -1 : 1;
                     sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + offsetX, y + (ChartEditor.CELL_SIZE * note.step));
     
-                    if (FlxG.mouse.overlaps(sprite, charter.noteCam) && !coveredUpByOtherUI) {
+                    if (pointer.overlaps(sprite, charter.noteCam) && !coveredUpByOtherUI) {
                         isHoveringNote = true;
-                        if(FlxG.mouse.pressed && FlxG.mouse.justMoved && note.selected && !charter.selectionBox.exists) {
+                        if(MouseUtil.isPressed() && MouseUtil.wasJustMoved() && note.selected && !charter.selectionBox.exists) {
                             for(object in charter.selectedObjects) {
                                 switch(object) {
                                     case CNote(note):
@@ -185,10 +187,10 @@ class CharterObjectGroup extends FlxObject {
                             _movingObjects = true;
                             return;
                         }
-                        if(FlxG.mouse.justReleased)
+                        if(MouseUtil.isJustReleased())
                             onNoteClick.dispatch(note);
     
-                        else if(FlxG.mouse.justReleasedRight)
+                        else if(MouseUtil.isJustReleasedRight())
                             onNoteRightClick.dispatch(note);
                         
                         isEmptyCell = false;
@@ -197,6 +199,8 @@ class CharterObjectGroup extends FlxObject {
                 }
             }
             else {
+                final pointer = MouseUtil.getPointer();
+
                 // handle events
                 final begin:Int = SortedArrayUtil.binarySearch(events, Conductor.instance.curStep - max, _getVarForEachEventAdd);
                 final end:Int = SortedArrayUtil.binarySearch(events, Conductor.instance.curStep + max, _getVarForEachEventRemove);
@@ -211,10 +215,10 @@ class CharterObjectGroup extends FlxObject {
                     _eventBGSprite.width = 70 + ((event.events.length - 1) * 30);
                     _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step) - (_eventBGSprite.height * 0.5));
 
-                    if (FlxG.mouse.overlaps(_eventBGSprite, charter.noteCam) && !coveredUpByOtherUI) {
+                    if (pointer.overlaps(_eventBGSprite, charter.noteCam) && !coveredUpByOtherUI) {
                         isHoveringEvent = true;
                         
-                        if(FlxG.mouse.pressed && FlxG.mouse.justMoved && event.selected && !charter.selectionBox.exists) {
+                        if(MouseUtil.isPressed() && MouseUtil.wasJustMoved() && event.selected && !charter.selectionBox.exists) {
                             for(object in charter.selectedObjects) {
                                 switch(object) {
                                     case CNote(note):
@@ -231,10 +235,10 @@ class CharterObjectGroup extends FlxObject {
                             _movingObjects = true;
                             return;
                         }
-                        if(FlxG.mouse.justReleased)
+                        if(MouseUtil.isJustReleased())
                             onEventClick.dispatch(event);
     
-                        else if(FlxG.mouse.justReleasedRight)
+                        else if(MouseUtil.isJustReleasedRight())
                             onEventRightClick.dispatch(event);
                         
                         isEmptyCell = false;
@@ -242,7 +246,7 @@ class CharterObjectGroup extends FlxObject {
                     }                    
                 }
             }
-            if(isEmptyCell && FlxG.mouse.justReleased && !charter.selectionBox.exists)
+            if(isEmptyCell && MouseUtil.isJustReleased() && !charter.selectionBox.exists)
                 onEmptyCellClick.dispatch();
 		}
     }
@@ -263,6 +267,7 @@ class CharterObjectGroup extends FlxObject {
         final begin:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep - max, _getVarForEachNoteAdd);
         final end:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep + max, _getVarForEachNoteRemove);
 
+        final pointer = MouseUtil.getPointer();
         for(i in begin...end) {
             note = notes[i];
 
@@ -294,7 +299,7 @@ class CharterObjectGroup extends FlxObject {
             sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + offsetX, y + (ChartEditor.CELL_SIZE * note.step));
             sprite.draw();
 
-            if(FlxG.mouse.overlaps(sprite, charter.noteCam))
+            if(pointer.overlaps(sprite, charter.noteCam))
                 isHoveringNote = true;
         }
 
@@ -318,7 +323,7 @@ class CharterObjectGroup extends FlxObject {
             _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step) - (_eventBGSprite.height * 0.5));
             _eventBGSprite.draw();
 
-            if(FlxG.mouse.overlaps(_eventBGSprite, charter.noteCam))
+            if(pointer.overlaps(_eventBGSprite, charter.noteCam))
                 isHoveringEvent = true;
 
             // draw icons

@@ -233,7 +233,7 @@ class StoryMenuState extends FunkinState {
         scoreText.text = 'LEVEL SCORE: ${FlxStringUtil.formatMoney(Math.floor(lerpScore), false)}';
 
         if(!transitioning) {
-            final wheel:Float = -FlxG.mouse.wheel;
+            final wheel:Float = MouseUtil.getWheel();
             if(controls.justPressed.UI_UP || wheel < 0)
                 changeSelection(-1);
     

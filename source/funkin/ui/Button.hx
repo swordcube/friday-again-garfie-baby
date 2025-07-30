@@ -43,10 +43,10 @@ class Button extends UIComponent {
 
     override function update(elapsed:Float):Void {
         if(checkMouseOverlap()) {
-            if(FlxG.mouse.justPressed && !pressed)
+            if(MouseUtil.isJustPressed() && !pressed)
                 pressed = true;
 
-            if(FlxG.mouse.justReleased && pressed) {
+            if(MouseUtil.isJustReleased() && pressed) {
                 if(callback != null)
                     callback();
 
@@ -62,7 +62,8 @@ class Button extends UIComponent {
 
     override function checkMouseOverlap():Bool {
         _checkingMouseOverlap = true;
-        final ret:Bool = FlxG.mouse.overlaps(bg, getDefaultCamera()) && UIUtil.allDropDowns.length == 0;
+        final pointer = MouseUtil.getPointer();
+        final ret:Bool = pointer.overlaps(bg, getDefaultCamera()) && UIUtil.allDropDowns.length == 0;
         _checkingMouseOverlap = false;
         return ret;
     }
