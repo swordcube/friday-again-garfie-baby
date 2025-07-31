@@ -12,6 +12,10 @@ import funkin.backend.InitState;
 import funkin.backend.StatsDisplay;
 import funkin.backend.native.HiddenProcess;
 
+#if android
+import funkin.mobile.utilities.MobileUtil;
+#end
+
 #if (linux && !debug)
 @:cppInclude('../../../../vendor/gamemode_client.h')
 @:cppFileCode('#define GAMEMODE_AUTO')
@@ -32,6 +36,12 @@ class Main extends Sprite {
 		super();
 		instance = this;
 
+		#if android
+		Sys.setCwd(haxe.io.Path.addTrailingSlash(MobileUtil.getDirectory()));
+		MobileUtil.getPermissions();
+		#elseif ios
+		Sys.setCwd(lime.system.System.applicationStorageDirectory);
+		#end
 		for(i in 0...4)
 			gameThreads.push(Thread.createWithEventLoop(() -> Thread.current().events.promise()));
 

@@ -7,24 +7,7 @@ import funkin.states.menus.MainMenuState;
 import funkin.states.menus.OptionsState;
 
 class MainPage extends Page {
-    public var pages:Array<PageData> = [
-        {
-            name: "Gameplay",
-            menu: () -> new GameplayPage()
-        },
-        {
-            name: "Appearance",
-            menu: () -> new AppearancePage()
-        },
-        {
-            name: "Miscellanous",
-            menu: () -> new MiscellanousPage()
-        },
-        {
-            name: "Controls",
-            menu: () -> new ControlsPage()
-        }
-    ];
+    public var pages:Array<PageData>;
     public var curSelected:Int = 0;
 
     public var menuItems:FlxTypedSpriteContainer<AtlasText>;
@@ -32,12 +15,35 @@ class MainPage extends Page {
 
     override function create():Void {
         super.create();
-
+        pages = [
+            {
+                name: "Gameplay",
+                callback: () -> menu.loadPage(new GameplayPage())
+            },
+            {
+                name: "Appearance",
+                callback: () -> menu.loadPage(new AppearancePage())
+            },
+            {
+                name: "Miscellanous",
+                callback: () -> menu.loadPage(new MiscellanousPage())
+            },
+            {
+                name: "Controls",
+                callback: () -> menu.loadPage(new ControlsPage())
+            },
+            #if android
+            {
+                name: "Open Data Folder",
+                callback: () -> trace("TODO: OPEN DATA FOLDER NOT IMPLEMENTED!")
+            }
+            #end
+        ];
         for(pack => customPages in Options.customPages) {
             for(page in customPages) {
                 pages.push({
                     name: page,
-                    menu: () -> new OptionPage('${pack}://${page}')
+                    callback: () -> menu.loadPage(new OptionPage('${pack}://${page}'))
                 });
             }
         }
@@ -51,6 +57,7 @@ class MainPage extends Page {
         for(i => page in pages) {
             final item:AtlasText = new AtlasText(0, 90 * i, "bold", LEFT, page.name);
             item.alpha = 0.6;
+            item.ID = i;
             menuItems.add(item);
         }
         menuItems.screenCenter();
@@ -59,10 +66,17 @@ class MainPage extends Page {
         for(i => page in pages) {
             final item:AtlasText = menuItems.members[i];
             final icon:FlxSprite = new FlxSprite(item.x + menuItems.width + iconSpacing, item.y - 10);
-            icon.loadGraphic(Paths.image('menus/options/category/${page.name.toLowerCase()}'));
+            
+            final iconPath:String = Paths.image('menus/options/category/${page.name.toLowerCase()}');
+            if(FlxG.assets.exists(iconPath))
+                icon.loadGraphic(iconPath);
+            else
+                icon.visible = false;
+
             icon.setGraphicSize(100, 100);
             icon.updateHitbox();
             icon.alpha = 0.6;
+            icon.ID = i;
             menuIcons.add(icon);
         }
         changeSelection(0, true);
@@ -71,6 +85,7 @@ class MainPage extends Page {
     override function update(elapsed:Float):Void {
         super.update(elapsed);
 
+        // traditional desktop controls
         final wheel:Float = MouseUtil.getWheel();
         if(controls.justPressed.UI_UP || wheel < 0)
             changeSelection(-1);
@@ -79,7 +94,11 @@ class MainPage extends Page {
             changeSelection(1);
 
         if(controls.justPressed.ACCEPT)
-            FlxTimer.wait(0.001, () -> menu.loadPage(pages[curSelected].menu()));
+            onAccept();
+
+        // mobile controls (available with mouse on desktop too cuz why not)
+        menuItems.forEach(_checkMenuButtonPresses);
+        menuIcons.forEach(_checkMenuButtonPresses);
 
         if(controls.justPressed.BACK) {
             Options.save();
@@ -105,9 +124,25 @@ class MainPage extends Page {
         }
         FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
     }
+
+    public function onAccept():Void {
+        FlxTimer.wait(0.001, pages[curSelected].callback);
+    }
+
+    private function _checkMenuButtonPresses(button:FlxSprite):Void {
+        final pointer = MouseUtil.getPointer();
+        if(MouseUtil.isJustPressed() && pointer.overlaps(button, getDefaultCamera())) {
+            if(curSelected != button.ID) {
+                curSelected = button.ID;
+                changeSelection(0, true);
+                return;
+            }
+            onAccept();
+        }
+    }
 }
 
 typedef PageData = {
     var name:String;
-    var menu:Void->Page;
+    var callback:Void->Void;
 }

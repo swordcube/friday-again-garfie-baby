@@ -99,6 +99,9 @@ class NativeAPI {
 	public static function showMessageBox(caption:String, message:String, options:Int):MessageBoxReturnValue {
 		#if windows
 		return Windows.showMessageBox(caption, message, options);
+		#elseif android
+		extension.androidtools.Tools.showAlertDialog(caption, message, {name: "OK", func: null}, null);
+		return OK;
 		#else
 		lime.app.Application.current.window.alert(message, caption);
 		return OK;

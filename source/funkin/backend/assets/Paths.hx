@@ -90,11 +90,13 @@ class Paths {
             #if FLX_DEFAULT_SOUND_EXT
             // add file extension
             if (type == SOUND)
-                id = addSoundExt(id);
+                id = FlxG.assets.addSoundExt(id);
             #end
+            id = sanitizePath(id); // just incase the path wasn't gotten from the functions in this class
             
-            if (FlxG.assets.useOpenflAssets(id))
-                return OpenFLAssets.exists(id, type.toOpenFlType());
+            final isOpenFL:Bool = OpenFLAssets.exists(id, type.toOpenFlType());
+            if (isOpenFL)
+                return isOpenFL;
 
             // Can't verify contents, match expected type without
             return FileSystem.exists(id);
@@ -103,7 +105,8 @@ class Paths {
         FlxG.assets.getAssetUnsafe = (id:String, type:FlxAssetType, useCache = true) -> {
             id = sanitizePath(id); // just incase the path wasn't gotten from the functions in this class
 
-            if(FlxG.assets.useOpenflAssets(id))
+            final isOpenFL:Bool = OpenFLAssets.exists(id, type.toOpenFlType());
+            if(isOpenFL)
                 return FlxG.assets.getOpenflAssetUnsafe(id, type, useCache);
             
             // load from custom assets directory
@@ -200,8 +203,12 @@ class Paths {
      * when compiling a build.
      */
     public static function getContentDirectory():String {
+        #if mobile
+        return '${funkin.mobile.utilities.MobileUtil.getDirectory()}/${CONTENT_DIRECTORY}';
+        #else
         final liveReload:Bool = #if TEST_BUILD true #else Sys.args().contains("-livereload") #end;
         return '${(liveReload) ? "../../../../" : ""}${CONTENT_DIRECTORY}';
+        #end
     }
 
     /**
@@ -237,7 +244,15 @@ class Paths {
                 }
             }
         }
-        final dirItems:Array<String> = FileSystem.readDirectory(contentDir);
+        if(!FileSystem.exists(contentDir)) {
+            Logs.warn('Content directory "${contentDir}" does not exist!');
+            try {
+                FileSystem.createDirectory(contentDir);
+            } catch(e) {
+                trace(e);
+            }
+        }
+        final dirItems:Array<String> = (FileSystem.exists(contentDir)) ? FileSystem.readDirectory(contentDir) : [];
         iterateThruContent(dirItems);
 
         final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders.copy();

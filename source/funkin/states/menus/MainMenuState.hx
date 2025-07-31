@@ -94,6 +94,7 @@ class MainMenuState extends FunkinState {
 			menuItem.scrollFactor.set(0, scr);
 			menuItem.updateHitbox();
 			menuItem.screenCenter(X);
+            menuItem.ID = i;
 
 			menuItems.add(menuItem);   
         }
@@ -121,6 +122,8 @@ class MainMenuState extends FunkinState {
 
         if(!transitioning) {
             final wheel:Float = MouseUtil.getWheel();
+
+            // traditional desktop controls
             if(controls.justPressed.UI_UP || wheel < 0)
                 changeSelection(-1);
     
@@ -129,6 +132,9 @@ class MainMenuState extends FunkinState {
     
             if(controls.justPressed.ACCEPT)
                 onSelect();
+
+            // mobile controls (available with mouse on desktop too cuz why not)
+            menuItems.forEach(_checkMenuButtonPresses);
 
             if(controls.justPressed.DEBUG) {
                 persistentUpdate = false;
@@ -244,6 +250,18 @@ class MainMenuState extends FunkinState {
 			FlxTween.tween(magenta, {alpha: 1.0}, 0.96, {ease: FlxEase.quintOut});
 		}
 	}
+
+    private function _checkMenuButtonPresses(button:FlxSprite):Void {
+        final pointer = MouseUtil.getPointer();
+        if(MouseUtil.isJustPressed() && pointer.overlaps(button, getDefaultCamera())) {
+            if(curSelected != button.ID) {
+                curSelected = button.ID;
+                changeSelection(0, true);
+                return;
+            }
+            onSelect();
+        }
+    }
 }
 
 @:structInit

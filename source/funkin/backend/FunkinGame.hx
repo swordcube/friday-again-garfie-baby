@@ -76,7 +76,8 @@ class FunkinGame extends FlxGame {
 				// Close the game
 		}
 		#else
-		FlxG.stage.window.alert(callstack, err);
+        NativeAPI.showMessageBox(err, boxMessage, ERROR | MessageBoxOptions.OK);
+		// FlxG.stage.window.alert(callstack, err);
 		#end
         
 		System.exit(1);

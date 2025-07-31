@@ -4,8 +4,7 @@
 
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="friday again garfie baby" file="Funkin" main="funkin.backend.Main" version="0.1.0" company="swordcube" />
-	<architecture name="x64" if="android" />
+	<app title="friday again garfie baby" file="Funkin" main="funkin.backend.Main" package="com.swordcube.GarfieBabyFunkin" packageName="com.swordcube.GarfieBabyFunkin" version="0.1.0" company="swordcube" />
 
 	<!-- ____________________________ Window Settings ___________________________ -->
 
@@ -69,7 +68,7 @@
 
 		lime test platform -DNO_DISCORD_RPC
 	-->
-	<define name="DISCORD_ALLOWED" if="windows || mac || linux" unless="NO_DISCORD_RPC || NO_DISCORD || NO_DISCORD_RPC_ALLOWED || NO_DISCORD_ALLOWED" />
+	<define name="DISCORD_ALLOWED" if="cpp desktop" unless="NO_DISCORD_RPC || NO_DISCORD || NO_DISCORD_RPC_ALLOWED || NO_DISCORD_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable video playback
@@ -95,7 +94,7 @@
 
 		lime test platform -DNO_WINDOWS_CRASH_HANDLER
 	-->
-	<define name="WINDOWS_CRASH_HANDLER" unless="NO_WINDOWS_CRASH_HANDLER || NO_WINDOWS_CRASH_HANDLER_ALLOWED" />
+	<define name="WINDOWS_CRASH_HANDLER" if="windows" unless="NO_WINDOWS_CRASH_HANDLER || NO_WINDOWS_CRASH_HANDLER_ALLOWED" />
 
 	<!--
 		Comment/delete this line below to disable crash log saving
@@ -145,7 +144,8 @@
 	-->
 	<section unless="TEST_BUILD || display || macro">
 		<assets path="assets" />
-		<assets path="content" />
+		<assets path="example_content" rename="content" if="desktop" /> <!-- Copy example content to content folder for desktop -->
+		<assets path="content" if="desktop" /> <!-- Only copy content folder for desktop -->
 	</section>
 
 	<!--
@@ -175,6 +175,9 @@
 	<haxelib name="flixel" />
 	<haxelib name="flixel-addons" />
 	<haxelib name="flixel-controls" />
+	
+	<!-- Android Libraries -->
+	<haxelib name="extension-androidtools" if="android" />
 
 	<!-- Loading Animate Atlas -->
 	<haxelib name="flixel-animate" />
@@ -243,12 +246,13 @@
 			<haxedef name="HXCPP_STACK_LINE" />
 			<haxedef name="HXCPP_STACK_TRACE" />
 			<haxedef name="HXCPP_CATCH_SEGV" />
+			<haxedef name="HXCPP_DEBUG_LINK" if="mobile release" /> <!-- Only needed on mobile release builds -->
 			<haxedef name="openfl-enable-handle-error" />
 		</section>
     </section>
 
-	<!-- Enable generational garbage collection -->
-	<haxedef name="HXCPP_GC_GENERATIONAL" />
+	<!-- Enable generational garbage collection (desktop only) -->
+	<haxedef name="HXCPP_GC_GENERATIONAL" if="desktop" />
 
     <!-- Self explanatory i'd say -->
     <haxedef name="no-deprecation-warnings" />
@@ -264,7 +268,7 @@
 	<haxedef name="DISCORD_DISABLE_IO_THREAD" if="DISCORD_ALLOWED" />
 
 	<!-- Fixes linux compilation -->
-	<haxedef name="NO_PRECOMPILED_HEADERS" />
+	<haxedef name="NO_PRECOMPILED_HEADERS" if="desktop" />
 
 	<!--
 		Experimental OpenFL update queue
@@ -316,7 +320,22 @@
 	<icon path="art/icons/256x.png" size="1024"  />
 
 	<!-- _________________________________ Android Stuff _______________________________ -->
-	 
-	<config:android permission="android.permission.READ_EXTERNAL_STORAGE" if="android"/>
-	<config:android permission="android.permission.WRITE_EXTERNAL_STORAGE" if="android"/>
+
+	<section if="android">
+		<android target-sdk-version="34" />
+		<android min-sdk-version="19" />
+	
+		<architecture name="x64" if="android USE_EMULATOR" />
+	
+		<config:android permission="android.permission.MANAGE_MEDIA"/> 
+		<config:android permission="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+		<config:android permission="android.permission.READ_MEDIA_IMAGES"/>
+		<config:android permission="android.permission.READ_MEDIA_AUDIO"/>
+		<config:android permission="android.permission.READ_MEDIA_VIDEO"/>
+		<config:android permission="android.permission.VIBRATE" />
+		<config:android permission="android.permission.INTERNET" />
+		<config:android permission="android.permission.ACCESS_WIFI_STATE"/>
+		<config:android permission="android.permission.ACCESS_NETWORK_STATE" />
+		<config:android permission="android.permission.CAPTURE_AUDIO_OUTPUT" />
+	</section>
 </project>

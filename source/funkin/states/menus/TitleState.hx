@@ -143,7 +143,12 @@ class TitleState extends FunkinState {
         if(controls.pressed.UI_RIGHT)
             swagShader.setFloat("OFFSET", swagShader.getFloat("OFFSET") + (elapsed * 0.1));
 
-        if(controls.justPressed.ACCEPT) {
+        #if mobile
+        final accept:Bool = controls.justPressed.ACCEPT || MouseUtil.isJustPressed();
+        #else
+        final accept:Bool = controls.justPressed.ACCEPT;
+        #end
+        if(accept) {
             if(!skippedIntro)
                 skipIntro();
             

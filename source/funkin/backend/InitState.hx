@@ -34,7 +34,7 @@ class InitState extends FlxState {
     override function create() {
         super.create();
 
-        #if cpp
+        #if (cpp && desktop)
         // ugly hack to make printing actually work
         //
         // it stopped working due to a recent hxcpp change:
