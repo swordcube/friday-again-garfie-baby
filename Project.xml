@@ -39,7 +39,8 @@
 	<define name="DEV_BUILD" if="TEST_BUILD" />
 
 	<!-- Temporary define for testing mobile UI on desktop -->
-	<define name="MOBILE_UI" if="mobile || TEST_BUILD" />
+	<!-- <define name="MOBILE_UI" if="mobile" /> -->
+	<define name="MOBILE_UI" />
 
 	<!--
 		Comment/delete this line below to disable all scripting

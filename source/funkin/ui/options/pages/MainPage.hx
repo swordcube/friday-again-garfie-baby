@@ -3,6 +3,8 @@ package funkin.ui.options.pages;
 import flixel.util.FlxTimer;
 
 import funkin.ui.AtlasText;
+
+import funkin.states.FunkinState;
 import funkin.states.menus.MainMenuState;
 import funkin.states.menus.OptionsState;
 
@@ -79,6 +81,10 @@ class MainPage extends Page {
             icon.ID = i;
             menuIcons.add(icon);
         }
+        #if MOBILE_UI
+        final state:FunkinState = cast FlxG.state;
+        state.addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, goBack, 1.0);
+        #end
         changeSelection(0, true);
     }
 
@@ -101,10 +107,14 @@ class MainPage extends Page {
         menuIcons.forEach(_checkMenuButtonPresses);
 
         if(controls.justPressed.BACK) {
-            Options.save();
-            FlxG.switchState((OptionsState.lastParams.exitState != null) ? OptionsState.lastParams.exitState : MainMenuState.new);
+            goBack();
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
+    }
+
+    public function goBack():Void {
+        Options.save();
+        FlxG.switchState((OptionsState.lastParams.exitState != null) ? OptionsState.lastParams.exitState : MainMenuState.new);
     }
 
     public function changeSelection(by:Int = 0, ?force:Bool = false):Void {

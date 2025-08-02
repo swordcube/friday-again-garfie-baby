@@ -12,8 +12,16 @@ import funkin.graphics.GraphicCacheSprite;
 import funkin.scripting.FunkinScript;
 import funkin.scripting.FunkinScriptGroup;
 #end
+#if MOBILE_UI
+import funkin.mobile.ui.BackButton;
+#end
 
 class FunkinSubState extends FlxSubState implements IBeatReceiver {
+    #if MOBILE_UI
+    public var camControls(default, null):FlxCamera;
+    public var backButton(default, null):BackButton;
+    #end
+
     public var graphicCache(default, null):GraphicCacheSprite;
     public var controls(get, never):Controls;
     
@@ -103,6 +111,23 @@ class FunkinSubState extends FlxSubState implements IBeatReceiver {
         subStateScripts.call(method, args);
         #end
     }
+
+    #if MOBILE_UI
+    public function addBackButton(?xPos:Float = 0, ?yPos:Float = 0, ?color:FlxColor = FlxColor.WHITE, ?confirmCallback:Void->Void = null, ?restOpacity:Float = 0.3, ?instant:Bool = false):Void {
+        if(backButton != null) {
+            remove(backButton, true);
+            backButton.destroy();
+        }
+        if(camControls == null) {
+            camControls = new FlxCamera();
+            camControls.bgColor = 0;
+            FlxG.cameras.add(camControls, false);
+        }
+        backButton = new BackButton(xPos, yPos, color, confirmCallback, restOpacity, instant);
+        backButton.cameras = [camControls];
+        add(backButton);
+    }
+    #end
     
     public function onSubStateOpen(substate:FlxSubState):Void {
         call("onSubStateOpen", [substate]);

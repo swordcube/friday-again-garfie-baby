@@ -174,6 +174,9 @@ class FreeplayState extends FunkinState {
         grpSongs.curSelected = lastSelected;
         grpSongs.changeSelection(0, true, false);
 
+        #if MOBILE_UI
+        addBackButton(FlxG.width - 230, FlxG.height - 220, FlxColor.WHITE, goBack, 1.0);
+        #end
         #if FLX_MOUSE
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
@@ -222,7 +225,7 @@ class FreeplayState extends FunkinState {
             changeDifficulty(1);
 
         if(controls.justPressed.BACK) {
-            FlxG.switchState(MainMenuState.new);
+            goBack();
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
         if(controls.justPressed.RESET) {
@@ -286,6 +289,10 @@ class FreeplayState extends FunkinState {
         #end
         if(tryingToListen)
             grpSongs.active = true;
+    }
+
+    public function goBack():Void {
+        FlxG.switchState(MainMenuState.new);
     }
 
     public function addCategory(id:String, name:String, ?songIDs:Array<String>, ?contentPack:String):Void {

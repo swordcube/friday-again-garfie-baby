@@ -85,6 +85,9 @@ class CreditsState extends FunkinState {
         rightArrow.alpha = 0.6;
         add(rightArrow);
 
+        #if MOBILE_UI
+        addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, goBack, 1.0);
+        #end
         changeCategory(0, true);
     }
 
@@ -114,9 +117,13 @@ class CreditsState extends FunkinState {
             CoolUtil.openURL(category.items[curSelected].url);
         }
         if(controls.justPressed.BACK) {
-            FlxG.switchState(MainMenuState.new);
+            goBack();
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
+    }
+
+    public function goBack():Void {
+        FlxG.switchState(MainMenuState.new);
     }
 
     public function changeCategory(by:Int = 0, ?force:Bool = false):Void {

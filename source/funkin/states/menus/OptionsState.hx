@@ -16,6 +16,7 @@ class OptionsState extends FunkinState {
     };
     public var bg:FlxSprite;
     public var currentPage:Page;
+    public var lastMouseVisible:Bool = false;
 
     public function new(?params:OptionsStateParams) {
 		super();
@@ -43,6 +44,11 @@ class OptionsState extends FunkinState {
             InitState._lastState = PlayState;
         }
         loadPage(new MainPage());
+
+        #if FLX_MOUSE
+        lastMouseVisible = FlxG.mouse.visible;
+        FlxG.mouse.visible = true;
+        #end
     }
 
     public function loadPage(newPage:Page):Void {
@@ -61,5 +67,12 @@ class OptionsState extends FunkinState {
             insert(pageIndex, currentPage);
         else
             add(currentPage);
+    }
+
+    override function destroy():Void {
+        #if FLX_MOUSE
+        FlxG.mouse.visible = lastMouseVisible;
+        #end
+        super.destroy();
     }
 }

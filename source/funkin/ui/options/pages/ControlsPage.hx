@@ -11,6 +11,8 @@ import funkin.ui.Prompt;
 import funkin.ui.AtlasText;
 import funkin.utilities.InputFormatter;
 
+import funkin.states.FunkinState;
+
 class ControlsPage extends Page {
     public var bindCategories:Array<BindCategory> = [
         {
@@ -211,6 +213,10 @@ class ControlsPage extends Page {
         camera.deadzone.set(0, margin, camera.width, camera.height - margin * 2);
         camera.minScrollY = 0;
         
+        #if MOBILE_UI
+        final state:FunkinState = cast FlxG.state;
+        state.addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, goBack, 1, true);
+        #end
         changeSelection(0, true);
     }
 
@@ -243,8 +249,7 @@ class ControlsPage extends Page {
                 resetSpecificBind();
             
             if(controls.justPressed.BACK) {
-                controls.flush();
-                menu.loadPage(new MainPage());
+                goBack();
                 FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
             }
         } else {
@@ -255,6 +260,11 @@ class ControlsPage extends Page {
                 stopChangingBind();
             }
         }
+    }
+
+    public function goBack():Void {
+        controls.flush();
+        menu.loadPage(new MainPage());
     }
 
     function resetAllBinds() {

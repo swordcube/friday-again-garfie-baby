@@ -116,6 +116,9 @@ class MainMenuState extends FunkinState {
         FlxG.camera.follow(camFollow, LOCKON, 0.06);
         changeSelection(0, true);
 
+        #if MOBILE_UI
+        addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, goBack, 1.0);
+        #end
         #if FLX_MOUSE
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
@@ -151,10 +154,14 @@ class MainMenuState extends FunkinState {
             }
         }
         if(controls.justPressed.BACK) {
-            persistentUpdate = false;
-            FlxG.switchState(TitleState.new);
+            goBack();
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
+    }
+
+    public function goBack():Void {
+        persistentUpdate = false;
+        FlxG.switchState(TitleState.new);
     }
 
     public function updateDiscordRPC():Void {
@@ -227,6 +234,12 @@ class MainMenuState extends FunkinState {
 				});
             }
         }
+        #if MOBILE_UI
+        if(backButton != null) {
+            backButton.active = false;
+            FlxTween.tween(backButton, {alpha: 0}, 0.4, {ease: FlxEase.quadOut});
+        }
+        #end
         transitioning = true;
         FlxG.sound.play(Paths.sound("menus/sfx/select"));
     }
@@ -262,9 +275,18 @@ class MainMenuState extends FunkinState {
         if(MouseUtil.isJustPressed() && pointer.overlaps(button, getDefaultCamera())) {
             if(curSelected != button.ID) {
                 curSelected = button.ID;
+                
+                button.scale.set(0.94, 0.94);
+                FlxTween.cancelTweensOf(button.scale);
+                FlxTween.tween(button.scale, {x: 1, y: 1}, 0.3, {ease: FlxEase.backOut});
+
                 changeSelection(0, true);
                 return;
             }
+            button.scale.set(1.1, 1.1);
+            FlxTween.cancelTweensOf(button.scale);
+            FlxTween.tween(button.scale, {x: 1, y: 1}, 0.3, {ease: FlxEase.backOut});
+
             onSelect();
         }
     }

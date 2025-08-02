@@ -53,6 +53,7 @@ class StoryMenuState extends FunkinState {
     public var intendedScore:Int = 0;
 
     public var grpWarningTexts:FlxTypedContainer<FlxText>;
+    public var lastMouseVisible:Bool = false;
 
     override function create():Void {
         super.create();
@@ -207,7 +208,15 @@ class StoryMenuState extends FunkinState {
         grpWarningTexts = new FlxTypedContainer<FlxText>();
         add(grpWarningTexts);
 
+        #if MOBILE_UI
+        addBackButton(FlxG.width - 230, FlxG.height - 170, FlxColor.WHITE, goBack, 0.7);
+        #end
         changeSelection(0, true);
+
+        #if FLX_MOUSE
+        lastMouseVisible = FlxG.mouse.visible;
+        FlxG.mouse.visible = true;
+        #end
     }
 
     override function update(elapsed:Float):Void {
@@ -267,13 +276,17 @@ class StoryMenuState extends FunkinState {
                 onSelect();
 
             if(controls.justPressed.BACK) {
-                persistentUpdate = false;
-                FlxG.switchState(new MainMenuState());
+                goBack();
                 FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
             }
         }
         for(i => t in grpWarningTexts)
             t.y = 20 + (i * 20);
+    }
+
+    public function goBack():Void {
+        persistentUpdate = false;
+        FlxG.switchState(new MainMenuState());
     }
 
     public function showWarning(warning:String):Void {
@@ -496,6 +509,9 @@ class StoryMenuState extends FunkinState {
     }
 
     override function destroy():Void {
+        #if FLX_MOUSE
+        FlxG.mouse.visible = lastMouseVisible;
+        #end
         Paths.forceContentPack = null;
         super.destroy();
     }

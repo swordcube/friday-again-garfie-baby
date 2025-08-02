@@ -6,6 +6,8 @@ import flixel.util.FlxSignal.FlxTypedSignal;
 import funkin.ui.AtlasText;
 import funkin.ui.options.*;
 
+import funkin.states.FunkinState;
+
 class OptionPage extends Page {
     public static final OPTION_HEIGHT:Float = 120;
 
@@ -64,6 +66,10 @@ class OptionPage extends Page {
         pageText.alpha = 0.6;
         add(pageText);
 
+        #if MOBILE_UI
+        final state:FunkinState = cast FlxG.state;
+        state.addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, goBack, 0.3, true);
+        #end
         changeSelection(0, true);
     }
 
@@ -86,12 +92,16 @@ class OptionPage extends Page {
             changeSelection(1);
 
         if(controls.justPressed.BACK) {
-            if(menu != null)
-                menu.loadPage(new MainPage());
-
-            onExit.dispatch();
+            goBack();
             FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
         }
+    }
+
+    public function goBack():Void {
+        if(menu != null)
+            menu.loadPage(new MainPage());
+
+        onExit.dispatch();
     }
 
     /**
