@@ -204,7 +204,7 @@ class Paths {
      */
     public static function getContentDirectory():String {
         #if mobile
-        return '${funkin.mobile.utilities.MobileUtil.getDirectory()}/${CONTENT_DIRECTORY}';
+        return CONTENT_DIRECTORY;
         #else
         final liveReload:Bool = #if TEST_BUILD true #else Sys.args().contains("-livereload") #end;
         return '${(liveReload) ? "../../../../" : ""}${CONTENT_DIRECTORY}';
@@ -254,6 +254,46 @@ class Paths {
         }
         final dirItems:Array<String> = (FileSystem.exists(contentDir)) ? FileSystem.readDirectory(contentDir) : [];
         iterateThruContent(dirItems);
+        Logs.verbose('Found ${contentFolders.length} standard content packs');
+        
+        var openflPacks:Int = 0;
+        var fullContentDir:String = #if mobile CONTENT_DIRECTORY #else Path.normalize(Path.join([Sys.getCwd(), CONTENT_DIRECTORY])) #end;
+        #if !mobile
+        if(!FileSystem.exists(fullContentDir))
+            fullContentDir = contentDir;
+        #end
+        final oflList:Array<String> = OpenFLAssets.list();
+        for(i in 0...oflList.length) {
+            var rawPath:String = oflList[oflList.length - i - 1];
+            var realPath:String = Path.normalize(OpenFLAssets.getPath(rawPath) ?? rawPath);
+
+            final absPath:String = Path.normalize(FileSystem.absolutePath(realPath));
+            if(FileSystem.exists(absPath))
+                realPath = absPath;
+
+            if(realPath.endsWith("metadata.json") && realPath.startsWith(fullContentDir)) {
+                var text:String = OpenFLAssets.getText(rawPath);
+                var isContentMeta:Bool = false;
+                try {
+                    // try parsing the json
+                    // and see if it's a content metadata json
+                    final j = Json.parse(text);
+                    isContentMeta = j.id != null;
+                }
+                catch(e) {
+                    // not a valid json, skip
+                    isContentMeta = false;
+                }
+                if(!isContentMeta)
+                    continue;
+
+                var shit:String = Path.directory(realPath.substr(fullContentDir.length + 1));
+                contentFolders.insert(0, shit);
+                openflPacks++;
+            }
+        }
+        trace(contentFolders);
+        Logs.verbose('Found ${openflPacks} embedded content packs');
 
         final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders.copy();
         for(i in 0...loaders.length) {
@@ -285,7 +325,10 @@ class Paths {
             final folder:String = contentFolders[i];
             final shortFolder:String = folder.substr(folder.lastIndexOf("/") + 1);
 
-            final metaPath:String = '${contentDir}/${folder}/metadata.json';
+            var metaPath:String = '${contentDir}/${folder}/metadata.json';
+            if(!FlxG.assets.exists(metaPath))
+                metaPath = '${CONTENT_DIRECTORY}/${folder}/metadata.json';
+
             if(FlxG.assets.exists(metaPath)) {
                 final parser:JsonParser<ContentMetadata> = new JsonParser<ContentMetadata>();
                 parser.ignoreUnknownVariables = true;

@@ -173,6 +173,11 @@ class FreeplayState extends FunkinState {
 
         grpSongs.curSelected = lastSelected;
         grpSongs.changeSelection(0, true, false);
+
+        #if FLX_MOUSE
+        lastMouseVisible = FlxG.mouse.visible;
+        FlxG.mouse.visible = true;
+        #end
     }
 
     override function update(elapsed:Float) {
@@ -528,7 +533,12 @@ class FreeplayState extends FunkinState {
         LoadingState.loadIntoState(PlayState.new.bind(PlayState.lastParams));
     }
 
+    private var lastMouseVisible:Bool = true;
+
     override function destroy():Void {
+        #if FLX_MOUSE
+        FlxG.mouse.visible = lastMouseVisible;
+        #end
         Paths.forceContentPack = null;
         super.destroy();
     }

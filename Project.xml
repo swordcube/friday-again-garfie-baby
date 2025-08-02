@@ -38,6 +38,9 @@
 	-->
 	<define name="DEV_BUILD" if="TEST_BUILD" />
 
+	<!-- Temporary define for testing mobile UI on desktop -->
+	<define name="MOBILE_UI" if="mobile || TEST_BUILD" />
+
 	<!--
 		Comment/delete this line below to disable all scripting
 		Or compile with the NO_SCRIPTING define, like so:
@@ -144,9 +147,13 @@
 	-->
 	<section unless="TEST_BUILD || display || macro">
 		<assets path="assets" />
-		<assets path="example_content" rename="content" if="desktop" /> <!-- Copy example content to content folder for desktop -->
-		<assets path="content" if="desktop" /> <!-- Only copy content folder for desktop -->
+		
+		<!-- Only copy content folder for desktop -->
+		<assets path="content" type="template" if="desktop" />
 	</section>
+
+	<!-- Copy example content to content folder for all builds -->
+	<assets path="example_content" rename="content" />
 
 	<!--
 		Copy ALSoft configuration to export directory

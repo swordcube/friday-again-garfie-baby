@@ -120,8 +120,8 @@ class TitleState extends FunkinState {
             gfDance.shader = swagShader;
             titleGroup.add(gfDance);
     
-            titleText = new FlxSprite(100, FlxG.height * 0.8);
-            titleText.frames = Paths.getSparrowAtlas('menus/title/enter');
+            titleText = new FlxSprite(#if MOBILE_UI 50 #else 100 #end, FlxG.height * 0.8);
+            titleText.frames = Paths.getSparrowAtlas(#if MOBILE_UI 'menus/title/enter_mobile' #else 'menus/title/title' #end);
             titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
             titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
             titleText.animation.play('idle');
@@ -143,7 +143,7 @@ class TitleState extends FunkinState {
         if(controls.pressed.UI_RIGHT)
             swagShader.setFloat("OFFSET", swagShader.getFloat("OFFSET") + (elapsed * 0.1));
 
-        #if mobile
+        #if MOBILE_UI
         final accept:Bool = controls.justPressed.ACCEPT || MouseUtil.isJustPressed();
         #else
         final accept:Bool = controls.justPressed.ACCEPT;

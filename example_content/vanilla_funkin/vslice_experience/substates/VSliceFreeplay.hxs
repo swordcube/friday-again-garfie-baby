@@ -1140,7 +1140,7 @@ function makeDifficultyStars(x:Float, y:Float):DifficultyStars {
     ret.grp.add(ret.flames);
 
     ret.stars = new FunkinSprite();
-    ret.stars.loadAnimateFrames("menus/freeplay/stars");
+    ret.stars.loadAnimateFrames("menus/freeplay/stars"); // TODO: this breaks on mobile???
     ret.stars.anim.addBySymbol("stars", "diff stars", 24, false);
     ret.stars.anim.play("stars");
     ret.grp.add(ret.stars);

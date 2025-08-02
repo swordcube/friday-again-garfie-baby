@@ -115,6 +115,11 @@ class MainMenuState extends FunkinState {
         
         FlxG.camera.follow(camFollow, LOCKON, 0.06);
         changeSelection(0, true);
+
+        #if FLX_MOUSE
+        lastMouseVisible = FlxG.mouse.visible;
+        FlxG.mouse.visible = true;
+        #end
     }
 
     override function update(elapsed:Float):Void {
@@ -229,6 +234,7 @@ class MainMenuState extends FunkinState {
     //----------- [ Private API ] -----------//
 
     private var magTwn:FlxTween = null;
+    private var lastMouseVisible:Bool = true;
 
 	private function _magentaFlicker(?tmr:FlxTimer):Void {
 		if(magTwn != null)
@@ -262,6 +268,13 @@ class MainMenuState extends FunkinState {
             onSelect();
         }
     }
+
+    #if FLX_MOUSE
+    override function destroy():Void {
+        FlxG.mouse.visible = lastMouseVisible;
+        super.destroy();
+    }
+    #end
 }
 
 @:structInit

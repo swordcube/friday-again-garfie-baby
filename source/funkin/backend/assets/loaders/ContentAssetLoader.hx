@@ -9,7 +9,8 @@ class ContentAssetLoader extends AssetLoader {
         final liveReload:Bool = #if TEST_BUILD true #else Sys.args().contains("-livereload") #end;
         final root:String = (liveReload) ? "../../../../" : "";
         
-        super('${root}${Paths.CONTENT_DIRECTORY}/${folder}');
+        final p:String = '${root}${Paths.CONTENT_DIRECTORY}/${folder}';
+        super((FlxG.assets.exists(p)) ? p : '${Paths.CONTENT_DIRECTORY}/${folder}');
     }
 
     override function toString():String {

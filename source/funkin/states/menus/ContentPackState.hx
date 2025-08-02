@@ -292,6 +292,9 @@ class ContentPackItem extends FlxSpriteContainer {
         super.update(elapsed);
 
         final pointer = MouseUtil.getPointer();
+        if(pointer == null)
+            return;
+        
         final hovered:Bool = pointer.overlaps(bg, getDefaultCamera());
         if(hovered && MouseUtil.isJustPressed()) {
             canDrag = true;
