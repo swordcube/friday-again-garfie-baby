@@ -174,10 +174,14 @@ class FreeplayState extends FunkinState {
         grpSongs.curSelected = lastSelected;
         grpSongs.changeSelection(0, true, false);
 
+        #if mobile
+        FlxG.touches.swipeThreshold.x = 100;
+        FlxG.touches.swipeThreshold.y = 100;
+        #end
         #if MOBILE_UI
         addBackButton(FlxG.width - 230, FlxG.height - 220, FlxColor.WHITE, goBack, 1.0);
         #end
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
         #end
@@ -212,16 +216,17 @@ class FreeplayState extends FunkinState {
         scoreText.text = 'PERSONAL BEST:${Math.floor(lerpScore)}';
         positionHighscore();
 
-        if(FlxG.keys.justPressed.Q)
+        final pointer = TouchUtil.touch;
+        if(FlxG.keys.justPressed.Q || (SwipeUtil.swipeLeft && (pointer?.overlaps(scoreBG) ?? false) == false))
             changeCategory(-1);
 
-        if(FlxG.keys.justPressed.E)
+        if(FlxG.keys.justPressed.E || (SwipeUtil.swipeRight && (pointer?.overlaps(scoreBG) ?? false) == false))
             changeCategory(1);
 
-        if(controls.justPressed.UI_LEFT)
+        if(controls.justPressed.UI_LEFT || (SwipeUtil.swipeLeft && (pointer?.overlaps(scoreBG) ?? false) == true))
             changeDifficulty(-1);
 
-        if(controls.justPressed.UI_RIGHT)
+        if(controls.justPressed.UI_RIGHT || (SwipeUtil.swipeRight && (pointer?.overlaps(scoreBG) ?? false) == true))
             changeDifficulty(1);
 
         if(controls.justPressed.BACK) {
@@ -543,7 +548,7 @@ class FreeplayState extends FunkinState {
     private var lastMouseVisible:Bool = true;
 
     override function destroy():Void {
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         FlxG.mouse.visible = lastMouseVisible;
         #end
         Paths.forceContentPack = null;

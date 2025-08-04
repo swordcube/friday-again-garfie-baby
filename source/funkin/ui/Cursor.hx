@@ -35,12 +35,12 @@ class Cursor {
             switch(type) {
                 case POINTER, GRABBING:
                     final prev:CursorType = type;    
-                    if(MouseUtil.isJustPressed()) {
+                    if(TouchUtil.justPressed) {
                         @:bypassAccessor type = null;
                         type = GRABBING;
                         @:bypassAccessor type = prev;
                     }
-                    else if(MouseUtil.isJustReleased()) {
+                    else if(TouchUtil.justReleased) {
                         @:bypassAccessor type = null;
                         type = POINTER; 
                         @:bypassAccessor type = prev;
@@ -56,7 +56,7 @@ class Cursor {
     @:noCompletion
     private static function set_type(newType:CursorType):CursorType {
         if(type != newType) {
-            #if FLX_MOUSE
+            #if (FLX_MOUSE && !mobile)
             final data:CursorData = cursorTypes.get(newType);
             FlxG.mouse.load(data.path, data.scale, data.offsetX, data.offsetY);
             #end

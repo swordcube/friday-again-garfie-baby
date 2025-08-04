@@ -45,7 +45,10 @@ class OptionsState extends FunkinState {
         }
         loadPage(new MainPage());
 
-        #if FLX_MOUSE
+        #if mobile
+        FlxG.touches.swipeThreshold.y = 100;
+        #end
+        #if (FLX_MOUSE && !mobile)
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
         #end
@@ -70,7 +73,7 @@ class OptionsState extends FunkinState {
     }
 
     override function destroy():Void {
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         FlxG.mouse.visible = lastMouseVisible;
         #end
         super.destroy();

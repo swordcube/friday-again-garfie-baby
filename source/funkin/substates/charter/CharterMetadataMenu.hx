@@ -29,13 +29,13 @@ class CharterMetadataMenu extends UISubState {
         final isUIFocused:Bool = UIUtil.isAnyComponentFocused([window.charter.grid, window.charter.selectionBox]);
         FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY) && !isUIFocused;
         
-        if(MouseUtil.isJustReleased() && !window.checkMouseOverlap())
+        if(TouchUtil.justReleased && !window.checkMouseOverlap())
             FlxTimer.wait(0.001, window.close);
 
-        if(MouseUtil.isJustPressed())
+        if(TouchUtil.justPressed)
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_down"));
         
-        else if(MouseUtil.isJustReleased())
+        else if(TouchUtil.justReleased)
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_up"));
         
         super.update(elapsed);

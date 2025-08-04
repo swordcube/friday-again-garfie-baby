@@ -222,9 +222,9 @@
 	<haxedef name="FLX_NO_VALIDATE_CUSTOM_ASSETS_DIRECTORY" />
 
 	<!--Optimise inputs, be careful you will get null errors if you don't use conditionals in your game-->
-	<haxedef name="FLX_NO_MOUSE" if="mobile" />
+	<!-- <haxedef name="FLX_NO_MOUSE" if="mobile" /> -->
 	<!-- <haxedef name="FLX_NO_KEYBOARD" if="mobile" /> -->
-	<haxedef name="FLX_NO_TOUCH" if="desktop" />
+	<!-- <haxedef name="FLX_NO_TOUCH" if="desktop" /> -->
 
 	<!--Disable the Flixel core focus lost screen-->
 	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
@@ -316,7 +316,7 @@
 		<android target-sdk-version="34" />
 		<android min-sdk-version="19" />
 	
-		<architecture name="x64" if="android USE_EMULATOR" />
+		<architecture name="x64" />
 	
 		<config:android permission="android.permission.MANAGE_MEDIA"/> 
 		<config:android permission="android.permission.MANAGE_EXTERNAL_STORAGE"/>

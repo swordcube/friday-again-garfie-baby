@@ -46,7 +46,7 @@ class DropDownItem extends UIComponent {
         if(Math.abs(bg.alpha) < 0.001)
             bg.alpha = 0;
 
-        if(MouseUtil.isJustReleased() && callback != null && isHovered)
+        if(TouchUtil.justReleased && callback != null && isHovered)
             callback();
 
         super.update(elapsed);
@@ -54,7 +54,7 @@ class DropDownItem extends UIComponent {
 
     override function checkMouseOverlap():Bool {
         _checkingMouseOverlap = true;
-        final pointer = MouseUtil.getPointer();
+        final pointer = TouchUtil.touch;
         final ret:Bool = pointer.overlaps(bg, getDefaultCamera()) && UIUtil.allDropDowns.last() == dropdown;
         _checkingMouseOverlap = false;
         return ret;

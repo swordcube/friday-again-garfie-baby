@@ -1,6 +1,7 @@
 package funkin.states.menus;
 
 import flixel.text.FlxText;
+import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
 import flixel.effects.FlxFlicker;
 
@@ -8,6 +9,7 @@ import funkin.backend.macros.GitCommitMacro;
 import funkin.substates.EditorPickerSubState;
 
 import funkin.utilities.InputFormatter;
+import funkin.mobile.input.ControlsHandler;
 
 class MainMenuState extends FunkinState {
     public var options:Array<MainMenuOption>;
@@ -21,6 +23,9 @@ class MainMenuState extends FunkinState {
     public var transitioning:Bool = false;
     public var versionText:FlxText;
 
+    #if mobile
+    public var gyroPan:Null<FlxPoint>;
+    #end
     public static var curSelected:Int = 0;
 
     public function initOptions():Void {
@@ -80,6 +85,9 @@ class MainMenuState extends FunkinState {
         menuItems = new FlxTypedContainer<FlxSprite>();
         add(menuItems);
 
+        #if mobile
+        gyroPan = new FlxPoint();
+        #end
         final offset:Float = 108 - (Math.max(options.length, 4) - 4) * 80;
 		final scr:Float = (options.length < 6) ? 0 : (options.length - 4) * 0.135;
         
@@ -107,7 +115,12 @@ class MainMenuState extends FunkinState {
         #end
         versionString += "\nFriday Night Funkin' v0.7.0";
         
-        versionText = new FlxText(5, FlxG.height - 2, 0, versionString + '\nPress ${InputFormatter.formatFlixel(Controls.getKeyFromInputType(controls.getCurrentMappings().get(Control.MANAGE_CONTENT)[0])).toUpperCase()} to manage content packs');
+        #if mobile
+        versionString += '\nTap anywhere with 2 fingers to manage content packs';
+        #else
+        versionString += '\nPress ${InputFormatter.formatFlixel(Controls.getKeyFromInputType(controls.getCurrentMappings().get(Control.MANAGE_CONTENT)[0])).toUpperCase()} to manage content packs';
+        #end
+        versionText = new FlxText(5, FlxG.height - 2, 0, versionString);
 		versionText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		versionText.scrollFactor.set();
         versionText.y -= versionText.height;
@@ -119,7 +132,7 @@ class MainMenuState extends FunkinState {
         #if MOBILE_UI
         addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, goBack, 1.0);
         #end
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
         #end
@@ -128,8 +141,22 @@ class MainMenuState extends FunkinState {
     override function update(elapsed:Float):Void {
         super.update(elapsed);
 
+        #if mobile
+        if(gyroPan != null && bg != null && !ControlsHandler.usingExternalInputDevice) {
+            gyroPan.add(FlxG.gyroscope.pitch * -1.25, FlxG.gyroscope.roll * -1.25);
+
+            // our pseudo damping
+            gyroPan.x = MathUtil.smoothLerpPrecision(gyroPan.x, 0, elapsed, 2.5);
+            gyroPan.y = MathUtil.smoothLerpPrecision(gyroPan.y, 0, elapsed, 2.5);
+
+            // how far away from bg mid do we want to pan via gyroPan
+            final add:Float = (menuItems.length > 4) ? (menuItems.length * 8) : 0;
+            camFollow.x = bg.getGraphicMidpoint().x - gyroPan.x;
+            camFollow.y = bg.getGraphicMidpoint().y - gyroPan.y - add;
+        }
+        #end
         if(!transitioning) {
-            final wheel:Float = MouseUtil.getWheel();
+            final wheel:Float = TouchUtil.wheel;
 
             // traditional desktop controls
             if(controls.justPressed.UI_UP || wheel < 0)
@@ -146,10 +173,13 @@ class MainMenuState extends FunkinState {
 
             if(controls.justPressed.DEBUG) {
                 persistentUpdate = false;
+                transitioning = true;
                 openSubState(new EditorPickerSubState());
             }
-            if(controls.justPressed.MANAGE_CONTENT) {
+            final doubleTapped:Bool = FlxG.touches.list.length > 1;
+            if(controls.justPressed.MANAGE_CONTENT || doubleTapped) {
                 persistentUpdate = false;
+                transitioning = true;
                 FlxG.switchState(ContentPackState.new);
             }
         }
@@ -161,6 +191,7 @@ class MainMenuState extends FunkinState {
 
     public function goBack():Void {
         persistentUpdate = false;
+        transitioning = true;
         FlxG.switchState(TitleState.new);
     }
 
@@ -179,9 +210,11 @@ class MainMenuState extends FunkinState {
             if(curSelected == i) {
                 item.animation.play("selected");
                 item.centerOffsets();
-
+                
+                #if !mobile
                 final add:Float = (menuItems.length > 4) ? (menuItems.length * 8) : 0;
 				camFollow.setPosition(item.getGraphicMidpoint().x, item.getGraphicMidpoint().y - add);
+                #end
             }
             else {
                 item.animation.play("idle");
@@ -271,8 +304,8 @@ class MainMenuState extends FunkinState {
 	}
 
     private function _checkMenuButtonPresses(button:FlxSprite):Void {
-        final pointer = MouseUtil.getPointer();
-        if(MouseUtil.isJustPressed() && pointer.overlaps(button, getDefaultCamera())) {
+        final pointer = TouchUtil.touch;
+        if(TouchUtil.justPressed && pointer.overlaps(button, getDefaultCamera())) {
             if(curSelected != button.ID) {
                 curSelected = button.ID;
                 
@@ -291,7 +324,7 @@ class MainMenuState extends FunkinState {
         }
     }
 
-    #if FLX_MOUSE
+    #if (FLX_MOUSE && !mobile)
     override function destroy():Void {
         FlxG.mouse.visible = lastMouseVisible;
         super.destroy();

@@ -167,7 +167,7 @@ class ChartFormatMenu extends FunkinSubState {
 
         changeSelection(0, true);
 
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         _mouseVisibility = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
         #end
@@ -186,7 +186,7 @@ class ChartFormatMenu extends FunkinSubState {
             if(controls.justPressed.UI_DOWN)
                 changeSelection(1);
     
-            if(controls.justPressed.ACCEPT || MouseUtil.isJustPressed()) {
+            if(controls.justPressed.ACCEPT || TouchUtil.justPressed) {
                 if(onSelect != null)
                     onSelect(validFormats[curSelected]);
             }
@@ -194,7 +194,7 @@ class ChartFormatMenu extends FunkinSubState {
         selectionArrow.y = FlxMath.lerp(selectionArrow.y, grpFormats.members[curSelected].y, elapsed * 15);
     }
     
-    #if FLX_MOUSE
+    #if (FLX_MOUSE && !mobile)
     override function destroy():Void {
         FlxG.mouse.visible = _mouseVisibility;
         super.destroy();
@@ -353,8 +353,8 @@ class ChartFormatItem extends AtlasText {
         while(state.subState != null)
             state = state.subState;
 
-        final pointer = MouseUtil.getPointer();
-        if(MouseUtil.wasJustMoved() && state is ChartFormatMenu) {
+        final pointer = TouchUtil.touch;
+        if(TouchUtil.justMoved && state is ChartFormatMenu) {
             final menu:ChartFormatMenu = cast state;
             final mousePos:FlxPoint = pointer.getScreenPosition(menu.menuCam, _cachedPoint);
 

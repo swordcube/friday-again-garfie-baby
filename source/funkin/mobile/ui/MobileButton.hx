@@ -46,7 +46,7 @@ class MobileButton extends FunkinSprite {
 
     override function update(elapsed:Float):Void {
         super.update(elapsed);
-        final pointer = MouseUtil.getPointer();
+        final pointer = TouchUtil.touch;
         if(pointer != null) {
             final curHovered:Bool = pointer.overlaps(this, getDefaultCamera()) ?? false;
             if(curHovered != hovered) {
@@ -57,12 +57,12 @@ class MobileButton extends FunkinSprite {
                 }
             }
         }
-        if(MouseUtil.isJustPressed() && hovered && !pressed) {
+        if(TouchUtil.justPressed && hovered && !pressed) {
             pressed = true;
             onDown.dispatch();
             alpha = 1;
         }
-        if(MouseUtil.isJustReleased() && pressed) {
+        if(TouchUtil.justReleased && pressed) {
             pressed = false;
             onUp.dispatch();
         }

@@ -58,7 +58,7 @@ class CharacterEditor extends UIState {
         super.create();
         FlxG.camera.bgColor = FlxColor.GRAY;
         
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
         #end
@@ -147,16 +147,16 @@ class CharacterEditor extends UIState {
                     addOffsetToCurAnim(amount, 0);
             }
             // camera panning (via middle click dragging)
-            final pointer = MouseUtil.getPointer();
-            if(MouseUtil.isJustPressedMiddle()) {
+            final pointer = TouchUtil.touch;
+            if(FlxG.mouse.justPressedMiddle) {
                 panningCamera = true;
                 lastCamPos.set(camFollow.x, camFollow.y);
                 pointer.getGamePosition(lastMousePos);
             }
-            if(MouseUtil.isJustReleasedMiddle())
+            if(FlxG.mouse.justReleasedMiddle)
                 panningCamera = false;
             
-            if(panningCamera && MouseUtil.wasJustMoved()) {
+            if(panningCamera && TouchUtil.justMoved) {
                 pointer.getGamePosition(curMousePos);
                 camFollow.setPosition(
                     lastCamPos.x - ((curMousePos.x - lastMousePos.x) / FlxG.camera.zoom),
@@ -164,15 +164,15 @@ class CharacterEditor extends UIState {
                 );
             } else {
                 // animation offsetting (via mouse dragging)
-                if(MouseUtil.isJustPressed()) {
+                if(TouchUtil.justPressed) {
                     draggingOffsets = true;
                     lastCamPos.set(character.animation.curAnim.offset.x, character.animation.curAnim.offset.y); // reuse lastCamPos because i don't care fuck you
                     pointer.getGamePosition(lastMousePos);
                 }
-                if(MouseUtil.isJustReleased())
+                if(TouchUtil.justReleased)
                     draggingOffsets = false;
                 
-                if(draggingOffsets && MouseUtil.wasJustMoved()) {
+                if(draggingOffsets && TouchUtil.justMoved) {
                     pointer.getGamePosition(curMousePos);
                     setOffsetForCurAnim(
                         Std.int(lastCamPos.x - ((curMousePos.x - lastMousePos.x) / character.scale.x / FlxG.camera.zoom)),
@@ -180,7 +180,7 @@ class CharacterEditor extends UIState {
                     );
                 }
                 // camera zooming (via mouse wheel)
-                FlxG.camera.zoom += MouseUtil.getWheel() * (0.1 * FlxG.camera.zoom);
+                FlxG.camera.zoom += TouchUtil.wheel * (0.1 * FlxG.camera.zoom);
             }
         }
         super.update(elapsed);
@@ -366,7 +366,7 @@ class CharacterEditor extends UIState {
         curMousePos = FlxDestroyUtil.put(curMousePos);
         lastMousePos = FlxDestroyUtil.put(lastMousePos);
 
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         FlxG.mouse.visible = lastMouseVisible;
         #end
         super.destroy();

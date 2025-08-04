@@ -92,7 +92,7 @@ class MainPage extends Page {
         super.update(elapsed);
 
         // traditional desktop controls
-        final wheel:Float = MouseUtil.getWheel();
+        final wheel:Float = TouchUtil.wheel;
         if(controls.justPressed.UI_UP || wheel < 0)
             changeSelection(-1);
 
@@ -140,8 +140,8 @@ class MainPage extends Page {
     }
 
     private function _checkMenuButtonPresses(button:FlxSprite):Void {
-        final pointer = MouseUtil.getPointer();
-        if(MouseUtil.isJustPressed() && pointer.overlaps(button, getDefaultCamera())) {
+        final pointer = TouchUtil.touch;
+        if(TouchUtil.justPressed && pointer.overlaps(button, getDefaultCamera())) {
             if(curSelected != button.ID) {
                 curSelected = button.ID;
                 changeSelection(0, true);

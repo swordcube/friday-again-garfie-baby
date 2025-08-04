@@ -30,7 +30,7 @@ class TopBarButton extends UIComponent {
 
     override function update(elapsed:Float):Void {
         final isHovered:Bool = checkMouseOverlap();
-        final offset:Float = (isHovered) ? (MouseUtil.isPressed() ? -15 : 15) : 0;
+        final offset:Float = (isHovered) ? (TouchUtil.pressed ? -15 : 15) : 0;
         
         bg.colorTransform.redOffset = FlxMath.lerp(bg.colorTransform.redOffset, offset, FlxMath.getElapsedLerp(0.32, elapsed));
         if(Math.abs(bg.colorTransform.redOffset) < 0.001)
@@ -46,7 +46,7 @@ class TopBarButton extends UIComponent {
 
         bg.visible = bg.colorTransform.hasRGBOffsets();
 
-        if(isHovered && MouseUtil.isJustReleased()) {
+        if(isHovered && TouchUtil.justReleased) {
             if(callback != null)
                 callback();
         }
@@ -55,7 +55,7 @@ class TopBarButton extends UIComponent {
 
     override function checkMouseOverlap():Bool {
         _checkingMouseOverlap = true;
-        final pointer = MouseUtil.getPointer();
+        final pointer = TouchUtil.touch;
         final ret:Bool = pointer.overlaps(bg, bg.getDefaultCamera());
         _checkingMouseOverlap = false;
         return ret;

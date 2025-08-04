@@ -203,7 +203,8 @@ class FunkinScript {
         set("UIWindow", funkin.ui.Window);
 
         setClass(funkin.utilities.UndoList);
-        setClass(funkin.utilities.MouseUtil);
+        setClass(funkin.utilities.TouchUtil);
+        setClass(funkin.utilities.SwipeUtil);
         setClass(funkin.utilities.ArrayUtil);
         setClass(funkin.utilities.StringUtil);
         setClass(funkin.utilities.CustomEmitter);

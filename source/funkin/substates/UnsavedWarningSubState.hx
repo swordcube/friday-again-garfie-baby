@@ -20,7 +20,7 @@ class UnsavedWarningSubState extends UISubState {
     override function create():Void {
         super.create();
         
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
         #end
@@ -38,13 +38,13 @@ class UnsavedWarningSubState extends UISubState {
     }
 
     override function update(elapsed:Float):Void {
-        if(MouseUtil.isJustReleased() && !window.checkMouseOverlap())
+        if(TouchUtil.justReleased && !window.checkMouseOverlap())
             FlxTimer.wait(0.001, window.close);
         
         super.update(elapsed);
     }
 
-    #if FLX_MOUSE
+    #if (FLX_MOUSE && !mobile)
     override function destroy():Void {
         FlxG.mouse.visible = lastMouseVisible;
         FlxG.cameras.remove(camera);

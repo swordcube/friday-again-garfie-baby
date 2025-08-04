@@ -52,7 +52,7 @@ class FileDialogMenu extends UISubState {
     override function create():Void {
         super.create();
         
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
 
@@ -139,7 +139,7 @@ class FileDialogMenu extends UISubState {
     }
 
     override function destroy():Void {
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         FlxG.mouse.useSystemCursor = lastMouseSystemCursor;
         FlxG.mouse.visible = lastMouseVisible;
         #end

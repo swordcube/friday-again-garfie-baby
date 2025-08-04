@@ -132,6 +132,10 @@ class TitleState extends FunkinState {
         }
         if(initialized)
             skipIntro();
+
+        #if mobile
+        FlxG.touches.swipeThreshold.y = 100;
+        #end
     }
     
     override function update(elapsed:Float):Void {
@@ -144,7 +148,7 @@ class TitleState extends FunkinState {
             swagShader.setFloat("OFFSET", swagShader.getFloat("OFFSET") + (elapsed * 0.1));
 
         #if MOBILE_UI
-        final accept:Bool = controls.justPressed.ACCEPT || MouseUtil.isJustPressed();
+        final accept:Bool = controls.justPressed.ACCEPT || TouchUtil.justPressed;
         #else
         final accept:Bool = controls.justPressed.ACCEPT;
         #end

@@ -58,7 +58,7 @@ class CharterPlaytest extends FunkinSubState {
         super.create();
         Scoring.currentSystem = new PBotSystem();
 
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = false;
         #end
@@ -169,10 +169,10 @@ class CharterPlaytest extends FunkinSubState {
         if(controls.justPressed.BACK)
             close();
 
-        if(MouseUtil.isJustPressed())
+        if(TouchUtil.justPressed)
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_down"));
         
-        else if(MouseUtil.isJustReleased())
+        else if(TouchUtil.justReleased)
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_up"));
     }
 
@@ -200,7 +200,7 @@ class CharterPlaytest extends FunkinSubState {
     
     override function destroy():Void {
         FlxG.timeScale = 1;
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         FlxG.mouse.visible = lastMouseVisible;
         #end
         WindowUtil.titleSuffix = " - Chart Editor";

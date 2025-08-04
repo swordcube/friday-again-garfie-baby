@@ -226,7 +226,7 @@ class ControlsPage extends Page {
             return;
 
         if(!changingBind) {
-            final wheel:Float = MouseUtil.getWheel();
+            final wheel:Float = TouchUtil.wheel;
             if(controls.justPressed.UI_UP || wheel < 0)
                 changeSelection(-1);
     

@@ -504,7 +504,7 @@ class ChartEditor extends UIState {
 
         // adjust a few lil things
 
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         FlxG.mouse.visible = true;
         #end
         Main.statsDisplay.visible = false; // it gets in the way
@@ -549,7 +549,7 @@ class ChartEditor extends UIState {
     }
 
     override function update(elapsed:Float) {
-        final pointer = MouseUtil.getPointer();
+        final pointer = TouchUtil.touch;
         final isUIFocused:Bool = UIUtil.isAnyComponentFocused([grid, selectionBox]);
 
         FlxG.sound.acceptInputs = !UIUtil.isModifierKeyPressed(ANY) && !isUIFocused;
@@ -575,17 +575,17 @@ class ChartEditor extends UIState {
         Conductor.instance.hasMetronome = editorSettings.metronome && inst.playing;
         conductorInfoText.text = 'Step: ${Conductor.instance.curStep}\nBeat: ${Conductor.instance.curBeat}\nMeasure: ${Conductor.instance.curMeasure}';
 
-        if(MouseUtil.isJustPressed())
+        if(TouchUtil.justPressed)
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_down"));
         
-        else if(MouseUtil.isJustReleased())
+        else if(TouchUtil.justReleased)
             FlxG.sound.play(Paths.sound("editors/charter/sfx/click_up"));
 
         final targetScrollY:Float = (CELL_SIZE * Conductor.instance.getStepAtTime(Conductor.instance.playhead)) - (FlxG.height * 0.5);
         if(inst.playing || isUIFocused)
             noteCam.scroll.y = targetScrollY;
         else {
-            final wheel:Float = MouseUtil.getWheel();
+            final wheel:Float = TouchUtil.wheel;
             if(wheel != 0) {
                 if(wheel < 0)
                     goBackABeat();
@@ -597,22 +597,22 @@ class ChartEditor extends UIState {
             else
                 noteCam.scroll.y = FlxMath.lerp(noteCam.scroll.y, targetScrollY, FlxMath.getElapsedLerp(0.32, elapsed));
 
-            if(MouseUtil.isPressedMiddle() && MouseUtil.wasJustMoved() && !_middleScrolling) {
+            if(FlxG.mouse.pressedMiddle && TouchUtil.justMoved && !_middleScrolling) {
                 _middleScrolling = true;
                 _lastMousePos.y = pointer.y;
             }
             if(_middleScrolling) {
                 seekToTime(FlxMath.bound(Conductor.instance.time + ((pointer.y - _lastMousePos.y) * elapsed * 10), 0, inst.length));
-                if(!MouseUtil.isPressedMiddle())
+                if(!FlxG.mouse.pressedMiddle)
                     _middleScrolling = false;
             }
         }
 		if (!objectGroup._movingObjects) {
-            if(MouseUtil.isJustPressed() && !isUIActive)
+            if(TouchUtil.justPressed && !isUIActive)
                 _selectingObjects = true;
 
             if(_selectingObjects) {
-                if(MouseUtil.wasJustMoved() && !selectionBox.exists) {
+                if(TouchUtil.justMoved && !selectionBox.exists) {
                     _lastMousePos.copyFrom(_mousePos);
                     selectionBox.revive();
                 }
@@ -640,7 +640,7 @@ class ChartEditor extends UIState {
                     selectionBox.visible = (newWidthAbs > 5 && newHeightAbs > 5);
                 }
             }
-            if(MouseUtil.isJustReleased() && !isUIActive) {
+            if(TouchUtil.justReleased && !isUIActive) {
                 _selectingObjects = false;
                 if(selectionBox.exists) {
 					var selected:Array<ChartEditorObject> = objectGroup.checkSelection();
@@ -660,7 +660,7 @@ class ChartEditor extends UIState {
                         forceSelectObjects([]);
                 }
             }
-            if(MouseUtil.isJustReleasedRight() && !isUIActive && !objectGroup.isHoveringNote && !objectGroup.isHoveringEvent) {
+            if(FlxG.mouse.justReleasedRight && !isUIActive && !objectGroup.isHoveringNote && !objectGroup.isHoveringEvent) {
                 final direction:Int = Math.floor((_mousePos.x - objectGroup.x) / CELL_SIZE);
                 if(direction < 0 || direction >= (Constants.KEY_COUNT * 2)) {
                     if(rightClickMenu != null)
@@ -701,7 +701,7 @@ class ChartEditor extends UIState {
         _lastMousePos = FlxDestroyUtil.put(_lastMousePos);
 
         Main.statsDisplay.visible = true;
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         FlxG.mouse.visible = false;
         #end
         Conductor.instance.rate = 1;
@@ -1100,7 +1100,7 @@ class ChartEditor extends UIState {
         if(UIUtil.isModifierKeyPressed(CTRL))
             deleteObjects([object]);
         else {
-            final pointer = MouseUtil.getPointer();
+            final pointer = TouchUtil.touch;
             if(rightClickMenu != null) {
                 remove(rightClickMenu, true);
                 rightClickMenu.destroy();

@@ -85,6 +85,9 @@ class CreditsState extends FunkinState {
         rightArrow.alpha = 0.6;
         add(rightArrow);
 
+        #if mobile
+        FlxG.touches.swipeThreshold.y = 100;
+        #end
         #if MOBILE_UI
         addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, goBack, 1.0);
         #end
@@ -99,17 +102,17 @@ class CreditsState extends FunkinState {
             entry.y = FlxMath.lerp(entry.y, y, FlxMath.getElapsedLerp(0.16, elapsed));
             entry.x = -50 + (Math.abs(Math.cos((entry.y + (ENTRY_HEIGHT * 0.5) - (getDefaultCamera().scroll.y + (FlxG.height * 0.5))) / (FlxG.height * 1.25) * Math.PI)) * 150);
         }
-        final wheel:Float = MouseUtil.getWheel();
-        if(controls.justPressed.UI_UP || wheel < 0)
+        final wheel:Float = TouchUtil.wheel;
+        if(controls.justPressed.UI_UP || SwipeUtil.swipeUp || wheel < 0)
             changeSelection(-1);
 
-        if(controls.justPressed.UI_DOWN || wheel > 0)
+        if(controls.justPressed.UI_DOWN || SwipeUtil.swipeDown || wheel > 0)
             changeSelection(1);
 
-        if(controls.justPressed.UI_LEFT)
+        if(controls.justPressed.UI_LEFT || SwipeUtil.swipeLeft)
             changeCategory(-1);
 
-        if(controls.justPressed.UI_RIGHT)
+        if(controls.justPressed.UI_RIGHT || SwipeUtil.swipeRight)
             changeCategory(1);
 
         if(controls.justPressed.ACCEPT) {

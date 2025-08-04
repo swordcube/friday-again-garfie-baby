@@ -88,7 +88,7 @@ class CharterObjectGroup extends FlxObject {
         final direction:Int = Math.floor((charter._mousePos.x - x) / ChartEditor.CELL_SIZE);
         if(_movingObjects) {
             final snapMult:Float = ChartEditor.CELL_SIZE * (16 / ChartEditor.editorSettings.gridSnap);
-            if(MouseUtil.isJustReleased())
+            if(TouchUtil.justReleased)
                 _movingObjects = false;
             
             for(object in charter.selectedObjects) {
@@ -154,7 +154,7 @@ class CharterObjectGroup extends FlxObject {
             var isEmptyCell:Bool = true;
 
             if(direction > -1) {
-                final pointer = MouseUtil.getPointer();
+                final pointer = TouchUtil.touch;
 
                 // handle notes
                 final begin:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep - max, _getVarForEachNoteAdd);
@@ -170,7 +170,7 @@ class CharterObjectGroup extends FlxObject {
     
                     if (pointer.overlaps(sprite, charter.noteCam) && !coveredUpByOtherUI) {
                         isHoveringNote = true;
-                        if(MouseUtil.isPressed() && MouseUtil.wasJustMoved() && note.selected && !charter.selectionBox.exists) {
+                        if(TouchUtil.pressed && TouchUtil.justMoved && note.selected && !charter.selectionBox.exists) {
                             for(object in charter.selectedObjects) {
                                 switch(object) {
                                     case CNote(note):
@@ -187,10 +187,10 @@ class CharterObjectGroup extends FlxObject {
                             _movingObjects = true;
                             return;
                         }
-                        if(MouseUtil.isJustReleased())
+                        if(TouchUtil.justReleased)
                             onNoteClick.dispatch(note);
     
-                        else if(MouseUtil.isJustReleasedRight())
+                        else if(FlxG.mouse.justReleasedRight)
                             onNoteRightClick.dispatch(note);
                         
                         isEmptyCell = false;
@@ -199,7 +199,7 @@ class CharterObjectGroup extends FlxObject {
                 }
             }
             else {
-                final pointer = MouseUtil.getPointer();
+                final pointer = TouchUtil.touch;
 
                 // handle events
                 final begin:Int = SortedArrayUtil.binarySearch(events, Conductor.instance.curStep - max, _getVarForEachEventAdd);
@@ -218,7 +218,7 @@ class CharterObjectGroup extends FlxObject {
                     if (pointer.overlaps(_eventBGSprite, charter.noteCam) && !coveredUpByOtherUI) {
                         isHoveringEvent = true;
                         
-                        if(MouseUtil.isPressed() && MouseUtil.wasJustMoved() && event.selected && !charter.selectionBox.exists) {
+                        if(TouchUtil.pressed && TouchUtil.justMoved && event.selected && !charter.selectionBox.exists) {
                             for(object in charter.selectedObjects) {
                                 switch(object) {
                                     case CNote(note):
@@ -235,10 +235,10 @@ class CharterObjectGroup extends FlxObject {
                             _movingObjects = true;
                             return;
                         }
-                        if(MouseUtil.isJustReleased())
+                        if(TouchUtil.justReleased)
                             onEventClick.dispatch(event);
     
-                        else if(MouseUtil.isJustReleasedRight())
+                        else if(FlxG.mouse.justReleasedRight)
                             onEventRightClick.dispatch(event);
                         
                         isEmptyCell = false;
@@ -246,7 +246,7 @@ class CharterObjectGroup extends FlxObject {
                     }                    
                 }
             }
-            if(isEmptyCell && MouseUtil.isJustReleased() && !charter.selectionBox.exists)
+            if(isEmptyCell && TouchUtil.justReleased && !charter.selectionBox.exists)
                 onEmptyCellClick.dispatch();
 		}
     }
@@ -267,7 +267,7 @@ class CharterObjectGroup extends FlxObject {
         final begin:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep - max, _getVarForEachNoteAdd);
         final end:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep + max, _getVarForEachNoteRemove);
 
-        final pointer = MouseUtil.getPointer();
+        final pointer = TouchUtil.touch;
         for(i in begin...end) {
             note = notes[i];
 

@@ -31,19 +31,19 @@ class HorizontalSlider extends Slider {
     }
 
     override function update(elapsed:Float) {
-        final pointer = MouseUtil.getPointer();
+        final pointer = TouchUtil.touch;
 
         final thumbHovered:Bool = pointer.overlaps(thumb);
         thumb.frame = thumb.frames.frames[(thumbHovered || dragging) ? 1 : 0];
 
-        if(checkMouseOverlap() && MouseUtil.isPressed() && !dragging) {
+        if(checkMouseOverlap() && TouchUtil.pressed && !dragging) {
             dragging = true;
 
             final thumbPosCap = width - (thumb.width - 1);
             _lastThumbPos.x = FlxMath.bound(((thumbHovered) ? thumb.x : (pointer.x - ((thumb.width + 1) * 0.5))) - x, 0, thumbPosCap) + 1;
             pointer.getWorldPosition(getDefaultCamera(), _lastMousePos);
         }
-        else if(dragging && MouseUtil.isJustReleased())
+        else if(dragging && TouchUtil.justReleased)
             dragging = false;
 
         if(dragging) {

@@ -65,10 +65,10 @@ class Textbox extends UIComponent {
         caret.alpha = (typing) ? Math.abs(Math.sin((System.getTimerPrecise() / 1000) * 2)) : 0;
 
         if(checkMouseOverlap()) {
-            if(MouseUtil.isJustPressed()) {
+            if(TouchUtil.justPressed) {
                 typing = true;
                 
-                final pointer = MouseUtil.getPointer();
+                final pointer = TouchUtil.touch;
                 final pos = pointer.getScreenPosition(getDefaultCamera());
                 pos.x -= label.x;
                 pos.y -= label.y;
@@ -86,7 +86,7 @@ class Textbox extends UIComponent {
             }
         }
         else {
-            if(MouseUtil.isJustReleased() && typing) {
+            if(TouchUtil.justReleased && typing) {
                 if(callback != null)
                     callback(label.text);
 
@@ -117,7 +117,7 @@ class Textbox extends UIComponent {
 
     override function checkMouseOverlap():Bool {
         _checkingMouseOverlap = true;
-        final pointer = MouseUtil.getPointer();
+        final pointer = TouchUtil.touch;
         final ret:Bool = pointer.overlaps(bg, getDefaultCamera()) && UIUtil.allDropDowns.length == 0;
         _checkingMouseOverlap = false;
         return ret;

@@ -43,10 +43,10 @@ class Button extends UIComponent {
 
     override function update(elapsed:Float):Void {
         if(checkMouseOverlap()) {
-            if(MouseUtil.isJustPressed() && !pressed)
+            if(TouchUtil.justPressed && !pressed)
                 pressed = true;
 
-            if(MouseUtil.isJustReleased() && pressed) {
+            if(TouchUtil.justReleased && pressed) {
                 if(callback != null)
                     callback();
 
@@ -62,7 +62,7 @@ class Button extends UIComponent {
 
     override function checkMouseOverlap():Bool {
         _checkingMouseOverlap = true;
-        final pointer = MouseUtil.getPointer();
+        final pointer = TouchUtil.touch;
         final ret:Bool = pointer.overlaps(bg, getDefaultCamera()) && UIUtil.allDropDowns.length == 0;
         _checkingMouseOverlap = false;
         return ret;

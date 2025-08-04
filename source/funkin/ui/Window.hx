@@ -89,19 +89,19 @@ class Window extends UIComponent {
             totalShit += icon.width + 14;
             icon.x = bg.x + (bg.width - totalShit) + 4;
         }
-        final pointer = MouseUtil.getPointer();
-        if(closeIcon.visible && closeIcon.checkMouseOverlap() && MouseUtil.isJustReleased())
+        final pointer = TouchUtil.touch;
+        if(closeIcon.visible && closeIcon.checkMouseOverlap() && TouchUtil.justReleased)
             FlxTimer.wait(0.001, close);
 
-        if(MouseUtil.isJustPressed() && pointer.overlaps(titleBar, getDefaultCamera())) {
+        if(TouchUtil.justPressed && pointer.overlaps(titleBar, getDefaultCamera())) {
             _lastPos.set(x, y);
             pointer.getViewPosition(getDefaultCamera(), _lastMousePos);
             dragging = true;
         }
-        if(dragging && MouseUtil.isJustReleased())
+        if(dragging && TouchUtil.justReleased)
             dragging = false;
 
-        if(dragging && MouseUtil.isPressed() && MouseUtil.wasJustMoved()) {
+        if(dragging && TouchUtil.pressed && TouchUtil.justMoved) {
             pointer.getViewPosition(getDefaultCamera(), _mousePos);
             x = _lastPos.x + (_mousePos.x - _lastMousePos.x);
             y = _lastPos.y + (_mousePos.y - _lastMousePos.y);

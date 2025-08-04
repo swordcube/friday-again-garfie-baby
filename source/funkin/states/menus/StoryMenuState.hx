@@ -208,12 +208,16 @@ class StoryMenuState extends FunkinState {
         grpWarningTexts = new FlxTypedContainer<FlxText>();
         add(grpWarningTexts);
 
+        #if mobile
+        FlxG.touches.swipeThreshold.x = 100;
+        FlxG.touches.swipeThreshold.y = 100;
+        #end
         #if MOBILE_UI
         addBackButton(FlxG.width - 230, FlxG.height - 170, FlxColor.WHITE, goBack, 0.7);
         #end
         changeSelection(0, true);
 
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         lastMouseVisible = FlxG.mouse.visible;
         FlxG.mouse.visible = true;
         #end
@@ -242,12 +246,18 @@ class StoryMenuState extends FunkinState {
         scoreText.text = 'LEVEL SCORE: ${FlxStringUtil.formatMoney(Math.floor(lerpScore), false)}';
 
         if(!transitioning) {
-            final wheel:Float = MouseUtil.getWheel();
-            if(controls.justPressed.UI_UP || wheel < 0)
+            final wheel:Float = TouchUtil.wheel;
+            if(controls.justPressed.UI_UP || SwipeUtil.swipeUp || wheel < 0)
                 changeSelection(-1);
     
-            if(controls.justPressed.UI_DOWN || wheel > 0)
+            if(controls.justPressed.UI_DOWN || SwipeUtil.swipeDown || wheel > 0)
                 changeSelection(1);
+
+            if(SwipeUtil.swipeLeft)
+                changeDifficulty(-1);
+            
+            if(SwipeUtil.swipeRight)
+                changeDifficulty(1);
 
             if(controls.justPressed.UI_LEFT) {
                 leftArrow.animation.play("press");
@@ -509,7 +519,7 @@ class StoryMenuState extends FunkinState {
     }
 
     override function destroy():Void {
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         FlxG.mouse.visible = lastMouseVisible;
         #end
         Paths.forceContentPack = null;

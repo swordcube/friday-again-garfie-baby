@@ -36,9 +36,11 @@ import funkin.ui.Cursor;
 import funkin.graphics.FunkinSprite;
 
 import funkin.utilities.Constants;
+import funkin.utilities.MathUtil;
 import funkin.utilities.CoolUtil;
 import funkin.utilities.WindowUtil;
-import funkin.utilities.MouseUtil;
+import funkin.utilities.TouchUtil;
+import funkin.utilities.SwipeUtil;
 
 import haxe.Json;
 import json2object.JsonParser;

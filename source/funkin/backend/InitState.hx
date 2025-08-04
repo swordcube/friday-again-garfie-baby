@@ -124,14 +124,14 @@ class InitState extends FlxState {
         FlxG.plugins.addPlugin(new ScreenShotPlugin());
 
         // hide cursor, we probably don't need it rn
-        #if FLX_MOUSE
+        #if (FLX_MOUSE && !mobile)
         FlxG.mouse.visible = false;
         #else
         startGame();
         #end
     }
 
-    #if FLX_MOUSE
+    #if (FLX_MOUSE && !mobile)
     override function update(elapsed:Float):Void {
         super.update(elapsed);
         

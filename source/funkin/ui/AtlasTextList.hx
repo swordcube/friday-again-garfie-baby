@@ -9,6 +9,7 @@ import flixel.util.FlxSignal;
  */
 class AtlasTextList extends FlxTypedGroup<AtlasText> {
     public var curSelected:Int = 0;
+    public var acceptTimeout:Float = 0;
     public var callbacks:Map<String, ListCallbacks> = [];
 
     public function clearList():Void {
@@ -45,16 +46,24 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
     }
 
     override function update(elapsed:Float):Void {
-        final wheel:Float = MouseUtil.getWheel();
+        final wheel:Float = TouchUtil.wheel;
         final controls:Controls = Controls.instance;
 
-        if(controls.justPressed.UI_UP || wheel < 0)
+        acceptTimeout -= elapsed;
+        if(acceptTimeout < 0)
+            acceptTimeout = 0;
+
+        if(SwipeUtil.swipeAny)
+            acceptTimeout = 0.5;
+
+        if(controls.justPressed.UI_UP || SwipeUtil.swipeUp || wheel < 0)
             changeSelection(-1);
 
-        if(controls.justPressed.UI_DOWN || wheel > 0)
+        if(controls.justPressed.UI_DOWN || SwipeUtil.swipeDown || wheel > 0)
             changeSelection(1);
 
-        if(controls.justPressed.ACCEPT) {
+        final pointer = TouchUtil.touch;
+        if(controls.justPressed.ACCEPT || (TouchUtil.justPressed && acceptTimeout <= 0 && (pointer?.overlaps(members.unsafeGet(curSelected)) ?? false) == true)) {
             final callback = callbacks.get(members.unsafeGet(curSelected).text).onAccept;
             if(callback != null)
                 callback(curSelected, members.unsafeGet(curSelected));
