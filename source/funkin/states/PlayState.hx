@@ -71,10 +71,6 @@ import funkin.scripting.FunkinScript;
 import funkin.scripting.FunkinScriptGroup;
 #end
 
-import modchart.Config as FMConfig;
-import modchart.Manager as ModManager;
-import modchart.engine.PlayField as PlayFieldRenderer;
-
 enum abstract CameraTarget(Int) from Int to Int {
 	final OPPONENT = 0;
 	final PLAYER = 1;
@@ -142,10 +138,6 @@ class PlayState extends FunkinState {
 
 	public var currentChart:ChartData;
 	public var playField:PlayField;
-
-	#if MODCHARTING_ALLOWED
-	public var modManager(get, null):ModManager;
-	#end
 
 	public var opponentStrumLine(get, never):StrumLine;
 	public var opponentStrums(get, never):StrumLine;
@@ -711,9 +703,6 @@ class PlayState extends FunkinState {
 			hud.script.setParent(hud);
 			hud.script.call("onCreate");
 		}
-		#end
-		#if MODCHARTING_ALLOWED
-		FMConfig.PREVENT_SCALED_HOLD_END = true; // nasty ass sustains be GONE
 		#end
 		countdown = new Countdown();
 		countdown.onStart.add(onCountdownStart);
@@ -1680,23 +1669,6 @@ class PlayState extends FunkinState {
 		FlxG.timeScale = playbackRate;
 		return playbackRate;
 	}
-
-	#if MODCHARTING_ALLOWED
-	@:noCompletion
-	private function get_modManager():ModManager {
-		if(modManager == null) {
-			if(playField != null) {
-				modManager = new ModManager();
-				add(modManager);
-
-				playField.renderer = new PlayFieldRenderer();
-				playField.insert(playField.members.indexOf(playField.playerStrumLine) + 1, playField.renderer);
-			} else
-				Logs.warn('You cannot initialize the modifier manager before the playfield was initialized. Try doing this in onCreatePost!');
-		}
-		return modManager;
-	}
-	#end
 
 	override function destroy() {
 		#if SCRIPTING_ALLOWED

@@ -124,13 +124,6 @@
       "url": "https://github.com/swordcubes-grave-of-shite/openfl"
     },
     {
-      "name": "funkin-modchart",
-      "type": "git",
-      "dir": null,
-      "ref": "garfie-baby-dev",
-      "url": "https://github.com/swordcube/FunkinModchart-flixel6"
-    },
-    {
       "name": "rulescript",
       "type": "git",
       "dir": null,

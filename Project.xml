@@ -125,18 +125,10 @@
 	<define name="USE_MOONCHART" unless="NO_MOONCHART" />
 
 	<!--
-		Comment/delete this line below to disable crash log saving
-		Or compile with the NO_MODCHARTING define, like so:
-
-		lime test platform -DNO_MODCHARTING
-	-->
-	<define name="MODCHARTING_ALLOWED" unless="NO_MODCHARTING || NO_MODCHARTING_ALLOWED" />
-
-	<!--
 		Comment/delete this line below to disable case-insensitive file paths on Linux
-		Or compile with the NO_MODCHARTING define, like so:
+		Or compile with the NO_LINUX_CASE_INSENSITIVE_FILES define, like so:
 
-		lime test platform -DNO_MODCHARTING
+		lime test platform -DNO_LINUX_CASE_INSENSITIVE_FILES
 	-->
 	<define name="LINUX_CASE_INSENSITIVE_FILES" if="linux" unless="NO_LINUX_CASE_INSENSITIVE_FILES || LINUX_CASE_SENSITIVE_FILES" />
 
@@ -205,9 +197,6 @@
 
 	<!-- Extra chart format support -->
 	<haxelib name="moonchart" if="USE_MOONCHART" />
-
-	<!-- Modcharting -->
-	<haxelib name="funkin-modchart" if="MODCHARTING_ALLOWED" />
 
 	<!-- Runtime scripting -->
 	<section if="SCRIPTING_ALLOWED">
@@ -298,12 +287,6 @@
 	
 		<!--Include most classes into the executable, useful for scripting -->
 		<haxeflag name="--macro" value="funkin.backend.macros.IncludeMacro.build()" if="SCRIPTING_ALLOWED" />
-	</section>
-
-	<section if="MODCHARTING_ALLOWED">
-		<haxedef name="FM_ENGINE" value="Garfie"/>
-		<haxedef name="FM_ENGINE_VERSION" value="0.1.0"/>
-		<haxeflag name="--macro" value="modchart.backend.macros.Macro.includeFiles()"/>
 	</section>
 
     <!-- Fix compiling issues with local libraries -->

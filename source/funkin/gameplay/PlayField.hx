@@ -23,19 +23,11 @@ import funkin.backend.events.NoteEvents;
 import funkin.states.PlayState;
 import funkin.gameplay.scoring.Scoring;
 
-#if MODCHARTING_ALLOWED
-import modchart.engine.PlayField as PlayFieldRenderer;
-#end
-
 class PlayField extends FlxContainer {
     public var strumLines:FlxTypedGroup<StrumLine>;
 
     public var opponentStrumLine:StrumLine;
     public var playerStrumLine:StrumLine;
-    
-    #if MODCHARTING_ALLOWED
-    public var renderer:PlayFieldRenderer;
-    #end
 
     public var stats:PlayerStats;
     public var hud:BaseHUD;
@@ -354,41 +346,6 @@ class PlayField extends FlxContainer {
         }
         super.update(elapsed);
     }
-
-    #if MODCHARTING_ALLOWED
-    override function draw():Void {
-		final oldDefaultCameras = @:privateAccess FlxCamera._defaultCameras;
-		if (_cameras != null)
-			@:privateAccess FlxCamera._defaultCameras = _cameras;
-		
-		if(zIndexesAllowed) {
-            if(_drawQueue.length != 0)
-				_drawQueue.resize(0);
-            
-			var basic:FlxBasic = null;
-			for (i in 0...members.length) {
-                basic = members[i];
-
-                final isExcluded:Bool = (renderer?.visible ?? false) && (basic == opponentStrumLine || basic == playerStrumLine);
-				if (!isExcluded && basic != null && basic.exists && basic.visible)
-					_drawQueue.push(i);
-			}
-			_drawQueue.sort(_drawQueueSort);
-			
-			for(i in 0..._drawQueue.length) {
-                basic = members[_drawQueue[i]];
-				basic.draw();
-			}
-		} else {
-            for (basic in members) {
-                final isExcluded:Bool = (renderer?.visible ?? false) && (basic == opponentStrumLine || basic == playerStrumLine);
-				if (!isExcluded && basic != null && basic.exists && basic.visible)
-					basic.draw();
-			}
-		}
-		@:privateAccess FlxCamera._defaultCameras = oldDefaultCameras;
-	}
-    #end
 
     //----------- [ Private API ] -----------//
 
