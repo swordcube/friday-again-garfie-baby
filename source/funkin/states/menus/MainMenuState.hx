@@ -162,9 +162,8 @@ class MainMenuState extends FunkinState {
             gyroPan.y = MathUtil.smoothLerpPrecision(gyroPan.y, 0, elapsed, 2.5);
 
             // how far away from bg mid do we want to pan via gyroPan
-            final add:Float = (menuItems.length > 4) ? (menuItems.length * 8) : 0;
             camFollow.x = bg.getGraphicMidpoint().x - gyroPan.x;
-            camFollow.y = bg.getGraphicMidpoint().y - gyroPan.y - add;
+            camFollow.y = bg.getGraphicMidpoint().y - gyroPan.y;
         }
         #end
         if(!transitioning) {
