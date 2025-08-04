@@ -67,8 +67,13 @@ class MainMenuState extends FunkinState {
         Conductor.instance.music = FlxG.sound.music;
 
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg"));
+        #if mobile
+        bg.scrollFactor.set(0.17, 0.17);
+        bg.scale.set(1.2, 1.2);
+        #else
         bg.scrollFactor.set(0, Math.max(0.1, 0.25 - (0.05 * (options.length - 4))));
         bg.scale.set(1.175, 1.175);
+        #end
         bg.updateHitbox();
         bg.screenCenter();
         add(bg);
@@ -99,12 +104,19 @@ class MainMenuState extends FunkinState {
 			menuItem.animation.addByPrefix("selected", '${option.name} selected', 24);
 			menuItem.animation.play("idle");
 
+            #if mobile
+			menuItem.scrollFactor.set(0.4, (scr > 0) ? 0.4 + scr : 0.4);
+            #else
 			menuItem.scrollFactor.set(0, scr);
+            #end
 			menuItem.updateHitbox();
 			menuItem.screenCenter(X);
             menuItem.ID = i;
 
-			menuItems.add(menuItem);   
+			menuItems.add(menuItem);
+            
+            if(i == 1)
+                camFollow.setPosition(menuItem.getGraphicMidpoint().x, menuItem.getGraphicMidpoint().y);
         }
         camFollow = new FlxObject(0, 0, 1, 1);
         add(camFollow);

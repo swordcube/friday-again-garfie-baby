@@ -56,6 +56,8 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
         if(SwipeUtil.swipeAny)
             acceptTimeout = 0.5;
 
+        // TODO: why is this so broken bro
+        // the swiping doesn't work here and i have genuinely no idea why
         if(controls.justPressed.UI_UP || SwipeUtil.swipeUp || wheel < 0)
             changeSelection(-1);
 

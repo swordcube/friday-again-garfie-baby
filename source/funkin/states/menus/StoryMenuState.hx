@@ -253,10 +253,12 @@ class StoryMenuState extends FunkinState {
             if(controls.justPressed.UI_DOWN || SwipeUtil.swipeDown || wheel > 0)
                 changeSelection(1);
 
-            if(SwipeUtil.swipeLeft)
+            // needs to be swapped for mobile
+            // idk why
+            if(SwipeUtil.swipeRight)
                 changeDifficulty(-1);
             
-            if(SwipeUtil.swipeRight)
+            if(SwipeUtil.swipeLeft)
                 changeDifficulty(1);
 
             if(controls.justPressed.UI_LEFT) {
