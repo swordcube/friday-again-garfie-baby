@@ -144,16 +144,10 @@ class Project extends HXProject {
 				addAssetPath("example_content", "content");
 			}
 		}
-		// ALSoft configuration
-		// Makes audio sound cleaner
-		if (isDesktop()) {
-			if (isWindows())
-				addAsset("alsoft.ini", "plugins/alsoft.ini");
-			else
-				addAsset("alsoft.ini", "plugins/alsoft.conf");
-
-			setDefine("NO_PRECOMPILED_HEADERS"); // fix Linux compilation
-		}
+		// fix Linux compilation
+		if (isDesktop())
+			setDefine("NO_PRECOMPILED_HEADERS");
+		
 		if (isLinux() || isMac())
 			addAsset("art/icons/256x.png", "icon.png"); // icon for Linux and macOS
 
