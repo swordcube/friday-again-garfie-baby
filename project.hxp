@@ -115,7 +115,7 @@ class Project extends HXProject {
 		// [ assets ] //
 
 		// ASTC asset compression
-		if (isMobile()) {
+		if (isMobile() && !isDisplay()) {
 			final folders:Array<String> = ['assets', 'example_content'];
 			trace('Compressing folders: ${folders}');
 			for (f in folders) {
@@ -130,7 +130,7 @@ class Project extends HXProject {
 			}
 		}
 		// add assets (if not on a test build)
-		if (!isDefined("TEST_BUILD") && !isDefined("display") && !isDefined("macro")) {
+		if (!isDefined("TEST_BUILD") && !isDisplay()) {
 			if (isMobile()) {
 				// add ASTC compressed and uncompressed assets
 				addAssetPath("assets");
