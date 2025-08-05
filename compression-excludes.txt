@@ -1,0 +1,12 @@
+assets/preload/images/freeplay/*
+assets/gameplay/icons/*
+assets/menus/title/enter.png
+assets/menus/title/enter_mobile.png
+assets/ui/images/*
+assets/ui/images/cursors/*
+assets/ui/images/volume/*
+assets/ui/images/status/*
+assets/ui/images/window/*
+assets/gameplay/characters/bf-pixel/*
+assets/editors/charter/images/events/*
+example_content/base_game/gameplay/icons/*

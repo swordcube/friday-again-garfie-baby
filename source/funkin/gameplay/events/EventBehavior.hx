@@ -4,15 +4,20 @@ import funkin.backend.ContentMetadata;
 import funkin.backend.events.GameplayEvents;
 import funkin.backend.assets.loaders.AssetLoader;
 
+#if SCRIPTING_ALLOWED
 import funkin.scripting.FunkinScript;
 import funkin.scripting.FunkinScriptGroup;
+#end
 
 import funkin.states.PlayState;
 
 class EventBehavior {
     public var game(default, null):PlayState;
     public var eventType(default, null):String;
+
+    #if SCRIPTING_ALLOWED
     public var scripts(default, null):FunkinScriptGroup;
+    #end
 
     public function new(eventType:String) {
         game = PlayState.instance;

@@ -121,7 +121,7 @@ class TitleState extends FunkinState {
             titleGroup.add(gfDance);
     
             titleText = new FlxSprite(#if MOBILE_UI 50 #else 100 #end, FlxG.height * 0.8);
-            titleText.frames = Paths.getSparrowAtlas(#if MOBILE_UI 'menus/title/enter_mobile' #else 'menus/title/title' #end);
+            titleText.frames = Paths.getSparrowAtlas(#if MOBILE_UI 'menus/title/enter_mobile' #else 'menus/title/enter' #end);
             titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
             titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
             titleText.animation.play('idle');

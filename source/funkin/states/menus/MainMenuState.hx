@@ -93,6 +93,9 @@ class MainMenuState extends FunkinState {
         #if mobile
         gyroPan = new FlxPoint();
         #end
+        camFollow = new FlxObject(0, 0, 1, 1);
+        add(camFollow);
+        
         final offset:Float = 108 - (Math.max(options.length, 4) - 4) * 80;
 		final scr:Float = (options.length < 6) ? 0 : (options.length - 4) * 0.135;
         
@@ -118,9 +121,6 @@ class MainMenuState extends FunkinState {
             if(i == 1)
                 camFollow.setPosition(menuItem.getGraphicMidpoint().x, menuItem.getGraphicMidpoint().y);
         }
-        camFollow = new FlxObject(0, 0, 1, 1);
-        add(camFollow);
-
         var versionString:String = 'Garfie Engine v${FlxG.stage.application.meta.get("version")}';
         #if DEV_BUILD
         versionString += ' (${GitCommitMacro.getBranch()}/${GitCommitMacro.getCommitHash()})';

@@ -6,6 +6,8 @@
 
 	<app title="friday again garfie baby" file="Funkin" main="funkin.backend.Main" package="com.swordcube.GarfieBabyFunkin" packageName="com.swordcube.GarfieBabyFunkin" version="0.1.0" company="swordcube" />
 
+	<prebuild haxe="Prebuild.hx" />
+
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
@@ -139,14 +141,16 @@
 		We'll load from source directory instead of export directory instead
 	-->
 	<section unless="TEST_BUILD || display || macro">
-		<assets path="assets" />
+		<assets path="assets" exclude="*.png" if="mobile" />
+		<assets path="astc-textures/assets" rename="assets" exclude="*.astc" unless="mobile" />
 		
 		<!-- Only copy content folder for desktop -->
 		<assets path="content" type="template" if="desktop" />
 	</section>
 
 	<!-- Copy example content to content folder for all builds -->
-	<assets path="example_content" rename="content" />
+	<assets path="example_content" rename="content" exclude="*.png" if="mobile" />
+	<assets path="astc-textures/example_content" rename="content" exclude="*.astc" unless="mobile" />
 
 	<!--
 		Copy ALSoft configuration to export directory

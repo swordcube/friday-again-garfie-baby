@@ -38,7 +38,7 @@ enum AssetType {
 @:allow(funkin.backend.LevelData)
 class Paths {
     public static final ASSET_EXTENSIONS:Map<AssetType, Array<String>> = [
-        IMAGE => [".png", ".jpg", ".jpeg", ".bmp"],
+        IMAGE => [".astc", ".png", ".jpg", ".jpeg", ".bmp"],
         SOUND => [".ogg", ".wav", ".mp3"],
         VIDEO => [".mp4", ".mkv", ".ogv", ".avi", ".flv", ".3gp", ".avif"],
         FONT => [".ttf", ".otf"],
@@ -292,7 +292,6 @@ class Paths {
                 openflPacks++;
             }
         }
-        trace(contentFolders);
         Logs.verbose('Found ${openflPacks} embedded content packs');
 
         final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders.copy();

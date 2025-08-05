@@ -92,8 +92,8 @@
       "name": "lime",
       "type": "git",
       "dir": null,
-      "ref": "develop",
-      "url": "https://github.com/swordcubes-grave-of-shite/lime"
+      "ref": "garfie-baby/main",
+      "url": "https://github.com/swordcubes-grave-of-shite/lime-fc"
     },
     {
       "name": "linc_luajit",
@@ -157,6 +157,13 @@
       "dir": null,
       "ref": "master",
       "url": "https://github.com/LimeExtensions/extension-androidtools"
+    },
+    {
+      "name": "astc-compressor",
+      "type": "git",
+      "dir": null,
+      "ref": "94e641a2b4f9d289278b5bc23601029c0abacba2",
+      "url": "https://github.com/KarimAkra/astc-compressor"
     }
   ]
 }
