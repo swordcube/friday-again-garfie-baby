@@ -131,7 +131,7 @@ function onStartOut() {
 
 function onStartIn() {
     TransitionableState.resetDefaultTransitions();
-    if(FlxG.state is ScriptedState && FlxG.state.scriptName != "VSliceFreeplay") {
+    if(FlxG.state is TransitionState && !((FlxG.state is ScriptedState) && FlxG.state.scriptName == "VSliceFreeplay")) {
         FlxG.state.transIn = TransitionableState.defaultTransIn;
         FlxG.state.transOut = TransitionableState.defaultTransOut;
     }

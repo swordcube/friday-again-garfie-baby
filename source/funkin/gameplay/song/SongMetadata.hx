@@ -83,9 +83,15 @@ class SongMetadata {
 		parser.ignoreUnknownVariables = true;
 
 		final meta:SongMetadata = parser.fromJson(FlxG.assets.getText(Paths.json('gameplay/songs/${song}/${mix}/metadata', loaderID)));
-		if(mix == "default")
-			meta.song.mixes.insert(0, "default");
-
+		if(mix == "default") {
+			// remove duplicates of default (if any)
+			while(meta.song.mixes.contains("default"))
+				meta.song.mixes.remove("default");
+			
+			// if default isn't present, add it
+			if(!meta.song.mixes.contains("default"))
+				meta.song.mixes.insert(0, "default");
+		}
 		return meta;
     }
 
