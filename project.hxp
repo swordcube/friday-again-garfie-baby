@@ -133,9 +133,11 @@ class Project extends HXProject {
 			}
 		}
 		// add assets (if not on a test build)
+		addAssetLibrary("default");
+
 		if (!isDefined("TEST_BUILD") && !isDisplay()) {
-			addAssetPath("assets");
-			addAssetPath("example_content", "content");
+			addAssetPath("assets", null, "default", ["*"]);
+			addAssetPath("example_content", "content", "default", ["*"]);
 		}
 		// ALSoft configuration
 		// Makes audio sound cleaner
@@ -225,19 +227,23 @@ class Project extends HXProject {
 
 			// performance improvements for nape (if used)
 			setDefine("NAPE_RELEASE_BUILD");
-
-			if (isDefined("CRASH_HANDLER")) {
-				setDefine("HXCPP_CHECK_POINTER");
-				setDefine("HXCPP_STACK_LINE");
-				setDefine("HXCPP_STACK_TRACE");
-				setDefine("HXCPP_CATCH_SEGV");
-
-				if (isMobile())
-					setDefine("HXCPP_DEBUG_LINK");
-
-				setDefine("openfl-enable-handle-error");
-			}
 		}
+		// crash handler stuff
+		if (isDefined("CRASH_HANDLER")) {
+			setDefine("HXCPP_CHECK_POINTER");
+			setDefine("HXCPP_STACK_LINE");
+			setDefine("HXCPP_STACK_TRACE");
+			setDefine("HXCPP_CATCH_SEGV");
+
+			if (isMobile())
+				setDefine("HXCPP_DEBUG_LINK");
+
+			setDefine("openfl-enable-handle-error");
+		}
+		// disable a macro in lime that generates a random number for Assets.cache.version every build.
+    	// this doesn't seem to be useful and it also makes lime.utils.AssetCache to be re-compiled on every build.
+		setDefine("lime_disable_assets_version");
+
 		// generational gc on desktop
 		if (isDesktop())
 			setDefine("HXCPP_GC_GENERATIONAL");
@@ -250,6 +256,7 @@ class Project extends HXProject {
 
 		// better hscript errors
 		setDefine("hscriptPos");
+		setDefine("safeMode");
 
 		// experimental update queue (performance thingie)
 		setDefine("openfl_enable_experimental_update_queue");
@@ -279,6 +286,15 @@ class Project extends HXProject {
 
 		// android config
 		if (isAndroid()) {
+			// go my keystore!! (i don't care about securing this)
+			// this isn't going on the app store anytime soon
+			if(isRelease()) {
+				keystore = new Keystore();
+				keystore.path = 'key.keystore';
+				keystore.alias = 'Garfield';
+				keystore.password = 'GarfieldLovesLasagna';
+			}
+			Reflect.setField(config.get('android.manifest'), 'xmlns:tools', 'http://schemas.android.com/tools');
 			final permissionsConfig:Array<String> = [
 				'<uses-permission android:name="android.permission.MANAGE_MEDIA" tools:node="remove"/>',
 				'<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove"/>',
@@ -299,9 +315,12 @@ class Project extends HXProject {
 			else
 				config.get('android.manifest').xmlChildren = permissionsConfig;
 
-			config.set("android.minimum-sdk-version", 21);
-			config.set("android.target-sdk-version", 34);
+			config.set("android.minimum-sdk-version", 28);
+			config.set("android.target-sdk-version", 35);
 
+			if (isBundle())
+				config.set("android.gradle-project-directory", "bin-bundle");
+			
 			architectures.push(Architecture.X64);
 		}
 	}

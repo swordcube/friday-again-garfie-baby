@@ -39,11 +39,12 @@ class MobileUtil {
      * Requests Storage Permissions on Android Platform.
      */
     public static function getPermissions():Void {
-        if (VERSION.SDK_INT >= 33) {
-            if (!Environment.isExternalStorageManager())
-                Settings.requestSetting('MANAGE_APP_ALL_FILES_ACCESS_PERMISSION');
-        } else
-            Permissions.requestPermissions(['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE']);
+        // Doesn't work on Android 11+ because fuck you i guess
+        // if (VERSION.SDK_INT >= 33) {
+        //     if (!Environment.isExternalStorageManager())
+        //         Settings.requestSetting('MANAGE_APP_ALL_FILES_ACCESS_PERMISSION');
+        // } else
+        //     Permissions.requestPermissions(['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE']);
     
         try {
             if (!FileSystem.exists(MobileUtil.getDirectory()))
