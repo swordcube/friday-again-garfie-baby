@@ -118,7 +118,7 @@ class Project extends HXProject {
 		// [ assets ] //
 
 		// ASTC asset compression
-		if (isMobile() && !isDisplay()) {
+		if (isMobile() && !isDisplay() && !isDebug()) {
 			final folders:Array<String> = ['assets', 'example_content'];
 			trace('Compressing folders: ${folders}');
 			for (f in folders) {
