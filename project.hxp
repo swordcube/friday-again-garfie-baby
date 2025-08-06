@@ -299,7 +299,7 @@ class Project extends HXProject {
 			else
 				config.get('android.manifest').xmlChildren = permissionsConfig;
 
-			config.set("android.minimum-sdk-version", 19);
+			config.set("android.minimum-sdk-version", 21);
 			config.set("android.target-sdk-version", 34);
 
 			architectures.push(Architecture.X64);
