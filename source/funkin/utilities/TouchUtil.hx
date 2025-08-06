@@ -179,7 +179,7 @@ class TouchUtil {
 	#else
 	@:noCompletion
 	static function get_touch():FlxMouse {
-		FlxG.mouse.visible = true;
+		// FlxG.mouse.visible = true; // why? -swordcube
 		return FlxG.mouse;
 	}
     @:noCompletion
