@@ -37,10 +37,11 @@ class Main extends Sprite {
 		instance = this;
 
 		#if android
-		Sys.setCwd(haxe.io.Path.addTrailingSlash(MobileUtil.getDirectory()));
-		MobileUtil.getPermissions();
+		// On Android use External Files Dir.
+		Sys.setCwd(haxe.io.Path.addTrailingSlash(extension.androidtools.content.Context.getExternalFilesDir()));
 		#elseif ios
-		Sys.setCwd(lime.system.System.applicationStorageDirectory);
+		// On iOS use Documents Dir.
+		Sys.setCwd(haxe.io.Path.addTrailingSlash(lime.system.System.documentsDirectory));
 		#end
 		for(i in 0...4)
 			gameThreads.push(Thread.createWithEventLoop(() -> Thread.current().events.promise()));

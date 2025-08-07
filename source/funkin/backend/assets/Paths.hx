@@ -92,7 +92,8 @@ class Paths {
             if (type == SOUND)
                 id = FlxG.assets.addSoundExt(id);
             #end
-            id = sanitizePath(id); // just incase the path wasn't gotten from the functions in this class
+            if(!_skipSanitization)
+                id = sanitizePath(id); // just incase the path wasn't gotten from the functions in this class
             
             final isOpenFL:Bool = OpenFLAssets.exists(id, type.toOpenFlType());
             if (isOpenFL)
@@ -103,7 +104,8 @@ class Paths {
         }
         @:privateAccess
         FlxG.assets.getAssetUnsafe = (id:String, type:FlxAssetType, useCache = true) -> {
-            id = sanitizePath(id); // just incase the path wasn't gotten from the functions in this class
+            if(!_skipSanitization)
+                id = sanitizePath(id); // just incase the path wasn't gotten from the functions in this class
 
             final isOpenFL:Bool = OpenFLAssets.exists(id, type.toOpenFlType());
             if(isOpenFL)
@@ -218,6 +220,8 @@ class Paths {
      * This will clear out any previously loaded content packs.
      */
     public static function reloadContent():Void {
+        _skipSanitization = true;
+
         contentFolders.clear();
         contentPacks.clear();
         contentMetadata.clear();
@@ -308,7 +312,6 @@ class Paths {
         Paths.registerAssetLoader("default", new DefaultAssetLoader());
 
         final metaPath:String = Paths.json("metadata", "default", false);
-        trace(metaPath);
         if(FlxG.assets.exists(metaPath)) {
             final parser:JsonParser<ContentMetadata> = new JsonParser<ContentMetadata>();
             parser.ignoreUnknownVariables = true;
@@ -444,6 +447,7 @@ class Paths {
                 }
             }
         }
+        _skipSanitization = false;
     }
 
     public static function getEnabledContentPacks():Array<String> {
@@ -473,18 +477,28 @@ class Paths {
         if(loaderID == null || loaderID.length == 0) {
             final loaders:Array<AssetLoader> = _registeredAssetLoaders;
             for(i in 0...loaders.length) {
+                // don't sanitize path on mobile otherwise
+                // sanitizePath suddenly becomes recursive, calls itself 589 times, and the game crashes
                 var path:String = sanitizePath(loaders[i].getPath(name));
-                if(FlxG.assets.exists(path))
+                _skipSanitization = true;
+
+                if(FlxG.assets.exists(path)) {
+                    _skipSanitization = false;
                     return path;
+                }
+                _skipSanitization = false;
             }
         } else {
             // try to load from specified loader id (usually the name of a content pack)
             final loader:AssetLoader = _registeredAssetLoadersMap.get(loaderID);
             if(loader != null) {
                 final path:String = sanitizePath(loader.getPath(name));
-                if(FlxG.assets.exists(path))
+                _skipSanitization = true;
+
+                if(FlxG.assets.exists(path)) {
+                    _skipSanitization = false;
                     return path;
-    
+                }
                 if(useFallback) {
                     // load from loaders that have runGlobally set as true
                     // inside of their metadata as fallback
@@ -495,12 +509,18 @@ class Paths {
                             continue;
         
                         final path:String = sanitizePath(loaders[i].getPath(name));
-                        if(FlxG.assets.exists(path))
+                        _skipSanitization = true;
+
+                        if(FlxG.assets.exists(path)) {
+                            _skipSanitization = false;
                             return path;
+                        }
                     }
                 }
             }
         }
+        _skipSanitization = false;
+
         // either use assets as emergency fallback (usually enabled)
         // or return null
         if(useFallback) {
@@ -511,43 +531,63 @@ class Paths {
     }
 
     public static function image(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        _skipSanitization = true;
         final exts:Array<String> = ASSET_EXTENSIONS.get(IMAGE);
         for(i in 0...exts.length) {
             final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
-            if(FlxG.assets.exists(path))
+            if(FlxG.assets.exists(path)) {
+                _skipSanitization = false;
                 return path;
+            }
         }
-        return getAsset('${name}.png', loaderID, useFallback);
+        final ret:String = getAsset('${name}.png', loaderID, useFallback);
+        _skipSanitization = false;
+        return ret;
     }
 
     public static function sound(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        _skipSanitization = true;
         final exts:Array<String> = ASSET_EXTENSIONS.get(SOUND);
         for(i in 0...exts.length) {
             final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
-            if(FlxG.assets.exists(path))
+            if(FlxG.assets.exists(path)) {
+                _skipSanitization = false;
                 return path;
+            }
         }
-        return getAsset('${name}.ogg', loaderID, useFallback);
+        final ret:String = getAsset('${name}.ogg', loaderID, useFallback);
+        _skipSanitization = false;
+        return ret;
     }
 
     public static function video(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        _skipSanitization = true;
         final exts:Array<String> = ASSET_EXTENSIONS.get(VIDEO);
         for(i in 0...exts.length) {
             final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
-            if(FlxG.assets.exists(path))
+            if(FlxG.assets.exists(path)) {
+                _skipSanitization = false;
                 return path;
+            }
         }
-        return getAsset('${name}.mp4', loaderID, useFallback);
+        final ret:String = getAsset('${name}.mp4', loaderID, useFallback);
+        _skipSanitization = false;
+        return ret;
     }
 
     public static function font(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        _skipSanitization = true;
         final exts:Array<String> = ASSET_EXTENSIONS.get(FONT);
         for(i in 0...exts.length) {
             final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
-            if(FlxG.assets.exists(path))
+            if(FlxG.assets.exists(path)) {
+                _skipSanitization = false;
                 return path;
+            }
         }
-        return getAsset('${name}.ttf', loaderID, useFallback);
+        final ret:String = getAsset('${name}.ttf', loaderID, useFallback);
+        _skipSanitization = false;
+        return ret;
     }
 
     public static function json(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
@@ -575,13 +615,18 @@ class Paths {
     }
 
     public static function script(name:String, ?loaderID:String, ?useFallback:Bool = true):String {
+        _skipSanitization = true;
         final exts:Array<String> = ASSET_EXTENSIONS.get(SCRIPT);
         for(i in 0...exts.length) {
             final path:String = getAsset('${name}${exts[i]}', loaderID, useFallback);
-            if(FlxG.assets.exists(path))
+            if(FlxG.assets.exists(path)) {
+                _skipSanitization = false;
                 return path;
+            }
         }
-        return getAsset('${name}.hx', loaderID, useFallback);
+        final ret:String = getAsset('${name}.hx', loaderID, useFallback);
+        _skipSanitization = false;
+        return ret;
     }
 
     public static function isAssetType(path:String, type:AssetType):Bool {
@@ -669,6 +714,8 @@ class Paths {
 
     //----------- [ Private API ] -----------//
     
+    private static var _skipSanitization:Bool = true;
+
     @:unreflective
     private static var _registeredAssetLoaders:Array<AssetLoader> = [];
 
@@ -695,17 +742,21 @@ class Paths {
     * @param path
     */
     private static function _getPathLike(path:String):Null<String> {
-        if(FlxG.assets.exists(path))
+        _skipSanitization = true;
+        if(FlxG.assets.exists(path)) {
+            _skipSanitization = false;
             return path;
-        
+        }
         final baseParts:Array<String> = path.replace('\\', '/').split('/');
-        if(baseParts.length == 0)
+        if(baseParts.length == 0) {
+            _skipSanitization = false;
             return null;
-        
+        }
         final keyParts:Array<String> = [];
         while(!FlxG.assets.exists(baseParts.join("/")) && baseParts.length != 0)
             keyParts.insert(0, baseParts.pop());
         
+        _skipSanitization = false;
         return _findFile(baseParts.join("/"), keyParts);
     }
 
@@ -720,7 +771,8 @@ class Paths {
                 return null;
             
             nextDir += '/${foundNode}';
-        }	return nextDir;
+        }
+        return nextDir;
     }
 
     /**

@@ -37,7 +37,7 @@ class MainPage extends Page {
             #if android
             {
                 name: "Open Data Folder",
-                callback: () -> trace("TODO: OPEN DATA FOLDER NOT IMPLEMENTED!")
+                callback: () -> funkin.mobile.external.android.DataFolderUtil.openDataFolder()
             }
             #end
         ];

@@ -143,6 +143,11 @@ class InitState extends FlxState {
         FlxG.plugins.addPlugin(new ForceCrashPlugin());
         FlxG.plugins.addPlugin(new ScreenShotPlugin());
         
+        #if android
+        FlxG.android.preventDefaultKeys = [flixel.input.android.FlxAndroidKey.BACK];
+        funkin.mobile.external.android.CallbackUtil.init();
+        #end
+
         // hide cursor, we probably don't need it rn
         trace("start game");
         #if (FLX_MOUSE && !mobile)
