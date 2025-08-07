@@ -3,6 +3,7 @@
 dump/
 export/
 astc-textures/
+debug.log
 
 # this file is used for quicker development
 # of the UI system, prevents me from having to recomp the game over and over again

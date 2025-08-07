@@ -16,4 +16,4 @@ read -n 1 -s -r -p ""
 echo
 
 # run on emulator
-haxelib run lime run android -debug -simulator > debug.log
+haxelib run lime run android -debug -simulator

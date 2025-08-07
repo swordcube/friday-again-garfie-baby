@@ -19,4 +19,4 @@ read -n 1 -s -r -p ""
 echo
 
 # run on phone
-haxelib run lime run android -debug > debug.log
+haxelib run lime run android -debug
