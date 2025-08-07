@@ -73,24 +73,17 @@ class InitState extends FlxState {
 		#end
 
         // init logging and controls
-        trace("init logging");
         Logs.init();
-        trace("init controls");
         Controls.init();
         
         // init options & highscore
-        trace("init options");
         Options.init();
-        trace("init highscore");
         Highscore.init();
         
         // init some flixel stuff
-        trace("init flxutil");
         FlxUtil.init();
-        trace("init paths asset system");
         Paths.initAssetSystem();
         
-        trace("init scale mode & pre state create signal");
         FlxG.scaleMode = new RatioScaleModeEx();
         FlxG.signals.preStateCreate.add((newState:FlxState) -> {
             if(Type.getClass(newState) != _lastState)
@@ -98,27 +91,21 @@ class InitState extends FlxState {
             
             _lastState = Type.getClass(newState);
         });
-        trace("init window util");
         WindowUtil.init();
         
         // init global script
         #if SCRIPTING_ALLOWED
-        trace("init global script");
         GlobalScript.init();
         #end
         
         // init the transition shit stuff
-        trace("init transitions");
         TransitionableState.resetDefaultTransitions();
         
         // init cursor, discord rpc, and vlc
-        trace("init cursor");
         Cursor.init();
-        trace("init discord rpc");
         DiscordRPC.init();
         
         #if hxvlc
-        trace("init vlc");
         #if desktop
         Handle.initAsync();
         #else
@@ -127,19 +114,16 @@ class InitState extends FlxState {
         #end
         
         // init conductor
-        trace("init conductor");
         Conductor.instance = new Conductor();
         Conductor.instance.dispatchToStates = true;
         FlxG.plugins.addPlugin(Conductor.instance);
         
         // init moonchart shit
         #if USE_MOONCHART
-        trace("init moonchart");
         FormatDetector.registerFormat(GarfieFormat.__getFormat());
         #end
         
         // init extra plugins
-        trace("init plugins");
         FlxG.plugins.addPlugin(new ForceCrashPlugin());
         FlxG.plugins.addPlugin(new ScreenShotPlugin());
         
@@ -149,7 +133,6 @@ class InitState extends FlxState {
         #end
 
         // hide cursor, we probably don't need it rn
-        trace("start game");
         #if (FLX_MOUSE && !mobile)
         FlxG.mouse.visible = false;
         #else

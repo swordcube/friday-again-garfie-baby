@@ -248,7 +248,6 @@ class Paths {
                 }
             }
         }
-        trace("try validating content directory");
         if(!FileSystem.exists(contentDir)) {
             Logs.warn('Content directory "${contentDir}" does not exist!');
             try {
@@ -257,20 +256,16 @@ class Paths {
                 trace(e);
             }
         }
-        trace("read content directory");
         final dirItems:Array<String> = (FileSystem.exists(contentDir)) ? FileSystem.readDirectory(contentDir) : [];
-        trace("scan content directory");
         iterateThruContent(dirItems);
         Logs.verbose('Found ${contentFolders.length} standard content packs');
         
-        trace("get full content directory");
         var openflPacks:Int = 0;
         var fullContentDir:String = #if mobile CONTENT_DIRECTORY #else Path.normalize(Path.join([Sys.getCwd(), CONTENT_DIRECTORY])) #end;
         #if !mobile
         if(!FileSystem.exists(fullContentDir))
             fullContentDir = contentDir;
         #end
-        trace("scan thru openfl assets");
         final oflList:Array<String> = OpenFLAssets.list();
         for(i in 0...oflList.length) {
             var rawPath:String = oflList[oflList.length - i - 1];
@@ -303,7 +298,6 @@ class Paths {
         }
         Logs.verbose('Found ${openflPacks} embedded content packs');
         
-        trace("register default asset loader");
         final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders.copy();
         for(i in 0...loaders.length) {
             final loader:AssetLoader = loaders[i];
@@ -316,7 +310,6 @@ class Paths {
             final parser:JsonParser<ContentMetadata> = new JsonParser<ContentMetadata>();
             parser.ignoreUnknownVariables = true;
 
-            trace("load default metadata");
             final meta:ContentMetadata = parser.fromJson(FlxG.assets.getText(metaPath));
             meta.folder = "assets";
 
@@ -334,7 +327,6 @@ class Paths {
 
             contentMetadata.set(meta.id, meta);
         }
-        trace("register content packs");
         final contentDir:String = getContentDirectory();
         for(i in 0...contentFolders.length) {
             final folder:String = contentFolders[i];
