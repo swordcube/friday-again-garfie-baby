@@ -10,10 +10,12 @@ import openfl.display.Sprite;
 import funkin.backend.Lasagna;
 import funkin.backend.InitState;
 import funkin.backend.StatsDisplay;
+import funkin.backend.native.NativeAPI;
 import funkin.backend.native.HiddenProcess;
 
 #if android
 import funkin.mobile.utilities.MobileUtil;
+import extension.androidtools.Permissions;
 #end
 
 #if (linux && !debug)
@@ -39,6 +41,9 @@ class Main extends Sprite {
 		#if android
 		// On Android use External Files Dir.
 		Sys.setCwd(haxe.io.Path.addTrailingSlash(extension.androidtools.content.Context.getExternalFilesDir()));
+
+		// Ensure we have the permissions to read and write to external storage
+		Permissions.requestPermissions(["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "MANAGE_MEDIA", "READ_MEDIA_IMAGES", "READ_MEDIA_AUDIO", "READ_MEDIA_VIDEO"]);
 		#elseif ios
 		// On iOS use Documents Dir.
 		Sys.setCwd(haxe.io.Path.addTrailingSlash(lime.system.System.documentsDirectory));

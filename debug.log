@@ -1,5 +1,0 @@
-[33;1mWarning:[0m [1mLime version  may not be compatible with OpenFL openfl (expected version 7.7.0+)[0m
-Use <lime version="" /> before <haxelib name="openfl" /> to include a specific version
-[33;1mWarning:[0m [1mLime version  may not be compatible with OpenFL 9.4.1 (expected version 7.7.0+)[0m
-Use <lime version="" /> before <haxelib name="openfl" /> to include a specific version
-Performing Streamed Install

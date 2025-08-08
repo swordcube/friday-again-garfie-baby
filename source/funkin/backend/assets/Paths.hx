@@ -134,19 +134,31 @@ class Paths {
                 
                 // Get asset and set cache
                 case IMAGE:
-                    final bitmap = BitmapData.fromFile(id);
+                    var bitmap = try BitmapData.fromFile(id) catch(e) null;
+                    #if android
+                    if (bitmap == null)
+                        bitmap = try BitmapData.fromFile(Path.normalize(Path.join([Sys.getCwd(), id]))) catch(e) null;
+                    #end
                     if (canUseCache)
                         OpenFLAssets.cache.setBitmapData(id, bitmap);
                     bitmap;
                 
                 case SOUND:
-                    final sound = Sound.fromFile(id);
+                    var sound = try Sound.fromFile(id) catch(e) null;
+                    #if android
+                    if (sound == null)
+                        sound = try Sound.fromFile(Path.normalize(Path.join([Sys.getCwd(), id]))) catch(e) null;
+                    #end
                     if (canUseCache)
                         OpenFLAssets.cache.setSound(id, sound);
                     sound;
                 
                 case FONT:
-                    final font = Font.fromFile(id);
+                    var font = try Font.fromFile(id) catch(e) null;
+                    #if android
+                    if (font == null)
+                        font = try Font.fromFile(Path.normalize(Path.join([Sys.getCwd(), id]))) catch(e) null;
+                    #end
                     if (canUseCache)
                         OpenFLAssets.cache.setFont(id, font);
                     font;
@@ -455,6 +467,13 @@ class Paths {
 
     public static function sanitizePath(path:String):String {
         var sanitizedPath:String = Path.normalize(path);
+        #if android
+        if(OpenFLAssets.exists(sanitizedPath))
+            return sanitizedPath;
+
+        if(!FileSystem.exists(sanitizedPath))
+            sanitizedPath = Path.join([Sys.getCwd(), sanitizedPath]);
+        #end
         #if LINUX_CASE_INSENSITIVE_FILES
         if(Options.caseInsensitiveFiles)
             sanitizedPath = _getPathLike(sanitizedPath); // handles case-insensitive files
@@ -469,8 +488,6 @@ class Paths {
         if(loaderID == null || loaderID.length == 0) {
             final loaders:Array<AssetLoader> = _registeredAssetLoaders;
             for(i in 0...loaders.length) {
-                // don't sanitize path on mobile otherwise
-                // sanitizePath suddenly becomes recursive, calls itself 589 times, and the game crashes
                 var path:String = sanitizePath(loaders[i].getPath(name));
                 _skipSanitization = true;
 
