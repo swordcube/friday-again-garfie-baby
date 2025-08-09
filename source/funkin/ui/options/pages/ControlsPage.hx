@@ -115,6 +115,10 @@ class ControlsPage extends Page {
                     control: Control.DEBUG
                 },
                 {
+                    name: "Debug Overlay",
+                    control: Control.DEBUG_OVERLAY
+                },
+                {
                     name: "Emergency",
                     control: Control.EMERGENCY
                 },

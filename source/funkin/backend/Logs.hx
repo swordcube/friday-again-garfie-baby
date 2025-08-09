@@ -40,10 +40,18 @@ class Logs {
 	}
 
 	public static function trace(text:String):Void {
+		DebugOverlay.showLog({
+			type: TRACE,
+			message: text
+		});
 		traceColored([{text: text}], TRACE);
 	}
 
 	public static function warn(text:String):Void {
+		DebugOverlay.showLog({
+			type: WARNING,
+			message: text
+		});
 		traceColored([
 			{
 				text: text,
@@ -53,6 +61,10 @@ class Logs {
 	}
 
 	public static function error(text:String):Void {
+		DebugOverlay.showLog({
+			type: ERROR,
+			message: text
+		});
 		traceColored([
 			{
 				text: text,
@@ -62,6 +74,10 @@ class Logs {
 	}
 
 	public static function success(text:String):Void {
+		DebugOverlay.showLog({
+			type: SUCCESS,
+			message: text
+		});
 		traceColored([
 			{
 				text: text,
@@ -71,8 +87,13 @@ class Logs {
 	}
 
 	public static function verbose(text:String):Void {
-		if(Options.verboseLogging)
+		if(Options.verboseLogging) {
+			DebugOverlay.showLog({
+				type: VERBOSE,
+				message: text
+			});
 			traceColored([{text: text}], VERBOSE);
+		}
 	}
 
 	public static function traceColored(chunks:Array<LogChunk>, ?level:LogLevel = TRACE):Void {
@@ -186,7 +207,6 @@ class Logs {
 			prefix = "[ FLIXEL ]";
 			level = WARNING;
 		}
-
 		var d:Dynamic = Data;
 		if(!(d is Array))
 			d = [d];
@@ -194,6 +214,10 @@ class Logs {
 		var a:Array<Dynamic> = d;
 		var strs = [for (e in a) Std.string(e)];
 		for (e in strs) {
+			DebugOverlay.showLog({
+				type: level,
+				message: e
+			});
 			Logs.traceColored([
 				{
 					text: '${prefix} ',

@@ -28,10 +28,12 @@ class Options {
     public static var autoPause:Bool = true;
     public static var verboseLogging:Bool = false;
     public static var loadingScreen:Bool = true;
-
+    
     #if LINUX_CASE_INSENSITIVE_FILES
     public static var caseInsensitiveFiles:Bool = true;
     #end
+    public static var developerMode:Bool = false;
+    public static var maximumShownLogs:Int = 350;
 
     public static var frameRate:Int = 360;
 

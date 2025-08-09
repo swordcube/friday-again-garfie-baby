@@ -36,14 +36,13 @@ class Main extends Sprite {
 
 	public function new() {
 		super();
+		NativeAPI.registerAsDPICompatible();
+
 		instance = this;
 
 		#if android
 		// On Android use External Files Dir.
 		Sys.setCwd(haxe.io.Path.addTrailingSlash(extension.androidtools.content.Context.getExternalFilesDir()));
-
-		// Ensure we have the permissions to read and write to external storage
-		Permissions.requestPermissions(["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "MANAGE_MEDIA", "READ_MEDIA_IMAGES", "READ_MEDIA_AUDIO", "READ_MEDIA_VIDEO"]);
 		#elseif ios
 		// On iOS use Documents Dir.
 		Sys.setCwd(haxe.io.Path.addTrailingSlash(lime.system.System.documentsDirectory));
@@ -60,6 +59,7 @@ class Main extends Sprite {
 		sideBars = new SideBars();
 		FlxG.game.addChildAt(sideBars, FlxG.game.getChildIndex(FlxG.game._inputContainer));
 		
+		addChild(new DebugOverlay());
 		addChild(new Lasagna());
 	}
 

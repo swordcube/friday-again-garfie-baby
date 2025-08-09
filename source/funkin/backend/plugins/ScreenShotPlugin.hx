@@ -31,6 +31,7 @@ class ScreenShotPlugin extends FlxBasic {
      */
     public function new() {
         super();
+        visible = false;
 
         tweenManager = new FlxTweenManager();
         FlxG.signals.preStateSwitch.remove(tweenManager.clear);

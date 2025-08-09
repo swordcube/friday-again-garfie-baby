@@ -6,9 +6,8 @@ import hxvlc.util.Handle;
 import lime.graphics.Image;
 import flixel.util.FlxTimer;
 
+import funkin.backend.plugins.*;
 import funkin.backend.native.NativeAPI;
-import funkin.backend.plugins.ForceCrashPlugin;
-import funkin.backend.plugins.ScreenShotPlugin;
 
 import funkin.graphics.RatioScaleModeEx;
 
