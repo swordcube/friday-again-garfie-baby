@@ -6,7 +6,9 @@ import haxe.ds.ReadOnlyArray;
 import sys.io.File;
 import sys.FileSystem;
 
-import openfl.text.Font;
+import lime.text.Font;
+import openfl.text.Font as OpenFLFont;
+
 import openfl.media.Sound;
 import openfl.display.BitmapData;
 
@@ -42,8 +44,11 @@ class Paths {
         SOUND => [".ogg", ".wav", ".mp3"],
         VIDEO => [".mp4", ".mkv", ".ogv", ".avi", ".flv", ".3gp", ".avif"],
         FONT => [".ttf", ".otf"],
+        JSON => [".json"],
+        XML => [".xml"],
         SCRIPT => [".hx", ".hxs", ".hsc", ".hscript", ".lua"]
     ];
+    public static final TEXT_ASSET_EXTENSIONS:Array<String> = [".txt", ".ini", ".conf", ".csv", ".log"];
     public static final CONTENT_DIRECTORY:String = "content";
 
     public static var forceContentPack:String = null;
@@ -82,6 +87,10 @@ class Paths {
     public static var registeredAssetLoaders(get, never):ReadOnlyArray<AssetLoader>;
 
     public static function initAssetSystem():Void {
+        for(arr in [ASSET_EXTENSIONS.get(JSON), ASSET_EXTENSIONS.get(XML), ASSET_EXTENSIONS.get(SCRIPT)]) {
+            for(i in 0...arr.length)
+                TEXT_ASSET_EXTENSIONS.push(arr[i]);
+        }
         @:privateAccess
         FlxG.assets.exists = (id:String, ?type:FlxAssetType) -> {
             if (id == null) // no clue what's being sent null, but fixes hl shit so idc???
@@ -134,31 +143,25 @@ class Paths {
                 
                 // Get asset and set cache
                 case IMAGE:
-                    var bitmap = try BitmapData.fromFile(id) catch(e) null;
-                    #if android
-                    if (bitmap == null)
-                        bitmap = try BitmapData.fromFile(Path.normalize(Path.join([Sys.getCwd(), id]))) catch(e) null;
-                    #end
+                    var bitmap = BitmapData.fromFile(FileSystem.absolutePath(id));
                     if (canUseCache)
                         OpenFLAssets.cache.setBitmapData(id, bitmap);
                     bitmap;
                 
                 case SOUND:
-                    var sound = try Sound.fromFile(id) catch(e) null;
-                    #if android
-                    if (sound == null)
-                        sound = try Sound.fromFile(Path.normalize(Path.join([Sys.getCwd(), id]))) catch(e) null;
-                    #end
+                    var sound = Sound.fromFile(FileSystem.absolutePath(id));
                     if (canUseCache)
                         OpenFLAssets.cache.setSound(id, sound);
                     sound;
                 
                 case FONT:
-                    var font = try Font.fromFile(id) catch(e) null;
-                    #if android
-                    if (font == null)
-                        font = try Font.fromFile(Path.normalize(Path.join([Sys.getCwd(), id]))) catch(e) null;
-                    #end
+                    var limeFont = Font.fromFile(FileSystem.absolutePath(id));
+                    var font = new OpenFLFont();
+                    @:privateAccess {
+                        // manually register the font because fuck you lime and or openfl
+                        font.__fromLimeFont(limeFont);
+                        OpenFLFont.registerFont(font);
+                    }
                     if (canUseCache)
                         OpenFLAssets.cache.setFont(id, font);
                     font;
@@ -470,9 +473,6 @@ class Paths {
         #if android
         if(OpenFLAssets.exists(sanitizedPath))
             return sanitizedPath;
-
-        if(!FileSystem.exists(sanitizedPath))
-            sanitizedPath = Path.join([Sys.getCwd(), sanitizedPath]);
         #end
         #if LINUX_CASE_INSENSITIVE_FILES
         if(Options.caseInsensitiveFiles)
