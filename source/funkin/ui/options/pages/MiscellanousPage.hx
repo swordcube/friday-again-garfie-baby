@@ -1,5 +1,7 @@
 package funkin.ui.options.pages;
 
+import funkin.utilities.InputFormatter;
+
 class MiscellanousPage extends OptionPage {
     public function new() {
         super("Miscellanous");
