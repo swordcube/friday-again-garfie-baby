@@ -70,6 +70,10 @@ class OptionPage extends Page {
         final state:FunkinState = cast FlxG.state;
         state.addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, goBack, 0.3, true);
         #end
+        #if mobile
+        FlxG.touches.swipeThreshold.x = 500;
+        FlxG.touches.swipeThreshold.y = 150;
+        #end
         changeSelection(0, true);
     }
 

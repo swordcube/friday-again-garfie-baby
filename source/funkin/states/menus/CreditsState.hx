@@ -86,8 +86,8 @@ class CreditsState extends FunkinState {
         add(rightArrow);
 
         #if mobile
-        FlxG.touches.swipeThreshold.x = 800;
-        FlxG.touches.swipeThreshold.y = 100;
+        FlxG.touches.swipeThreshold.x = 500;
+        FlxG.touches.swipeThreshold.y = 150;
         #end
         #if MOBILE_UI
         addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, goBack, 1.0);

@@ -1,5 +1,8 @@
 package funkin.backend.assets;
 
+import sys.FileSystem;
+import sys.thread.Thread;
+
 import openfl.media.Sound;
 import openfl.geom.Rectangle;
 import openfl.utils.AssetCache as OpenFLAssetCache;
@@ -12,17 +15,6 @@ import funkin.gameplay.notes.NoteSkin;
 import funkin.gameplay.character.CharacterData;
 
 import funkin.states.FunkinState;
-
-import sys.thread.Thread;
-
-enum MasterMessage {
-	Load(asset:AssetPreload);
-	Finish();
-}
-enum SlaveMessage {
-	Loaded(thread:Thread);
-	Finished(thread:Thread, ?loadedGraphics:Map<String, FlxGraphic>, ?loadedSounds:Map<String, Sound>);
-}
 
 enum abstract AssetPreloadType(String) from String to String {
 	var IMAGE = "image";
@@ -58,8 +50,12 @@ class Cache {
                     }
                 
                 case SOUND:
-                    if(FlxG.assets.exists(asset.path) && !OpenFLAssets.cache.hasSound(asset.path))
-                        OpenFLAssets.cache.setSound(asset.path, Sound.fromFile(asset.path));
+                    if(FlxG.assets.exists(asset.path) && !OpenFLAssets.cache.hasSound(asset.path)) {
+                        if(OpenFLAssets.exists(asset.path, SOUND))
+                            OpenFLAssets.cache.setSound(asset.path, OpenFLAssets.getSound(asset.path, false));
+                        else
+                            OpenFLAssets.cache.setSound(asset.path, Sound.fromFile(FileSystem.absolutePath(asset.path)));
+                    }
             }
         }
     }
@@ -129,76 +125,4 @@ class Cache {
         noteSkinCache.clear();
         characterCache.clear();
     }
-
-    private static function _loadingThreadFunc(mainThread:Thread):Void {
-		var loadedGraphics:Map<String, FlxGraphic> = [];
-		var loadedSounds:Map<String, Sound> = [];
-
-		var thisThread = Thread.current();
-		while(true) {
-			var msg:MasterMessage = Thread.readMessage(true);
-
-			switch(msg) {
-				case Load(ass):
-                    if(FlxG.assets.exists(ass.path)) {
-                        switch(ass.type) {
-                            case IMAGE:
-                                var result = {path: ass.path, graphic: FlxG.bitmap.add(ass.path)};
-
-                                // this line of code was to test if it was even working
-                                // it infact was
-                                
-                                // result.graphic.bitmap.fillRect(new Rectangle(0, 0, result.graphic.width, result.graphic.height), 0xFFFF0000);
-                                if (result != null) loadedGraphics.set(result.path, result.graphic);
-                            
-                            case SOUND:
-                                var result = {path: ass.path, sound: (OpenFLAssets.cache.hasSound(ass.path)) ? OpenFLAssets.cache.getSound(ass.path) : Sound.fromFile(ass.path)};
-                                if (result != null) loadedSounds.set(result.path, result.sound);
-                        }
-                        Logs.verbose('- Loaded ${ass.type} asset at ${ass.path}');
-                    }
-					mainThread.sendMessage(Loaded(thisThread));
-
-				case Finish:
-                    final total:Int = Lambda.count(loadedGraphics) + Lambda.count(loadedSounds);
-                    Logs.verbose('Finished loading ${total} asset${(total == 1) ? '' : 's'}');
-
-					// send back everything loaded by this thread
-					mainThread.sendMessage(Finished(thisThread, loadedGraphics, loadedSounds));
-					break;
-                
-				default:
-			}
-		}
-	}
-
-    public static final processorCores:Int = {	
-		var result:Null<String> = null;
-
-		#if windows
-		result = Sys.getEnv("NUMBER_OF_PROCESSORS");
-			
-		#elseif linux
-		result = Main.runProcess("nproc", []);
-		
-		if (result == null) {
-			var cpuinfo = Main.runProcess("cat", [ "/proc/cpuinfo" ]);
-			
-			if (cpuinfo != null) {
-				var split = cpuinfo.split("processor");
-				result = Std.string(split.length - 1);
-			}
-		}
-			
-		#elseif mac
-		var cores = ~/Total Number of Cores: (\d+)/;
-		var output = Main.runProcess("/usr/sbin/system_profiler", ["-detailLevel", "full", "SPHardwareDataType"]);
-		
-		if (cores.match(output))
-			result = cores.matched(1);
-		#end
-
-		var n:Null<Int> = (result == null) ? null : Std.parseInt(result);
-		(n == null) ? 1 : n;
-	}
 }
