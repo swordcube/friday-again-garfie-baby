@@ -623,7 +623,7 @@ class FunkinRuleScriptHxParser extends HxParser {
 }
 
 class FunkinHScriptParser extends HScriptParserPlus { // i love abusing deprecated typedefs!
-	public static final defaultPreprocessors:Map<String, Bool> = [
+	public static final defaultPreprocessors:Map<String, Dynamic> = [
 		#if desktop "desktop" => 1, #end
 		#if mobile "mobile" => 1, #end
 		#if android "android" => 1, #end
