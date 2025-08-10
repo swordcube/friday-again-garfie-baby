@@ -13,6 +13,8 @@ class NumberOption extends Option {
     public var valueText:AtlasText;
     public var holdTimer:Float = 0;
 
+    public var swipedLeft:Bool = false;
+
     public function new(id:String, name:String, description:String, callback:Dynamic->Option->Void, isGameplayModifier:Bool, ?isInteger:Bool) {
         super(id, '${name}:', description, callback, isGameplayModifier);
         
@@ -30,20 +32,26 @@ class NumberOption extends Option {
     } 
 
     override function handleInputs():Void {
-        if(controls.pressed.UI_LEFT || controls.pressed.UI_RIGHT)
+        final leftP:Bool = controls.justPressed.UI_LEFT || SwipeUtil.swipeLeft;
+        final rightP:Bool = controls.justPressed.UI_RIGHT || SwipeUtil.swipeRight;
+
+        final holdingTouch:Bool = TouchUtil.touch?.pressed ?? false;
+        swipedLeft = leftP;
+
+        if(controls.pressed.UI_LEFT || controls.pressed.UI_RIGHT || holdingTouch)
             holdTimer += FlxG.elapsed;
         else
             holdTimer = 0;
 
-        if(controls.justPressed.UI_LEFT || controls.justPressed.UI_RIGHT)
+        if(leftP || rightP)
             FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
         
-        if(controls.justPressed.UI_LEFT || controls.justPressed.UI_RIGHT || holdTimer >= 0.5) {
+        if(leftP || rightP || holdTimer >= 0.5) {
             if(decimals == 0 || isInteger) {
-                value = FlxMath.bound(Std.int(value + ((controls.pressed.UI_LEFT) ? -step : step)), min, max);
+                value = FlxMath.bound(Std.int(value + ((controls.pressed.UI_LEFT || swipedLeft) ? -step : step)), min, max);
                 setValue(Std.int(value));
             } else {
-                value = FlxMath.bound(FlxMath.roundDecimal(value + ((controls.pressed.UI_LEFT) ? -step : step), decimals), min, max);
+                value = FlxMath.bound(FlxMath.roundDecimal(value + ((controls.pressed.UI_LEFT || swipedLeft) ? -step : step), decimals), min, max);
                 setValue(value);
             }
             if(holdTimer >= 0.5)

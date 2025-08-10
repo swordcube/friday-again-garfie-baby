@@ -24,8 +24,11 @@ class ListOption extends Option {
     } 
 
     override function handleInputs():Void {
-        if(controls.justPressed.UI_LEFT || controls.justPressed.UI_RIGHT) {
-            final mult:Int = (controls.pressed.UI_LEFT) ? -1 : 1;
+        final left:Bool = controls.justPressed.UI_LEFT || SwipeUtil.swipeLeft;
+        final right:Bool = controls.justPressed.UI_RIGHT || SwipeUtil.swipeRight;
+
+        if(left || right) {
+            final mult:Int = (left) ? -1 : 1;
             final index:Int = FlxMath.boundInt(possibleValues.indexOf(value) + mult, 0, possibleValues.length - 1);
 
             value = possibleValues[index];

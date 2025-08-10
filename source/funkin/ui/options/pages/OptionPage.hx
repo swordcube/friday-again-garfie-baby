@@ -85,10 +85,10 @@ class OptionPage extends Page {
 			option.x = -80 + (Math.abs(Math.cos((option.y + (OPTION_HEIGHT * 0.5) - (getDefaultCamera().scroll.y + (FlxG.height * 0.5))) / (FlxG.height * 1.25) * Math.PI)) * 150);
         }
         final wheel:Float = TouchUtil.wheel;
-        if(controls.justPressed.UI_UP || wheel < 0)
+        if(controls.justPressed.UI_UP || SwipeUtil.swipeUp || wheel < 0)
             changeSelection(-1);
 
-        if(controls.justPressed.UI_DOWN || wheel > 0)
+        if(controls.justPressed.UI_DOWN || SwipeUtil.swipeDown || wheel > 0)
             changeSelection(1);
 
         if(controls.justPressed.BACK) {

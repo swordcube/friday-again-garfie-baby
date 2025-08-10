@@ -23,7 +23,8 @@ class CheckboxOption extends Option {
     }
 
     override function handleInputs():Void {
-        if(controls.justPressed.ACCEPT) {
+        final pointer = TouchUtil.touch;
+        if(controls.justPressed.ACCEPT || (TouchUtil.justReleased && !SwipeUtil.swipeAny && ((pointer?.overlaps(checkbox, checkbox.getDefaultCamera()) ?? false) == true || (pointer?.overlaps(text, text.getDefaultCamera()) ?? false) == true))) {
             final checked:Bool = cast getValue();
             setValue(!checked);
             FlxG.sound.play(Paths.sound("menus/sfx/select"));
