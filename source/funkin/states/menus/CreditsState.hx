@@ -86,6 +86,7 @@ class CreditsState extends FunkinState {
         add(rightArrow);
 
         #if mobile
+        FlxG.touches.swipeThreshold.x = 800;
         FlxG.touches.swipeThreshold.y = 100;
         #end
         #if MOBILE_UI

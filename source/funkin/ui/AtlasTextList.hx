@@ -9,7 +9,6 @@ import flixel.util.FlxSignal;
  */
 class AtlasTextList extends FlxTypedGroup<AtlasText> {
     public var curSelected:Int = 0;
-    public var acceptTimeout:Float = 0;
     public var callbacks:Map<String, ListCallbacks> = [];
 
     public function clearList():Void {
@@ -49,14 +48,6 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
         final wheel:Float = TouchUtil.wheel;
         final controls:Controls = Controls.instance;
 
-        acceptTimeout -= elapsed;
-        if(acceptTimeout < 0)
-            acceptTimeout = 0;
-
-        if(SwipeUtil.swipeAny)
-            acceptTimeout = 0.5;
-
-        // TODO: why is this so broken bro
         // the swiping doesn't work here and i have genuinely no idea why
         if(controls.justPressed.UI_UP || SwipeUtil.swipeUp || wheel < 0)
             changeSelection(-1);
@@ -65,7 +56,7 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
             changeSelection(1);
 
         final pointer = TouchUtil.touch;
-        if(controls.justPressed.ACCEPT || (TouchUtil.justPressed && acceptTimeout <= 0 && (pointer?.overlaps(members.unsafeGet(curSelected)) ?? false) == true)) {
+        if(controls.justPressed.ACCEPT || (TouchUtil.justReleased && !SwipeUtil.swipeAny && (pointer?.overlaps(members.unsafeGet(curSelected), members.unsafeGet(curSelected).getDefaultCamera()) ?? false) == true)) {
             final callback = callbacks.get(members.unsafeGet(curSelected).text).onAccept;
             if(callback != null)
                 callback(curSelected, members.unsafeGet(curSelected));

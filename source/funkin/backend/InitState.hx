@@ -81,6 +81,7 @@ class InitState extends FlxState {
         
         // init some flixel stuff
         FlxUtil.init();
+        SwipeUtil.init();
         Paths.initAssetSystem();
         
         FlxG.scaleMode = new RatioScaleModeEx();

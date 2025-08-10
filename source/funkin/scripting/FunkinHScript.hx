@@ -623,8 +623,25 @@ class FunkinRuleScriptHxParser extends HxParser {
 }
 
 class FunkinHScriptParser extends HScriptParserPlus { // i love abusing deprecated typedefs!
+	public static final defaultPreprocessors:Map<String, Bool> = [
+		#if desktop "desktop" => 1, #end
+		#if mobile "mobile" => 1, #end
+		#if android "android" => 1, #end
+		#if ios "ios" => 1, #end
+		#if windows "windows" => 1, #end
+		#if (mac || macos) "mac" => 1, #end
+		#if (mac || macos) "macos" => 1, #end
+		#if linux "linux" => 1, #end
+	];
+	
 	var nextIsStatic:Bool = false;
 	var nextIsPublic:Bool = false;
+
+	public function new() {
+		super();
+		for (key => value in defaultPreprocessors)
+			preprocesorValues.set(key, value);
+	}
 
 	override function parseStructure(id:String) {
 		#if hscriptPos

@@ -175,7 +175,7 @@ class FreeplayState extends FunkinState {
         grpSongs.changeSelection(0, true, false);
 
         #if mobile
-        FlxG.touches.swipeThreshold.x = 100;
+        FlxG.touches.swipeThreshold.x = 800;
         FlxG.touches.swipeThreshold.y = 100;
         #end
         #if MOBILE_UI

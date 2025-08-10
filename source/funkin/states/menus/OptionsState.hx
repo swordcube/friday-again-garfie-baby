@@ -46,6 +46,7 @@ class OptionsState extends FunkinState {
         loadPage(new MainPage());
 
         #if mobile
+        FlxG.touches.swipeThreshold.x = 100;
         FlxG.touches.swipeThreshold.y = 100;
         #end
         #if (FLX_MOUSE && !mobile)

@@ -24,77 +24,81 @@ class SwipeUtil {
 	/**
 	 * Tracks if an upward swipe has been detected.
 	 */
-	public static var swipeUp(get, never):Bool;
+	public static var swipeUp(default, null):Bool;
 
 	/**
 	 * Tracks if a rightward swipe has been detected.
 	 */
-	public static var swipeRight(get, never):Bool;
+	public static var swipeRight(default, null):Bool;
 
 	/**
 	 * Tracks if a leftward swipe has been detected.
 	 */
-	public static var swipeLeft(get, never):Bool;
+	public static var swipeLeft(default, null):Bool;
 
 	/**
 	 * Tracks if a downward swipe has been detected.
 	 */
-	public static var swipeDown(get, never):Bool;
+	public static var swipeDown(default, null):Bool;
 
 	/**
 	 * Tracks if any swipe direction is detected (down, left, up, or right).
 	 */
-	public static var swipeAny(get, never):Bool;
+	public static var swipeAny(default, null):Bool;
 
 	/**
 	 * Indicates if there is an up swipe gesture detected.
 	 */
-	public static var justSwipedUp(get, never):Bool;
+	public static var justSwipedUp(default, null):Bool;
 
 	/**
 	 * Indicates if there is a right swipe gesture detected.
 	 */
-	public static var justSwipedRight(get, never):Bool;
+	public static var justSwipedRight(default, null):Bool;
 
 	/**
 	 * Indicates if there is a left swipe gesture detected.
 	 */
-	public static var justSwipedLeft(get, never):Bool;
+	public static var justSwipedLeft(default, null):Bool;
 
 	/**
 	 * Indicates if there is a down swipe gesture detected.
 	 */
-	public static var justSwipedDown(get, never):Bool;
+	public static var justSwipedDown(default, null):Bool;
 
 	/**
 	 * Indicates if there is any swipe gesture detected.
 	 */
-	public static var justSwipedAny(get, never):Bool;
+	public static var justSwipedAny(default, null):Bool;
 
 	/**
 	 * Checks if an upward flick direction is detected.
 	 */
-	public static var flickUp(get, never):Bool;
+	public static var flickUp(default, null):Bool;
 
 	/**
 	 * Checks if a rightward flick direction is detected.
 	 */
-	public static var flickRight(get, never):Bool;
+	public static var flickRight(default, null):Bool;
 
 	/**
 	 * Checks if a leftward flick direction is detected.
 	 */
-	public static var flickLeft(get, never):Bool;
+	public static var flickLeft(default, null):Bool;
 
 	/**
 	 * Checks if a downward flick direction is detected.
 	 */
-	public static var flickDown(get, never):Bool;
+	public static var flickDown(default, null):Bool;
 
 	/**
 	 *  Boolean variable that returns true if any flick direction is detected (down, left, up, or right).
 	 */
-	public static var flickAny(get, never):Bool;
+	public static var flickAny(default, null):Bool;
+
+	public static function init():Void {
+		FlxG.signals.preUpdate.add(update);
+	}
 
 	/**
 	 * Updates the swipe threshold based on the provided group.
@@ -132,128 +136,43 @@ class SwipeUtil {
 	}
 
 	@:noCompletion
-	inline static function get_swipeUp():Bool {
-		#if mobile
-		return TouchUtil.touch?.justMovedUp ?? false;
-		#else
-		return FlxG.mouse.justMovedUp && FlxG.mouse.pressed;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_swipeRight():Bool {
-		#if mobile
-		return TouchUtil.touch?.justMovedRight ?? false;
-		#else
-		return FlxG.mouse.justMovedRight && FlxG.mouse.pressed;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_swipeLeft():Bool {
-		#if mobile
-		return TouchUtil.touch?.justMovedLeft ?? false;
-		#else
-		return FlxG.mouse.justMovedLeft && FlxG.mouse.pressed;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_swipeDown():Bool {
-		#if mobile
-		return TouchUtil.touch?.justMovedDown ?? false;
-		#else
-		return FlxG.mouse.justMovedDown && FlxG.mouse.pressed;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_swipeAny():Bool
-		return swipeDown || swipeLeft || swipeRight || swipeUp;
-
-	@:noCompletion
-	inline static function get_justSwipedUp():Bool {
+	static function update():Void {
 		#if mobile
 		final swipe:FlxSwipe = (FlxG.swipes.length > 0) ? FlxG.swipes[0] : null;
-		return (swipe?.degrees > 45 && swipe?.degrees < 135 && swipe?.distance > 20);
+		
+		swipeUp = TouchUtil.touch?.justMovedUp ?? false;
+		swipeDown = TouchUtil.touch?.justMovedDown ?? false;
+		swipeLeft = TouchUtil.touch?.justMovedLeft ?? false;
+		swipeRight = TouchUtil.touch?.justMovedRight ?? false;
+		
+		justSwipedUp = swipe?.degrees > 45 && swipe?.degrees < 135 && swipe?.distance > 20;
+		justSwipedDown = swipe?.degrees > -135 && swipe?.degrees < -45 && swipe?.distance > 20;
+		justSwipedLeft = (swipe?.degrees > 135 || swipe?.degrees < -135) && swipe?.distance > 20;
+		justSwipedRight = swipe?.degrees > -45 && swipe?.degrees < 45 && swipe?.distance > 20;
+
+		flickUp = FlxG.touches.flickManager.flickUp;
+		flickDown = FlxG.touches.flickManager.flickDown;
+		flickLeft = FlxG.touches.flickManager.flickLeft;
+		flickRight = FlxG.touches.flickManager.flickRight;
 		#else
-		return false;
+		swipeUp = FlxG.mouse.justMovedUp && FlxG.mouse.pressed;
+		swipeDown = FlxG.mouse.justMovedDown && FlxG.mouse.pressed;
+		swipeLeft = FlxG.mouse.justMovedLeft && FlxG.mouse.pressed;
+		swipeRight = FlxG.mouse.justMovedRight && FlxG.mouse.pressed;
+
+		justSwipedUp = false;
+		justSwipedDown = false;
+		justSwipedLeft = false;
+		justSwipedRight = false;
+
+		flickUp = FlxG.mouse.flickManager.flickUp;
+		flickDown = FlxG.mouse.flickManager.flickDown;
+		flickLeft = FlxG.mouse.flickManager.flickLeft;
+		flickRight = FlxG.mouse.flickManager.flickRight;
 		#end
-	}
-
-	@:noCompletion
-	inline static function get_justSwipedRight():Bool {
-		#if mobile
-		final swipe:FlxSwipe = (FlxG.swipes.length > 0) ? FlxG.swipes[0] : null;
-		return (swipe?.degrees > -45 && swipe?.degrees < 45 && swipe?.distance > 20);
-		#else
-		return false;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_justSwipedLeft():Bool {
-		#if mobile
-		final swipe:FlxSwipe = (FlxG.swipes.length > 0) ? FlxG.swipes[0] : null;
-		return ((swipe?.degrees > 135 || swipe?.degrees < -135) && swipe?.distance > 20);
-		#else
-		return false;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_justSwipedDown():Bool {
-		#if mobile
-		final swipe:FlxSwipe = (FlxG.swipes.length > 0) ? FlxG.swipes[0] : null;
-		return (swipe?.degrees > -135 && swipe?.degrees < -45 && swipe?.distance > 20);
-		#else
-		return false;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_justSwipedAny():Bool
-		return justSwipedDown || justSwipedLeft || justSwipedRight || justSwipedUp;
-
-	@:noCompletion
-	inline static function get_flickUp():Bool {
-		#if mobile
-		return FlxG.touches.flickManager.flickUp;
-		#else
-		return FlxG.mouse.flickManager.flickUp;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_flickRight():Bool {
-		#if mobile
-		return FlxG.touches.flickManager.flickRight;
-		#else
-		return FlxG.mouse.flickManager.flickRight;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_flickLeft():Bool {
-		#if mobile
-		return FlxG.touches.flickManager.flickLeft;
-		#else
-		return FlxG.mouse.flickManager.flickLeft;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_flickDown():Bool {
-		#if mobile
-		return FlxG.touches.flickManager.flickDown;
-		#else
-		return FlxG.mouse.flickManager.flickDown;
-		#end
-	}
-
-	@:noCompletion
-	inline static function get_flickAny():Bool {
-		return flickUp || flickRight || flickLeft || flickDown;
+		swipeAny = swipeUp || swipeDown || swipeLeft || swipeRight;
+		justSwipedAny = justSwipedUp || justSwipedDown || justSwipedLeft || justSwipedRight;
+		flickAny = flickUp || flickDown || flickLeft || flickRight;
 	}
 
 	/**

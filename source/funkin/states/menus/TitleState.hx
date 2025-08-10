@@ -134,6 +134,7 @@ class TitleState extends FunkinState {
             skipIntro();
 
         #if mobile
+        FlxG.touches.swipeThreshold.x = 100;
         FlxG.touches.swipeThreshold.y = 100;
         #end
     }
