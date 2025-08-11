@@ -298,16 +298,15 @@ class Project extends HXProject {
 
 			// go my keystore!! (i don't care about securing this)
 			// this isn't going on the app store anytime soon
-			if(isRelease()) {
-				keystore = new Keystore();
-				keystore.path = 'key.keystore';
-				keystore.alias = 'Garfield';
-				keystore.password = 'GarfieldLovesLasagna';
-			}
+			keystore = new Keystore();
+			keystore.path = 'key.keystore';
+			keystore.alias = 'Garfield';
+			keystore.password = 'GarfieldLovesLasagna';
+
 			Reflect.setField(config.get('android.manifest'), 'xmlns:tools', 'http://schemas.android.com/tools');
 			final permissionsConfig:Array<String> = [
 				'<uses-permission android:name="android.permission.MANAGE_MEDIA" tools:node="remove"/>',
-				'<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove"/>',
+				'<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove" tools:ignore="ScopedStorage"/>',
 				'<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove"/>',
 				'<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove"/>',
 				'<uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove"/>',
@@ -341,6 +340,7 @@ class Project extends HXProject {
 				'  </intent-filter>',
 				'</provider>'
 			];
+			Reflect.setField(config.get('android.application'), "android:requestLegacyExternalStorage", "true");
 			final xmlChildren:Null<Array<String>> = config.get('android.application').xmlChildren;
 			if (xmlChildren != null)
 				config.get('android.application').xmlChildren = xmlChildren.concat(modsFolderProvider);
