@@ -223,7 +223,7 @@ class Paths {
         #if mobile
         return CONTENT_DIRECTORY;
         #else
-        final liveReload:Bool = #if TEST_BUILD true #else Sys.args().contains("-livereload") #end;
+        final liveReload:Bool = #if (TEST_BUILD && desktop) true #else Sys.args().contains("-livereload") #end;
         return '${(liveReload) ? "../../../../" : ""}${CONTENT_DIRECTORY}';
         #end
     }
@@ -533,7 +533,7 @@ class Paths {
         // either use assets as emergency fallback (usually enabled)
         // or return null
         if(useFallback) {
-            final liveReload:Bool = #if TEST_BUILD true #else Sys.args().contains("-livereload") #end;
+            final liveReload:Bool = #if (TEST_BUILD && desktop) true #else Sys.args().contains("-livereload") #end;
             return '${(liveReload) ? "../../../../" : ""}assets/${name}';
         }
         return null;

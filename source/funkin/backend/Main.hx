@@ -14,7 +14,6 @@ import funkin.backend.native.NativeAPI;
 import funkin.backend.native.HiddenProcess;
 
 #if android
-import funkin.mobile.utilities.MobileUtil;
 import extension.androidtools.Permissions;
 #end
 

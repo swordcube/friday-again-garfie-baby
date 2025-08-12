@@ -6,7 +6,7 @@ class ContentAssetLoader extends AssetLoader {
     public function new(folder:String) {
         this.folder = folder;
 
-        final liveReload:Bool = #if TEST_BUILD true #else Sys.args().contains("-livereload") #end;
+        final liveReload:Bool = #if (TEST_BUILD && desktop) true #else Sys.args().contains("-livereload") #end;
         final root:String = (liveReload) ? "../../../../" : "";
         
         final p:String = '${root}${Paths.CONTENT_DIRECTORY}/${folder}';
@@ -14,7 +14,7 @@ class ContentAssetLoader extends AssetLoader {
     }
 
     override function toString():String {
-        final liveReload:Bool = #if TEST_BUILD true #else Sys.args().contains("-livereload") #end;
+        final liveReload:Bool = #if (TEST_BUILD && desktop) true #else Sys.args().contains("-livereload") #end;
         final root:String = (liveReload) ? "../../../../" : "";
         return 'ContentAssetLoader(${id} - ${root}${Paths.CONTENT_DIRECTORY}/${folder})';
     }

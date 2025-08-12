@@ -7,7 +7,7 @@ killall java
 # killall adb
 
 # build
-haxelib run lime build android -debug
+haxelib run lime build android -debug -DTEST_BUILD
 
 # wait for emulator
 echo Press enter once you have the Android Studio emulator fully booted up

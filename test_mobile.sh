@@ -7,7 +7,7 @@ killall java
 # killall adb
 
 # build
-haxelib run lime build android -debug
+haxelib run lime build android -debug -DTEST_BUILD
 
 # wait for phone
 echo Press enter once you are ready to test on your physical phone
