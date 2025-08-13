@@ -624,6 +624,7 @@ class FunkinRuleScriptHxParser extends HxParser {
 
 class FunkinHScriptParser extends HScriptParserPlus { // i love abusing deprecated typedefs!
 	public static final defaultPreprocessors:Map<String, Dynamic> = [
+		// os defines
 		#if desktop "desktop" => 1, #end
 		#if mobile "mobile" => 1, #end
 		#if android "android" => 1, #end
@@ -632,6 +633,15 @@ class FunkinHScriptParser extends HScriptParserPlus { // i love abusing deprecat
 		#if (mac || macos) "mac" => 1, #end
 		#if (mac || macos) "macos" => 1, #end
 		#if linux "linux" => 1, #end
+
+		// funkin defines
+		#if TEST_BUILD "TEST_BUILD" => 1, #end
+		#if MOBILE_UI "MOBILE_UI" => 1, #end
+		#if DISCORD_ALLOWED "DISCORD_ALLOWED" => 1, #end
+		#if SCRIPTING_ALLOWED "SCRIPTING_ALLOWED" => 1, #end
+		#if VIDEOS_ALLOWED "VIDEOS_ALLOWED" => 1, #end
+		#if USE_MOONCHART "USE_MOONCHART" => 1, #end
+		#if LINUX_CASE_INSENSITIVE_FILES "LINUX_CASE_INSENSITIVE_FILES" => 1, #end
 	];
 	
 	var nextIsStatic:Bool = false;

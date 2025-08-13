@@ -128,6 +128,15 @@ class TitleState extends FunkinState {
             titleText.shader = swagShader;
             titleGroup.add(titleText);
 
+            if(FlxG.random.bool(10)) {
+                titleText.frames = Paths.getSparrowAtlas(#if MOBILE_UI 'menus/title/enter_mobile_funny' #else 'menus/title/enter_funny' #end);
+                titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
+                titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
+                titleText.animation.play('idle');
+                titleText.scale.set(#if MOBILE_UI 1.32 #else 1.5 #end, 1.32);
+                titleText.updateHitbox();
+                titleText.y -= 40;
+            }
             call("onTitleGroupCreationPost", [event.flagAsPost()]);
         }
         if(initialized)
