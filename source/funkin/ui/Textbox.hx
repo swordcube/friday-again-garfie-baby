@@ -67,6 +67,7 @@ class Textbox extends UIComponent {
         if(checkMouseOverlap()) {
             if(TouchUtil.justPressed) {
                 typing = true;
+                FlxG.stage.window.textInputEnabled = true;
                 
                 final pointer = TouchUtil.touch;
                 final pos = pointer.getScreenPosition(getDefaultCamera());
@@ -91,6 +92,7 @@ class Textbox extends UIComponent {
                     callback(label.text);
 
                 typing = false;
+                FlxG.stage.window.textInputEnabled = false;
             }
         }
         if(typing) {
