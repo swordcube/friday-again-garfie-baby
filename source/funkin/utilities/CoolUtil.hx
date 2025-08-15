@@ -26,6 +26,7 @@ class CoolUtil {
 
         final config:MusicConfig = parser.fromJson(FlxG.assets.getText(Paths.json('${name}/config')));
         FlxG.sound.playMusic((snd != null) ? snd : Paths.sound('${name}/music'), volume, looped);
+        FlxG.sound.music.loopTime = config.loopTime;
 
         Conductor.instance.music = FlxG.sound.music;
         Conductor.instance.reset(config.timingPoints.first().bpm);
@@ -139,6 +140,10 @@ class CoolUtil {
 @:structInit
 class MusicConfig {
     public var timingPoints:Array<TimingPoint>;
+    
+    @:optional
+    @:default(0.0)
+    public var loopTime:Float = 0.0;
 }
 
 class ScriptedThreadResult {
