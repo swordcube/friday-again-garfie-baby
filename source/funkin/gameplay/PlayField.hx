@@ -186,6 +186,7 @@ class PlayField extends FlxContainer {
             stats.score += event.score;
             stats.health += event.healthGain;
         }
+        stats.missCombo = 0;
         if(event.increaseCombo)
             stats.combo++;
         

@@ -44,8 +44,6 @@ class PauseSubState extends FunkinSubState {
 
     public var bg:FlxSprite;
     public var grpItems:AtlasTextList;
-
-    public var artistText:FlxText;
     public var grpStats:FlxTypedContainer<FlxText>;
 
     public var pauseMusic:FlxSound;
@@ -97,6 +95,7 @@ class PauseSubState extends FunkinSubState {
         final stats:Array<PauseMenuStat> = [
             {name: game.currentChart.meta.song.title},
             {name: 'Artist: ${game.currentChart.meta.song.artist}'},
+            {name: 'Charter: ${game.currentChart.meta.song.charter}'},
             {name: 'Difficulty: ${game.currentDifficulty.toUpperCase()}'},
             {name: '${PlayState.deathCounter} Blue Ball${(PlayState.deathCounter != 1) ? "s" : ""}'}
         ];
@@ -114,9 +113,6 @@ class PauseSubState extends FunkinSubState {
 
             FlxTween.tween(text, {alpha: 1, y: text.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.3 * yIndex});
         }
-        artistText = grpStats.members[1]; // hardcoded but i don't care
-        startCharterTimer();
-
         WindowUtil.onClose = () -> {
             if(!WindowUtil.preventClosing)
                 return;
@@ -429,52 +425,6 @@ class PauseSubState extends FunkinSubState {
 
     //----------- [ Private API ] -----------//
 
-    private var _charterFadeTween:Null<FlxTween> = null;
-
-    private function startCharterTimer():Void {
-        _charterFadeTween = FlxTween.tween(artistText, {alpha: 0.0}, CHARTER_FADE_DURATION, {
-            startDelay: CHARTER_FADE_DELAY,
-            ease: FlxEase.quartOut,
-            onComplete: (_) -> {
-                final game:PlayState = PlayState.instance;
-                if (game.currentChart != null)
-                    artistText.text = 'Charter: ${game.currentChart.meta.song.charter ?? 'Unknown'}';
-                else
-                    artistText.text = 'Charter: Unknown';
-                
-                artistText.x = FlxG.width - (artistText.width + 20);
-                FlxTween.tween(artistText, {alpha: 1.0}, CHARTER_FADE_DURATION, {
-                    ease: FlxEase.quartOut,
-                    onComplete: (_) -> {
-                        startArtistTimer();
-                    }
-                });
-            }
-        });
-    }
-
-    private function startArtistTimer():Void {
-        _charterFadeTween = FlxTween.tween(artistText, {alpha: 0.0}, CHARTER_FADE_DURATION, {
-            startDelay: CHARTER_FADE_DELAY,
-            ease: FlxEase.quartOut,
-            onComplete: (_) -> {
-                final game:PlayState = PlayState.instance;
-                if (game.currentChart != null)
-                    artistText.text = 'Artist: ${game.currentChart.meta.song.artist ?? 'Unknown'}';
-                else
-                    artistText.text = 'Artist: Unknown';
-
-                artistText.x = FlxG.width - (artistText.width + 20);
-                FlxTween.tween(artistText, {alpha: 1.0}, CHARTER_FADE_DURATION, {
-                    ease: FlxEase.quartOut,
-                    onComplete: (_) -> {
-                        startCharterTimer();
-                    }
-                });
-            }
-        });
-    }
-
     private var _createEvent:PauseMenuCreateEvent;
 
     override function _callCreate():Void {
@@ -495,10 +445,6 @@ class PauseSubState extends FunkinSubState {
         for(tween in pausedTweens)
             tween.paused = false;
 
-        if(_charterFadeTween != null) {
-            _charterFadeTween.cancel();
-            _charterFadeTween = null;
-        }
         if(pauseMusic != null)
             pauseMusic = FlxDestroyUtil.destroy(pauseMusic);
         

@@ -62,6 +62,8 @@ class Character extends TrackingSprite implements IBeatReceiver {
     public var curAnimContext:AnimationContext = DANCE;
 
     public var healthColor:Null<FlxColor> = null;
+    public var healthOutlineColor:Null<FlxColor> = null; // added purely for SCS but you can use it if you need it too
+    
     public var footOffset:FlxPoint = FlxPoint.get(0, 0);
 
     public var canDance:Bool = true;
@@ -195,6 +197,9 @@ class Character extends TrackingSprite implements IBeatReceiver {
 
         final color:String = data.healthIcon?.color;
         healthColor = (color != null && color.length != 0) ? FlxColor.fromString(color) : null;
+
+        final outlineColor:String = data.healthIcon?.outlineColor;
+        healthOutlineColor = (outlineColor != null && outlineColor.length != 0) ? FlxColor.fromString(outlineColor) : null;
 
         if(!debugMode)
             correctAnimations();

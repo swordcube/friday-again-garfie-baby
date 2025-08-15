@@ -178,5 +178,9 @@ class HealthIconData {
 	public var color:String = "#FFFFFF";
 
     @:optional
+	@:default(null)
+	public var outlineColor:String = null; // added purely for SCS but you can use it if you need it too
+
+    @:optional
     public var animations:Map<String, AnimationData>;
 }
