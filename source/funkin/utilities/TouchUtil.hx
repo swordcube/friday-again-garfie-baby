@@ -169,7 +169,6 @@ class TouchUtil {
 			if (touch != null)
 				return touch;
 		}
-
 		return FlxG.touches.getFirst();
 	}
     @:noCompletion

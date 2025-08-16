@@ -146,7 +146,7 @@ class CharterObjectGroup extends FlxObject {
         isHoveringNote = false;
         isHoveringEvent = false;
 
-        final coveredUpByOtherUI:Bool = UIUtil.isHoveringAnyComponent([charter.grid, charter.selectionBox]) || UIUtil.isAnyComponentFocused([charter.grid, charter.selectionBox]);
+        final coveredUpByOtherUI:Bool = UIUtil.isHoveringAnyComponent([charter.grid, charter.selectionBox, _eventBGSprite]) || UIUtil.isAnyComponentFocused([charter.grid, charter.selectionBox, _eventBGSprite]);
 		if(direction < (Constants.KEY_COUNT * 2)) {
             final max:Float = FlxG.height / 70 / getDefaultCamera().zoom;
     

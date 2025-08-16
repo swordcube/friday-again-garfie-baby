@@ -422,7 +422,7 @@ class ChartEditor extends UIState {
         strumLine.cameras = [noteCam];
         add(strumLine);
 
-        selectionBox = new SelectionPanel(0, 0, 16, 16);
+        selectionBox = new SelectionPanel(-99999, -99999, 16, 16);
         selectionBox.kill();
         selectionBox.cameras = [noteCam];
         add(selectionBox);
@@ -1024,7 +1024,8 @@ class ChartEditor extends UIState {
     }
 
     public function selectObjects(objects:Array<ChartEditorObject>, ?unsafe:Bool = false):Void {
-        if(UIUtil.isHoveringAnyComponent([grid, selectionBox]) || UIUtil.isAnyComponentFocused([grid, selectionBox]))
+        @:privateAccess
+        if(UIUtil.isHoveringAnyComponent([grid, selectionBox, objectGroup._eventBGSprite]) || UIUtil.isAnyComponentFocused([grid, selectionBox, objectGroup._eventBGSprite]))
             return;
 
         forceSelectObjects(objects, unsafe);
