@@ -57,7 +57,7 @@ class Note extends SkinnableSprite {
 
     public function setup(strumLine:StrumLine, time:Float, direction:Int, length:Float, type:String, skin:String):Note {
         loadSkin(skin);
-        scale.set(_skinData.scale, _skinData.scale);
+        scale.set(_skinData.scale * strumLine.scaleMult.x, _skinData.scale * strumLine.scaleMult.y);
 
         this.strumLine = strumLine;
         this.time = time;
@@ -123,6 +123,12 @@ class Note extends SkinnableSprite {
     public function isInRange():Bool {
         return Math.abs(time - (strumLine?.playField.attachedConductor?.time ?? Conductor.instance.time)) <= (Options.hitWindow * FlxG.timeScale);
     }
+    
+    public function updateOffset():Void {
+        centerOrigin();
+        centerOffsets();
+        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
+    }
 
     override function loadSkin(newSkin:String) {
         if(_skin == newSkin)
@@ -149,11 +155,8 @@ class Note extends SkinnableSprite {
         if(animation.exists(animName))
             animation.play(animName);
 
-        centerOrigin();        
         updateHitbox();
-
-        centerOffsets();
-        offset.add(skinData.offset[0] ?? 0.0, skinData.offset[1] ?? 0.0);
+        updateOffset();
 
         return direction;
     }

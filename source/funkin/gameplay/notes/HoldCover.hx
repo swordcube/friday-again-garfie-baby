@@ -46,6 +46,12 @@ class HoldCover extends SkinnableSprite {
         onHoldEnd.dispatch();
     }
 
+    public function updateOffset():Void {
+        centerOrigin();
+        centerOffsets();
+        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
+    }
+
     override function loadSkin(newSkin:String):Void {
         if(_skin == newSkin)
             return;
@@ -72,10 +78,7 @@ class HoldCover extends SkinnableSprite {
             animation.play(animName);
 
         updateHitbox();
-        centerOrigin();
-    
-        centerOffsets();
-        offset.add(skinData.offset[0] ?? 0.0, skinData.offset[1] ?? 0.0);
+        updateOffset();
 
         return direction;
     }

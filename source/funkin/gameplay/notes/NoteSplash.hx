@@ -17,7 +17,7 @@ class NoteSplash extends SkinnableSprite {
 
     public function setup(strumLine:StrumLine, direction:Int, skin:String):NoteSplash {
         loadSkin(skin);
-        scale.set(_skinData.scale, _skinData.scale);
+        scale.set(_skinData.scale * strumLine.scaleMult.x, _skinData.scale * strumLine.scaleMult.y);
 
         this.strumLine = strumLine;
         this.direction = direction % Constants.KEY_COUNT;
@@ -38,6 +38,12 @@ class NoteSplash extends SkinnableSprite {
         colorTransform.redMultiplier = colorTransform.greenMultiplier = colorTransform.blueMultiplier = 1;
 
         return this;
+    }
+
+    public function updateOffset():Void {
+        centerOrigin();
+        centerOffsets();
+        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
     }
 
     override function loadSkin(newSkin:String):Void {
@@ -74,11 +80,8 @@ class NoteSplash extends SkinnableSprite {
         if(animation.exists(animName))
             animation.play(animName);
 
-        centerOrigin();        
         updateHitbox();
-
-        centerOffsets();
-        offset.add(skinData.offset[0] ?? 0.0, skinData.offset[1] ?? 0.0);
+        updateOffset();
 
         return direction;
     }

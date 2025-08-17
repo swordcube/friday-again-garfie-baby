@@ -1,0 +1,57 @@
+#if !MOBILE_UI
+// Stop running the script if we're not on mobile
+closeScript();
+return;
+#end
+
+public var controlScheme:String = "Arrows";
+importScript("gameplay/scripts/mobile/ControlScheme" + StringTools.replace(controlScheme, " ", ""));
+
+function onCreatePost() {
+    switch(controlScheme) {
+        case "Arrows":
+            opponentStrums.scaleMult.set(0.5, 0.5);
+            opponentStrums.setPosition(125, 70);
+            opponentStrums.downscroll = !Options.downscroll;
+        
+            opponentStrums.notes.visible = false;
+            opponentStrums.holdTrails.visible = false;
+            opponentStrums.splashes.visible = false;
+            opponentStrums.holdGradients.visible = false;
+            opponentStrums.holdCovers.visible = false;
+        
+            playerStrums.x = FlxG.width * 0.5;
+            playerStrums.scaleMult.set(1.1, 1.1);
+        
+            for(i in 0...opponentStrums.strums.length) {
+                final strum:Strum = opponentStrums.strums.members[i];
+                FlxTween.cancelTweensOf(strum);
+                strum.y -= 10;
+                strum.alpha = 0.001;
+                FlxTween.tween(strum, {alpha: 1, y: strum.y + 10}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+            }
+            for(i in 0...playerStrums.strums.length) {
+                final strum:Strum = playerStrums.strums.members[i];
+                strum.screenCenter(FlxAxes.X);
+        
+                final halfKeyCount:Int = Math.floor(Constants.KEY_COUNT / 2);
+                strum.x += (i % halfKeyCount) * (Constants.STRUM_SPACING * 1.745);
+                strum.x += ((i < halfKeyCount) ? -375 : 145) + 30;
+        
+                final yOffset:Float = 15;
+                strum.y += (Options.downscroll) ? -yOffset : yOffset;
+        
+                FlxTween.cancelTweensOf(strum);
+                strum.y -= 10;
+                strum.alpha = 0.001;
+                FlxTween.tween(strum, {alpha: 1, y: strum.y + 10}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+            }
+            // final ref:FlxSprite = new FlxSprite().loadGraphic(Paths.image("gameplay/ref"));
+            // ref.setGraphicSize(0, FlxG.height);
+            // ref.updateHitbox();
+            // ref.screenCenter();
+            // ref.cameras = [camHUD];
+            // ref.alpha = 0.35;
+            // add(ref); 
+    }
+}

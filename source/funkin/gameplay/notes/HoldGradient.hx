@@ -16,6 +16,12 @@ class HoldGradient extends SkinnableSprite {
         this.direction = direction;
     }
 
+    public function updateOffset():Void {
+        centerOrigin();
+        centerOffsets();
+        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
+    }
+
     override function update(elapsed:Float):Void {
         if(holding)
             alpha = FlxMath.lerp(alpha, skinData.alpha, FlxMath.getElapsedLerp(Conductor.instance.stepLength / 1000, FlxG.elapsed));
@@ -53,10 +59,7 @@ class HoldGradient extends SkinnableSprite {
             animation.play(animName);
 
         updateHitbox();
-        centerOrigin();
-    
-        centerOffsets();
-        offset.add(skinData.offset[0] ?? 0.0, skinData.offset[1] ?? 0.0);
+        updateOffset();
         
         return direction;
     }

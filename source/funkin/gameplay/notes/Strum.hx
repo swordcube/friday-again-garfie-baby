@@ -24,9 +24,13 @@ class Strum extends SkinnableSprite {
         if(frameNumber != 0)
             return;
 
+        updateOffset();
+    }
+
+    public function updateOffset():Void {
         centerOrigin();
         centerOffsets();
-        offset.add(skinData.offset[0] ?? 0.0, skinData.offset[1] ?? 0.0);
+        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
     }
 
     override function update(elapsed:Float) {
@@ -52,10 +56,7 @@ class Strum extends SkinnableSprite {
 
         direction = direction; // force animation update
         updateHitbox();
-        centerOrigin();
-
-        centerOffsets();
-        offset.add(skinData.offset[0] ?? 0.0, skinData.offset[1] ?? 0.0);
+        updateOffset();
 
         final prevAlpha:Float = alpha;
         alpha = 0.0000001;

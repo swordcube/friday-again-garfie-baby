@@ -1,0 +1,75 @@
+final grpHitboxes:FlxTypedGroup;
+
+function onCreatePost() {
+    grpHitboxes = new FlxTypedGroup();
+    grpHitboxes.cameras = [camOther];
+    add(grpHitboxes);
+
+    for(i in 0...playerStrums.strums.length) {
+        final strum:Strum = playerStrums.strums.members[i];
+
+        final hitbox:FlxSprite = new FlxSprite(strum.x, strum.y).makeSolid(Constants.STRUM_SPACING * 2.35, Constants.STRUM_SPACING * 1.5, FlxColor.WHITE);
+        hitbox.x -= ((hitbox.width - strum.width) * 0.5) + 20;
+        hitbox.y -= (hitbox.height - strum.height);
+        hitbox.alpha = 0.5;
+        hitbox.color = FlxColor.RED;
+        hitbox.updateHitbox();
+        grpHitboxes.add(hitbox);
+    }
+    FlxG.mouse.visible = true;
+}
+
+function forcePress(direction:Int) {
+    playField.strumsPressed[direction] = true;
+    playField.onNotePress(playerStrums, direction);
+}
+
+function forceRelease(direction:Int) {
+    playField.strumsPressed[direction] = false;
+    playField.onNoteRelease(playerStrums, direction);
+}
+
+function onUpdate(dt:Float) {
+    if(playerStrums.botplay)
+        return;
+    
+    #if mobile
+    for(touch in FlxG.touches.list) {
+        if(touch.justPressed) {
+            for(i in 0...grpHitboxes.length) {
+                final hitbox:FlxSprite = grpHitboxes.members[i];
+                if(touch.overlaps(hitbox, camOther)) {
+                    forcePress(i);
+                    hitbox.color = FlxColor.BLUE;
+                }
+            }
+        }
+        if(touch.justReleased) {
+            for(i in 0...grpHitboxes.length) {
+                final hitbox:FlxSprite = grpHitboxes.members[i];
+                if(touch.overlaps(hitbox, camOther)) {
+                    forceRelease(i);
+                    hitbox.color = FlxColor.RED;
+                }
+            }
+        }
+    }
+    #else
+    for(i in 0...grpHitboxes.length) {
+        final hitbox:FlxSprite = grpHitboxes.members[i];
+        if(TouchUtil.overlaps(hitbox, camOther)) {
+            if(FlxG.mouse.justPressed) {
+                forcePress(i);
+                hitbox.color = FlxColor.BLUE;
+            }
+            else if(FlxG.mouse.justReleased) {
+                forceRelease(i);
+                hitbox.color = FlxColor.RED;
+            }
+        } else if(playField.strumsPressed[i]) {
+            forceRelease(i);
+            hitbox.color = FlxColor.RED;
+        }
+    }
+    #end
+}

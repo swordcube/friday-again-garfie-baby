@@ -2,8 +2,14 @@ package funkin.gameplay.notes;
 
 import flixel.util.FlxSort;
 import flixel.util.FlxSignal;
+import flixel.util.FlxDestroyUtil;
+
+import flixel.math.FlxPoint;
+import flixel.math.FlxPoint.FlxCallbackPoint;
+
 import flixel.tweens.FlxTween;
 
+import funkin.gameplay.notes.NoteSkin;
 import funkin.gameplay.notes.HoldTrail;
 
 class StrumLine extends FlxSpriteGroup {
@@ -23,6 +29,8 @@ class StrumLine extends FlxSpriteGroup {
     
     public var scrollSpeed:Float = 1;
     public var playField:PlayField;
+
+    public var scaleMult(default, null):FlxCallbackPoint;
 
     public var skin(default, set):String;
     public var onBotplayToggle:FlxTypedSignal<Bool->Void> = new FlxTypedSignal<Bool->Void>();
@@ -52,6 +60,10 @@ class StrumLine extends FlxSpriteGroup {
         splashes = new FlxTypedSpriteGroup<NoteSplash>();
         splashes.maxSize = Constants.KEY_COUNT * 3;
         add(splashes);
+
+        scaleMult = new FlxCallbackPoint(_scaleMultCallback);
+        Reflect.setField(scaleMult, "x", 1);
+        Reflect.setField(scaleMult, "y", 1);
 
         for(i in 0...Constants.KEY_COUNT) {
             final strum:Strum = new Strum((i - (Constants.KEY_COUNT * 0.5)) * Constants.STRUM_SPACING, 0, i, skin);
@@ -253,6 +265,53 @@ class StrumLine extends FlxSpriteGroup {
     }
 
     @:noCompletion
+    private function _scaleMultCallback(point:FlxPoint):Void {
+        final json:NoteSkinData = NoteSkin.get(skin);
+        for(i in 0...Constants.KEY_COUNT) {
+            final strum:Strum = strums.members[i];
+            strum.scale.set(json.strum.scale * point.x, json.strum.scale * point.y);
+            strum.updateHitbox();
+            strum.updateOffset();
+            strum.x = x + ((i - (Constants.KEY_COUNT * 0.5)) * Constants.STRUM_SPACING * point.x);
+        }
+        notes.forEachAlive((note:Note) -> {
+            note.scale.set(json.note.scale * point.x, json.note.scale * point.y);
+            note.updateHitbox();
+            note.updateOffset();
+        });
+        holdTrails.forEachAlive((trail:HoldTrail) -> {
+            @:privateAccess {
+                trail.strip.scale.set(trail.strip._skinData.scale * point.x, trail.strip._skinData.scale * point.y);
+                trail.strip.updateHitbox();
+                trail.strip.centerOrigin();
+                trail.strip.centerOffsets();
+                trail.strip.offset.add((trail.strip._skinData.offset[0] ?? 0.0) * point.x, (trail.strip._skinData.offset[1] ?? 0.0) * point.y);
+
+                trail.tail.scale.set(trail.tail._skinData.scale * point.x, trail.tail._skinData.scale * point.y);
+                trail.tail.updateHitbox();
+                trail.tail.centerOrigin();
+                trail.tail.centerOffsets();
+                trail.tail.offset.add((trail.tail._skinData.offset[0] ?? 0.0) * point.x, (trail.tail._skinData.offset[1] ?? 0.0) * point.y);
+            }
+        });
+        holdGradients.forEach((gradient:HoldGradient) -> {
+            gradient.scale.set(json.holdGradients.scale * point.x, json.holdGradients.scale * point.y);
+            gradient.updateHitbox();
+            gradient.updateOffset();
+        });
+        holdCovers.forEach((cover:HoldCover) -> {
+            cover.scale.set(json.holdCovers.scale * point.x, json.holdCovers.scale * point.y);
+            cover.updateHitbox();
+            cover.updateOffset();
+        });
+        splashes.forEach((splash:NoteSplash) -> {
+            splash.scale.set(json.splash.scale * point.x, json.splash.scale * point.y);
+            splash.updateHitbox();
+            splash.updateOffset();
+        });
+    }
+
+    @:noCompletion
     private function set_botplay(newValue:Bool):Bool {
         if(playField != null) {
             for(i in 0...Constants.KEY_COUNT)
@@ -274,6 +333,9 @@ class StrumLine extends FlxSpriteGroup {
         for(note in notes)
             note.loadSkin(newSkin);
 
+        for(hold in holdTrails)
+            hold.setup(hold.note, newSkin);
+
         for(splash in splashes)
             splash.loadSkin(newSkin);
 
@@ -290,6 +352,7 @@ class StrumLine extends FlxSpriteGroup {
         if(playField != null)
             playField.attachedConductor.onBeatHit.remove(sortVisualNotes);
 
+        scaleMult = FlxDestroyUtil.destroy(scaleMult);
         super.destroy();
     }
 }

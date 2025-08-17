@@ -62,17 +62,19 @@ class HoldTrail extends FlxSpriteContainer {
         else {
             revive();
             final laneStr:String = Constants.NOTE_DIRECTIONS[note.direction];
-
-            strip.animation.play('${laneStr} hold', true);
-            strip.updateHitbox();
-            strip.setPosition(-999999, -999999);
-            strip.offset.add(strip.skinData.offset[0] ?? 0.0, strip.skinData.offset[1] ?? 0.0);
-            
-            tail.animation.play('${laneStr} tail', true);
-            tail.updateHitbox();
-            tail.setPosition(-999999, -999999);
-            tail.offset.add(tail.skinData.offset[0] ?? 0.0, tail.skinData.offset[1] ?? 0.0);
-
+            @:privateAccess {
+                strip.animation.play('${laneStr} hold', true);
+                strip.scale.set(strip._skinData.scale * (note.strumLine?.scaleMult?.x ?? 1.0), strip._skinData.scale * (note.strumLine?.scaleMult?.y ?? 1.0));
+                strip.updateHitbox();
+                strip.setPosition(-999999, -999999);
+                strip.offset.add((strip.skinData.offset[0] ?? 0.0) * (note.strumLine?.scaleMult?.x ?? 1.0), (strip.skinData.offset[1] ?? 0.0) * (note.strumLine?.scaleMult?.y ?? 1.0));
+                
+                tail.animation.play('${laneStr} tail', true);
+                tail.scale.set(strip._skinData.scale * (note.strumLine?.scaleMult?.x ?? 1.0), strip._skinData.scale * (note.strumLine?.scaleMult?.y ?? 1.0));
+                tail.updateHitbox();
+                tail.setPosition(-999999, -999999);
+                tail.offset.add((tail.skinData.offset[0] ?? 0.0) * (note.strumLine?.scaleMult?.x ?? 1.0), (tail.skinData.offset[1] ?? 0.0) * (note.strumLine?.scaleMult?.y ?? 1.0));
+            }
             height = height;
         }
     }
