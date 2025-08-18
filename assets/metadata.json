@@ -1,6 +1,9 @@
 {
     "apiVersion": "0.1.0",
+    
+    "allowUnsafeScripts": true,
     "runGlobally": true,
+
     "levels": [],
     "freeplayCategories": [
         {

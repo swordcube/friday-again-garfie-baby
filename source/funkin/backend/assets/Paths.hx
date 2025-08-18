@@ -223,7 +223,7 @@ class Paths {
         #if mobile
         return CONTENT_DIRECTORY;
         #else
-        final liveReload:Bool = #if (TEST_BUILD && desktop) true #else Sys.args().contains("-livereload") #end;
+        final liveReload:Bool = #if NO_LIVE_RELOAD false #else #if (TEST_BUILD && desktop) true #else Sys.args().contains("-livereload") #end #end;
         return '${(liveReload) ? "../../../../" : ""}${CONTENT_DIRECTORY}';
         #end
     }
@@ -533,7 +533,7 @@ class Paths {
         // either use assets as emergency fallback (usually enabled)
         // or return null
         if(useFallback) {
-            final liveReload:Bool = #if (TEST_BUILD && desktop) true #else Sys.args().contains("-livereload") #end;
+            final liveReload:Bool = #if NO_LIVE_RELOAD false #else #if (TEST_BUILD && desktop) true #else Sys.args().contains("-livereload") #end #end;
             return '${(liveReload) ? "../../../../" : ""}assets/${name}';
         }
         return null;
@@ -663,12 +663,19 @@ class Paths {
         return cast Cache.atlasCache.get(key);
     }
 
-    public static function getAnimateAtlas(name:String, ?loaderID:String, ?useFallback:Bool = true):FlxAtlasFrames {
+    public static function getAnimateAtlas(name:String, ?loaderID:String, ?useFallback:Bool = true):FlxAnimateFrames {
         final basePath:String = getAsset(name, loaderID, useFallback);
         final key:String = 'ANIMATE_TA://${basePath}';
         
         if(Cache.atlasCache.get(key) == null) {
-            final atlas:FlxAnimateFrames = FlxAnimateFrames.fromAnimate(basePath);
+            final atlas:FlxAnimateFrames = try {
+                final a = FlxAnimateFrames.fromAnimate(basePath);
+                if(a == null)
+                    throw "Failed, trying to use default asset library";
+                a;
+            } catch(e) {
+                FlxAnimateFrames.fromAnimate('default:${basePath}');
+            }
             if(atlas.parent != null) {
                 atlas.parent.persist = true;
                 atlas.parent.incrementUseCount();

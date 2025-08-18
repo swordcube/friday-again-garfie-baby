@@ -127,6 +127,8 @@ class InitState extends FlxState {
         FlxG.plugins.addPlugin(new ForceCrashPlugin());
         FlxG.plugins.addPlugin(new ScreenShotPlugin());
         
+        funkin.mobile.input.ControlsHandler.initInputTrackers();
+        
         #if android
         FlxG.android.preventDefaultKeys = [flixel.input.android.FlxAndroidKey.BACK];
         funkin.mobile.external.android.CallbackUtil.init();

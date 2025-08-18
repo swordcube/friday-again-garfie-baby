@@ -13,6 +13,7 @@ function onCreatePost() {
         hitbox.y -= (hitbox.height - strum.height);
         hitbox.alpha = 0.5;
         hitbox.color = FlxColor.RED;
+        hitbox.visible = false;
         hitbox.updateHitbox();
         grpHitboxes.add(hitbox);
     }
@@ -66,7 +67,7 @@ function onUpdate(dt:Float) {
                 forceRelease(i);
                 hitbox.color = FlxColor.RED;
             }
-        } else if(playField.strumsPressed[i]) {
+        } else if(FlxG.mouse.justReleased && playField.strumsPressed[i]) {
             forceRelease(i);
             hitbox.color = FlxColor.RED;
         }

@@ -25,18 +25,24 @@ class StatsDisplay extends Sprite {
 
     public function new(x:Float = 0, y:Float = 0) {
         super();
-
+        
         this.x = x;
         this.y = y;
         
+        var fontPath = Paths.font("fonts/montserrat/semibold");
+        var font = FlxG.assets.getFont(fontPath);
+        
+        if(font == null && OpenFLAssets.exists(fontPath, FONT))
+            font = OpenFLAssets.getFont(fontPath);
+        
         mainFPSText = new TextField();
-        mainFPSText.setupTextField(Paths.font("fonts/montserrat/semibold"), 16, FlxColor.WHITE, LEFT, "0");
+        mainFPSText.setupTextField(font?.fontName ?? fontPath, 16, FlxColor.WHITE, LEFT, "0");
         mainFPSText.selectable = false;
         addChild(mainFPSText);
         
         subFPSText = new TextField();
         subFPSText.y = 4;
-        subFPSText.setupTextField(Paths.font("fonts/montserrat/semibold"), 12, FlxColor.WHITE, LEFT, "FPS");
+        subFPSText.setupTextField(font?.fontName ?? fontPath, 12, FlxColor.WHITE, LEFT, "FPS");
         subFPSText.selectable = false;
         addChild(subFPSText);
 

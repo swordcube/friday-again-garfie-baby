@@ -10,7 +10,7 @@ class ControlsHandler {
 	/**
 	 * Returns wether the last input was sent through touch.
 	 */
-	public static var lastInputTouch(default, null):Bool = true;
+	public static var lastInputTouch(default, null):Bool = #if mobile true #else false #end;
 
     /**
      * Returns wether there's a keyboard connected and active.

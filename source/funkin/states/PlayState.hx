@@ -297,12 +297,22 @@ class PlayState extends FunkinState {
 			
 			@:privateAccess
 			final loaders:Array<AssetLoader> = Paths._registeredAssetLoaders;
+			final oflAssetList:Array<String> = OpenFLAssets.list();
 			
 			inline function addScripts(loader:AssetLoader, dir:String) {
 				final items:Array<String> = loader.readDirectory(dir);
-				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
-
 				final scriptExts:Array<String> = Paths.ASSET_EXTENSIONS.get(SCRIPT);
+
+				for(ass in oflAssetList) {
+					ass = Path.normalize(ass);
+
+					final dir2:String = Path.directory(ass);
+					if(Path.normalize(Path.join([loader.root, dir])) != dir2)
+						continue;
+
+					items.push(Path.withoutDirectory(ass));
+				}
+				final contentMetadata:ContentMetadata = Paths.contentMetadata.get(loader.id);
 				for(i in 0...items.length) {
 					final path:String = Path.normalize(loader.getPath('${dir}/${items[i]}'));
 					if(!scriptExts.contains('.${Path.extension(path)}'))
