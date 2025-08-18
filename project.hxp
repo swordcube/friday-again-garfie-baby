@@ -263,7 +263,6 @@ class Project extends HXProject {
 
 		// better hscript errors
 		setDefine("hscriptPos");
-		setDefine("safeMode");
 
 		// experimental update queue (performance thingie)
 		setDefine("openfl_enable_experimental_update_queue");
@@ -293,16 +292,21 @@ class Project extends HXProject {
 
 		// android config
 		if (isAndroid()) {
+			// ensure gradle makes a debug build
+			if(isDebug())
+				setenv("ANDROID_GRADLE_TASK", "assembleDebug");
+
 			// external java code
 			javaPaths.push(Path.join([SOURCE_DIR, 'funkin/mobile/external/android/java']));
 
 			// go my keystore!! (i don't care about securing this)
 			// this isn't going on the app store anytime soon
-			keystore = new Keystore();
-			keystore.path = 'key.keystore';
-			keystore.alias = 'Garfield';
-			keystore.password = 'GarfieldLovesLasagna';
-
+			if(isRelease()) {
+				keystore = new Keystore();
+				keystore.path = 'key.keystore';
+				keystore.alias = 'Garfield';
+				keystore.password = 'GarfieldLovesLasagna';
+			}
 			Reflect.setField(config.get('android.manifest'), 'xmlns:tools', 'http://schemas.android.com/tools');
 			final permissionsConfig:Array<String> = [
 				'<uses-permission android:name="android.permission.MANAGE_MEDIA" tools:node="remove" tools:ignore="ScopedStorage" />',
@@ -332,6 +336,7 @@ class Project extends HXProject {
 			if (isBundle())
 				config.set("android.gradle-project-directory", "bin-bundle");
 			
+			architectures.push(Architecture.X86);
 			architectures.push(Architecture.X64);
 
 			final modsFolderProvider = [
@@ -394,7 +399,7 @@ class Project extends HXProject {
 	 */
 	public function addAsset(path:String, ?rename:String, ?library:String, ?embed:Bool = false, ?padName:String):Void {
 		// path, rename, type, embed, setDefaults
-		if (Path.extension(path) == 'png' && isMobile()) {
+		if (Path.extension(path) == 'png' && isMobile() && !isDebug()) {
 			final astcPath:String = "astc-textures/" + path.substr(0, path.length - 3) + "astc";
 			if (!isASTCExcluded(path) && FileSystem.exists(astcPath)) {
 				path = astcPath;

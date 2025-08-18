@@ -40,7 +40,7 @@ enum AssetType {
 @:allow(funkin.backend.LevelData)
 class Paths {
     public static final ASSET_EXTENSIONS:Map<AssetType, Array<String>> = [
-        IMAGE => [".astc", ".png", ".jpg", ".jpeg", ".bmp"],
+        IMAGE => [#if (mobile && !debug) ".astc", #end ".png", ".jpg", ".jpeg", ".bmp"],
         SOUND => [".ogg", ".wav", ".mp3"],
         VIDEO => [".mp4", ".mkv", ".ogv", ".avi", ".flv", ".3gp", ".avif"],
         FONT => [".ttf", ".otf"],
