@@ -1,7 +1,6 @@
-// #if !MOBILE_UI
-// closeScript();
-// return;
-// #end
+// TODO: hardcode this instead of softcoding
+// because this runs like piss when hitting notes
+
 import funkin.mobile.input.ControlsHandler;
 
 if(ControlsHandler.usingExternalInputDevice) {
@@ -10,10 +9,10 @@ if(ControlsHandler.usingExternalInputDevice) {
     closeScript();
     return;
 }
-trace("Activating mobile controls...");
+Logs.verbose("Activating mobile controls...");
 
 public var controlScheme:String = "Arrows";
-trace("Current control scheme: " + controlScheme);
+Logs.verbose("Current control scheme: " + controlScheme);
 
 importScript("gameplay/scripts/mobile/ControlScheme" + StringTools.replace(controlScheme, " ", ""));
 

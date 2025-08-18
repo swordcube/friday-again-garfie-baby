@@ -1,3 +1,6 @@
+// TODO: hardcode this instead of softcoding
+// because this runs like piss when hitting notes
+
 final grpHitboxes:FlxTypedGroup;
 
 function onCreatePost() {
@@ -8,16 +11,15 @@ function onCreatePost() {
     for(i in 0...playerStrums.strums.length) {
         final strum:Strum = playerStrums.strums.members[i];
 
-        final hitbox:FlxSprite = new FlxSprite(strum.x, strum.y).makeSolid(Constants.STRUM_SPACING * 2.35, Constants.STRUM_SPACING * 1.5, FlxColor.WHITE);
+        final hitbox:FlxSprite = new FlxSprite(strum.x, strum.y).makeSolid(Constants.STRUM_SPACING * 2.35, Constants.STRUM_SPACING * 2, FlxColor.WHITE);
         hitbox.x -= ((hitbox.width - strum.width) * 0.5) + 20;
-        hitbox.y -= (hitbox.height - strum.height);
+        hitbox.y -= (hitbox.height - strum.height) * 0.8;
         hitbox.alpha = 0.5;
         hitbox.color = FlxColor.RED;
         hitbox.visible = false;
         hitbox.updateHitbox();
         grpHitboxes.add(hitbox);
     }
-    FlxG.mouse.visible = true;
 }
 
 function forcePress(direction:Int) {
@@ -35,39 +37,35 @@ function onUpdate(dt:Float) {
         return;
     
     #if mobile
-    for(touch in FlxG.touches.list) {
-        if(touch.justPressed) {
-            for(i in 0...grpHitboxes.length) {
-                final hitbox:FlxSprite = grpHitboxes.members[i];
-                if(touch.overlaps(hitbox, camOther)) {
+    for(i in 0...grpHitboxes.length) {
+        final hitbox:FlxSprite = grpHitboxes.members[i];
+
+        var pressed:Bool = false;
+        for(touch in FlxG.touches.list) {
+            if(touch.overlaps(hitbox, camOther) && touch.pressed) {
+                if(!playField.strumsPressed[i]) {
                     forcePress(i);
                     hitbox.color = FlxColor.BLUE;
                 }
+                pressed = true;
+                break;
             }
         }
-        if(touch.justReleased) {
-            for(i in 0...grpHitboxes.length) {
-                final hitbox:FlxSprite = grpHitboxes.members[i];
-                if(touch.overlaps(hitbox, camOther)) {
-                    forceRelease(i);
-                    hitbox.color = FlxColor.RED;
-                }
-            }
+        if(!pressed && playField.strumsPressed[i]) {
+            forceRelease(i);
+            hitbox.color = FlxColor.RED;
         }
     }
     #else
     for(i in 0...grpHitboxes.length) {
         final hitbox:FlxSprite = grpHitboxes.members[i];
-        if(TouchUtil.overlaps(hitbox, camOther)) {
-            if(FlxG.mouse.justPressed) {
+        if(FlxG.mouse.overlaps(hitbox, camOther) && FlxG.mouse.pressed) {
+            if(!playField.strumsPressed[i]) {
                 forcePress(i);
                 hitbox.color = FlxColor.BLUE;
             }
-            else if(FlxG.mouse.justReleased) {
-                forceRelease(i);
-                hitbox.color = FlxColor.RED;
-            }
-        } else if(FlxG.mouse.justReleased && playField.strumsPressed[i]) {
+        }
+        else if(playField.strumsPressed[i] && FlxG.mouse.justReleased) {
             forceRelease(i);
             hitbox.color = FlxColor.RED;
         }

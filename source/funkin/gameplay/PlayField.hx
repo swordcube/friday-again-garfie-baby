@@ -335,13 +335,14 @@ class PlayField extends FlxContainer {
                 final controls:Controls = Controls.instance;
                 for(i in 0...this.controls.length) {
                     final control:Control = this.controls[i];
-                    if(controls.justPressed.check(control))
+                    if(controls.justPressed.check(control)) {
+                        strumsPressed[i] = true;
                         onNotePress(strumLine, i);
-                    
-                    if(controls.justReleased.check(control))
+                    }
+                    if(controls.justReleased.check(control)) {
+                        strumsPressed[i] = false;
                         onNoteRelease(strumLine, i);
-    
-                    strumsPressed[i] = controls.pressed.check(control);
+                    }
                 }
             }
         }
