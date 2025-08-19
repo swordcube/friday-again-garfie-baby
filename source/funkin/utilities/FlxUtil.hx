@@ -61,13 +61,20 @@ class FlxUtil {
             // to clear excess memory
 			MemoryUtil.clearAll();
 
-            // Fixes shader coord problems that typically
-            // occur when the window is resized
+            // Self explanatory line of code (i think)
             applyShaderResizeFix();
         });
-
+        
         // Fixes shader coord problems that typically
         // occur when the window is resized
+        //
+        // 8/19/2025 (August 19th, 2025) - swordcube 
+        // Even though this was fixed as of a new OpenFL commit: https://github.com/openfl/openfl/commit/2dc98531ee685c465ad98cfebef6da3002648840
+        //
+        // The fix there isn't perfect and doesn't work in all cases, one of them being
+        // going into fullscreen and back out again, it looks correct in fullscreen, but going back out of fullscreen
+        // will cause the shader to break! So we still need to do it ourselves here
+        // when the game is resized (or as seen a few lines above, after the state is switched)
         FlxG.signals.gameResized.add((width:Int, height:Int) -> {
             applyShaderResizeFix();
         });
