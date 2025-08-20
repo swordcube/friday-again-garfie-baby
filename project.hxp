@@ -125,20 +125,22 @@ class Project extends HXProject {
 		// [ assets ] //
 
 		// ASTC asset compression
-		if (isMobile() && !isDisplay() && !isDebug()) {
-			final folders:Array<String> = ['assets', 'example_content'];
-			trace('Compressing folders: ${folders}');
-			for (f in folders) {
-				var args:Array<String> = ['run', 'astc-compressor', 'compress'];
-				args = args.concat(['-i', './${f}']);
-				args = args.concat(['-o', './astc-textures/']);
-				args = args.concat(['-blocksize', "10x10"]);
-				args = args.concat(['-quality', "medium"]);
-				args = args.concat(['-excludes', './compression-excludes.txt']);
-				args = args.concat(['-colorprofile', 'cl']);
-				Sys.command('haxelib', args);
-			}
-		}
+		// TODO: get astc asset compression working again...at some point
+		// final noASTCCompress:Bool = Sys.getEnv("NO_ASTC_COMPRESSION") == "1";
+		// if (isMobile() && !isDisplay() && !isDebug() && !noASTCCompress) {
+		// 	final folders:Array<String> = ['assets', 'example_content'];
+		// 	trace('Compressing folders: ${folders}');
+		// 	for (f in folders) {
+		// 		var args:Array<String> = ['run', 'astc-compressor', 'compress'];
+		// 		args = args.concat(['-i', './${f}']);
+		// 		args = args.concat(['-o', './astc-textures/']);
+		// 		args = args.concat(['-blocksize', "10x10"]);
+		// 		args = args.concat(['-quality', "medium"]);
+		// 		args = args.concat(['-excludes', './compression-excludes.txt']);
+		// 		args = args.concat(['-colorprofile', 'cl']);
+		// 		Sys.command('haxelib', args);
+		// 	}
+		// }
 		// add assets (if not on a test build)
 		addAssetLibrary("default");
 
@@ -398,17 +400,20 @@ class Project extends HXProject {
 	 * @param padName The name of the Play Assets Delivery that this asset will be added to. (Android only)
 	 */
 	public function addAsset(path:String, ?rename:String, ?library:String, ?embed:Bool = false, ?padName:String):Void {
-		// path, rename, type, embed, setDefaults
-		if (Path.extension(path) == 'png' && isMobile() && !isDebug()) {
-			final astcPath:String = "astc-textures/" + path.substr(0, path.length - 3) + "astc";
-			if (!isASTCExcluded(path) && FileSystem.exists(astcPath)) {
-				path = astcPath;
+		// TODO: get astc asset compression working again...at some point
+		// i can't be bothered to make OpenFL be able to locate the asset
+		// i swear i had it working at one point too, no clue what happened
+		// this code will stay as a remnant
+		//
+		// if (Path.extension(path) == 'png' && isMobile() && !isDebug()) {
+		// 	final astcPath:String = "astc-textures/" + path.substr(0, path.length - 3) + "astc";
+		// 	if (!isASTCExcluded(path) && FileSystem.exists(astcPath)) {
+		// 		path = astcPath;
 
-				if (rename != null)
-					rename = rename.substr(0, rename.length - 3) + "astc";
-			}
-		}
-
+		// 		if (rename != null)
+		// 			rename = rename.substr(0, rename.length - 3) + "astc";
+		// 	}
+		// }
 		var asset = new Asset(path, rename, null, embed, true);
 		asset.library = library ?? "default";
 

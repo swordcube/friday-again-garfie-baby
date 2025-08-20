@@ -1,6 +1,3 @@
-// TODO: hardcode this instead of softcoding
-// because this runs like piss when hitting notes
-
 import funkin.mobile.input.ControlsHandler;
 
 if(ControlsHandler.usingExternalInputDevice) {

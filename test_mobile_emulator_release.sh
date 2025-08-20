@@ -7,6 +7,7 @@ killall java
 # killall adb
 
 # build
+export NO_ASTC_COMPRESSION=0
 haxelib run lime build android
 
 # wait for emulator
@@ -16,4 +17,5 @@ read -n 1 -s -r -p ""
 echo
 
 # run on emulator
+export NO_ASTC_COMPRESSION=1
 haxelib run lime run android -simulator
