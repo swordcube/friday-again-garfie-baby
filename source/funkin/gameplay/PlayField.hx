@@ -106,7 +106,8 @@ class PlayField extends FlxContainer {
         }
         hitSound = new FlxSound();
         hitSound.loadEmbedded(Options.getHitsoundPath());
-        hitSound.volume = Options.hitsoundVolume;
+        hitSound.volume = 0;
+        hitSound.play();
         FlxG.sound.list.add(hitSound);
 
         for(i in 0...3) {
@@ -117,6 +118,8 @@ class PlayField extends FlxContainer {
                 for(i in 0...3) {
                     final sound:FlxSound = new FlxSound();
                     sound.loadEmbedded(sndPath);
+                    sound.volume = 0;
+                    sound.play();
                     FlxG.sound.list.add(sound);
                     sounds.push(sound);
                 }
@@ -222,6 +225,7 @@ class PlayField extends FlxContainer {
 
         if(event.playHitSound && Options.hitsoundVolume > 0) {
             hitSound.time = 0;
+            hitSound.volume = Options.hitsoundVolume;
             hitSound.play(true);
         }
         if(event.showHoldCovers && event.length > 0)
@@ -357,6 +361,7 @@ class PlayField extends FlxContainer {
 
         if(Options.hitsoundBehavior == "Key Press" && Options.hitsoundVolume > 0) {
             hitSound.time = 0;
+            hitSound.volume = Options.hitsoundVolume;
             hitSound.play(true);
         }
         final validNotes:Array<Note> = strumLine.notes.members.filter((note:Note) -> {

@@ -36,7 +36,7 @@ class NumberOption extends Option {
         final rightP:Bool = controls.justPressed.UI_RIGHT || SwipeUtil.swipeRight;
 
         final holdingTouch:Bool = TouchUtil.touch?.pressed ?? false;
-        swipedLeft = leftP;
+        swipedLeft = leftP || (holdingTouch && (TouchUtil.touch?.x ?? FlxG.width) < FlxG.width * 0.5);
 
         if(controls.pressed.UI_LEFT || controls.pressed.UI_RIGHT || holdingTouch)
             holdTimer += FlxG.elapsed;
