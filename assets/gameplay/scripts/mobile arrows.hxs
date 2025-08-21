@@ -2,12 +2,12 @@ import funkin.mobile.input.ControlsHandler;
 
 public var usingMobileControls:Bool = true;
 
-// if(ControlsHandler.usingExternalInputDevice) {
-//     // User is using a keyboard/gamepad, don't use touch controls
-//     Logs.verbose("Keyboard/gamepad detected, disabling touch controls!");
-//     usingMobileControls = false;
-//     return;
-// }
+if(ControlsHandler.usingExternalInputDevice) {
+    // User is using a keyboard/gamepad, don't use touch controls
+    Logs.verbose("Keyboard/gamepad detected, disabling touch controls!");
+    usingMobileControls = false;
+    return;
+}
 Logs.verbose("Activating mobile controls...");
 
 public var controlScheme:String = #if mobile Options.controlScheme #else "Arrows" #end;
