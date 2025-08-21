@@ -19,7 +19,7 @@ function onCreatePost() {
     switch(controlScheme) {
         case "Arrows":
             opponentStrums.scaleMult.set(0.5, 0.5);
-            opponentStrums.setPosition(125, 70);
+            opponentStrums.setPosition(202 * ((FlxG.scaleMode.width / FlxG.scaleMode.height) / (FlxG.initialWidth / FlxG.initialHeight)), 70);
             opponentStrums.downscroll = !Options.downscroll;
         
             opponentStrums.notes.visible = false;

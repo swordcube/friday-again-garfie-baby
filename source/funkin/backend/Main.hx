@@ -24,7 +24,6 @@ import extension.androidtools.Permissions;
 @:access(flixel.FlxGame)
 class Main extends Sprite {
 	public static var instance(default, null):Main;
-	public static var gameThreads:Array<Thread> = [];
 
 	public static var changeID:Int = 0;
     public static var audioDisconnected:Bool = false;
@@ -46,9 +45,6 @@ class Main extends Sprite {
 		// On iOS use Documents Dir.
 		Sys.setCwd(haxe.io.Path.addTrailingSlash(lime.system.System.documentsDirectory));
 		#end
-		for(i in 0...4)
-			gameThreads.push(Thread.createWithEventLoop(() -> Thread.current().events.promise()));
-
 		statsDisplay = new StatsDisplay(10, 3);
 		addChild(statsDisplay);
 		
@@ -60,11 +56,6 @@ class Main extends Sprite {
 		
 		addChild(new DebugOverlay());
 		addChild(new Lasagna());
-	}
-
-	public static function execASync(func:Void->Void) {
-		var thread = gameThreads[(_threadCycle++) % gameThreads.length];
-		thread.events.run(func);
 	}
 
 	public static function callstackToString(callstack:Array<StackItem>):String {

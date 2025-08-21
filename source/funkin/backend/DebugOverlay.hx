@@ -48,7 +48,7 @@ class DebugOverlay extends Sprite {
         logContainer = new Sprite();
         addChild(logContainer);
 
-        visible = #if mobile true #else false #end;
+        visible = #if mobile Options.developerMode #else false #end;
     }
 
     override function __enterFrame(dt:Float):Void {
@@ -65,6 +65,8 @@ class DebugOverlay extends Sprite {
             graphics.drawRect(0, 0, FlxG.stage.window.width, FlxG.stage.window.height);
             graphics.endFill();
         }
+        #else
+        visible = Options.developerMode; // TODO: actually match the option's description, i'm just lazy!
         #end
         updateLogPositions();
     }

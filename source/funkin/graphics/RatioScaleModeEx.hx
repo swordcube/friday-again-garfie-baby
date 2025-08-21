@@ -48,17 +48,22 @@ class RatioScaleModeEx extends RatioScaleMode {
 		height = null;
 	}
 
-    // --------------- //
-    // [ Private API ] //
-    // --------------- //
+	// --------------- //
+	// [ Private API ] //
+	// --------------- //
 
 	private inline function get_width():Null<Int> {
+		#if mobile
+		// the math for the widescreen support was a lot easier than i thought it was going to be
+		return this.width == null ? Math.floor(FlxG.stage.stageWidth / (FlxG.stage.stageHeight / FlxG.initialHeight)) : this.width;
+		#else
 		return this.width == null ? FlxG.initialWidth : this.width;
-    }
+		#end
+	}
 
 	private inline function get_height():Null<Int> {
 		return this.height == null ? FlxG.initialHeight : this.height;
-    }
+	}
 
 	private inline function set_width(v:Null<Int>):Null<Int> {
 		this.width = v;
