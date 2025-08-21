@@ -58,6 +58,15 @@ class GameplayPage extends OptionPage {
             id: "hitWindow",
             type: TInt(5, 180, 5)
         });
+        #if mobile
+        addOption({
+            name: "Control Scheme",
+            description: "Change the control scheme you prefer to use during gameplay.\nThese will get disabled if a keyboard or gamepad are detected.",
+
+            id: "controlScheme",
+            type: TList(["Arrows", "Hitbox", "Invisible Hitbox"])
+        });
+        #end
         final hitsoundTypeOption:ListOption = cast addOption({
             name: "Hitsound Type",
             description: "Change the kind of hitsounds to use during gameplay.",

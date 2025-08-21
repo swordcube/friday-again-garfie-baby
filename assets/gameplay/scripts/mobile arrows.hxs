@@ -2,24 +2,29 @@ import funkin.mobile.input.ControlsHandler;
 
 public var usingMobileControls:Bool = true;
 
-if(ControlsHandler.usingExternalInputDevice) {
-    // User is using a keyboard/gamepad, don't use touch controls
-    Logs.verbose("Keyboard/gamepad detected, disabling touch controls!");
-    usingMobileControls = false;
-    return;
-}
+// if(ControlsHandler.usingExternalInputDevice) {
+//     // User is using a keyboard/gamepad, don't use touch controls
+//     Logs.verbose("Keyboard/gamepad detected, disabling touch controls!");
+//     usingMobileControls = false;
+//     return;
+// }
 Logs.verbose("Activating mobile controls...");
 
-public var controlScheme:String = "Arrows";
+public var controlScheme:String = #if mobile Options.controlScheme #else "Arrows" #end;
 Logs.verbose("Current control scheme: " + controlScheme);
 
-importScript("gameplay/scripts/mobile/ControlScheme" + StringTools.replace(controlScheme, " ", ""));
+var loadedControlScheme:String = controlScheme;
+switch(controlScheme) {
+    case "Invisible Hitbox":
+        loadedControlScheme = "Hitbox";
+}
+importScript("gameplay/scripts/mobile/ControlScheme" + StringTools.replace(loadedControlScheme, " ", ""));
 
 function onCreatePost() {
     switch(controlScheme) {
         case "Arrows":
             opponentStrums.scaleMult.set(0.5, 0.5);
-            opponentStrums.setPosition(202 * ((FlxG.scaleMode.width / FlxG.scaleMode.height) / (FlxG.initialWidth / FlxG.initialHeight)), 70);
+            opponentStrums.setPosition(170 * ((FlxG.scaleMode.width / FlxG.scaleMode.height) / (FlxG.initialWidth / FlxG.initialHeight)), 70);
             opponentStrums.downscroll = !Options.downscroll;
         
             opponentStrums.notes.visible = false;

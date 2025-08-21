@@ -15,6 +15,10 @@ class Options {
     public static var hitsoundType:String = "osu!";
     public static var hitsoundBehavior:String = "Note Hit";
     public static var hitsoundVolume:Float = 0;
+
+    #if mobile
+    public static var controlScheme:String = "Arrows";
+    #end
     
     // APPEARANCE //
     public static var antialiasing:Bool = true;

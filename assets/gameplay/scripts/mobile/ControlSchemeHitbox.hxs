@@ -1,0 +1,92 @@
+final grpHitboxes:FlxTypedGroup;
+
+public var hitboxColors:Array<FlxColor> = [
+    0xFFc24b99,
+    0xFF00ffff,
+    0xFF12fa05,
+    0xFFf9393f
+];
+
+function updateHitboxColors() {
+    for(i in 0...grpHitboxes.length) {
+        final hitbox:FlxSprite = grpHitboxes.members[i];
+        hitbox.color = hitboxColors[i % hitboxColors.length];
+    }
+}
+
+function onCreatePost() {
+    grpHitboxes = new FlxTypedGroup();
+    grpHitboxes.cameras = [camOther];
+    add(grpHitboxes);
+
+    for(i in 0...playerStrums.strums.length) {
+        final strum:Strum = playerStrums.strums.members[i];
+        final hitboxWidth:Int = FlxG.width / playerStrums.strums.length;
+
+        final hitbox:FlxSprite = new FlxSprite(i * hitboxWidth).makeSolid(hitboxWidth, FlxG.height, FlxColor.WHITE);
+        hitbox.alpha = 0.5;
+        hitbox.color = FlxColor.RED;
+        hitbox.visible = controlScheme != "Invisible Hitbox";
+        hitbox.updateHitbox();
+        grpHitboxes.add(hitbox);
+    }
+    updateHitboxColors();
+}
+
+function forcePress(direction:Int) {
+    playField.strumsPressed[direction] = true;
+    playField.onNotePress(playerStrums, direction);
+}
+
+function forceRelease(direction:Int) {
+    playField.strumsPressed[direction] = false;
+    playField.onNoteRelease(playerStrums, direction);
+}
+
+function onUpdate(dt:Float) {
+    if(playerStrums.botplay)
+        return;
+    
+    #if mobile
+    for(i in 0...grpHitboxes.length) {
+        final hitbox:FlxSprite = grpHitboxes.members[i];
+
+        var pressed:Bool = false;
+        for(touch in FlxG.touches.list) {
+            if(touch.overlaps(hitbox, camOther) && touch.pressed) {
+                if(!playField.strumsPressed[i]) {
+                    forcePress(i);
+                    hitbox.alpha = 0.35;
+                    // hitbox.color = FlxColor.BLUE;
+                }
+                pressed = true;
+                break;
+            }
+        }
+        if(!pressed && playField.strumsPressed[i]) {
+            forceRelease(i);
+            // hitbox.color = FlxColor.RED;
+        }
+        if(!playField.strumsPressed[i] && !startingSong)
+            hitbox.alpha = FlxMath.lerp(hitbox.alpha, 0, FlxMath.getElapsedLerp(0.25, FlxG.elapsed));
+    }
+    #else
+    for(i in 0...grpHitboxes.length) {
+        final hitbox:FlxSprite = grpHitboxes.members[i];
+        if(FlxG.mouse.overlaps(hitbox, camOther) && FlxG.mouse.pressed) {
+            if(!playField.strumsPressed[i]) {
+                forcePress(i);
+                hitbox.alpha = 0.35;
+                // hitbox.color = FlxColor.BLUE;
+            }
+        }
+        else if(playField.strumsPressed[i] && FlxG.mouse.justReleased) {
+            forceRelease(i);
+            // hitbox.color = FlxColor.RED;
+        }
+        if(!playField.strumsPressed[i] && !startingSong)
+            hitbox.alpha = FlxMath.lerp(hitbox.alpha, 0, FlxMath.getElapsedLerp(0.25, FlxG.elapsed));
+    }
+    #end
+    updateHitboxColors();
+}
