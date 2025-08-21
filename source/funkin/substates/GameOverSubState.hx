@@ -126,6 +126,9 @@ class GameOverSubState extends FunkinSubState {
             
             deathSFX = FlxG.sound.play(Paths.sound(_createEvent.deathSFX));
         }
+        #if MOBILE_UI
+        addBackButton(FlxG.width - 230, FlxG.height - 200, FlxColor.WHITE, exit);
+        #end
     }
 
     override function update(elapsed):Void {
@@ -133,7 +136,8 @@ class GameOverSubState extends FunkinSubState {
         if(_createEvent.cancelled)
             return;
 
-        if(controls.justPressed.ACCEPT)
+        final hoveringBackButton:Bool = #if MOBILE_UI TouchUtil.overlaps(backButton, camControls) #else false #end;
+        if(controls.justPressed.ACCEPT || (TouchUtil.justReleased && !hoveringBackButton))
             retry();
 
         if(controls.justPressed.BACK)

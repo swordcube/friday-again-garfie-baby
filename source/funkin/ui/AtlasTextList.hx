@@ -7,9 +7,13 @@ import flixel.util.FlxSignal;
  * 
  * Mainly used for things like the freeplay and pause menu.
  */
-class AtlasTextList extends FlxTypedGroup<AtlasText> {
+class AtlasTextList extends FlxTypedContainer<AtlasText> {
     public var curSelected:Int = 0;
     public var callbacks:Map<String, ListCallbacks> = [];
+    public var disableTouchInputs:Bool = false;
+
+    public var onSelect:FlxTypedSignal<Int->AtlasText->Void> = new FlxTypedSignal<Int->AtlasText->Void>();
+    public var onAccept:FlxTypedSignal<Int->AtlasText->Void> = new FlxTypedSignal<Int->AtlasText->Void>();
 
     public function clearList():Void {
         while(length > 0) {
@@ -20,13 +24,17 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
         callbacks.clear();
     }
 
-    public function addItem(text:String, callbacks:ListCallbacks):AtlasText {
-        final item:AtlasText = new AtlasText(0, 30 + (70 * length), "bold", LEFT, text);
-        item.isMenuItem = true;
-        item.targetY = length;
-        add(item);
-
+    public function addStaticItem(x:Float = 0, y:Float = 0, text:String, callbacks:ListCallbacks):AtlasText {
+        final item:AtlasText = new AtlasText(x, y, "bold", LEFT, text);
+        item.ID = length;
         this.callbacks.set(text, callbacks);
+        return cast add(item);
+    }
+
+    public function addItem(text:String, callbacks:ListCallbacks):AtlasText {
+        final item:AtlasText = addStaticItem(0, 30 + (70 * length), text, callbacks);
+        item.isMenuItem = true;
+        item.targetY = item.ID = length;
         return item;
     }
 
@@ -48,19 +56,15 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
         final wheel:Float = TouchUtil.wheel;
         final controls:Controls = Controls.instance;
 
-        // the swiping doesn't work here and i have genuinely no idea why
-        if(controls.justPressed.UI_UP || SwipeUtil.swipeUp || wheel < 0)
+        if(controls.justPressed.UI_UP || (!disableTouchInputs && SwipeUtil.swipeUp) || wheel < 0)
             changeSelection(-1);
 
-        if(controls.justPressed.UI_DOWN || SwipeUtil.swipeDown || wheel > 0)
+        if(controls.justPressed.UI_DOWN || (!disableTouchInputs && SwipeUtil.swipeDown) || wheel > 0)
             changeSelection(1);
 
-        final pointer = TouchUtil.touch;
-        if(controls.justPressed.ACCEPT || (TouchUtil.justReleased && !SwipeUtil.swipeAny && (pointer?.overlaps(members.unsafeGet(curSelected), members.unsafeGet(curSelected).getDefaultCamera()) ?? false) == true)) {
-            final callback = callbacks.get(members.unsafeGet(curSelected).text).onAccept;
-            if(callback != null)
-                callback(curSelected, members.unsafeGet(curSelected));
-        }
+        if(controls.justPressed.ACCEPT || (!disableTouchInputs && TouchUtil.justReleased && !SwipeUtil.swipeAny && TouchUtil.overlaps(members.unsafeGet(curSelected), getDefaultCamera())))
+            accept();
+        
         super.update(elapsed);
     }
 
@@ -76,12 +80,24 @@ class AtlasTextList extends FlxTypedGroup<AtlasText> {
             song.targetY = i - curSelected;
             song.alpha = (i == curSelected) ? 1.0 : 0.6;
         }
-        final callback = callbacks.get(members.unsafeGet(curSelected).text).onSelect;
+        final item:AtlasText = members.unsafeGet(curSelected);
+        onSelect.dispatch(curSelected, item);
+
+        final callback = callbacks.get(item.text).onSelect;
         if(callback != null)
-            callback(curSelected, members.unsafeGet(curSelected));
+            callback(curSelected, item);
 
         if(playScrollSFX)
             FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
+    }
+
+    public function accept():Void {
+        final item:AtlasText = members.unsafeGet(curSelected);
+        onAccept.dispatch(curSelected, item);
+
+        final callback = callbacks.get(item.text).onAccept;
+        if(callback != null)
+            callback(curSelected, item);
     }
 }
 

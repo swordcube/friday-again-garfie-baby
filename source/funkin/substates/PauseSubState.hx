@@ -52,6 +52,8 @@ class PauseSubState extends FunkinSubState {
     public var prevWindowOnClose:Void->Void;
     public var lastTimeScale:Float = 1;
 
+    public var lastSelected:Int = 0;
+
     override function create():Void {
         super.create();
         
@@ -82,6 +84,10 @@ class PauseSubState extends FunkinSubState {
 
         grpItems = new AtlasTextList();
         grpItems.active = false;
+        grpItems.onSelect.add(onItemSelect);
+        #if mobile
+        grpItems.disableTouchInputs = true; // we handle our own inputs instead
+        #end
         add(grpItems);
 
         grpStats = new FlxTypedContainer<FlxText>();
@@ -140,9 +146,12 @@ class PauseSubState extends FunkinSubState {
             
             return;
         }
-        if(inputAllowed)
+        if(inputAllowed) {
             grpItems.active = true;
-
+            #if mobile
+            grpItems.forEach(_checkItemTouch);
+            #end
+        }
         inputAllowed = true;
         super.update(elapsed);
     }
@@ -168,48 +177,78 @@ class PauseSubState extends FunkinSubState {
         musicThread.onError((e:Dynamic) -> {});
     }
 
+    public function onItemSelect(idx:Int, item:AtlasText):Void {
+        if(idx == lastSelected)
+            return;
+
+        #if mobile
+        FlxTween.cancelTweensOf(item);
+        item.x = 165;
+        FlxTween.tween(item, {x: 150}, 0.2, {ease: FlxEase.backInOut});
+        #end
+        lastSelected = idx;
+    }
+
+    public function addItem(name:String, callback:Void->Void):Void {
+        #if !mobile
+        grpItems.addItem(name, {onAccept: (_, _) -> callback()});
+        #else
+        final item:AtlasText = grpItems.addStaticItem(110, 0, name, {onAccept: (_, _) -> callback()});
+        item.y = ((FlxG.height - item.height) * 0.5) + ((grpItems.length - 1) * 105);
+        FlxTween.tween(item, {x: 150}, 0.4 * grpItems.length, {ease: FlxEase.expoOut});
+        #end
+    }
+
+    public function centerItems():Void {
+        for(item in grpItems.members)
+            item.y -= ((grpItems.length - 1) * 105) * 0.5;
+    }
+
     public function regenerateItems(page:PageType):Void {
         grpItems.clearList();
         switch(page) {
             case MAIN:
                 final game:PlayState = PlayState.instance;
-                grpItems.addItem("Resume", {onAccept: (_, _) -> close()});
+                addItem("Resume", close);
 
                 if(game.inCutscene) {
-                    grpItems.addItem("Skip Cutscene", {onAccept: (_, _) -> {
+                    addItem("Skip Cutscene", () -> {
                         game.cutscene.finish();
                         close();
-                    }});
+                    });
                     if(game.cutscene.canRestart) {
-                        grpItems.addItem("Restart Cutscene", {onAccept: (_, _) -> {
+                        addItem("Restart Cutscene", () -> {
                             game.cutscene.restart();
                             close();
-                        }});
+                        });
                     }
                 } else
-                    grpItems.addItem("Restart Song", {onAccept: (_, _) -> restartSong()});
+                    addItem("Restart Song", () -> restartSong());
                 
                 if(game.currentChart.meta.song.difficulties.length > 1)
-                    grpItems.addItem("Change Difficulty", {onAccept: (_, _) -> regenerateItems(CHANGE_DIFF)});
+                    addItem("Change Difficulty", () -> regenerateItems(CHANGE_DIFF));
 
                 if(game.chartingMode)
-                    grpItems.addItem("Leave Charting Mode", {onAccept: (_, _) -> restartSong(true)});
+                    addItem("Leave Charting Mode", () -> restartSong(true));
 
-                grpItems.addItem("Change Options", {onAccept: (_, _) -> goToOptions()});
-                grpItems.addItem("Exit to Menu", {onAccept: (_, _) -> exitToMenu()});
+                addItem("Change Options", goToOptions);
+                addItem("Exit to Menu", exitToMenu);
                 
             case CHANGE_DIFF:
                 final game:PlayState = PlayState.instance;
                 for(diff in game.currentChart.meta.song.difficulties.filter((diff:String) -> diff != game.currentDifficulty)) {
-                    grpItems.addItem(diff.toUpperCase(), {onAccept: (_, _) -> {
+                    addItem(diff.toUpperCase(), () -> {
                         game.currentDifficulty = diff;
                         restartSong();
-                    }});
+                    });
                 }
-                grpItems.addItem("Back", {onAccept: (_, _) -> regenerateItems(MAIN)});
+                addItem("Back", () -> regenerateItems(MAIN));
         }
         call("onRegenerateItems", [page]);
 
+        #if mobile
+        centerItems();
+        #end
         grpItems.curSelected = 0;
         grpItems.changeSelection(0, true);
     }
@@ -435,6 +474,19 @@ class PauseSubState extends FunkinSubState {
     override function _callCreatePost():Void {
         call("onCreatePost", [_createEvent.flagAsPost()]);
     }
+
+    #if mobile
+    private function _checkItemTouch(item:AtlasText):Void {
+        if(!(TouchUtil.justReleased && TouchUtil.overlaps(item, camera)))
+            return;
+
+        if(item.ID != lastSelected) {
+            grpItems.curSelected = item.ID;
+            grpItems.changeSelection(0, true);
+        } else
+            grpItems.accept();
+    }
+    #end
 
     override function destroy():Void {
         FlxG.timeScale = lastTimeScale;
