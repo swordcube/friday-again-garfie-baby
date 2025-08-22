@@ -18,13 +18,14 @@ switch(controlScheme) {
     case "Invisible Hitbox":
         loadedControlScheme = "Hitbox";
 }
-importScript("gameplay/scripts/mobile/ControlScheme" + StringTools.replace(loadedControlScheme, " ", ""));
+importScript("gameplay/scripts/mobile/controls/ControlScheme" + StringTools.replace(loadedControlScheme, " ", ""));
+importScript("gameplay/scripts/mobile/PauseButton");
 
 function onCreatePost() {
     switch(controlScheme) {
         case "Arrows":
             opponentStrums.scaleMult.set(0.5, 0.5);
-            opponentStrums.setPosition(170 * ((FlxG.scaleMode.width / FlxG.scaleMode.height) / (FlxG.initialWidth / FlxG.initialHeight)), 70);
+            opponentStrums.setPosition(170 * ((FlxG.scaleMode.width / FlxG.scaleMode.height) / (Constants.GAME_WIDTH / Constants.GAME_HEIGHT)), 70);
             opponentStrums.downscroll = !Options.downscroll;
         
             opponentStrums.notes.visible = false;

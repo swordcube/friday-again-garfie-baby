@@ -325,7 +325,6 @@ class PlayState extends FunkinState {
 
 						script.execute();
 						script.call("new");
-						script.call("onCreate");
 					}
 				}
 			}
@@ -340,7 +339,6 @@ class PlayState extends FunkinState {
 
 					script.execute();
 					script.call("new");
-					script.call("onCreate");
 				}
 			}
 			for(i in 0...loaders.length) {
@@ -359,6 +357,7 @@ class PlayState extends FunkinState {
 				// uiskin script
 				addSingleScript(loader, 'gameplay/uiskins/${uiSkin}/script');
 			}
+			scripts.call("onCreate");
 		}
 		Logs.verbose('- Loading scripts took ${getElapsedTime()}s');
 		#end
@@ -712,6 +711,8 @@ class PlayState extends FunkinState {
 			
 			hud.script.setParent(hud);
 			hud.script.call("onCreate");
+
+			scripts.onCall.add((m:String, a:Array<Dynamic>) -> hud.call(m, a));
 		}
 		#end
 		countdown = new Countdown();
@@ -766,7 +767,6 @@ class PlayState extends FunkinState {
 		if(scriptsAllowed)
 			scripts.call("onCreatePost");
 		#end
-		playField.hud.call("onCreatePost");
 	}
 
 	override function update(elapsed:Float) {
@@ -1079,9 +1079,6 @@ class PlayState extends FunkinState {
 			scripts.call("onSongStart");
 		}
 		#end
-		playField.hud.call("onStartSong");
-		playField.hud.call("onSongStart");
-
 		final hasStartTime:Bool = lastParams.startTime != null && lastParams.startTime > 0;
 		if(hasStartTime)
 			Conductor.instance.time = lastParams.startTime;
@@ -1107,8 +1104,6 @@ class PlayState extends FunkinState {
 			scripts.call("onSongStartPost");
 		}
 		#end
-		playField.hud.call("onStartSongPost");
-		playField.hud.call("onSongStartPost");
 	}
 
 	public function endSong():Void {
@@ -1133,9 +1128,6 @@ class PlayState extends FunkinState {
 			scripts.call("onSongEnd");
 		}
 		#end
-		playField.hud.call("onEndSong");
-		playField.hud.call("onSongEnd");
-
 		if(_saveScore) {
 			final recordID:String = Highscore.getScoreRecordID(
 				currentSong, currentDifficulty, currentMix, null,
@@ -1204,8 +1196,6 @@ class PlayState extends FunkinState {
 			scripts.call("onSongEndPost");
 		}
 		#end
-		playField.hud.call("onEndSongPost");
-		playField.hud.call("onSongEndPost");
 	}
 
 	public function updateDiscordRPC(stats:PlayerStats):Void {

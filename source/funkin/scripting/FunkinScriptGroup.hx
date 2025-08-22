@@ -1,6 +1,7 @@
 package funkin.scripting;
 
 #if SCRIPTING_ALLOWED
+import flixel.util.FlxSignal.FlxTypedSignal;
 import funkin.backend.events.ActionEvent;
 
 @:access(funkin.backend.events.ActionEvent)
@@ -10,6 +11,9 @@ class FunkinScriptGroup {
 
     public var additionalDefaults:Map<String, Dynamic> = [];
     public var publicVariables:Map<String, Dynamic> = [];
+
+    public var onPreAdd:FlxTypedSignal<FunkinScript->Void> = new FlxTypedSignal<FunkinScript->Void>();
+    public var onCall:FlxTypedSignal<String->Array<Dynamic>->Void> = new FlxTypedSignal<String->Array<Dynamic>->Void>();
 
     public function new() {
         additionalDefaults.set("importScript", importScript);
@@ -72,6 +76,8 @@ class FunkinScriptGroup {
             remove(_scriptsToClose[i]);
 
         _scriptsToClose.clear();
+        onCall.dispatch(method, args ?? []);
+
         return value;
     }
     
@@ -91,6 +97,8 @@ class FunkinScriptGroup {
             remove(_scriptsToClose[i]);
         
         _scriptsToClose.clear();
+        onCall.dispatch(method, [event]);
+
         return event;
     }
 
@@ -115,6 +123,8 @@ class FunkinScriptGroup {
         script.onClose.add(() -> {
             _scriptsToClose.push(script);
         });
+        onPreAdd.dispatch(script);
+
         for(k => v in additionalDefaults)
             script.set(k, v);
     }

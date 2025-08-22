@@ -1,0 +1,47 @@
+if(!game.scripts.publicVariables.get("usingMobileControls")) {
+    closeScript();
+    return;
+}
+public var fakePauseButton:FunkinSprite;
+public var fakePauseCircle:FunkinSprite;
+
+function onCreatePost() {
+    if(game.scripts.publicVariables.get("pauseButton") == null)
+        return;
+    
+    #if !MOBILE_UI
+    final camControls = new FlxCamera();
+    camControls.bgColor = 0;
+    FlxG.cameras.add(camControls, false);
+    #end
+    fakePauseButton = new FunkinSprite().loadSparrowFrames("gameplay/mobile/pauseButton");
+    fakePauseButton.animation.addByIndices('idle', 'pause', [0], "", 24, false);
+    fakePauseButton.animation.addByIndices('hold', 'pause', [5], "", 24, false);
+    fakePauseButton.animation.addByIndices('confirm', 'pause', [for(i in 6...33) i], "", 24, false);
+    fakePauseButton.scale.set(0.8, 0.8);
+    fakePauseButton.updateHitbox();
+    fakePauseButton.animation.play("idle");
+    fakePauseButton.setPosition(game.scripts.publicVariables.get("pauseButton").x, game.scripts.publicVariables.get("pauseButton").y);
+    fakePauseButton.cameras = [camControls];
+
+    fakePauseCircle = new FunkinSprite().loadGraphic(Paths.image("gameplay/mobile/pauseCircle"));
+    fakePauseCircle.scale.set(0.84, 0.8);
+    fakePauseCircle.updateHitbox();
+    fakePauseCircle.cameras = [camControls];
+    fakePauseCircle.x = ((fakePauseButton.x + (fakePauseButton.width / 2)) - (fakePauseCircle.width / 2));
+    fakePauseCircle.y = ((fakePauseButton.y + (fakePauseButton.height / 2)) - (fakePauseCircle.height / 2));
+    fakePauseCircle.alpha = 0.1;
+
+    add(fakePauseCircle);
+    add(fakePauseButton);
+
+    fakePauseButton.animation.play("confirm");
+    fakePauseCircle.scale.set(0.84 * 1.4, 0.8 * 1.4);
+    fakePauseCircle.alpha = 0.4;
+    FlxTween.tween(fakePauseCircle.scale, {x: 0.84 * 0.8, y: 0.8 * 0.8}, 0.4, {ease: FlxEase.backInOut});
+    FlxTween.tween(fakePauseCircle, {alpha: 0}, 0.6, {ease: FlxEase.quartOut});
+
+    FlxTimer.wait(0.3, () -> {
+        FlxTween.tween(fakePauseButton, {alpha: 0}, 0.6, {ease: FlxEase.quartOut});
+    });
+}

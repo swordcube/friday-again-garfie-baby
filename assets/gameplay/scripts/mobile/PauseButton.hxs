@@ -1,0 +1,72 @@
+public var pauseButton:FunkinSprite;
+public var pauseCircle:FunkinSprite;
+
+function onCreatePost() {
+    final e = {
+        cancelled: false,
+        bottomAlign: false
+    };
+    scripts.call("onMobilePauseButtonCreation", [e]);
+    if(!e.cancelled) {
+        #if !MOBILE_UI
+        final camControls = new FlxCamera();
+        camControls.bgColor = 0;
+        FlxG.cameras.add(camControls, false);
+        #end
+        pauseButton = new FunkinSprite().loadSparrowFrames("gameplay/mobile/pauseButton");
+        pauseButton.animation.addByIndices('idle', 'back', [0], "", 24, false);
+        pauseButton.animation.addByIndices('hold', 'back', [5], "", 24, false);
+        pauseButton.animation.addByIndices('confirm', 'back', [for(i in 6...33) i], "", 24, false);
+        pauseButton.scale.set(0.8, 0.8);
+        pauseButton.updateHitbox();
+        pauseButton.animation.play("idle");
+        pauseButton.setPosition((FlxG.width - pauseButton.width) - 35, (e.bottomAlign) ? FlxG.height - 125 : 35);
+        pauseButton.cameras = [camControls];
+    
+        pauseCircle = new FunkinSprite().loadGraphic(Paths.image("gameplay/mobile/pauseCircle"));
+        pauseCircle.scale.set(0.84, 0.8);
+        pauseCircle.updateHitbox();
+        pauseCircle.cameras = [camControls];
+        pauseCircle.x = ((pauseButton.x + (pauseButton.width / 2)) - (pauseCircle.width / 2));
+        pauseCircle.y = ((pauseButton.y + (pauseButton.height / 2)) - (pauseCircle.height / 2));
+        pauseCircle.alpha = 0.1;
+    
+        add(pauseCircle);
+        add(pauseButton);
+    
+        scripts.call("onMobilePauseButtonCreationPost", [e]);
+    }
+}
+
+function togglePauseButton(?visible:Bool) {
+    visible ??= false;
+    pauseCircle.alpha = (visible) ? 0.1 : 0;
+    pauseButton.alpha = (visible) ? 1 : 0;
+}
+
+function onPausePost(e) {
+    FlxTween.cancelTweensOf(pauseButton);
+    FlxTween.cancelTweensOf(pauseCircle);
+    
+    pauseButton.alpha = 0;
+    pauseCircle.alpha = 0;
+}
+
+function onUpdate(dt:Float) {
+    final androidPause:Bool = #if android FlxG.android.justReleased.BACK #else false; #end
+    if(canPause && (TouchUtil.pressAction(pauseButton) || androidPause))
+        pause();
+}
+
+function onSubStateClose() {
+    FlxTween.cancelTweensOf(pauseButton);
+    FlxTween.cancelTweensOf(pauseCircle);
+
+    FlxTween.tween(pauseButton, {alpha: 1}, 0.25, {ease: FlxEase.quartOut});
+    FlxTween.tween(pauseCircle, {alpha: 0.1}, 0.25, {ease: FlxEase.quartOut});
+}
+
+function onSongEnd() {
+    pauseButton.visible = false;
+    pauseCircle.visible = false;
+}
