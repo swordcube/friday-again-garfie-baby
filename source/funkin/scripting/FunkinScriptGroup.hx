@@ -130,16 +130,25 @@ class FunkinScriptGroup {
     }
 
     public function add(script:FunkinScript):Void {
+        if(script == null)
+            return;
+
         preAdd(script);
         members.push(script);
     }
 
     public function insert(index:Int, script:FunkinScript):Void {
+        if(script == null)
+            return;
+
         preAdd(script);
         members.insert(index, script);
     }
 
     public function remove(script:FunkinScript):Void {
+        if(script == null)
+            return;
+        
         members.remove(script);
     }
 
