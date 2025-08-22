@@ -53,7 +53,11 @@ function onPausePost(e) {
 }
 
 function onUpdate(dt:Float) {
-    final androidPause:Bool = #if android FlxG.android.justReleased.BACK #else false; #end
+    #if android
+    final androidPause:Bool = FlxG.android.justReleased.BACK;
+    #else
+    final androidPause:Bool = false;
+    #end
     if(canPause && (TouchUtil.pressAction(pauseButton) || androidPause))
         pause();
 }

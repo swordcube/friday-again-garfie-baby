@@ -9,11 +9,6 @@ function onCreatePost() {
     if(game.scripts.publicVariables.get("pauseButton") == null)
         return;
     
-    #if !MOBILE_UI
-    final camControls = new FlxCamera();
-    camControls.bgColor = 0;
-    FlxG.cameras.add(camControls, false);
-    #end
     fakePauseButton = new FunkinSprite().loadSparrowFrames("gameplay/mobile/pauseButton");
     fakePauseButton.animation.addByIndices('idle', 'pause', [0], "", 24, false);
     fakePauseButton.animation.addByIndices('hold', 'pause', [5], "", 24, false);
@@ -22,12 +17,10 @@ function onCreatePost() {
     fakePauseButton.updateHitbox();
     fakePauseButton.animation.play("idle");
     fakePauseButton.setPosition(game.scripts.publicVariables.get("pauseButton").x, game.scripts.publicVariables.get("pauseButton").y);
-    fakePauseButton.cameras = [camControls];
 
     fakePauseCircle = new FunkinSprite().loadGraphic(Paths.image("gameplay/mobile/pauseCircle"));
     fakePauseCircle.scale.set(0.84, 0.8);
     fakePauseCircle.updateHitbox();
-    fakePauseCircle.cameras = [camControls];
     fakePauseCircle.x = ((fakePauseButton.x + (fakePauseButton.width / 2)) - (fakePauseCircle.width / 2));
     fakePauseCircle.y = ((fakePauseButton.y + (fakePauseButton.height / 2)) - (fakePauseCircle.height / 2));
     fakePauseCircle.alpha = 0.1;

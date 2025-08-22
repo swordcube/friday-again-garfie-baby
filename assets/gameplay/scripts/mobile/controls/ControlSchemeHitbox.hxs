@@ -16,7 +16,7 @@ function updateHitboxColors() {
 
 function onCreatePost() {
     grpHitboxes = new FlxTypedGroup();
-    grpHitboxes.cameras = [camOther];
+    grpHitboxes.cameras = [#if MOBILE_UI camControls #else camOther #end];
     add(grpHitboxes);
 
     for(i in 0...playerStrums.strums.length) {
@@ -53,7 +53,7 @@ function onUpdate(dt:Float) {
 
         var pressed:Bool = false;
         for(touch in FlxG.touches.list) {
-            if(!touch.overlaps(pauseButton) && touch.overlaps(hitbox, camOther) && touch.pressed) {
+            if(!touch.overlaps(pauseButton) && touch.overlaps(hitbox, grpHitboxes.camera) && touch.pressed) {
                 if(!playField.strumsPressed[i]) {
                     forcePress(i);
                     hitbox.alpha = 0.35;
@@ -73,7 +73,7 @@ function onUpdate(dt:Float) {
     #else
     for(i in 0...grpHitboxes.length) {
         final hitbox:FlxSprite = grpHitboxes.members[i];
-        if(!FlxG.mouse.overlaps(pauseButton) && FlxG.mouse.overlaps(hitbox, camOther) && FlxG.mouse.pressed) {
+        if(!FlxG.mouse.overlaps(pauseButton) && FlxG.mouse.overlaps(hitbox, grpHitboxes.camera) && FlxG.mouse.pressed) {
             if(!playField.strumsPressed[i]) {
                 forcePress(i);
                 hitbox.alpha = 0.35;

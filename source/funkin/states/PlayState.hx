@@ -264,7 +264,12 @@ class PlayState extends FunkinState {
 		camOther = new FunkinCamera();
 		camOther.bgColor = 0;
 		FlxG.cameras.add(camOther, false);
-		
+
+		#if MOBILE_UI
+		camControls = new FunkinCamera();
+		camControls.bgColor = 0;
+      	FlxG.cameras.add(camControls, false);
+		#end
 		Scoring.currentSystem = new PBotSystem(); // reset the scoring system, cuz you can change it thru scripting n shit, and that shouldn't persist
 		
 		final rawNoteSkin:String = currentChart.meta.game.noteSkin;
