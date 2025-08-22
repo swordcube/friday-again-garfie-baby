@@ -247,6 +247,7 @@ class MainMenuState extends FunkinState {
             
             return;
         }
+        #if !mobile
         var bgScale = bg.scale.x;
 		var bgTargetScale = FlxG.height / bg.frameHeight;
 		var bgScroll = bg.scrollFactor.y;
@@ -260,6 +261,7 @@ class MainMenuState extends FunkinState {
 			var scroll = FlxMath.lerp(bgScroll, 0.0, progress);
 			bg.scrollFactor.y = magenta.scrollFactor.y = scroll;
 		});
+        #end
         _bgFlicker();
 
         for(i => item in menuItems) {

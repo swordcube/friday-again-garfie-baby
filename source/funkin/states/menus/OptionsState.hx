@@ -33,6 +33,10 @@ class OptionsState extends FunkinState {
         DiscordRPC.changePresence("Options Menu", null);
 
         bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_blue"));
+        #if mobile
+        bg.scale.set(1.2, 1.2);
+        bg.updateHitbox();
+        #end
         bg.screenCenter();
         bg.scrollFactor.set();
         add(bg);

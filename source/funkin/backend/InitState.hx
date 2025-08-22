@@ -135,19 +135,19 @@ class InitState extends FlxState {
         #end
 
         // hide cursor, we probably don't need it rn
-        #if (FLX_MOUSE && !mobile)
+        #if FLX_MOUSE
         FlxG.mouse.visible = false;
         #else
         startGame();
         #end
     }
 
-    #if (FLX_MOUSE && !mobile)
+    #if FLX_MOUSE
     override function update(elapsed:Float):Void {
         super.update(elapsed);
         
         // for some reason i have to do this bullshittery
-        // just for the cursor to be hidden on linux. what the fuck.
+        // just for the cursor to be hidden on linux/mobile. what the fuck.
         if(!_started && !FlxG.mouse.visible) {
             FlxTimer.wait(0.001, startGame);
             _started = true;
