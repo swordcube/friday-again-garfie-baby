@@ -41,6 +41,8 @@ class FunkinScriptGroup {
 
         for(i in 0...members.length) {
             member = members[i];
+            if(member == null)
+                continue;
             
             final ret:Dynamic = member.get(name);
             if(ret != defaultValue)
@@ -50,13 +52,25 @@ class FunkinScriptGroup {
     }
 
     public function set(name:String, value:Dynamic):Void {
-        for(i in 0...members.length)
-            members[i].set(name, value);
+        var member:FunkinScript = null;
+        for(i in 0...members.length) {  
+            member = members[i];
+            if(member == null)
+                continue;
+
+            member.set(name, value);
+        }
     }
 
     public function setClass(value:Class<Dynamic>):Void {
-        for(i in 0...members.length)
+        var member:FunkinScript = null;
+        for(i in 0...members.length) {
+            member = members[i];
+            if(member == null)
+                continue;
+
             members[i].setClass(value);
+        }
     }
 
     public function call(method:String, ?args:Array<Dynamic>, ?exclude:Array<FunkinScript>, ?defaultValue:Dynamic):Dynamic {
@@ -65,7 +79,7 @@ class FunkinScriptGroup {
         
         for(i in 0...members.length) {
             member = members[i];
-            if(exclude != null && exclude.length != 0 && exclude.contains(member))
+            if(member == null || (exclude != null && exclude.length != 0 && exclude.contains(member)))
                 continue;
             
             final ret:Dynamic = member.call(method, args);
@@ -88,7 +102,7 @@ class FunkinScriptGroup {
                 break;
 
             member = members[i];
-            if(exclude != null && exclude.length != 0 && exclude.contains(member))
+            if(member == null || (exclude != null && exclude.length != 0 && exclude.contains(member)))
                 continue;
 
             member.call(method, [event]);
@@ -111,9 +125,12 @@ class FunkinScriptGroup {
 
     public function close():Void {
         final members:Array<FunkinScript> = members.copy();
-        for(i in 0...members.length)
+        for(i in 0...members.length) {
+            if(members[i] == null)
+                continue;
+
             members[i].close();
-        
+        }
         this.members.clear();
     }
 
