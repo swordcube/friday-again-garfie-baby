@@ -14,7 +14,6 @@ import lime.ui.FileDialog;
 import openfl.net.FileFilter;
 import openfl.net.FileReference;
 #end
-
 import sys.io.File;
 import sys.FileSystem;
 
@@ -140,6 +139,9 @@ class FileDialogMenu extends UISubState {
                     close();
             }
             #else
+            final defaultSaveFile:String = dialogOptions?.defaultSaveFile;
+            final filters:Array<String> = dialogOptions?.filters ?? new Array<String>();
+
             final fileFilters:Array<FileFilter> = [];
             for(f in filters)
                 fileFilters.push(new FileFilter(f, f));
@@ -154,19 +156,19 @@ class FileDialogMenu extends UISubState {
                     var openFileDialog = new FileDialog();
                     openFileDialog.onCancel.add(() -> onCancel.dispatch());
                     openFileDialog.onSelect.add((f) -> onSelect.dispatch([f]));
-                    openFileDialog.browse(OPEN, filter);
+                    openFileDialog.browse(OPEN, filter, defaultSaveFile, title);
 
                 case OpenMultiple:
                     var openFileDialog = new FileDialog();
                     openFileDialog.onCancel.add(() -> onCancel.dispatch());
                     openFileDialog.onSelectMultiple.add((f) -> onSelect.dispatch(f));
-                    openFileDialog.browse(OPEN_MULTIPLE, filter);
+                    openFileDialog.browse(OPEN_MULTIPLE, filter, defaultSaveFile, title);
 
                 case Save:
                     var openFileDialog = new FileDialog();
                     openFileDialog.onCancel.add(() -> onCancel.dispatch());
                     openFileDialog.onSave.add((f) -> onSelect.dispatch([f]));
-                    openFileDialog.browse(OPEN, filter);
+                    openFileDialog.browse(OPEN, filter, defaultSaveFile, title);
             }
             Sys.sleep(0.25);
             close();
