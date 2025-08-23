@@ -168,7 +168,7 @@ class FileDialogMenu extends UISubState {
                     var openFileDialog = new FileDialog();
                     openFileDialog.onCancel.add(() -> onCancel.dispatch());
                     openFileDialog.onSave.add((f) -> onSelect.dispatch([f]));
-                    openFileDialog.browse(OPEN, filter, defaultSaveFile, title);
+                    openFileDialog.browse(SAVE, filter, defaultSaveFile, title);
             }
             Sys.sleep(0.25);
             close();
