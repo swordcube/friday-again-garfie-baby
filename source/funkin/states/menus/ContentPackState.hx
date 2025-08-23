@@ -247,6 +247,7 @@ class ContentPackItem extends FlxSpriteContainer {
     public var canDrag:Bool = false;
     public var dragging:Bool = false;
     public var onClick:Void->Void;
+    // pinili
 
     public function new(x:Float = 0, y:Float = 0, width:Float, contentPack:String) {
         super(x, y);
