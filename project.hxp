@@ -91,7 +91,11 @@ class Project extends HXProject {
 			setDefine("DISCORD_ALLOWED");
 
 		// video playback
-		if (isCPP() && !isDefined("NO_VIDEOS") && !isDefined("NO_VIDEOS_ALLOWED"))
+		
+		// TODO: why does going into gameplay crash on mobile when this is defined?
+		// it seems to crash during the loading of scripts, which is really odd
+
+		if (isCPP() && !isMobile() && !isDefined("NO_VIDEOS") && !isDefined("NO_VIDEOS_ALLOWED"))
 			setDefine("VIDEOS_ALLOWED");
 
 		// crash handler
