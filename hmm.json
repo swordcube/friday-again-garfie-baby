@@ -155,7 +155,7 @@
       "name": "extension-androidtools",
       "type": "git",
       "dir": null,
-      "ref": "master",
+      "ref": "main",
       "url": "https://github.com/LimeExtensions/extension-androidtools"
     },
     {
