@@ -22,7 +22,7 @@ import funkin.backend.Main;
 import funkin.ui.*;
 import funkin.ui.charter.*;
 import funkin.ui.panel.*;
-import funkin.ui.topbar.*;
+import funkin.ui.menubar.*;
 import funkin.ui.dropdown.*;
 import funkin.ui.notification.*;
 
@@ -118,7 +118,7 @@ class ChartEditor extends UIState {
 
     public var notifications:NotificationContainer;
 
-    public var topBar:CharterTopBar;
+    public var menuBar:CharterMenuBar;
     public var playBar:CharterPlayBar;
 
     public var conductorInfoText:FlxText;
@@ -475,12 +475,12 @@ class ChartEditor extends UIState {
 
         uiLayer.add(miniPerformers);
 
-        topBar = new CharterTopBar();
-        topBar.zIndex = 1;
-        uiLayer.add(topBar);
+        menuBar = new CharterMenuBar();
+        menuBar.zIndex = 1;
+        uiLayer.add(menuBar);
         
-        topBar.updateLeftSideItems();
-        topBar.updateRightSideItems();
+        menuBar.updateLeftSideItems();
+        menuBar.updateRightSideItems();
 
         playBar = new CharterPlayBar();
         playBar.zIndex = 1;
@@ -1239,7 +1239,7 @@ class ChartEditor extends UIState {
 
     public function setGridSnap(snap:Int):Void {
         editorSettings.gridSnap = snap;
-        topBar.updateRightSideItems();
+        menuBar.updateRightSideItems();
     }
 
     public function increaseGridSnap():Void {

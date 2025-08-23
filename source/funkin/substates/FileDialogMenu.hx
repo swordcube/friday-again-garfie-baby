@@ -2,12 +2,17 @@ package funkin.substates;
 
 import funkin.utilities.FileUtil;
 
-#if desktop
+#if hxnativefiledialog
 import cpp.RawPointer;
 import cpp.RawConstPointer;
 
 import hxnativefiledialog.NFD;
 import hxnativefiledialog.Types;
+#else
+import lime.ui.FileDialog;
+
+import openfl.net.FileFilter;
+import openfl.net.FileReference;
 #end
 
 import sys.io.File;
@@ -63,8 +68,8 @@ class FileDialogMenu extends UISubState {
         camera.bgColor = 0x80000000;
         FlxG.cameras.add(camera, false);
 
-        #if desktop
         FlxTimer.wait(0.25, () -> {
+            #if hxnativefiledialog
             final defaultSaveFile:String = dialogOptions?.defaultSaveFile;
             final filters:Array<String> = dialogOptions?.filters ?? new Array<String>();
             final filtersStr:String = filters.join(";");
@@ -134,8 +139,39 @@ class FileDialogMenu extends UISubState {
                     Sys.sleep(0.25);
                     close();
             }
+            #else
+            final fileFilters:Array<FileFilter> = [];
+            for(f in filters)
+                fileFilters.push(new FileFilter(f, f));
+
+            final filters:Array<String> = [];
+            for(type in fileFilters)
+                filters.push(StringTools.replace(StringTools.replace(type.extension, "*.", ""), ";", ","));
+            
+            final filter:String = filters.join(";");
+            switch(dialogType) {
+                case Open:
+                    var openFileDialog = new FileDialog();
+                    openFileDialog.onCancel.add(() -> onCancel.dispatch());
+                    openFileDialog.onSelect.add((f) -> onSelect.dispatch([f]));
+                    openFileDialog.browse(OPEN, filter);
+
+                case OpenMultiple:
+                    var openFileDialog = new FileDialog();
+                    openFileDialog.onCancel.add(() -> onCancel.dispatch());
+                    openFileDialog.onSelectMultiple.add((f) -> onSelect.dispatch(f));
+                    openFileDialog.browse(OPEN_MULTIPLE, filter);
+
+                case Save:
+                    var openFileDialog = new FileDialog();
+                    openFileDialog.onCancel.add(() -> onCancel.dispatch());
+                    openFileDialog.onSave.add((f) -> onSelect.dispatch([f]));
+                    openFileDialog.browse(OPEN, filter);
+            }
+            Sys.sleep(0.25);
+            close();
+            #end
         });
-        #end
     }
 
     override function destroy():Void {

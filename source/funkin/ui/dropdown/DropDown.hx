@@ -3,13 +3,13 @@ package funkin.ui.dropdown;
 import flixel.util.FlxTimer;
 
 import funkin.ui.panel.Panel;
-import funkin.ui.topbar.TopBar;
+import funkin.ui.menubar.MenuBar;
 
 import funkin.utilities.InputFormatter;
 
 class DropDown extends UIComponent {
     public var bg:Panel;
-    public var topBar:TopBar;
+    public var menuBar:MenuBar;
 
     public function new(x:Float = 0, y:Float = 0, width:Float = 0, height:Float = 0, items:Array<DropDownItemType>) {
         super(x, y);
@@ -66,8 +66,8 @@ class DropDown extends UIComponent {
     override function update(elapsed:Float) {
         if(_isInteractable && TouchUtil.justReleased) {
             FlxTimer.wait(0.001, () -> {
-                if(topBar != null)
-                    topBar.dropdown = null;
+                if(menuBar != null)
+                    menuBar.dropdown = null;
 
                 destroy();
             });

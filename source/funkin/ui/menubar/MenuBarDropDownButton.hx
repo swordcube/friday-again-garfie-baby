@@ -1,15 +1,15 @@
-package funkin.ui.topbar;
+package funkin.ui.menubar;
 
 import flixel.util.FlxDestroyUtil;
 
-class TopBarDropDownButton extends TopBarButton {
-    public var topBar:TopBar;
+class MenuBarDropDownButton extends MenuBarButton {
+    public var menuBar:MenuBar;
 
     override function update(elapsed:Float):Void {
         final hovered:Bool = checkMouseOverlap();
         if(hovered != _hovered) {
-            if(hovered && topBar.dropdown != null) {
-                topBar.dropdown = FlxDestroyUtil.destroy(topBar.dropdown);
+            if(hovered && menuBar.dropdown != null) {
+                menuBar.dropdown = FlxDestroyUtil.destroy(menuBar.dropdown);
                 if(callback != null)
                     callback();
             }

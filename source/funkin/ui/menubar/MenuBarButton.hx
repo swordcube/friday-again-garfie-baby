@@ -1,10 +1,10 @@
-package funkin.ui.topbar;
+package funkin.ui.menubar;
 
 import flixel.text.FlxText;
 
 using flixel.util.FlxColorTransformUtil;
 
-class TopBarButton extends UIComponent {
+class MenuBarButton extends UIComponent {
     public var bg:FlxSprite;
     public var label:FlxText;
     public var callback:Void->Void;

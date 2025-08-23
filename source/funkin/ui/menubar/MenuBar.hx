@@ -1,4 +1,4 @@
-package funkin.ui.topbar;
+package funkin.ui.menubar;
 
 import flixel.util.FlxSort;
 import funkin.ui.dropdown.*;
@@ -7,16 +7,16 @@ import funkin.ui.dropdown.DropDown;
 import flixel.util.FlxDestroyUtil;
 import flixel.input.keyboard.FlxKey;
 
-class TopBar extends UIComponent {
+class MenuBar extends UIComponent {
     public var bg:FlxSprite;
     public var dropdown:DropDown;
 
-    public var leftItems(default, set):Array<TopBarItemType> = [];
-    public var rightItems(default, set):Array<TopBarItemType> = [];
+    public var leftItems(default, set):Array<MenuBarItemType> = [];
+    public var rightItems(default, set):Array<MenuBarItemType> = [];
 
-    public var leftShortcuts(default, null):Array<TopBarShortcut> = [];
-    public var rightShortcuts(default, null):Array<TopBarShortcut> = [];
-    public var allShortcuts(default, null):Array<TopBarShortcut> = [];
+    public var leftShortcuts(default, null):Array<MenuBarShortcut> = [];
+    public var rightShortcuts(default, null):Array<MenuBarShortcut> = [];
+    public var allShortcuts(default, null):Array<MenuBarShortcut> = [];
 
     public function new(x:Float = 0, y:Float = 0) {
         super(x, y);
@@ -33,7 +33,7 @@ class TopBar extends UIComponent {
         add(_rightItemContainer);
     }
 
-    public static function getItemName(item:TopBarItemType):String {
+    public static function getItemName(item:MenuBarItemType):String {
         // is there a better way to do this
         //                            please i beg
         return switch(item) {
@@ -66,8 +66,8 @@ class TopBar extends UIComponent {
     private var _leftItemContainer:FlxSpriteContainer;
     private var _rightItemContainer:FlxSpriteContainer;
 
-    private function _handleShortcuts(shortcuts:Array<TopBarShortcut>):Void {
-        var pick:Array<TopBarShortcut> = [];
+    private function _handleShortcuts(shortcuts:Array<MenuBarShortcut>):Void {
+        var pick:Array<MenuBarShortcut> = [];
         for(shortcut in shortcuts) {
             if(shortcut.keybinds == null || shortcut.keybinds.length == 0)
                 continue;
@@ -92,13 +92,13 @@ class TopBar extends UIComponent {
 
         pick.sort((s1, s2) -> FlxSort.byValues(FlxSort.ASCENDING, s1.keybinds[s1.keybindSetPressed].length, s2.keybinds[s2.keybindSetPressed].length));
 
-        final lastPick:TopBarShortcut = pick.last();
+        final lastPick:MenuBarShortcut = pick.last();
         if(lastPick.callback != null)
             lastPick.callback();
     }
 
     @:noCompletion
-    private function set_leftItems(newItems:Array<TopBarItemType>):Array<TopBarItemType> {
+    private function set_leftItems(newItems:Array<MenuBarItemType>):Array<MenuBarItemType> {
         for(item in _leftItemContainer) {
             if(item != null)
                 item.destroy();
@@ -109,23 +109,23 @@ class TopBar extends UIComponent {
         leftShortcuts.clear();
 
         for(i in 0...newItems.length) {
-            final rawItem:TopBarItemType = newItems[i];
+            final rawItem:MenuBarItemType = newItems[i];
             switch(rawItem) {
                 case Button(name, callback):
-                    final item:TopBarButton = new TopBarButton(totalWidth, 0, name, callback);
+                    final item:MenuBarButton = new MenuBarButton(totalWidth, 0, name, callback);
                     totalWidth += item.width;
                     _leftItemContainer.add(item);
 
                 case DropDown(name, items):
-                    final item:TopBarDropDownButton = new TopBarDropDownButton(totalWidth, 0, name, null);
-                    item.topBar = this;
+                    final item:MenuBarDropDownButton = new MenuBarDropDownButton(totalWidth, 0, name, null);
+                    item.menuBar = this;
                     item.callback = () -> {
                         if(dropdown != null) {
                             remove(dropdown, true);
                             dropdown = FlxDestroyUtil.destroy(dropdown);
                         }
                         dropdown = new DropDown(item.x, item.y + bg.height, 0, 0, items);
-                        dropdown.topBar = this;
+                        dropdown.menuBar = this;
                         dropdown.setPosition(
                             FlxMath.bound(dropdown.x, 0, FlxG.width - dropdown.bg.width),
                             FlxMath.bound(dropdown.y, 0, FlxG.height - dropdown.bg.height),
@@ -150,12 +150,12 @@ class TopBar extends UIComponent {
                     }
 
                 case Slider(min, max, step, value, width, callback, valueFactory):
-                    final item:TopBarSlider = new TopBarSlider(totalWidth, 0, min, max, step, value, width, callback, valueFactory);
+                    final item:MenuBarSlider = new MenuBarSlider(totalWidth, 0, min, max, step, value, width, callback, valueFactory);
                     totalWidth += item.width;
                     _leftItemContainer.add(item);
 
                 case Text(contents):
-                    final item:TopBarText = new TopBarText(totalWidth, 0, contents);
+                    final item:MenuBarText = new MenuBarText(totalWidth, 0, contents);
                     totalWidth += item.width;
                     _leftItemContainer.add(item);
 
@@ -164,7 +164,7 @@ class TopBar extends UIComponent {
                     width ??= 100;
                     maxCharacters ??= 0;
 
-                    final item:TopBarTextbox = new TopBarTextbox(totalWidth, 0, contents, maxCharacters, autoSize, width, callback, valueFactory);
+                    final item:MenuBarTextbox = new MenuBarTextbox(totalWidth, 0, contents, maxCharacters, autoSize, width, callback, valueFactory);
                     totalWidth += item.width;
                     _leftItemContainer.add(item);
             }
@@ -174,7 +174,7 @@ class TopBar extends UIComponent {
     }
 
     @:noCompletion
-    private function set_rightItems(newItems:Array<TopBarItemType>):Array<TopBarItemType> {
+    private function set_rightItems(newItems:Array<MenuBarItemType>):Array<MenuBarItemType> {
         for(item in _rightItemContainer) {
             if(item != null)
                 item.destroy();
@@ -183,10 +183,10 @@ class TopBar extends UIComponent {
         rightShortcuts.clear();
 
         for(i in 0...newItems.length) {
-            final rawItem:TopBarItemType = newItems[i];
+            final rawItem:MenuBarItemType = newItems[i];
             switch(rawItem) {
                 case Button(name, callback):
-                    final item:TopBarButton = new TopBarButton(0, 0, name, callback);
+                    final item:MenuBarButton = new MenuBarButton(0, 0, name, callback);
 
                     for(leItem in _rightItemContainer)
                         leItem.x -= item.width;
@@ -195,15 +195,15 @@ class TopBar extends UIComponent {
                     _rightItemContainer.add(item);
 
                 case DropDown(name, items):
-                    final item:TopBarDropDownButton = new TopBarDropDownButton(0, 0, name, null);
-                    item.topBar = this;
+                    final item:MenuBarDropDownButton = new MenuBarDropDownButton(0, 0, name, null);
+                    item.menuBar = this;
                     item.callback = () -> {
                         if(dropdown != null) {
                             remove(dropdown, true);
                             dropdown = FlxDestroyUtil.destroy(dropdown);
                         }
                         dropdown = new DropDown(item.x, item.y + bg.height, 0, 0, items);
-                        dropdown.topBar = this;
+                        dropdown.menuBar = this;
                         dropdown.setPosition(
                             FlxMath.bound(dropdown.x, 0, FlxG.width - dropdown.bg.width),
                             FlxMath.bound(dropdown.y, 0, FlxG.height - dropdown.bg.height),
@@ -231,7 +231,7 @@ class TopBar extends UIComponent {
                     }
 
                 case Slider(min, max, step, value, width, callback, valueFactory):
-                    final item:TopBarSlider = new TopBarSlider(0, 0, min, max, step, value, width, callback, valueFactory);
+                    final item:MenuBarSlider = new MenuBarSlider(0, 0, min, max, step, value, width, callback, valueFactory);
 
                     for(leItem in _rightItemContainer)
                         leItem.x -= item.width;
@@ -240,7 +240,7 @@ class TopBar extends UIComponent {
                     _rightItemContainer.add(item);
 
                 case Text(contents):
-                    final item:TopBarText = new TopBarText(0, 0, contents);
+                    final item:MenuBarText = new MenuBarText(0, 0, contents);
                     
                     for(leItem in _rightItemContainer)
                         leItem.x -= item.width;
@@ -253,7 +253,7 @@ class TopBar extends UIComponent {
                     width ??= 100;
                     maxCharacters ??= 0;
 
-                    final item:TopBarTextbox = new TopBarTextbox(0, 0, contents, maxCharacters, autoSize, width, callback, valueFactory);
+                    final item:MenuBarTextbox = new MenuBarTextbox(0, 0, contents, maxCharacters, autoSize, width, callback, valueFactory);
                     
                     for(leItem in _rightItemContainer)
                         leItem.x -= item.width;
@@ -268,7 +268,7 @@ class TopBar extends UIComponent {
 }
 
 @:structInit
-class TopBarShortcut {
+class MenuBarShortcut {
     public var keybinds:Array<Array<FlxKey>>;
     public var callback:Void->Void;
 

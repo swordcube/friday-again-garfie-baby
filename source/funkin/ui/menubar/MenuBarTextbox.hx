@@ -1,6 +1,6 @@
-package funkin.ui.topbar;
+package funkin.ui.menubar;
 
-class TopBarTextbox extends UIComponent {
+class MenuBarTextbox extends UIComponent {
     public var bg:FlxSprite;
     public var textbox:Textbox;
     public var valueFactory:Void->String;

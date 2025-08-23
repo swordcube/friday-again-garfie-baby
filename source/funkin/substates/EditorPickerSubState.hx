@@ -3,6 +3,7 @@ package funkin.substates;
 import flixel.util.FlxTimer;
 import funkin.ui.AtlasText;
 
+import funkin.states.menus.*;
 import funkin.states.editors.*;
 import funkin.states.TransitionableState;
 
@@ -56,6 +57,11 @@ class EditorPickerSubState extends FunkinSubState {
             TransitionSubState.nextCamera = transitionCam;
             FlxG.switchState(CharacterEditor.new);
         });
+        #if TEST_BUILD
+        addItem("UI Debug State", () -> {
+            FlxG.switchState(UIDebugState.new);
+        });
+        #end
         call("onAddItems");
         changeSelection(0, true);
     }

@@ -1,8 +1,8 @@
-package funkin.ui.topbar;
+package funkin.ui.menubar;
 
 import flixel.text.FlxText;
 
-class TopBarText extends FlxSpriteContainer {
+class MenuBarText extends FlxSpriteContainer {
     public var bg:FlxSprite;
     public var label:FlxText;
 

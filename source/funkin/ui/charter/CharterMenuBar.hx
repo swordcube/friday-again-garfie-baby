@@ -1,11 +1,11 @@
 package funkin.ui.charter;
 
-import funkin.ui.topbar.*;
+import funkin.ui.menubar.*;
 import funkin.ui.dropdown.DropDownItemType;
 
 import funkin.states.editors.ChartEditor;
 
-class CharterTopBar extends TopBar {
+class CharterMenuBar extends MenuBar {
     public var charter(default, null):ChartEditor;
 
     public function new(x:Float = 0, y:Float = 0) {

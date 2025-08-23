@@ -1,9 +1,9 @@
-package funkin.ui.topbar;
+package funkin.ui.menubar;
 
 import flixel.text.FlxText;
 import funkin.ui.slider.HorizontalSlider;
 
-class TopBarSlider extends FlxSpriteContainer {
+class MenuBarSlider extends FlxSpriteContainer {
     public var bg:FlxSprite;
     public var slider:HorizontalSlider;
     public var valueFactory:Void->Float;

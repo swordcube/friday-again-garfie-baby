@@ -1,6 +1,7 @@
 package funkin.ui.options;
 
 import flixel.effects.FlxFlicker;
+import funkin.ui.options.components.Checkbox;
 
 class CheckboxOption extends Option {
     public var checkbox:Checkbox;

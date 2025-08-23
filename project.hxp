@@ -173,7 +173,7 @@ class Project extends HXProject {
 		setenv("HAXEPATH", "./");
 
 		// native file dialog (lime FileDialog sucks on linux)
-		if (isDesktop())
+		if (isDesktop() && isLinux())
 			addHaxelib("hxnativefiledialog");
 
 		// lime
