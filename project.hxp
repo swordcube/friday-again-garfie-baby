@@ -91,7 +91,7 @@ class Project extends HXProject {
 			setDefine("DISCORD_ALLOWED");
 
 		// video playback
-		if (isCPP() && !isMobile() && !isDefined("NO_VIDEOS") && !isDefined("NO_VIDEOS_ALLOWED"))
+		if (isCPP() && !isDefined("NO_VIDEOS") && !isDefined("NO_VIDEOS_ALLOWED"))
 			setDefine("VIDEOS_ALLOWED");
 
 		// crash handler
@@ -557,7 +557,7 @@ class Project extends HXProject {
 	}
 
 	public function isCPP():Bool {
-		return targetFlags.exists("cpp");
+		return !isHashLink() && !isNeko() && !isJava() && !isNodeJS() && !isCSharp() && !isDisplay();
 	}
 
 	public function isDebug():Bool {
