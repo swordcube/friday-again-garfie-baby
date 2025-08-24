@@ -18,8 +18,8 @@ class AtlasTextList extends FlxTypedContainer<AtlasText> {
     public function clearList():Void {
         while(length > 0) {
             final text:AtlasText = members[0];
-            text.destroy();
             remove(text, true);
+            text.destroy();
         }
         callbacks.clear();
     }
@@ -41,8 +41,8 @@ class AtlasTextList extends FlxTypedContainer<AtlasText> {
     public function removeItem(text:String):Void {
         for(item in members.copy()) {
             if(item.text == text) {
-                item.destroy();
                 remove(item, true);
+                item.destroy();
                 return;
             }
         }

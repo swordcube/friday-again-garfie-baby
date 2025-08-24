@@ -106,6 +106,7 @@ class CharterObjectGroup extends FlxObject {
                             sound.volume = 1;
                             sound.play(true);
                             curObjectMoveSound = (curObjectMoveSound + 1) % objectMoveSounds.length;
+                            charter.rawNotes.sort((a, b) -> Std.int(a.time - b.time));
                         }
                         if(!_movingObjects)
                             note.data.time = Conductor.instance.getTimeAtStep(note.step);
@@ -121,6 +122,7 @@ class CharterObjectGroup extends FlxObject {
                             sound.volume = 1;
                             sound.play(true);
                             curObjectMoveSound = (curObjectMoveSound + 1) % objectMoveSounds.length;
+                            charter.rawEvents.sort((a, b) -> Std.int(a.time - b.time));
                         }
                         if(!_movingObjects) {
                             final time:Float = Conductor.instance.getTimeAtStep(event.step);
@@ -154,8 +156,6 @@ class CharterObjectGroup extends FlxObject {
             var isEmptyCell:Bool = true;
 
             if(direction > -1) {
-                final pointer = TouchUtil.touch;
-
                 // handle notes
                 final begin:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep - max, _getVarForEachNoteAdd);
                 final end:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep + max, _getVarForEachNoteRemove);
@@ -167,9 +167,13 @@ class CharterObjectGroup extends FlxObject {
                     
                     final offsetX:Float = (note.data.direction < Constants.KEY_COUNT) ? -1 : 1;
                     sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + offsetX, y + (ChartEditor.CELL_SIZE * note.step));
-    
-                    if (pointer.overlaps(sprite, charter.noteCam) && !coveredUpByOtherUI) {
+                    
+                    // TODO: if you paste the same note(s) on top of each other (you may need to copy paste an opponent's section)
+                    // it isn't able to detect that the pointer is hovering the note for some reason
+                    
+                    if (TouchUtil.overlapsComplex(sprite, charter.noteCam) && !coveredUpByOtherUI) {
                         isHoveringNote = true;
+
                         if(TouchUtil.pressed && TouchUtil.justMoved && note.selected && !charter.selectionBox.exists) {
                             for(object in charter.selectedObjects) {
                                 switch(object) {
@@ -199,8 +203,6 @@ class CharterObjectGroup extends FlxObject {
                 }
             }
             else {
-                final pointer = TouchUtil.touch;
-
                 // handle events
                 final begin:Int = SortedArrayUtil.binarySearch(events, Conductor.instance.curStep - max, _getVarForEachEventAdd);
                 final end:Int = SortedArrayUtil.binarySearch(events, Conductor.instance.curStep + max, _getVarForEachEventRemove);
@@ -215,7 +217,7 @@ class CharterObjectGroup extends FlxObject {
                     _eventBGSprite.width = 70 + ((event.events.length - 1) * 30);
                     _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step) - (_eventBGSprite.height * 0.5));
 
-                    if (pointer.overlaps(_eventBGSprite, charter.noteCam) && !coveredUpByOtherUI) {
+                    if (TouchUtil.overlapsComplex(_eventBGSprite, charter.noteCam) && !coveredUpByOtherUI) {
                         isHoveringEvent = true;
                         
                         if(TouchUtil.pressed && TouchUtil.justMoved && event.selected && !charter.selectionBox.exists) {
@@ -267,7 +269,6 @@ class CharterObjectGroup extends FlxObject {
         final begin:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep - max, _getVarForEachNoteAdd);
         final end:Int = SortedArrayUtil.binarySearch(notes, Conductor.instance.curStep + max, _getVarForEachNoteRemove);
 
-        final pointer = TouchUtil.touch;
         for(i in begin...end) {
             note = notes[i];
 
@@ -299,7 +300,7 @@ class CharterObjectGroup extends FlxObject {
             sprite.setPosition(x + (ChartEditor.CELL_SIZE * note.data.direction) + offsetX, y + (ChartEditor.CELL_SIZE * note.step));
             sprite.draw();
 
-            if(pointer.overlaps(sprite, charter.noteCam))
+            if(TouchUtil.overlapsComplex(sprite, charter.noteCam))
                 isHoveringNote = true;
         }
 
@@ -323,7 +324,7 @@ class CharterObjectGroup extends FlxObject {
             _eventBGSprite.setPosition((x - _eventBGSprite.width) + offsetX, y + (ChartEditor.CELL_SIZE * event.step) - (_eventBGSprite.height * 0.5));
             _eventBGSprite.draw();
 
-            if(pointer.overlaps(_eventBGSprite, charter.noteCam))
+            if(TouchUtil.overlapsComplex(_eventBGSprite, charter.noteCam))
                 isHoveringEvent = true;
 
             // draw icons

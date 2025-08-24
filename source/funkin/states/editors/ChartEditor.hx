@@ -608,7 +608,7 @@ class ChartEditor extends UIState {
             }
         }
 		if (!objectGroup._movingObjects) {
-            if(TouchUtil.justPressed && !isUIActive)
+            if(TouchUtil.justPressed && !isUIActive && !objectGroup.isHoveringNote && !objectGroup.isHoveringEvent)
                 _selectingObjects = true;
 
             if(_selectingObjects) {
@@ -968,12 +968,14 @@ class ChartEditor extends UIState {
                 case CNote(note):
                     rawNotes.push(note.data);
 					objectGroup.notes.push(note);
-					objectGroup.notes.sort((a, b) -> Std.int(a.data.time - b.data.time));
     
                 case CEvent(event):
                     // TODO: this shit
             }
         }
+        rawNotes.sort((a, b) -> Std.int(a.time - b.time));
+        objectGroup.notes.sort((a, b) -> Std.int(a.data.time - b.data.time));
+
         forceSelectObjects(objects, true);
         if(!unsafe) {
             undos.unsaved = true;
@@ -1089,6 +1091,9 @@ class ChartEditor extends UIState {
                     objectGroup.events.remove(event);
             }
         }
+        rawNotes.sort((a, b) -> Std.int(a.time - b.time));
+        rawEvents.sort((a, b) -> Std.int(a.time - b.time));
+        
         forceSelectObjects([], true);
         if(!unsafe) {
             undos.unsaved = true;
@@ -1356,7 +1361,10 @@ class ChartEditor extends UIState {
             return;
         }
         try {
+            Logs.verbose("Saving chart...");
             File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/chart', lastParams.mod), ChartData.stringify(currentChart));
+            
+            Logs.verbose("Saving metadata...");
             File.saveContent(Paths.json('gameplay/songs/${currentSong}/${currentMix}/metadata', lastParams.mod), SongMetadata.stringify(currentChart.meta));
             
             final notif:Notification = notifications.send(SUCCESS, 'Successfully saved ${currentChart.meta.song.title} [${currentMix.toUpperCase()} - ${currentDifficulty.toUpperCase()}]');
