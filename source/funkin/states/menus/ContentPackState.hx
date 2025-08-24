@@ -1,373 +1,486 @@
 package funkin.states.menus;
 
+import sys.io.File;
+import funkin.utilities.FileUtil;
+import sys.FileSystem;
 import thx.semver.Version;
 import funkin.backend.ContentMetadata;
 import flixel.text.FlxText;
 import flixel.util.FlxSort;
-
-import funkin.ui.AtlasText;
+import funkin.substates.UISubState;
+import funkin.ui.*;
+import funkin.ui.dropdown.DropDown;
+import funkin.scripting.FunkinScript;
 import funkin.substates.transition.TransitionSubState;
 
 class ContentPackState extends FunkinState {
-    public var bg:FlxSprite;
-    public var curSelected:Int = 0;
+	public var bg:FlxSprite;
+	public var curSelected:Int = 0;
 
-    public var packCam:FlxCamera;
-    public var packCamFollow:FlxObject;
+	public var packCam:FlxCamera;
+	public var packCamFollow:FlxObject;
 
-    public var scrollBarBG:FlxSprite;
-    public var scrollBar:FlxSprite;
+	public var scrollBarBG:FlxSprite;
+	public var scrollBar:FlxSprite;
 
-    public var grpItems:FlxTypedContainer<ContentPackItem>;
-    public var lastMouseVisible:Bool = false;
+	public var grpItems:FlxTypedContainer<ContentPackItem>;
+	public var lastMouseVisible:Bool = false;
 
-    public var descriptionBG:FlxSprite;
-    public var descriptionText:FlxText;
+	public var descriptionBG:FlxSprite;
+	public var descriptionText:FlxText;
 
-    public var hintBG:FlxSprite;
-    public var hintText:FlxText;
+	public var hintBG:FlxSprite;
+	public var hintText:FlxText;
 
-    public var grpWarnings:FlxTypedContainer<ContentPackWarning>;
+	public var rightClickMenu:DropDown;
+	public var rightClickCam:FlxCamera;
 
-    override function create():Void {
-        final transitionCam:FlxCamera = new FlxCamera();
-        transitionCam.bgColor = 0;
-        FlxG.cameras.add(transitionCam, false);
+	public var grpWarnings:FlxTypedContainer<ContentPackWarning>;
 
-        TransitionSubState.nextCamera = transitionCam;
-        super.create();
+	override function create():Void {
+		final transitionCam:FlxCamera = new FlxCamera();
+		transitionCam.bgColor = 0;
+		FlxG.cameras.add(transitionCam, false);
 
-        DiscordRPC.changePresence("Managing Content Packs", null);
-        persistentUpdate = true;
+		TransitionSubState.nextCamera = transitionCam;
+		super.create();
 
-        #if (FLX_MOUSE && !mobile)
-        lastMouseVisible = FlxG.mouse.visible;
-        FlxG.mouse.visible = true;
-        #end
-        bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_blue"));
-        bg.screenCenter();
-        bg.scrollFactor.set();
-        add(bg);
+		DiscordRPC.changePresence("Managing Content Packs", null);
+		persistentUpdate = true;
 
-        packCamFollow = new FlxObject(0, 0, 1, 1);
-        add(packCamFollow);
+		#if (FLX_MOUSE && !mobile)
+		lastMouseVisible = FlxG.mouse.visible;
+		FlxG.mouse.visible = true;
+		#end
+		bg = new FlxSprite().loadGraphic(Paths.image("menus/bg_blue"));
+		bg.screenCenter();
+		bg.scrollFactor.set();
+		add(bg);
 
-        packCam = new FlxCamera(20, 20, Std.int(FlxG.width * 0.4), Std.int(FlxG.height - 40 - 70));
-        packCam.bgColor = FlxColor.BLACK;
-        packCam.bgColor.alphaFloat = 0.6;
-        packCam.follow(packCamFollow, LOCKON, 0.16);
-        packCam.deadzone.set(0, 0, packCam.width, packCam.height - 40);
-        packCam.minScrollY = 0;
-        FlxG.cameras.insert(packCam, 1, false);
+		packCamFollow = new FlxObject(0, 0, 1, 1);
+		add(packCamFollow);
 
-        grpItems = new FlxTypedContainer<ContentPackItem>();
-        grpItems.cameras = [packCam];
-        add(grpItems);
+		packCam = new FlxCamera(20, 20, Std.int(FlxG.width * 0.4), Std.int(FlxG.height - 40 - 70));
+		packCam.bgColor = FlxColor.BLACK;
+		packCam.bgColor.alphaFloat = 0.6;
+		packCam.follow(packCamFollow, LOCKON, 0.16);
+		packCam.deadzone.set(0, 0, packCam.width, packCam.height - 40);
+		packCam.minScrollY = 0;
+		FlxG.cameras.insert(packCam, 1, false);
 
-        scrollBarBG = new FlxSprite(packCam.width, 0).makeSolid(2, packCam.height, FlxColor.WHITE);
-        scrollBarBG.alpha = 0.25;
-        scrollBarBG.x -= scrollBarBG.width;
-        scrollBarBG.cameras = [packCam];
-        scrollBarBG.scrollFactor.set();
-        add(scrollBarBG);
+		grpItems = new FlxTypedContainer<ContentPackItem>();
+		grpItems.cameras = [packCam];
+		add(grpItems);
 
-        scrollBar = new FlxSprite(scrollBarBG.x, scrollBarBG.y).makeSolid(scrollBarBG.width, scrollBarBG.height, FlxColor.WHITE);
-        scrollBar.cameras = [packCam];
-        scrollBar.scrollFactor.set();
-        add(scrollBar);
+		scrollBarBG = new FlxSprite(packCam.width, 0).makeSolid(2, packCam.height, FlxColor.WHITE);
+		scrollBarBG.alpha = 0.25;
+		scrollBarBG.x -= scrollBarBG.width;
+		scrollBarBG.cameras = [packCam];
+		scrollBarBG.scrollFactor.set();
+		add(scrollBarBG);
 
-        descriptionBG = new FlxSprite(packCam.x + packCam.width + 20, packCam.y);
-        descriptionBG.makeSolid(FlxG.width - descriptionBG.x - 20, FlxG.height - 40, FlxColor.BLACK);
-        descriptionBG.alpha = 0.6;
-        add(descriptionBG);
+		scrollBar = new FlxSprite(scrollBarBG.x, scrollBarBG.y).makeSolid(scrollBarBG.width, scrollBarBG.height, FlxColor.WHITE);
+		scrollBar.cameras = [packCam];
+		scrollBar.scrollFactor.set();
+		add(scrollBar);
 
-        descriptionText = new FlxText(descriptionBG.x + 10, descriptionBG.y + 10, descriptionBG.width - 20, "asdlkadslkjasdlkjasdjlkasdlkjasdaljskdalskjdadlkjadkljdalkjadkljadasdlkadslkjasdlkjasdjlkasdlkjasdaljskdalskjdadlkjadkljdalkjadkljadasdlkadslkjasdlkjasdjlkasdlkjasdaljskdalskjdadlkjadkljdalkjadkljad");
-        descriptionText.setFormat(Paths.font("fonts/vcr"), 20, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
-        descriptionText.borderSize = 2;
-        add(descriptionText);
+		descriptionBG = new FlxSprite(packCam.x + packCam.width + 20, packCam.y);
+		descriptionBG.makeSolid(FlxG.width - descriptionBG.x - 20, FlxG.height - 40, FlxColor.BLACK);
+		descriptionBG.alpha = 0.6;
+		add(descriptionBG);
 
-        hintBG = new FlxSprite(packCam.x, packCam.y + packCam.height + 20).makeSolid(packCam.width, 50, FlxColor.BLACK);
-        hintBG.alpha = 0.6;
-        add(hintBG);
+		descriptionText = new FlxText(descriptionBG.x + 10, descriptionBG.y + 10, descriptionBG.width - 20,
+			"asdlkadslkjasdlkjasdjlkasdlkjasdaljskdalskjdadlkjadkljdalkjadkljadasdlkadslkjasdlkjasdjlkasdlkjasdaljskdalskjdadlkjadkljdalkjadkljadasdlkadslkjasdlkjasdjlkasdlkjasdaljskdalskjdadlkjadkljdalkjadkljad");
+		descriptionText.setFormat(Paths.font("fonts/vcr"), 20, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
+		descriptionText.borderSize = 2;
+		add(descriptionText);
 
-        hintText = new FlxText(hintBG.x, hintBG.y, 0, 'Press ACCEPT to toggle the pack on/off');
-        hintText.setFormat(Paths.font("fonts/vcr"), 20, FlxColor.WHITE, CENTER, OUTLINE, FlxColor.BLACK);
-        hintText.borderSize = 2;
-        hintText.x = hintBG.x + ((hintBG.width - hintText.width) * 0.5);
-        hintText.y += (hintBG.height - hintText.height) * 0.5;
-        add(hintText);
+		hintBG = new FlxSprite(packCam.x, packCam.y + packCam.height + 20).makeSolid(packCam.width, 50, FlxColor.BLACK);
+		hintBG.alpha = 0.6;
+		add(hintBG);
 
-        grpWarnings = new FlxTypedContainer<ContentPackWarning>();
-        add(grpWarnings);
+		hintText = new FlxText(hintBG.x, hintBG.y, 0, 'Press ACCEPT to toggle the pack on/off');
+		hintText.setFormat(Paths.font("fonts/vcr"), 20, FlxColor.WHITE, CENTER, OUTLINE, FlxColor.BLACK);
+		hintText.borderSize = 2;
+		hintText.x = hintBG.x + ((hintBG.width - hintText.width) * 0.5);
+		hintText.y += (hintBG.height - hintText.height) * 0.5;
+		add(hintText);
 
-        final packs:Array<String> = cast Options.contentPackOrder;
-        // for(i in 0...30)
-        //     packs.push("base-game");
+		grpWarnings = new FlxTypedContainer<ContentPackWarning>();
+		add(grpWarnings);
 
-        for(i in 0...packs.length) {
-            final item:ContentPackItem = new ContentPackItem(0, i * 40, packCam.width, packs[i]);
-            item.menu = this;
-            item.onClick = () -> {
-                curSelected = grpItems.members.indexOf(item);
-                changeSelection(0, true);
-            };
-            item.unselect();
-            grpItems.add(item);
-        }
-        scrollBar.setGraphicSize(scrollBarBG.width, FlxMath.bound(scrollBarBG.height * Math.min(scrollBarBG.height / (grpItems.length * 40), 1), 30, scrollBarBG.height));
-        scrollBar.updateHitbox();
-        
-        scrollBarBG.visible = scrollBar.visible = grpItems.length * 40 > packCam.height;
-        changeSelection(0, true);
-    }
+		rightClickCam = new FlxCamera();
+		rightClickCam.bgColor = FlxColor.TRANSPARENT;
+		FlxG.cameras.add(rightClickCam, false);
 
-    override function update(elapsed:Float):Void {
-        super.update(elapsed);
-        final percent:Float = FlxMath.bound(packCam.scroll.y / ((grpItems.length * 40) - packCam.height), 0, 1);
-        scrollBar.y = FlxMath.lerp(scrollBarBG.y, scrollBarBG.y + scrollBarBG.height - scrollBar.height, percent);
+		final packs:Array<String> = cast Options.contentPackOrder;
+		// for(i in 0...30)
+		//     packs.push("base-game");
 
-        final wheel:Float = TouchUtil.wheel;
-        if(controls.justPressed.UI_UP || wheel < 0) {
-            if(FlxG.keys.pressed.SHIFT)
-                moveItem(true);
-            else
-                changeSelection(-1);
-        }
-        if(controls.justPressed.UI_DOWN || wheel > 0) {
-            if(FlxG.keys.pressed.SHIFT)
-                moveItem(false);
-            else
-                changeSelection(1);
-        }
-        if(controls.justPressed.ACCEPT) {
-            final item:ContentPackItem = grpItems.members[curSelected];
-            item.check.loadGraphic(Paths.image('menus/content_manager/${(Options.toggledContentPacks.get(item.contentPack)) ? "cross" : "check"}'));
-            item.check.setGraphicSize(20, 20);
-            item.check.updateHitbox();
-            Options.toggledContentPacks.set(item.contentPack, !Options.toggledContentPacks.get(item.contentPack));
-        }
-        if(controls.justPressed.BACK) {
-            final packs:Array<String> = cast Options.contentPackOrder;
-            packs.clear();
+		for (i in 0...packs.length) {
+			final item:ContentPackItem = new ContentPackItem(0, i * 40, packCam.width, packs[i]);
+			item.menu = this;
+			item.onClick = () -> {
+				curSelected = grpItems.members.indexOf(item);
+				changeSelection(0, true);
+			};
+			item.onRightClick = () -> {
+				curSelected = grpItems.members.indexOf(item);
+				changeSelection(0, true);
 
-            for(item in grpItems)
-                packs.push(item.contentPack);
+				// show pinili
+				var p = TouchUtil.touch;
+				if (rightClickMenu != null)
+					rightClickMenu.destroy();
+				rightClickMenu = new DropDown(p.x, p.y, 0, 0, [
+					Button("Toggle Mod", [], () -> {
+						toggleContentPack(item);
+					}),
 
-            Options.contentPackOrder = packs.removeDuplicates();
-            Options.save();
+					Separator,
 
-            Paths.reloadContent();
-            GlobalScript.reloadScripts();
-            
-            FlxG.signals.preStateCreate.addOnce((_) -> {
-                Cache.clearAll();
-            });
-            persistentUpdate = false;
-            FlxG.switchState(MainMenuState.new);
-            FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
-        }
-    }
+					Button("Edit Metadata", [], () -> {
+						persistentDraw = true;
+						persistentUpdate = false;
 
-    public function showWarning(text:String):Void {
-        final warning:ContentPackWarning = new ContentPackWarning(0, 0, descriptionBG.width, text);
-        grpWarnings.add(warning);
+						final m:ContentPackMetaEditMenu = new ContentPackMetaEditMenu(item);
+						openSubState(m);
+					}),
 
-        var totalHeight:Float = 0;
-        for(warning in grpWarnings.members)
-            totalHeight += warning.height;
+					Button("Open content pack folder", [], () -> {
+						FileUtil.openFolder(FileSystem.absolutePath(Paths.getContentDirectory() + '/' + Paths.contentPacksToFolders.get(item.contentPack)));
+					}),
+				]);
+				rightClickMenu.cameras = [rightClickCam];
+				add(rightClickMenu);
+			}
+			item.unselect();
+			grpItems.add(item);
+		}
+		scrollBar.setGraphicSize(scrollBarBG.width,
+			FlxMath.bound(scrollBarBG.height * Math.min(scrollBarBG.height / (grpItems.length * 40), 1), 30, scrollBarBG.height));
+		scrollBar.updateHitbox();
 
-        warning.setPosition(descriptionBG.x, (descriptionBG.y + descriptionBG.height) - totalHeight);
-    }
+		scrollBarBG.visible = scrollBar.visible = grpItems.length * 40 > packCam.height;
+		changeSelection(0, true);
+	}
 
-    public function moveItem(up:Bool):Void {
-        final curItem:ContentPackItem = grpItems.members[curSelected];
-        curItem.y += 40.5 * ((up) ? -1 : 1);
-        grpItems.sort(ContentPackItem.sortByY, FlxSort.ASCENDING);
+	override function update(elapsed:Float):Void {
+		super.update(elapsed);
+		final percent:Float = FlxMath.bound(packCam.scroll.y / ((grpItems.length * 40) - packCam.height), 0, 1);
+		scrollBar.y = FlxMath.lerp(scrollBarBG.y, scrollBarBG.y + scrollBarBG.height - scrollBar.height, percent);
 
-        for(i => item in grpItems.members)
-            item.y = i * 40;
+		final wheel:Float = TouchUtil.wheel;
+		if (controls.justPressed.UI_UP || wheel < 0) {
+			if (FlxG.keys.pressed.SHIFT)
+				moveItem(true);
+			else
+				changeSelection(-1);
+		}
+		if (controls.justPressed.UI_DOWN || wheel > 0) {
+			if (FlxG.keys.pressed.SHIFT)
+				moveItem(false);
+			else
+				changeSelection(1);
+		}
+		if (controls.justPressed.ACCEPT) {
+			toggleContentPack(grpItems.members[curSelected]);
+		}
+		if (controls.justPressed.BACK) {
+			final packs:Array<String> = cast Options.contentPackOrder;
+			packs.clear();
 
-        curSelected = grpItems.members.indexOf(curItem);
-        changeSelection(0, true);
-    }
+			for (item in grpItems)
+				packs.push(item.contentPack);
 
-    public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
-        if(by == 0 && !force)
-            return;
+			Options.contentPackOrder = packs.removeDuplicates();
+			Options.save();
 
-        final prevSelected:Int = curSelected;
-        curSelected = FlxMath.boundInt(curSelected + by, 0, grpItems.length - 1);
+			Paths.reloadContent();
+			GlobalScript.reloadScripts();
 
-        if(curSelected == prevSelected && !force)
-            return;
+			FlxG.signals.preStateCreate.addOnce((_) -> {
+				Cache.clearAll();
+			});
+			persistentUpdate = false;
+			FlxG.switchState(MainMenuState.new);
+			FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
+		}
+	}
 
-        while(grpWarnings.length > 0) {
-            final warning:ContentPackWarning = grpWarnings.members.unsafeFirst();
-            grpWarnings.remove(warning, true);
-            warning.destroy();
-        }
-        final metadata:Null<ContentMetadata> = Paths.contentMetadata.get(grpItems.members[curSelected].contentPack);
-        if((metadata?.allowUnsafeScripts ?? false))
-            showWarning("This content pack may contain unsafe scripts!");
+	public function toggleContentPack(item:ContentPackItem) {
+		item.check.loadGraphic(Paths.image('menus/content_manager/${(Options.toggledContentPacks.get(item.contentPack)) ? "cross" : "check"}'));
+		item.check.setGraphicSize(20, 20);
+		item.check.updateHitbox();
+		Options.toggledContentPacks.set(item.contentPack, !Options.toggledContentPacks.get(item.contentPack));
+	}
 
-        final contentAPIVersion:Version = Version.stringToVersion(metadata?.apiVersion ?? FlxG.stage.application.meta.get("version"));
-        final currentAPIVersion:Version = Version.stringToVersion(FlxG.stage.application.meta.get("version"));
-        if(currentAPIVersion != contentAPIVersion)
-            showWarning('This content pack may be incompatible with\nyour current game version (${currentAPIVersion})!');
+	public function showWarning(text:String):Void {
+		final warning:ContentPackWarning = new ContentPackWarning(0, 0, descriptionBG.width, text);
+		grpWarnings.add(warning);
 
-        for(i => item in grpItems.members) {
-            if(curSelected == i)
-                item.select();
-            else
-                item.unselect();
-        }
-        packCamFollow.y = grpItems.members[curSelected].y;
-        descriptionText.text = metadata?.description ?? "This content pack has no description.";
-        FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
-    }
+		var totalHeight:Float = 0;
+		for (warning in grpWarnings.members)
+			totalHeight += warning.height;
 
-    #if (FLX_MOUSE && !mobile)
-    override function destroy():Void {
-        FlxG.mouse.visible = lastMouseVisible;
-        super.destroy();
-    }
-    #end
+		warning.setPosition(descriptionBG.x, (descriptionBG.y + descriptionBG.height) - totalHeight);
+	}
+
+	public function moveItem(up:Bool):Void {
+		final curItem:ContentPackItem = grpItems.members[curSelected];
+		curItem.y += 40.5 * ((up) ? -1 : 1);
+		grpItems.sort(ContentPackItem.sortByY, FlxSort.ASCENDING);
+
+		for (i => item in grpItems.members)
+			item.y = i * 40;
+
+		curSelected = grpItems.members.indexOf(curItem);
+		changeSelection(0, true);
+	}
+
+	public function changeSelection(by:Int = 0, ?force:Bool = false):Void {
+		if (by == 0 && !force)
+			return;
+
+		final prevSelected:Int = curSelected;
+		curSelected = FlxMath.boundInt(curSelected + by, 0, grpItems.length - 1);
+
+		if (curSelected == prevSelected && !force)
+			return;
+
+		while (grpWarnings.length > 0) {
+			final warning:ContentPackWarning = grpWarnings.members.unsafeFirst();
+			grpWarnings.remove(warning, true);
+			warning.destroy();
+		}
+		final metadata:Null<ContentMetadata> = Paths.contentMetadata.get(grpItems.members[curSelected].contentPack);
+		if ((metadata?.allowUnsafeScripts ?? false))
+			showWarning("This content pack may contain unsafe scripts!");
+
+		final contentAPIVersion:Version = Version.stringToVersion(metadata?.apiVersion ?? FlxG.stage.application.meta.get("version"));
+		final currentAPIVersion:Version = Version.stringToVersion(FlxG.stage.application.meta.get("version"));
+		if (currentAPIVersion != contentAPIVersion)
+			showWarning('This content pack may be incompatible with\nyour current game version (${currentAPIVersion})!');
+
+		for (i => item in grpItems.members) {
+			if (curSelected == i)
+				item.select();
+			else
+				item.unselect();
+		}
+		packCamFollow.y = grpItems.members[curSelected].y;
+		descriptionText.text = metadata?.description ?? "This content pack has no description.";
+		FlxG.sound.play(Paths.sound("menus/sfx/scroll"));
+	}
+
+	#if (FLX_MOUSE && !mobile)
+	override function destroy():Void {
+		FlxG.mouse.visible = lastMouseVisible;
+		super.destroy();
+	}
+	#end
 }
 
 class ContentPackItem extends FlxSpriteContainer {
-    public var menu:ContentPackState;
+	public var menu:ContentPackState;
 
-    public var contentPack:String;
-    public var bg:FlxSprite;
+	public var contentPack:String;
+	public var bg:FlxSprite;
 
-    public var icon:FlxSprite;
-    public var check:FlxSprite;
-    public var title:AtlasText;
+	public var icon:FlxSprite;
+	public var check:FlxSprite;
+	public var title:AtlasText;
 
-    public var canDrag:Bool = false;
-    public var dragging:Bool = false;
-    public var onClick:Void->Void;
-    // pinili
+	public var canDrag:Bool = false;
+	public var dragging:Bool = false;
+	public var onClick:Void->Void;
+	// pinili
+	public var onRightClick:Void->Void;
 
-    public function new(x:Float = 0, y:Float = 0, width:Float, contentPack:String) {
-        super(x, y);
-        this.contentPack = contentPack;
+	public function new(x:Float = 0, y:Float = 0, width:Float, contentPack:String) {
+		super(x, y);
+		this.contentPack = contentPack;
 
-        bg = new FlxSprite().makeSolid(width, 40, FlxColor.BLACK);
-        bg.alpha = 0.0;
-        add(bg);
+		bg = new FlxSprite().makeSolid(width, 40, FlxColor.BLACK);
+		bg.alpha = 0.0;
+		add(bg);
 
-        final iconPath:String = Paths.image("icon", contentPack, false);
-        icon = new FlxSprite(5, 5).loadGraphic((FlxG.assets.exists(iconPath)) ? iconPath : Paths.image("menus/missing_content_pack"));
-        icon.setGraphicSize(30, 30);
-        icon.updateHitbox();
-        add(icon);
+		final iconPath:String = Paths.image("icon", contentPack, false);
+		icon = new FlxSprite(5, 5).loadGraphic((FlxG.assets.exists(iconPath)) ? iconPath : Paths.image("menus/missing_content_pack"));
+		icon.setGraphicSize(30, 30);
+		icon.updateHitbox();
+		add(icon);
 
-        check = new FlxSprite(icon.x + (icon.width * 0.7), 0).loadGraphic(Paths.image('menus/content_manager/${(Options.toggledContentPacks.get(contentPack)) ? "check" : "cross"}'));
-        check.setGraphicSize(20, 20);
-        check.updateHitbox();
-        add(check);
+		check = new FlxSprite(icon.x + (icon.width * 0.7),
+			0).loadGraphic(Paths.image('menus/content_manager/${(Options.toggledContentPacks.get(contentPack)) ? "check" : "cross"}'));
+		check.setGraphicSize(20, 20);
+		check.updateHitbox();
+		add(check);
 
-        var maxTitleLength:Int = 26;
-        var titleStr:String = Paths.contentMetadata.get(contentPack)?.title ?? contentPack;
-        
-        if(titleStr.length > maxTitleLength)
-            titleStr = titleStr.substr(0, maxTitleLength - 3) + "...";
+		var maxTitleLength:Int = 26;
+		var titleStr:String = Paths.contentMetadata.get(contentPack)?.title ?? contentPack;
 
-        title = new AtlasText(icon.x + icon.width + 10, 0, "bold", LEFT, titleStr, 0.35);
-        title.y = (bg.height - title.height) * 0.5;
-        add(title);
-    }
+		if (titleStr.length > maxTitleLength)
+			titleStr = titleStr.substr(0, maxTitleLength - 3) + "...";
 
-    public function select():Void {
-        icon.alpha = 1;
-        title.alpha = 1;
-    }
+		title = new AtlasText(icon.x + icon.width + 10, 0, "bold", LEFT, titleStr, 0.35);
+		title.y = (bg.height - title.height) * 0.5;
+		add(title);
+	}
 
-    public function unselect():Void {
-        icon.alpha = 0.6;
-        title.alpha = 0.6;
-    }
+	public function select():Void {
+		icon.alpha = 1;
+		title.alpha = 1;
+	}
 
-    override function update(elapsed:Float):Void {
-        super.update(elapsed);
+	public function unselect():Void {
+		icon.alpha = 0.6;
+		title.alpha = 0.6;
+	}
 
-        final pointer = TouchUtil.touch;
-        if(pointer == null)
-            return;
-        
-        final hovered:Bool = pointer.overlaps(bg, getDefaultCamera());
-        if(hovered && TouchUtil.justPressed) {
-            canDrag = true;
-            if(onClick != null)
-                onClick();
-        }
-        if(TouchUtil.justReleased) {
-            menu.grpItems.sort(sortByY, FlxSort.ASCENDING);
-            for(i => item in menu.grpItems.members)
-                item.y = i * 40;
+	override function update(elapsed:Float):Void {
+		super.update(elapsed);
 
-            if(dragging)
-                menu.curSelected = menu.grpItems.members.indexOf(this);
+		final pointer = TouchUtil.touch;
+		if (pointer == null)
+			return;
 
-            canDrag = false;
-            dragging = false;
-        }
-        if(canDrag && !dragging && TouchUtil.justMoved) {
-            dragging = true;
+		final hovered:Bool = pointer.overlaps(bg, getDefaultCamera());
+		if (hovered && TouchUtil.justPressed) {
+			canDrag = true;
+			if (onClick != null)
+				onClick();
+		}
+		if (hovered && FlxG.mouse.justPressedRight) {
+			if (onRightClick != null)
+				onRightClick();
+		}
+		if (TouchUtil.justReleased) {
+			menu.grpItems.sort(sortByY, FlxSort.ASCENDING);
+			for (i => item in menu.grpItems.members)
+				item.y = i * 40;
 
-            _lastY = y;
-            _lastMouseY = pointer.y;  
-        }
-        if(dragging && TouchUtil.justMoved) {
-            final newY:Float = _lastY + (pointer.y - _lastMouseY);
-            y = newY;
+			if (dragging)
+				menu.curSelected = menu.grpItems.members.indexOf(this);
 
-            menu.grpItems.sort(sortByY, FlxSort.ASCENDING);
-            for(i => item in menu.grpItems.members) {
-                if(item == this)
-                    continue;
+			canDrag = false;
+			dragging = false;
+		}
+		if (canDrag && !dragging && TouchUtil.justMoved) {
+			dragging = true;
 
-                item.y = i * 40;
-            }
-        }
-        bg.alpha = FlxMath.lerp(bg.alpha, (hovered) ? ((TouchUtil.pressed) ? 0.6 : 0.4) : 0.0, FlxMath.getElapsedLerp(0.25, elapsed));
-    }
+			_lastY = y;
+			_lastMouseY = pointer.y;
+		}
+		if (dragging && TouchUtil.justMoved) {
+			final newY:Float = _lastY + (pointer.y - _lastMouseY);
+			y = newY;
 
-    public static inline function sortByY(Order:Int, Obj1:FlxObject, Obj2:FlxObject):Int {
+			menu.grpItems.sort(sortByY, FlxSort.ASCENDING);
+			for (i => item in menu.grpItems.members) {
+				if (item == this)
+					continue;
+
+				item.y = i * 40;
+			}
+		}
+
+		bg.alpha = FlxMath.lerp(bg.alpha, (hovered) ? ((TouchUtil.pressed) ? 0.6 : 0.4) : 0.0, FlxMath.getElapsedLerp(0.25, elapsed));
+	}
+
+	public static inline function sortByY(Order:Int, Obj1:FlxObject, Obj2:FlxObject):Int {
 		return FlxSort.byValues(Order, Obj1.y + Obj1.height, Obj2.y + Obj2.height);
 	}
 
-    private var _lastY:Float = 0;
-    private var _lastMouseY:Float = 0;
+	private var _lastY:Float = 0;
+	private var _lastMouseY:Float = 0;
 }
 
 class ContentPackWarning extends FlxSpriteContainer {
-    public var bg:FlxSprite;
-    public var icon:FlxSprite;
-    public var title:FlxText;
+	public var bg:FlxSprite;
+	public var icon:FlxSprite;
+	public var title:FlxText;
 
-    public function new(x:Float = 0, y:Float = 0, width:Float, warning:String) {
-        super(x, y);
+	public function new(x:Float = 0, y:Float = 0, width:Float, warning:String) {
+		super(x, y);
 
-        bg = new FlxSprite().makeSolid(width, 40, FlxColor.BLACK);
-        bg.alpha = 0.6;
-        add(bg);
+		bg = new FlxSprite().makeSolid(width, 40, FlxColor.BLACK);
+		bg.alpha = 0.6;
+		add(bg);
 
-        icon = new FlxSprite(5, 5).loadGraphic(Paths.image("menus/content_manager/warning"));
-        icon.setGraphicSize(30, 30);
-        icon.updateHitbox();
-        add(icon);
+		icon = new FlxSprite(5, 5).loadGraphic(Paths.image("menus/content_manager/warning"));
+		icon.setGraphicSize(30, 30);
+		icon.updateHitbox();
+		add(icon);
 
-        title = new FlxText(icon.x + icon.width + 10, 0, warning);
-        title.setFormat(Paths.font("fonts/vcr"), 20, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
-        title.borderSize = 2;
-        title.y = (bg.height - 22) * 0.5;
-        add(title);
+		title = new FlxText(icon.x + icon.width + 10, 0, warning);
+		title.setFormat(Paths.font("fonts/vcr"), 20, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
+		title.borderSize = 2;
+		title.y = (bg.height - 22) * 0.5;
+		add(title);
 
-        if((title.y + title.height) > bg.height) {
-            bg.setGraphicSize(bg.width, title.height + 20);
-            bg.updateHitbox();
-        }
-    }
+		if ((title.y + title.height) > bg.height) {
+			bg.setGraphicSize(bg.width, title.height + 20);
+			bg.updateHitbox();
+		}
+	}
+}
+
+class ContentPackMetaEditMenu extends UISubState {
+	public var window:ContentPackMetaEditWindow;
+
+	var contentPack:ContentPackItem;
+
+	public function new(cpack:ContentPackItem) {
+		this.contentPack = cpack;
+		super();
+	}
+
+	override function create():Void {
+		super.create();
+
+		camera = new FlxCamera();
+		camera.bgColor = 0x80000000;
+		FlxG.cameras.add(camera, false);
+
+		window = new ContentPackMetaEditWindow(contentPack);
+		window.onClose.add(() -> {
+			close();
+		});
+		window.setPosition((FlxG.width - window.bg.width) * 0.5, (FlxG.height - window.bg.height) * 0.5);
+		add(window);
+	}
+
+	override function destroy():Void {
+		FlxG.cameras.remove(camera);
+		super.destroy();
+	}
+}
+
+class ContentPackMetaEditWindow extends Window {
+	public var contentPack:ContentPackItem;
+	public var meta:ContentMetadata;
+
+	public function new(cpack:ContentPackItem) {
+		this.contentPack = cpack;
+		super(0, 0, "Edit content pack metadata", false, 600, 410);
+	}
+
+	override function initContents():Void {
+		meta = Paths.contentMetadata.get(contentPack.contentPack);
+
+		var scr = FunkinScript.fromFile(Paths.script("temp"));
+		scr.setParent(this);
+		scr.execute();
+	}
+
+	function saveSettings():Void {
+		var w = new JsonWriter<ContentMetadata>();
+		var json = w.write(meta, "\t");
+		File.saveContent(FileSystem.absolutePath(Paths.getContentDirectory() + '/' + Paths.contentPacksToFolders.get(meta.id) + '/metadata.json'), json);
+	}
+
+	override function update(elapsed:Float):Void {
+		super.update(elapsed);
+	}
 }

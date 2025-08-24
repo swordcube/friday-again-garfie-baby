@@ -24,13 +24,6 @@ class MiscellanousPage extends OptionPage {
             id: "verboseLogging",
             type: TCheckbox
         });
-        addOption({
-            name: "Loading Screen",
-            description: "Whether or not the game should display\na loading screen while loading into gameplay.",
-        
-            id: "loadingScreen",
-            type: TCheckbox
-        });
         #if LINUX_CASE_INSENSITIVE_FILES
         addOption({
             name: "Case Insensitive Files",

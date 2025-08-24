@@ -36,6 +36,20 @@ class GameplayPage extends OptionPage {
             id: "missSounds",
             type: TCheckbox
         });
+        addOption({
+            name: "Loading Screen",
+            description: "Whether or not the game should display\na loading screen while loading into gameplay.",
+        
+            id: "loadingScreen",
+            type: TCheckbox
+        });
+		addOption({
+			name: "Skip Loading Confirm",
+			description: "If enabled, the loading screen won't ask for an ENTER press when finished.",
+
+			id: "skipLoadingConfirm",
+			type: TCheckbox
+		});
         final songOffsetOption:Option = addOption({
             name: "Song Offset",
             description: "Changes how offset the music is from notes (in MS).\nMainly useful for headphones with lots of latency.\n\nPress ACCEPT to start calibrating offsets\ninstead of manually inputting them.",

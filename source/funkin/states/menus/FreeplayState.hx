@@ -542,7 +542,7 @@ class FreeplayState extends FunkinState {
             mix: currentMix,
             mod: categoryID.split(":").first()
         };
-        LoadingState.loadIntoState(PlayState.new.bind(PlayState.lastParams));
+		LoadingState.loadIntoGameplay();
     }
 
     private var lastMouseVisible:Bool = true;
