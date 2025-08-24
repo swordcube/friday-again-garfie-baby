@@ -1,5 +1,6 @@
 package funkin.utilities;
 
+// i wanna jump in The Pool:tm:!
 class Pool<T> {
     private var _index:Int = 0;
     private var _items:Array<T> = [];

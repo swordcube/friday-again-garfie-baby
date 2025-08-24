@@ -9,6 +9,8 @@ class Options {
     public static var centeredNotes:Bool = false;
     public static var useKillers:Bool = true;
     public static var missSounds:Bool = true;
+    public static var loadingScreen:Bool = true;
+	public static var skipLoadingConfirm:Bool = false;
     public static var songOffset:Float = 0;
     public static var hitWindow:Float = 180;
 
@@ -31,7 +33,6 @@ class Options {
     // MISCELLANOUS //
     public static var autoPause:Bool = true;
     public static var verboseLogging:Bool = false;
-    public static var loadingScreen:Bool = true;
     
     #if LINUX_CASE_INSENSITIVE_FILES
     public static var caseInsensitiveFiles:Bool = true;

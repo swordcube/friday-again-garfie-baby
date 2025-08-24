@@ -324,12 +324,16 @@ class LoadingState extends FunkinState {
         FlxTween.tween(spinner, {alpha: 0}, 0.5);
         FlxTween.tween(spinner, {y: FlxG.height}, 0.5, {ease: FlxEase.backOut});
         
-        pressEnter.revive();
-        FlxTween.tween(pressEnter, {alpha: 1}, 0.5);
-        FlxTween.tween(pressEnter, {y: FlxG.height - pressEnter.height - 30}, 0.5, {ease: FlxEase.backOut, startDelay: 0.5});
-
-        FlxG.sound.play(Paths.sound('menus/sfx/select'));
-        _statusQueue.push('100%\nDone!');
+		if (Options.skipLoadingConfirm) {
+			fadeToNextState();
+		} else {
+			pressEnter.revive();
+			FlxTween.tween(pressEnter, {alpha: 1}, 0.5);
+			FlxTween.tween(pressEnter, {y: FlxG.height - pressEnter.height - 30}, 0.5, {ease: FlxEase.backOut, startDelay: 0.5});
+			FlxG.sound.play(Paths.sound('menus/sfx/select'));
+		}
+		
+		_statusQueue.push('100%\nDone!');
     }
 
     public function fadeToNextState():Void {
