@@ -1,7 +1,7 @@
 name: Linux Build
 on:
   push:
-    branches: [ main, mobile-support ]
+    branches: [ main, feature/mobile-support ]
   workflow_dispatch:
 jobs:
   build:
