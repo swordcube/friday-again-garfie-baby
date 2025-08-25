@@ -813,30 +813,27 @@ class PlayState extends FunkinState {
 
 		if(!minimalMode) {
 			if(!isCameraOnForcedPos) {
-				final cameraPos:FlxPoint = FlxPoint.get();
 				switch(curCameraTarget) {
 					case OPPONENT:
-						opponent.getCameraPosition(cameraPos);
-						cameraPos += stage.cameraOffsets.get("opponent");
+						opponent.getCameraPosition(_tempCameraPos);
+						_tempCameraPos += stage.cameraOffsets.get("opponent");
 		
 					case PLAYER:
-						player.getCameraPosition(cameraPos);
-						cameraPos += stage.cameraOffsets.get("player");
+						player.getCameraPosition(_tempCameraPos);
+						_tempCameraPos += stage.cameraOffsets.get("player");
 		
 					case SPECTATOR:
-						spectator.getCameraPosition(cameraPos);
-						cameraPos += stage.cameraOffsets.get("spectator");
+						spectator.getCameraPosition(_tempCameraPos);
+						_tempCameraPos += stage.cameraOffsets.get("spectator");
 				}
 				var event:CameraMoveEvent = cast Events.get(CAMERA_MOVE);
-				event.recycle(cameraPos);
+				event.recycle(_tempCameraPos);
 				#if SCRIPTING_ALLOWED
 				if(scriptsAllowed)
 					scripts.event("onCameraMove", event);
 				#end
 				if(!event.cancelled)
 					camFollow.setPosition(event.position.x, event.position.y);
-
-				cameraPos.put();
 			}
 		}
 		#if SCRIPTING_ALLOWED
@@ -1581,6 +1578,9 @@ class PlayState extends FunkinState {
 	}
 
 	//----------- [ Private API ] -----------//
+
+	@:noCompletion
+	private var _tempCameraPos:FlxPoint = new FlxPoint();
 
 	@:noCompletion
 	private var _initialTransitionHappened:Bool = false;

@@ -303,12 +303,11 @@ class Character extends TrackingSprite implements IBeatReceiver {
         if(point == null)
             point = FlxPoint.get();
 
-		final midpoint:FlxPoint = getMidpoint();
+		final midpoint:FlxPoint = getMidpoint(_mp);
 		final camPos:FlxPoint = point.set(
             (midpoint.x + (isPlayer ? -100 : 150) + (data.position[0] ?? 0.0) + (data.camera[0] ?? 0.0)) - footOffset.x,
 			midpoint.y - (100 + footOffset.y) + (data.position[1] ?? 0.0) + (data.camera[1] ?? 0.0)
         );
-		midpoint.put();
 		return camPos;
 	}
 
@@ -379,6 +378,9 @@ class Character extends TrackingSprite implements IBeatReceiver {
 
     @:noCompletion
     private var _initializedScript:Bool = false;
+
+    @:noCompletion
+    private static var _mp:FlxPoint = FlxPoint.get();
 
     @:noCompletion
     private function set_isPlayer(value:Bool):Bool {
