@@ -105,14 +105,16 @@ class TitleState extends FunkinState {
         call("onTitleGroupCreation", [event]);
 
         if(!event.cancelled) {
-            logoBl = new FlxSprite(-150, -100);
+            final cutoutSize:Float = #if mobile cast(FlxG.scaleMode, funkin.graphics.RatioScaleModeEx).width - Constants.GAME_WIDTH #else 0 #end;
+    
+            logoBl = new FlxSprite(-150 + (cutoutSize / 2.5), -100);
             logoBl.frames = Paths.getSparrowAtlas('menus/title/logo');
             logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
             logoBl.animation.play('bump');
             logoBl.shader = swagShader;
             titleGroup.add(logoBl);
     
-            gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
+            gfDance = new FlxSprite((FlxG.width * 0.4) + (cutoutSize / 2.5), FlxG.height * 0.07);
             gfDance.frames = Paths.getSparrowAtlas('menus/title/gf');
             gfDance.animation.addByIndices('danceLeft', 'gfDance', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
             gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], "", 24, false);
@@ -120,7 +122,7 @@ class TitleState extends FunkinState {
             gfDance.shader = swagShader;
             titleGroup.add(gfDance);
     
-            titleText = new FlxSprite(#if MOBILE_UI 50 #else 100 #end, FlxG.height * 0.8);
+            titleText = new FlxSprite(#if MOBILE_UI 50 #else 100 #end + (cutoutSize / 2), FlxG.height * 0.8);
             titleText.frames = Paths.getSparrowAtlas(#if MOBILE_UI 'menus/title/enter_mobile' #else 'menus/title/enter' #end);
             titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
             titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
