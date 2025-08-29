@@ -3,9 +3,9 @@ package funkin.gameplay.scoring.system;
 import funkin.gameplay.notes.Note;
 
 /**
- * The Judge4 scoring system, used in Etterna.
+ * The Psych Engine scoring system.
  */
-class Judge4System extends ScoringSystem {
+class PsychSystem extends ScoringSystem {
     @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.getJudgements)
     override function getJudgements():Array<String> {
         return (useKillers) ? _judgementList : _noKillerJudgementList;
@@ -36,8 +36,8 @@ class Judge4System extends ScoringSystem {
         switch(judgement) {
             case "killer": return 1.0;
             case "sick":   return (useKillers) ? 0.9 : 1.0;
-            case "good":   return 0.7;
-            case "bad":    return 0.3;
+            case "good":   return 0.67;
+            case "bad":    return 0.34;
             case "shit":   return 0.0;
         }
         return 0.0;
@@ -47,8 +47,8 @@ class Judge4System extends ScoringSystem {
     override function scoreNote(note:Note, timestamp:Float):Int {
         final judgement:String = judgeNote(note, timestamp);
         switch(judgement) {
-            case "killer": return 350;
-            case "sick":   return 300;
+            case "killer": return 500;
+            case "sick":   return 350;
             case "good":   return 200;
             case "bad":    return 100;
             case "shit":   return 50;
@@ -59,6 +59,11 @@ class Judge4System extends ScoringSystem {
     @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.splashAllowed)
     override function splashAllowed(judgement:String):Bool {
         return (judgement == "killer" || judgement == "sick");
+    }
+
+    @:inheritDoc(funkin.gameplay.scoring.ScoringSystem.holdHealthIncreasingAllowed)
+    override function holdHealthIncreasingAllowed():Bool {
+        return true;
     }
 
     // --------------- //

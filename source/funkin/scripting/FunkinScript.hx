@@ -126,8 +126,9 @@ class FunkinScript {
         setClass(funkin.gameplay.scoring.Scoring);
         setClass(funkin.gameplay.scoring.ScoringSystem);
 
-        setClass(funkin.gameplay.scoring.system.PBotSystem);
-        setClass(funkin.gameplay.scoring.system.Judge4System);
+        setClass(funkin.gameplay.scoring.system.PBotSystem, "PBotScoringSystem");
+        setClass(funkin.gameplay.scoring.system.Judge4System, "Judge4ScoringSystem");
+        setClass(funkin.gameplay.scoring.system.PsychSystem, "PsychScoringSystem");
 
         setClass(funkin.gameplay.cutscenes.Cutscene);
         setClass(funkin.gameplay.cutscenes.ScriptedCutscene);
@@ -242,7 +243,7 @@ class FunkinScript {
 
     public function set(name:String, value:Dynamic):Void {}
 
-    public function setClass(value:Class<Dynamic>):Void {}
+    public function setClass(value:Class<Dynamic>, ?as:String):Void {}
 
     public function call(method:String, ?args:Array<Dynamic>):Dynamic {
         return null;

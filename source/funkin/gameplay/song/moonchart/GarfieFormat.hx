@@ -62,6 +62,9 @@ class GarfieFormat extends BasicFormat<ChartData, SongMetadata> {
 
                 noteTypes.push(note.type);
             }
+            if(!noteTypes.contains("Default"))
+                noteTypes.insert(0, "Default");
+
             for(type in noteTypes) {
                 for(dir in 0...Constants.KEY_COUNT) {
                     var lastNote:NoteData = null;
@@ -112,7 +115,6 @@ class GarfieFormat extends BasicFormat<ChartData, SongMetadata> {
 
     override function fromBasicFormat(chart:BasicChart, ?diff:FormatDifficulty):GarfieFormat {
         final chartResolve = resolveDiffsNotes(chart, diff);
-		final chartDiff:String = chartResolve.diffs[0];
         
         final basicMeta:BasicMetaData = chart.meta;
         final basicEvents:Array<BasicEvent> = chart.data.events;

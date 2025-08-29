@@ -118,10 +118,14 @@ class FunkinHScript extends FunkinScript {
         _rscript.variables.set(name, value);
     }
 
-    override function setClass(value:Class<Dynamic>):Void {
+    override function setClass(value:Class<Dynamic>, ?as:String):Void {
         if(closed) return;
-        final cl:Array<String> = Type.getClassName(value).split('.');
-        _rscript.variables.set(cl[cl.length - 1], value);
+		if(as != null && as.length != 0)
+			_rscript.variables.set(as, value);
+		else {
+			final cl:Array<String> = Type.getClassName(value).split('.');
+			_rscript.variables.set(cl[cl.length - 1], value);
+		}
     }
 
     override function call(method:String, ?args:Array<Dynamic>):Dynamic {
