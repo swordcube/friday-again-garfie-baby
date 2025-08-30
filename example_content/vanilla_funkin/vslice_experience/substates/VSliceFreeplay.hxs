@@ -279,7 +279,7 @@ function regenCapsules(filter:String) {
         capsule.anim.addByPrefix('selected', 'mp3 capsule w backing0', 24, true);
         capsule.anim.setOffset('selected', 4, 0);
         capsule.anim.play('idle');
-        capsule.setPosition(335 + Math.sin((i - curSelected) + 1) * 60 + FlxG.width, -200 + ((i - curSelected) * 115));
+        capsule.setPosition(335 + FlxMath.fastSin((i - curSelected) + 1) * 60 + FlxG.width, -200 + ((i - curSelected) * 115));
         capsule.setScale(0.8, FlxAxes.XY);
         capsule.extra.set("doLerp", true);
         Reflect.setProperty(capsule, "ID", i); // rulescript.
@@ -1866,17 +1866,16 @@ function onUpdatePre(dt:Float) {
             }});
         }
     }
+    final lerpAmountX:Float = FlxMath.getElapsedLerp(0.3, FlxG.elapsed);
+    final lerpAmountY:Float = FlxMath.getElapsedLerp(0.4, FlxG.elapsed);
+
     var i:Int = 0;
     for(capsule in grpCapsules.members) {
         final songName:TrackingSprite = grpSongNames.members[i];
         if(capsule.extra.get("doLerp")) {
             final index:Int = capsule.ID - curSelected;
-    
-            final lerpAmountX:Float = FlxMath.getElapsedLerp(0.3, FlxG.elapsed);
-            final lerpAmountY:Float = FlxMath.getElapsedLerp(0.4, FlxG.elapsed);
-    
             capsule.setPosition(
-                FlxMath.lerp(capsule.x - capsuleData.offsetX, 335 + Math.sin(index + 1) * 60 - (index > 3 ? 50 : 0), lerpAmountX),
+                FlxMath.lerp(capsule.x - capsuleData.offsetX, 335 + FlxMath.fastSin(index + 1) * 60 - (index > 3 ? 50 : 0), lerpAmountX),
                 FlxMath.lerp(capsule.y, 250 + (index * 115) - (index < -1 ? 100 : 0), lerpAmountY)
             );
             capsule.x += capsuleData.offsetX;
@@ -1889,7 +1888,7 @@ function onUpdatePre(dt:Float) {
         final baseTextWidth:Float = (visibleBadges > 1) ? 300 : 305;
         final textWidth:Float = (visibleBadges > 0) ? baseTextWidth - (visibleBadges * 40) : baseTextWidth;
         if(curSelected == songName.ID && !accepted) {
-            songName.trackingOffset.x = 88 - ((curSelected == songName.ID && songName.width > textWidth) ? (Math.sin(totalTime * 0.9) * (songName.width - textWidth) * 0.5) + ((songName.width - textWidth) * 0.5) : 0);
+            songName.trackingOffset.x = 88 - ((curSelected == songName.ID && songName.width > textWidth) ? (FlxMath.fastSin(totalTime * 0.9) * (songName.width - textWidth) * 0.5) + ((songName.width - textWidth) * 0.5) : 0);
             songName.clipRect.set(-(songName.trackingOffset.x - 88), 0, textWidth, songName.frameHeight);
             
             if(songName.width <= textWidth)
