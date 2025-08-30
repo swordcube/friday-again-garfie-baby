@@ -16,7 +16,9 @@ import rulescript.types.Property as RuleScriptProperty;
 import rulescript.parsers.HxParser;
 import rulescript.parsers.HxParser.HScriptParser;
 
-// TODO: look into extending BytecodeInterp instead of normal RuleScriptInterp?
+import funkin.backend.macros.DefinesMacro;
+
+// TODO: look into extending NeoInterp instead of normal RuleScriptInterp?
 
 class FunkinHScript extends FunkinScript {
     public static function createInterp():RuleScriptInterp {
@@ -627,33 +629,12 @@ class FunkinRuleScriptHxParser extends HxParser {
 }
 
 class FunkinHScriptParser extends HScriptParser {
-	public static final defaultPreprocessors:Map<String, Dynamic> = [
-		// os defines
-		#if desktop "desktop" => 1, #end
-		#if mobile "mobile" => 1, #end
-		#if android "android" => 1, #end
-		#if ios "ios" => 1, #end
-		#if windows "windows" => 1, #end
-		#if (mac || macos) "mac" => 1, #end
-		#if (mac || macos) "macos" => 1, #end
-		#if linux "linux" => 1, #end
-
-		// funkin defines
-		#if TEST_BUILD "TEST_BUILD" => 1, #end
-		#if MOBILE_UI "MOBILE_UI" => 1, #end
-		#if DISCORD_ALLOWED "DISCORD_ALLOWED" => 1, #end
-		#if SCRIPTING_ALLOWED "SCRIPTING_ALLOWED" => 1, #end
-		#if VIDEOS_ALLOWED "VIDEOS_ALLOWED" => 1, #end
-		#if USE_MOONCHART "USE_MOONCHART" => 1, #end
-		#if LINUX_CASE_INSENSITIVE_FILES "LINUX_CASE_INSENSITIVE_FILES" => 1, #end
-	];
-	
 	var nextIsStatic:Bool = false;
 	var nextIsPublic:Bool = false;
 
 	public function new() {
 		super();
-		for (key => value in defaultPreprocessors)
+		for (key => value in DefinesMacro.defines)
 			preprocesorValues.set(key, value);
 	}
 
