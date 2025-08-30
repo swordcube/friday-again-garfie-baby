@@ -1866,10 +1866,9 @@ function onUpdatePre(dt:Float) {
             }});
         }
     }
-    for(i in 0...grpCapsules.length) {
-        final capsule:SongCapsule = grpCapsules.members[i];
+    var i:Int = 0;
+    for(capsule in grpCapsules.members) {
         final songName:TrackingSprite = grpSongNames.members[i];
-        
         if(capsule.extra.get("doLerp")) {
             final index:Int = capsule.ID - curSelected;
     
@@ -1899,6 +1898,7 @@ function onUpdatePre(dt:Float) {
             songName.trackingOffset.x = 88;
             songName.clipRect.set(0, 0, textWidth, songName.frameHeight);
         }
+        i++;
     }
     for(arr in capsuleBadges) {
         var x:Int = 0;
