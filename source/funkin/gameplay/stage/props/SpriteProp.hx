@@ -13,6 +13,7 @@ class SpriteProp extends FunkinSprite implements StageProp {
     }
 
     public function applyProperties(properties:Dynamic):Void {
+        var updateLeHitbox:Bool = false;
         for(field in Reflect.fields(properties)) {
             final value:Dynamic = Reflect.field(properties, field);
             switch(field.toLowerCase()) {
@@ -43,11 +44,13 @@ class SpriteProp extends FunkinSprite implements StageProp {
 
                 case "updatehitbox":
                     if(value == true)
-                        updateHitbox();
+                        updateLeHitbox = true;
 
                 default:
                     Reflect.setProperty(this, field, value);
             }
         }
+        if(updateLeHitbox)
+            updateHitbox();
     }
 }
