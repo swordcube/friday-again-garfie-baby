@@ -1,14 +1,17 @@
 package funkin.backend.macros;
 
 import haxe.macro.*;
+import haxe.macro.Context;
+import haxe.macro.Expr;
 
 class IncludeMacro {
     /**
      * Makes sure a bunch of extra classes get compiled into the
      * executable file, for scripting purposes.
      */
-    public static function build() {
+    public static function build():Array<Field> {
         #if macro
+        final fields = Context.getBuildFields();
         final includes:Array<String> = [
             // OPENFL
             "openfl.system", "openfl.display", "openfl.geom", "openfl.media",
@@ -62,6 +65,10 @@ class IncludeMacro {
         }
         for(inc in includes)
 			Compiler.include(inc, true, ignores);
+        
+        return fields;
+        #else
+        return [];
         #end
     }
 }

@@ -14,7 +14,7 @@ import rulescript.interps.RuleScriptInterp;
 import rulescript.types.Property as RuleScriptProperty;
 
 import rulescript.parsers.HxParser;
-import rulescript.parsers.HxParser.HScriptParserPlus;
+import rulescript.parsers.HxParser.HScriptParser;
 
 // TODO: look into extending BytecodeInterp instead of normal RuleScriptInterp?
 
@@ -626,7 +626,7 @@ class FunkinRuleScriptHxParser extends HxParser {
 	}
 }
 
-class FunkinHScriptParser extends HScriptParserPlus { // i love abusing deprecated typedefs!
+class FunkinHScriptParser extends HScriptParser {
 	public static final defaultPreprocessors:Map<String, Dynamic> = [
 		// os defines
 		#if desktop "desktop" => 1, #end
