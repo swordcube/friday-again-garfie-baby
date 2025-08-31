@@ -63,6 +63,13 @@ class FlxUtil {
 
             // Self explanatory line of code (i think)
             applyShaderResizeFix();
+
+            // Make sure aspect ratio is applied
+            @:privateAccess
+            if(FlxG.scaleMode is RatioScaleModeEx) {
+                final scaleMode:RatioScaleModeEx = cast FlxG.scaleMode;
+                scaleMode.onMeasure(FlxG.stage.stageWidth, FlxG.stage.stageHeight);
+            }
         });
         
         // Fixes shader coord problems that typically
