@@ -174,11 +174,12 @@ class Controls extends FlxControls<Control> {
     }
 
     public function removeInvalidInputs(map:ActionMap<Control>):ActionMap<Control> {
-        for(inputs in map) {
+        for(control => inputs in map) {
             for(bind in inputs.copy()) {
-                if(bind == null || bind == FlxKey.NONE || bind == FlxGamepadInputID.NONE)
+                if(bind == null || bind.compare(Keyboard(Lone(NONE))) || bind.compare(Gamepad(Lone(NONE))))
                     inputs.remove(bind);
             }
+            map.set(control, inputs); // just in case  ...
         }
         return map;
     }
