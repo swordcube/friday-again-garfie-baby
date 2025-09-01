@@ -69,7 +69,7 @@ class Controls extends FlxControls<Control> {
         if(autoFlush)
             flush();
 
-        resetMappings(getCurrentMappings());
+        resetMappings(removeInvalidInputs(getCurrentMappings()));
         FlxG.stage.window.onClose.add(flush); 
         
         FlxTimer.wait(0.001, () -> {
@@ -105,7 +105,7 @@ class Controls extends FlxControls<Control> {
     }
 
     public function apply():Void {
-        final mappings:ActionMap<Control> = getCurrentMappings();
+        final mappings:ActionMap<Control> = removeInvalidInputs(getCurrentMappings());
         FlxG.sound.volumeUpKeys = [for(input in mappings.get(VOLUME_UP)) {
             final key:FlxKey = getKeyFromInputType(input);
             if(key != NONE)
@@ -172,29 +172,37 @@ class Controls extends FlxControls<Control> {
         }
         return map;
     }
+
+    public function removeInvalidInputs(map:ActionMap<Control>):ActionMap<Control> {
+        for(inputs in map) {
+            for(bind in inputs.copy()) {
+                if(bind == null || bind == FlxKey.NONE || bind == FlxGamepadInputID.NONE)
+                    inputs.remove(bind);
+            }
+        }
+        return map;
+    }
     
     // index is 0-1 here
     public function bindKey(control:Control, idx:Int, input:FlxKey):Void {
-        var currentMappings:ActionMap<Control> = getCurrentMappings();
-
-        var inputs:Array<FlxControlInputType> = currentMappings[control];
-        inputs[idx] = FlxControlInputType.fromKey(input);
-        currentMappings[control] = inputs;
+        var inputs:Array<FlxControlInputType> = Reflect.field(save.data, control.getName());
+        inputs[idx] = (input != NONE) ? FlxControlInputType.fromKey(input) : null;
         Reflect.setField(save.data, control.getName(), inputs);
 
-        resetMappings(currentMappings);
+        var currentMappings:ActionMap<Control> = getCurrentMappings();
+        currentMappings[control] = inputs;
+        resetMappings(removeInvalidInputs(currentMappings));
     }
 
     // index is still 0-1 here
     public function bindGamepadInput(control:Control, idx:Int, input:FlxGamepadInputID):Void {
-        var currentMappings:ActionMap<Control> = getCurrentMappings();
-
-        var inputs:Array<FlxControlInputType> = currentMappings[control];
-        inputs[idx + 2] = FlxControlInputType.fromGamepad(input);
-        currentMappings[control] = inputs;
+        var inputs:Array<FlxControlInputType> = Reflect.field(save.data, control.getName());
+        inputs[idx + 2] = (input != NONE) ? FlxControlInputType.fromGamepad(input) : null;
         Reflect.setField(save.data, control.getName(), inputs);
 
-        resetMappings(currentMappings);
+        var currentMappings:ActionMap<Control> = getCurrentMappings();
+        currentMappings[control] = inputs;
+        resetMappings(removeInvalidInputs(currentMappings));
     }
 
     public function flush():Void {
