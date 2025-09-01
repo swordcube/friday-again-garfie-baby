@@ -30,7 +30,7 @@ class DropDown extends UIComponent {
                 case Button(name, shortcut, callback):
                     var shortcutText:String = null;
                     if(shortcut != null && shortcut.length != 0)
-                        shortcutText = [for(i in shortcut[0]) InputFormatter.formatFlixel(i)].join("+");
+                        shortcutText = [for(i in shortcut[0]) InputFormatter.formatFlixelKey(i)].join("+");
                     
                     final item:DropDownItem = new DropDownItem(2, 2 + totalHeight, name, shortcutText, callback);
                     item.dropdown = this;

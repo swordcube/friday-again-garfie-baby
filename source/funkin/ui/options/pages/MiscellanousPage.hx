@@ -37,7 +37,7 @@ class MiscellanousPage extends OptionPage {
         #if mobile
         devModeDesc = "Whether or not to enable specific features to aid mod development.\n\nThis allows you tap and hold any corner of the screen\nfor 3 seconds to access a debug overlay.";
         #else
-        devModeDesc = 'Whether or not to enable specific features to aid mod development.\nThis allows you to press ${InputFormatter.formatFlixel(Controls.getKeyFromInputType(controls.getCurrentMappings().get(Control.MANAGE_CONTENT)[0])).toUpperCase()} to access a debug overlay.';
+        devModeDesc = 'Whether or not to enable specific features to aid mod development.\nThis allows you to press ${InputFormatter.formatFlixelKey(Controls.getKeyFromInputType(controls.getCurrentMappings().get(Control.MANAGE_CONTENT)[0])).toUpperCase()} to access a debug overlay.';
         #end
         addOption({
             name: "Developer Mode",

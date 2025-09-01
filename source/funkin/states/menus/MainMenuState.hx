@@ -130,7 +130,7 @@ class MainMenuState extends FunkinState {
         #if mobile
         versionString += '\nTap anywhere with 2 fingers to manage content packs';
         #else
-        versionString += '\nPress ${InputFormatter.formatFlixel(Controls.getKeyFromInputType(controls.getCurrentMappings().get(Control.MANAGE_CONTENT)[0])).toUpperCase()} to manage content packs';
+        versionString += '\nPress ${InputFormatter.formatFlixelKey(Controls.getKeyFromInputType(controls.getCurrentMappings().get(Control.MANAGE_CONTENT)[0])).toUpperCase()} to manage content packs';
         #end
         versionText = new FlxText(5, FlxG.height - 2, 0, versionString);
 		versionText.setFormat(Paths.font("fonts/vcr"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);

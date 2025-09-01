@@ -2,18 +2,32 @@ package funkin.ui;
 
 import flixel.util.FlxSignal;
 
+enum AtlasTextListDirection {
+    HORIZONTAL;
+    VERTICAL;
+}
+
 /**
  * A scrollable list of several `AtlasText` instances.
  * 
  * Mainly used for things like the freeplay and pause menu.
  */
 class AtlasTextList extends FlxTypedContainer<AtlasText> {
+    public var direction:AtlasTextListDirection = VERTICAL;
+
     public var curSelected:Int = 0;
     public var callbacks:Map<String, ListCallbacks> = [];
     public var disableTouchInputs:Bool = false;
 
     public var onSelect:FlxTypedSignal<Int->AtlasText->Void> = new FlxTypedSignal<Int->AtlasText->Void>();
     public var onAccept:FlxTypedSignal<Int->AtlasText->Void> = new FlxTypedSignal<Int->AtlasText->Void>();
+
+    public var enabled:Bool = true;
+
+    public function new(?direction:AtlasTextListDirection) {
+        super();
+        this.direction = direction ?? VERTICAL;
+    }
 
     public function clearList():Void {
         while(length > 0) {
@@ -32,8 +46,16 @@ class AtlasTextList extends FlxTypedContainer<AtlasText> {
     }
 
     public function addItem(text:String, callbacks:ListCallbacks):AtlasText {
-        final item:AtlasText = addStaticItem(0, 30 + (70 * length), text, callbacks);
-        item.isMenuItem = true;
+        final item:AtlasText = switch(direction) {
+            case HORIZONTAL:
+                final lastItemX:Float = (members[length - 1]?.x ?? 0.0) + (members[length - 1]?.width ?? 0.0);
+                addStaticItem((length != 0) ? lastItemX + 30 : 0, 0, text, callbacks);
+            
+            default:
+                final i:AtlasText = addStaticItem(0, 30 + (70 * length), text, callbacks);
+                i.isMenuItem = true;
+                i;
+        }
         item.targetY = item.ID = length;
         return item;
     }
@@ -53,18 +75,22 @@ class AtlasTextList extends FlxTypedContainer<AtlasText> {
     }
 
     override function update(elapsed:Float):Void {
-        final wheel:Float = TouchUtil.wheel;
-        final controls:Controls = Controls.instance;
+        if(enabled) {
+            final wheel:Float = TouchUtil.wheel;
+            final controls:Controls = Controls.instance;
 
-        if(controls.justPressed.UI_UP || (!disableTouchInputs && SwipeUtil.swipeUp) || wheel < 0)
-            changeSelection(-1);
-
-        if(controls.justPressed.UI_DOWN || (!disableTouchInputs && SwipeUtil.swipeDown) || wheel > 0)
-            changeSelection(1);
-
-        if(controls.justPressed.ACCEPT || (!disableTouchInputs && TouchUtil.justReleased && !SwipeUtil.swipeAny && TouchUtil.overlaps(members.unsafeGet(curSelected), getDefaultCamera())))
-            accept();
-        
+            final up:Bool = (direction == HORIZONTAL) ? controls.justPressed.UI_LEFT : controls.justPressed.UI_UP;
+            final down:Bool = (direction == HORIZONTAL) ? controls.justPressed.UI_RIGHT : controls.justPressed.UI_DOWN;
+    
+            if(up || (!disableTouchInputs && SwipeUtil.swipeUp) || wheel < 0)
+                changeSelection(-1);
+    
+            if(down || (!disableTouchInputs && SwipeUtil.swipeDown) || wheel > 0)
+                changeSelection(1);
+    
+            if(controls.justPressed.ACCEPT || (!disableTouchInputs && TouchUtil.justReleased && !SwipeUtil.swipeAny && TouchUtil.overlaps(members.unsafeGet(curSelected), getDefaultCamera())))
+                accept();
+        }
         super.update(elapsed);
     }
 

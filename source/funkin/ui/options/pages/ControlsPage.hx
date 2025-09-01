@@ -2,7 +2,9 @@ package funkin.ui.options.pages;
 
 import flixel.util.FlxTimer;
 import flixel.effects.FlxFlicker;
+
 import flixel.addons.input.FlxControls;
+import flixel.input.gamepad.FlxGamepadInputID;
 
 import flixel.text.FlxText;
 import flixel.input.keyboard.FlxKey;
@@ -12,6 +14,7 @@ import funkin.ui.AtlasText;
 import funkin.utilities.InputFormatter;
 
 import funkin.states.FunkinState;
+import funkin.mobile.input.ControlsHandler;
 
 class ControlsPage extends Page {
     public var bindCategories:Array<BindCategory> = [
@@ -141,6 +144,12 @@ class ControlsPage extends Page {
     public var promptCam:FlxCamera;
     public var camFollow:FlxObject;
 
+    public var deviceListBG:FlxSprite;
+    public var deviceList:AtlasTextList;
+
+    public var deviceListSelected:Bool = false;
+    public var gamepadSelected:Bool = false;
+
     public var controlItems:Array<Control> = [];
     public var changingBind:Bool = false;
     
@@ -164,27 +173,66 @@ class ControlsPage extends Page {
         grpText = new FlxTypedContainer<AtlasText>();
         add(grpText);
 
+        if(FlxG.gamepads.numActiveGamepads != 0) {
+            deviceListBG = new FlxSprite().makeSolid(FlxG.width, 100, 0xFFFAFD6D);
+            add(deviceListBG);
+
+            deviceList = new AtlasTextList(HORIZONTAL);
+            add(deviceList);
+            
+            var item:AtlasText = null;
+            item = deviceList.addItem("Keyboard", {
+                onSelect: (_, _) -> {
+                    gamepadSelected = false;
+                    refreshKeyboardBinds();
+                },
+                onAccept: (_, _) -> {
+                    FlxTimer.wait(0.001, () -> {
+                        deviceListSelected = deviceList.enabled = false;
+                    });
+                }
+            });
+            item.setPosition((FlxG.width * 0.5) - (item.width + 30), (deviceListBG.height - item.height) * 0.5);
+
+            item = deviceList.addItem("Gamepad", {
+                onSelect: (_, _) -> {
+                    gamepadSelected = true;
+                    refreshGamepadBinds();
+                },
+                onAccept: (_, _) -> {
+                    FlxTimer.wait(0.001, () -> {
+                        deviceListSelected = deviceList.enabled = false;
+                    });
+                }
+            });
+            item.setPosition((FlxG.width * 0.5) + 30, (deviceListBG.height - item.height) * 0.5);
+
+            deviceListSelected = true;
+            deviceList.changeSelection(0, true);
+        }
         bindCategories[bindCategories.length - 1].binds.push({
             name: "Reset to Default Keys",
             control: null
         });
         var y:Int = 0;
+        var yOffset:Float = (deviceListBG != null) ? 120 : 30;
+
         for(category in bindCategories) {
-            final categoryName:AtlasText = new AtlasText(0, (70 * y++) + 30, "bold", LEFT, category.name);
+            final categoryName:AtlasText = new AtlasText(0, (70 * y++) + yOffset, "bold", LEFT, category.name);
             categoryName.screenCenter(X);
             grpText.add(categoryName);
 
             for(bind in category.binds) {
                 if(bind.control != null) {
-                    final bindName:AtlasText = new AtlasText(50, (70 * y) + 30, "bold", LEFT, bind.name);
+                    final bindName:AtlasText = new AtlasText(50, (70 * y) + yOffset, "bold", LEFT, bind.name);
                     bindNames.push(bindName);  
                     grpText.add(bindName);
     
-                    final firstBind:AtlasText = new AtlasText(FlxG.width - 530, ((70 * y) + 30) - 40, "default", LEFT, InputFormatter.formatFlixel(Controls.getKeyFromInputType(curMappings.get(bind.control)[0])));
+                    final firstBind:AtlasText = new AtlasText(FlxG.width - 530, ((70 * y) + yOffset) - 40, "default", LEFT, InputFormatter.formatFlixelKey(Controls.getKeyFromInputType(curMappings.get(bind.control)[0])));
                     firstBind.color = FlxColor.BLACK;
                     grpText.add(firstBind);
     
-                    final secondBind:AtlasText = new AtlasText(firstBind.x + 300, ((70 * y) + 30) - 40, "default", LEFT, InputFormatter.formatFlixel(Controls.getKeyFromInputType(curMappings.get(bind.control)[1])));
+                    final secondBind:AtlasText = new AtlasText(firstBind.x + 300, ((70 * y) + yOffset) - 40, "default", LEFT, InputFormatter.formatFlixelKey(Controls.getKeyFromInputType(curMappings.get(bind.control)[1])));
                     secondBind.color = FlxColor.BLACK;
                     grpText.add(secondBind);
     
@@ -192,7 +240,7 @@ class ControlsPage extends Page {
                     bindTexts.push([firstBind, secondBind]);
                 } else {
                     y++;
-                    final bindName:AtlasText = new AtlasText(50, (70 * y) + 30, "bold", LEFT, bind.name);
+                    final bindName:AtlasText = new AtlasText(50, (70 * y) + yOffset, "bold", LEFT, bind.name);
                     bindNames.push(bindName);  
                     grpText.add(bindName);
 
@@ -226,7 +274,16 @@ class ControlsPage extends Page {
 
     override function update(elapsed:Float):Void {
         super.update(elapsed);
-        if(openedPrompt)
+        if(deviceListBG != null) {
+            if(!deviceListSelected && controls.justPressed.BACK)
+                deviceListSelected = deviceList.enabled = true;
+    
+            if(deviceListSelected && controls.justPressed.BACK) {
+                goBack();
+                FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
+            }
+        }
+        if(deviceListSelected || openedPrompt)
             return;
 
         if(!changingBind) {
@@ -252,12 +309,15 @@ class ControlsPage extends Page {
             if(controls.justPressed.RESET)
                 resetSpecificBind();
             
-            if(controls.justPressed.BACK) {
+            if(controls.justPressed.BACK && deviceListBG == null) {
                 goBack();
                 FlxG.sound.play(Paths.sound("menus/sfx/cancel"));
             }
         } else {
-            if(changingBind && !pressedKeyYet && FlxG.keys.justPressed.ANY) {
+            var pressedKey:Bool = (gamepadSelected) ? ((FlxG.gamepads.lastActive != null) ? FlxG.gamepads.lastActive.justPressed.ANY : false) : FlxG.keys.justPressed.ANY;
+            var pressedAnyEscapeKey:Bool = FlxG.keys.justPressed.BACKSPACE || FlxG.keys.justPressed.ESCAPE;
+
+            if(changingBind && !pressedKeyYet && (pressedKey || pressedAnyEscapeKey)) {
                 pressedKeyYet = true;
 
                 bindPrompt.exists = false;
@@ -282,11 +342,16 @@ class ControlsPage extends Page {
                     continue;
                 
                 for(j in 0...fuck.length) {
-                    final newKey:FlxKey = Controls.getKeyFromInputType(defaultMappings.get(controlItems[i])[j]);
-                    bindTexts[i][j].text = InputFormatter.formatFlixel(newKey);
+                    if(gamepadSelected) {
+                        final newGamepadInput:FlxGamepadInputID = Controls.getGamepadInputFromInputType(defaultMappings.get(controlItems[i])[j + 2]);
+                        bindTexts[i][j].text = InputFormatter.formatFlixelGamepadInput(newGamepadInput);
+                    } else {
+                        final newKey:FlxKey = Controls.getKeyFromInputType(defaultMappings.get(controlItems[i])[j]);
+                        bindTexts[i][j].text = InputFormatter.formatFlixelKey(newKey);
+                    }
                 }
             }
-            FlxTimer.wait(0.001, () -> {
+            FlxTimer.wait(0.15, () -> {
                 final defaultMappings:ActionMap<Control> = controls.getDefaultMappings();
                 openedPrompt = false;
                 for(c in controlItems) {
@@ -295,7 +360,11 @@ class ControlsPage extends Page {
     
                     for(i in 0...2) {
                         final newKey:FlxKey = Controls.getKeyFromInputType(defaultMappings.get(c)[i]);
+                        final newGamepadInput:FlxGamepadInputID = Controls.getGamepadInputFromInputType(defaultMappings.get(c)[i + 2]);
+                        
                         controls.bindKey(c, i, newKey);
+                        controls.bindGamepadInput(c, i, newGamepadInput);
+
                         controls.apply();
                     }
                 }
@@ -306,10 +375,10 @@ class ControlsPage extends Page {
             FlxG.sound.play(Paths.sound("menus/sfx/select"));
         };
         resetPrompt.onNo = () -> {
-            FlxTimer.wait(0.001, () -> {
+            FlxTimer.wait(0.15, () -> {
                 openedPrompt = false;
-                resetPrompt.closePrompt();
             });
+            resetPrompt.closePrompt();
         };
         resetPrompt.cameras = [promptCam];
         add(resetPrompt);
@@ -323,26 +392,34 @@ class ControlsPage extends Page {
         resetPrompt.createBGFromMargin(100, 0xFFfafd6d);
         resetPrompt.onYes = () -> {
             final defaultMappings:ActionMap<Control> = controls.getDefaultMappings();
+
             final newKey:FlxKey = Controls.getKeyFromInputType(defaultMappings.get(controlItems[curSelected])[curBindIndex]);
+            final newGamepadInput:FlxGamepadInputID = Controls.getGamepadInputFromInputType(defaultMappings.get(controlItems[curSelected])[curBindIndex + 2]);
             
             final bindText:AtlasText = bindTexts[curSelected][curBindIndex];
-            bindText.text = InputFormatter.formatFlixel(newKey);
+            bindText.text = (gamepadSelected) ? InputFormatter.formatFlixelGamepadInput(newGamepadInput) : InputFormatter.formatFlixelKey(newKey);
             
-            FlxTimer.wait(0.001, () -> {
+            FlxTimer.wait(0.15, () -> {
                 openedPrompt = false;
-                controls.bindKey(controlItems[curSelected], curBindIndex, newKey);
+
+                if(gamepadSelected)
+                    controls.bindGamepadInput(controlItems[curSelected], curBindIndex, newGamepadInput);
+                else
+                    controls.bindKey(controlItems[curSelected], curBindIndex, newKey);
+                
                 controls.apply();
             });
-            curMappings.get(controlItems[curSelected])[curBindIndex] = newKey;
+            final offset:Int = (gamepadSelected) ? 2 : 0;
+            curMappings.get(controlItems[curSelected])[curBindIndex + offset] = (gamepadSelected) ? newGamepadInput : newKey;
 
             resetPrompt.closePrompt();
             FlxG.sound.play(Paths.sound("menus/sfx/select"));
         };
         resetPrompt.onNo = () -> {
-            FlxTimer.wait(0.001, () -> {
+            FlxTimer.wait(0.15, () -> {
                 openedPrompt = false;
-                resetPrompt.closePrompt();
             });
+            resetPrompt.closePrompt();
         };
         resetPrompt.cameras = [promptCam];
         add(resetPrompt);
@@ -363,9 +440,12 @@ class ControlsPage extends Page {
 
     public function stopChangingBind():Void {
         var newKey:FlxKey = FlxG.keys.firstJustPressed();
+        var newGamepadInput:FlxGamepadInputID = FlxG.gamepads.lastActive?.firstJustPressedID() ?? NONE;
+        
         switch(newKey) {
             case NONE:
-                return;
+                if(newGamepadInput == NONE)
+                    return;
 
             case BACKSPACE:
                 newKey = NONE;
@@ -382,20 +462,52 @@ class ControlsPage extends Page {
 
             default:
         }
-        changingBind = false;
-        pressedKeyYet = false;
-
         final bindText:AtlasText = bindTexts[curSelected][curBindIndex];
         FlxFlicker.stopFlickering(bindText);
 
-        bindText.text = InputFormatter.formatFlixel(newKey);
+        bindText.text = (gamepadSelected) ? InputFormatter.formatFlixelGamepadInput(newGamepadInput) : InputFormatter.formatFlixelKey(newKey);
         bindText.visible = true;
-        
-        FlxTimer.wait(0.001, () -> {
+
+        if(gamepadSelected)
+            controls.bindGamepadInput(controlItems[curSelected], curBindIndex, newGamepadInput);
+        else
             controls.bindKey(controlItems[curSelected], curBindIndex, newKey);
-            controls.apply();
+        
+        controls.apply();
+
+        final offset:Int = (gamepadSelected) ? 2 : 0;
+        curMappings.get(controlItems[curSelected])[curBindIndex + offset] = (gamepadSelected) ? newGamepadInput : newKey;
+
+        FlxTimer.wait(0.15, () -> {
+            changingBind = false;
+            pressedKeyYet = false;
         });
-        curMappings.get(controlItems[curSelected])[curBindIndex] = newKey;
+    }
+
+    public function refreshKeyboardBinds():Void {
+        final currentMappings:ActionMap<Control> = controls.getCurrentMappings();
+        for(i => fuck in bindTexts) {
+            if(fuck == null)
+                continue;
+            
+            for(j in 0...fuck.length) {
+                final newKey:FlxKey = Controls.getKeyFromInputType(currentMappings.get(controlItems[i])[j]);
+                bindTexts[i][j].text = InputFormatter.formatFlixelKey(newKey);
+            }
+        }
+    }
+
+    public function refreshGamepadBinds():Void {
+        final currentMappings:ActionMap<Control> = controls.getCurrentMappings();
+        for(i => fuck in bindTexts) {
+            if(fuck == null)
+                continue;
+            
+            for(j in 0...fuck.length) {
+                final newInputID:FlxGamepadInputID = Controls.getGamepadInputFromInputType(currentMappings.get(controlItems[i])[j + 2]);
+                bindTexts[i][j].text = InputFormatter.formatFlixelGamepadInput(newInputID);
+            }
+        }
     }
 
     public function changeSelection(by:Int = 0, ?force:Bool = false):Void {

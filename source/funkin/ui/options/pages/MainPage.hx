@@ -8,39 +8,40 @@ import funkin.states.FunkinState;
 import funkin.states.menus.MainMenuState;
 import funkin.states.menus.OptionsState;
 
+import funkin.mobile.input.ControlsHandler;
+
 class MainPage extends Page {
-    public var pages:Array<PageData>;
+    public var pages:Array<PageData> = [];
     public var curSelected:Int = 0;
 
     public var menuItems:FlxTypedSpriteContainer<AtlasText>;
     public var menuIcons:FlxSpriteContainer;
 
-    override function create():Void {
-        super.create();
-        pages = [
-            {
-                name: "Gameplay",
-                callback: () -> menu.loadPage(new GameplayPage())
-            },
-            {
-                name: "Appearance",
-                callback: () -> menu.loadPage(new AppearancePage())
-            },
-            {
-                name: "Miscellanous",
-                callback: () -> menu.loadPage(new MiscellanousPage())
-            },
-            {
+    public function initPages():Void {
+        pages.push({
+            name: "Gameplay",
+            callback: () -> menu.loadPage(new GameplayPage())
+        });
+        pages.push({
+            name: "Appearance",
+            callback: () -> menu.loadPage(new AppearancePage())
+        });
+        pages.push({
+            name: "Miscellanous",
+            callback: () -> menu.loadPage(new MiscellanousPage())
+        });
+        if(ControlsHandler.hasExternalInputDevice) {
+            pages.push({
                 name: "Controls",
                 callback: () -> menu.loadPage(new ControlsPage())
-            },
-            #if android
-            {
-                name: "Open Data Folder",
-                callback: () -> funkin.mobile.external.android.DataFolderUtil.openDataFolder()
-            }
-            #end
-        ];
+            });
+        }
+        #if android
+        pages.push({
+            name: "Open Data Folder",
+            callback: () -> funkin.mobile.external.android.DataFolderUtil.openDataFolder()
+        });
+        #end
         for(pack => customPages in Options.customPages) {
             for(page in customPages) {
                 pages.push({
@@ -49,6 +50,12 @@ class MainPage extends Page {
                 });
             }
         }
+    }
+
+    override function create():Void {
+        super.create();
+        initPages();
+
         menuItems = new FlxTypedSpriteContainer<AtlasText>();
         add(menuItems);
 

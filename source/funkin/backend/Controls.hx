@@ -2,7 +2,9 @@ package funkin.backend;
 
 import flixel.util.FlxSave;
 import flixel.util.FlxTimer;
+
 import flixel.input.keyboard.FlxKey;
+import flixel.input.gamepad.FlxGamepadInputID;
 
 import flixel.addons.input.FlxControls;
 import flixel.addons.input.FlxControlInputType;
@@ -89,6 +91,19 @@ class Controls extends FlxControls<Control> {
         return key;
     }
 
+    public static function getGamepadInputFromInputType(shit:FlxControlInputType):FlxGamepadInputID {
+        var input:FlxGamepadInputID = NONE;
+        if(shit != null) {
+            switch(shit.simplify()) {
+                case Gamepad(Lone(i)):
+                    input = i;
+    
+                default:
+            }
+        }
+        return input;
+    }
+
     public function apply():Void {
         final mappings:ActionMap<Control> = getCurrentMappings();
         FlxG.sound.volumeUpKeys = [for(input in mappings.get(VOLUME_UP)) {
@@ -108,52 +123,78 @@ class Controls extends FlxControls<Control> {
         }];
     }
 
+    // 0-1 is keyboard input
+    // 2-3 is gamepad input
     public function getDefaultMappings():ActionMap<Control> {
         return [
-            UI_LEFT => [FlxKey.A, FlxKey.LEFT],
-            UI_DOWN => [FlxKey.S, FlxKey.DOWN],
-            UI_UP => [FlxKey.W, FlxKey.UP],
-            UI_RIGHT => [FlxKey.D, FlxKey.RIGHT],
+            UI_LEFT => [FlxKey.A, FlxKey.LEFT, FlxGamepadInputID.DPAD_LEFT, FlxGamepadInputID.LEFT_STICK_DIGITAL_LEFT],
+            UI_DOWN => [FlxKey.S, FlxKey.DOWN, FlxGamepadInputID.DPAD_DOWN, FlxGamepadInputID.LEFT_STICK_DIGITAL_DOWN],
+            UI_UP => [FlxKey.W, FlxKey.UP, FlxGamepadInputID.DPAD_UP, FlxGamepadInputID.LEFT_STICK_DIGITAL_UP],
+            UI_RIGHT => [FlxKey.D, FlxKey.RIGHT, FlxGamepadInputID.DPAD_RIGHT, FlxGamepadInputID.LEFT_STICK_DIGITAL_RIGHT],
 
-            ACCEPT => [FlxKey.ENTER, FlxKey.SPACE],
-            BACK => [FlxKey.ESCAPE, FlxKey.BACKSPACE],
-            RESET => [FlxKey.R, FlxKey.NONE],
-            PAUSE => [FlxKey.ENTER, FlxKey.ESCAPE],
+            ACCEPT => [FlxKey.ENTER, FlxKey.SPACE, FlxGamepadInputID.A, FlxGamepadInputID.START],
+            BACK => [FlxKey.ESCAPE, FlxKey.BACKSPACE, FlxGamepadInputID.B, FlxGamepadInputID.NONE],
+            RESET => [FlxKey.R, FlxKey.NONE, FlxGamepadInputID.BACK, FlxGamepadInputID.NONE],
+            PAUSE => [FlxKey.ENTER, FlxKey.ESCAPE, FlxGamepadInputID.START, FlxGamepadInputID.NONE],
 
-            NOTE_LEFT => [FlxKey.A, FlxKey.LEFT],
-            NOTE_DOWN => [FlxKey.S, FlxKey.DOWN],
-            NOTE_UP => [FlxKey.W, FlxKey.UP],
-            NOTE_RIGHT => [FlxKey.D, FlxKey.RIGHT],
+            NOTE_LEFT => [FlxKey.A, FlxKey.LEFT, FlxGamepadInputID.DPAD_LEFT, FlxGamepadInputID.X],
+            NOTE_DOWN => [FlxKey.S, FlxKey.DOWN, FlxGamepadInputID.DPAD_DOWN, FlxGamepadInputID.A],
+            NOTE_UP => [FlxKey.W, FlxKey.UP, FlxGamepadInputID.DPAD_UP, FlxGamepadInputID.Y],
+            NOTE_RIGHT => [FlxKey.D, FlxKey.RIGHT, FlxGamepadInputID.DPAD_RIGHT, FlxGamepadInputID.B],
 
-            SCREENSHOT => [FlxKey.F3, FlxKey.NONE],
-            FULLSCREEN => [FlxKey.F11, FlxKey.NONE],
+            SCREENSHOT => [FlxKey.F3, FlxKey.NONE, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
+            FULLSCREEN => [FlxKey.F11, FlxKey.NONE, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
 
-            VOLUME_UP => [FlxKey.PLUS, FlxKey.NUMPADPLUS],
-            VOLUME_DOWN => [FlxKey.MINUS, FlxKey.NUMPADMINUS],
-            VOLUME_MUTE => [FlxKey.ZERO, FlxKey.NUMPADZERO],
+            VOLUME_UP => [FlxKey.PLUS, FlxKey.NUMPADPLUS, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
+            VOLUME_DOWN => [FlxKey.MINUS, FlxKey.NUMPADMINUS, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
+            VOLUME_MUTE => [FlxKey.ZERO, FlxKey.NUMPADZERO, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
 
-            DEBUG => [FlxKey.SEVEN, FlxKey.NONE],
-            DEBUG_RELOAD => [FlxKey.F5, FlxKey.NONE],
-            DEBUG_OVERLAY => [FlxKey.F12, FlxKey.NONE],
-            EMERGENCY => [FlxKey.F7, FlxKey.NONE],
-            MANAGE_CONTENT => [FlxKey.TAB, FlxKey.NONE],
+            DEBUG => [FlxKey.SEVEN, FlxKey.NONE, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
+            DEBUG_RELOAD => [FlxKey.F5, FlxKey.NONE, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
+            DEBUG_OVERLAY => [FlxKey.F12, FlxKey.NONE, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
+            EMERGENCY => [FlxKey.F7, FlxKey.NONE, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
+            MANAGE_CONTENT => [FlxKey.TAB, FlxKey.NONE, FlxGamepadInputID.NONE, FlxGamepadInputID.NONE],
         ];
     }
 
     public function getCurrentMappings():ActionMap<Control> {
         final map:ActionMap<Control> = [];
+        final defaultMappings:ActionMap<Control> = getDefaultMappings();
 
-        for(i in 0...controlTypes.length)
-            map.set(controlTypes[i], Reflect.field(save.data, controlTypes[i].getName()));
-
+        for(i in 0...controlTypes.length) {
+            final inputs:Array<FlxControlInputType> = Reflect.field(save.data, controlTypes[i].getName());
+            final defaultInputs:Array<FlxControlInputType> = defaultMappings[controlTypes[i]];
+            for(j in 0...defaultInputs.length) {
+                if(inputs[j] == null)
+                    inputs[j] = defaultInputs[j]; // if any input is missing, use the default
+            }
+            map.set(controlTypes[i], inputs);
+        }
         return map;
     }
-
+    
+    // index is 0-1 here
     public function bindKey(control:Control, idx:Int, input:FlxKey):Void {
-        var inputs:Array<FlxControlInputType> = Reflect.field(save.data, control.getName());
-        inputs[idx] = input;
+        var currentMappings:ActionMap<Control> = getCurrentMappings();
+
+        var inputs:Array<FlxControlInputType> = currentMappings[control];
+        inputs[idx] = FlxControlInputType.fromKey(input);
+        currentMappings[control] = inputs;
         Reflect.setField(save.data, control.getName(), inputs);
-        resetMappings(getCurrentMappings());
+
+        resetMappings(currentMappings);
+    }
+
+    // index is still 0-1 here
+    public function bindGamepadInput(control:Control, idx:Int, input:FlxGamepadInputID):Void {
+        var currentMappings:ActionMap<Control> = getCurrentMappings();
+
+        var inputs:Array<FlxControlInputType> = currentMappings[control];
+        inputs[idx + 2] = FlxControlInputType.fromGamepad(input);
+        currentMappings[control] = inputs;
+        Reflect.setField(save.data, control.getName(), inputs);
+
+        resetMappings(currentMappings);
     }
 
     public function flush():Void {
