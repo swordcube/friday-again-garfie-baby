@@ -223,7 +223,7 @@ class PlayField extends FlxContainer {
         if(event.showSplash)
             event.note.strumLine.showSplash(event.direction);
 
-        if(event.playHitSound && Options.hitsoundVolume > 0) {
+        if(event.playHitSound && Options.hitsoundVolume > 0.001) {
             hitSound.time = 0;
             hitSound.volume = Options.hitsoundVolume;
             hitSound.play(true);
@@ -359,7 +359,7 @@ class PlayField extends FlxContainer {
         final strum:Strum = strumLine.strums.members[direction];
         strum.animation.play('${Constants.NOTE_DIRECTIONS[direction]} press');
 
-        if(Options.hitsoundBehavior == "Key Press" && Options.hitsoundVolume > 0) {
+        if(Options.hitsoundBehavior == "Key Press" && Options.hitsoundVolume > 0.001) {
             hitSound.time = 0;
             hitSound.volume = Options.hitsoundVolume;
             hitSound.play(true);

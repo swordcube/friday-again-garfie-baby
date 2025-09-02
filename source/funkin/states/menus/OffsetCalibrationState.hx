@@ -107,7 +107,7 @@ class OffsetCalibrationState extends FunkinState {
                 FlxTween.color(offsetText, 0.5, offsetText.color, FlxColor.WHITE);
 
                 final estimatedSongOffset:Float = Math.floor((newSongOffset - audioLatency) / 5) * 5;
-                Options.songOffset = Math.ffloor(estimatedSongOffset);
+                Options.songOffset = Math.floor(estimatedSongOffset);
 
                 FlxG.sound.play(Paths.sound("menus/sfx/select"));
             } else {

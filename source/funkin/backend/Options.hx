@@ -11,8 +11,8 @@ class Options {
     public static var missSounds:Bool = true;
     public static var loadingScreen:Bool = true;
 	public static var skipLoadingConfirm:Bool = false;
-    public static var songOffset:Float = 0;
-    public static var hitWindow:Float = 180;
+    public static var songOffset:Int = 0;
+    public static var hitWindow:Int = 180;
 
     public static var hitsoundType:String = "osu!";
     public static var hitsoundBehavior:String = "Note Hit";
