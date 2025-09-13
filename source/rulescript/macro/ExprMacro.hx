@@ -15,7 +15,7 @@ class ExprMacro
 		var pos = Context.currentPos();
 
 		for (field in fields)
-			if (field.name == 'EVar' || field.name == 'EFunction' || field.name == 'ENew')
+			if (field.name == 'EVar' || field.name == 'EFunction' || field.name == 'ENew' || field.name == 'ECast')
 				fields.remove(field);
 
 		var newFields:Map<String, Expr> = [
