@@ -2,6 +2,7 @@
 .haxelib/
 dump/
 export/
+lime/
 astc-textures/
 debug.log
 

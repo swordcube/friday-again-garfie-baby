@@ -8,9 +8,51 @@ package funkin.graphics;
 #if hxvlc
 import hxvlc.flixel.FlxVideoSprite;
 
-class VideoSprite extends FlxVideoSprite {}
+class VideoSprite extends FlxVideoSprite {
+    /**
+	 * Video loading argument to make the video loop
+	 * 
+	 * Usage:
+	 * ```haxe
+	 * video.load(Paths.video('vid.mp4'),[VideoSprite.looping]);
+	 * ```
+	 */
+	public static final looping:String = ':input-repeat=65535';
+	
+	/**
+	 * Video loading argument to make the video muted
+	 * Use if your video doesnt require audio
+	 * 
+	 * Usage:
+	 * ```haxe
+	 * video.load(Paths.video('vid.mp4'),[VideoSprite.muted]);
+	 * ```
+	 */
+	public static final muted:String = ':no-audio';
+}
 #else
 class VideoSprite extends FlxSprite {
+    /**
+	 * Video loading argument to make the video loop
+	 * 
+	 * Usage:
+	 * ```haxe
+	 * video.load(Paths.video('vid.mp4'),[VideoSprite.looping]);
+	 * ```
+	 */
+	public static final looping:String = '';
+	
+	/**
+	 * Video loading argument to make the video muted
+	 * Use if your video doesnt require audio
+	 * 
+	 * Usage:
+	 * ```haxe
+	 * video.load(Paths.video('vid.mp4'),[VideoSprite.muted]);
+	 * ```
+	 */
+	public static final muted:String = '';
+
     public function load(location:String, ?options:Array<String>):Bool {
         return true;
     }
