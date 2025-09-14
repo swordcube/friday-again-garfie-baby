@@ -389,6 +389,11 @@ class PlayField extends FlxContainer {
     }
 
     private function noteInputSort(a:Note, b:Note):Int {
+        if (a.dangerous && !b.dangerous)
+			return 1;
+		else if (!a.dangerous && b.dangerous)
+			return -1;
+
         return FlxSort.byValues(FlxSort.ASCENDING, a.time, b.time);
     }
 }

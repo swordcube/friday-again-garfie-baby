@@ -36,6 +36,14 @@ class Note extends SkinnableSprite {
     public var wasHit:Bool = false;
     public var wasMissed:Bool = false;
 
+    /**
+     * Whether or not the note is marked as dangerous.
+     * This will make the note lower priority than normal notes.
+     * 
+     * Equivalent to Psych's `lowPriority` field for notes.
+     */
+    public var dangerous:Bool = false;
+
     public var holdTrail:HoldTrail;
     public var stepLength:Float;
 
@@ -85,6 +93,7 @@ class Note extends SkinnableSprite {
         visible = true;
         wasHit = false;
         wasMissed = false;
+        dangerous = false;
         frameOffset.set();
         color = FlxColor.WHITE;
 
