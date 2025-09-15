@@ -20,12 +20,13 @@ class FunkinScriptGroup {
         members = [];
     }
 
-    public function importScript(path:String):Void {
+    public function importScript(path:String):FunkinScript {
         final scriptPath:String = Paths.script(path);
         final contentMetadata = Paths.contentMetadata.get(Paths.getContentPackFromPath(scriptPath));
         final script:FunkinScript = FunkinScript.fromFile(scriptPath, contentMetadata?.allowUnsafeScripts ?? false);
         add(script);
         script.execute();
+        return script;
     }
 
     public function execute():Void {

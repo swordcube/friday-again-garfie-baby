@@ -203,6 +203,9 @@ class FunkinScript {
         setClass(funkin.ui.UIUtil);
         set("UIWindow", funkin.ui.Window);
 
+        set("SoundTray", funkin.ui.SoundTray);
+        set("CustomSoundTray", funkin.ui.CustomSoundTray);
+
         setClass(funkin.utilities.UndoList);
         setClass(funkin.utilities.TouchUtil);
         setClass(funkin.utilities.SwipeUtil);
@@ -233,6 +236,9 @@ class FunkinScript {
 
         set("game", PlayState.instance);
         set("closeScript", close);
+
+        if(unsafe)
+            set("__script__", this);
     }
 
     public function execute():Void {}

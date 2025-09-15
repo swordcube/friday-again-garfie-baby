@@ -1,6 +1,7 @@
 package funkin.ui;
 
 import openfl.display.Bitmap;
+import openfl.display.BitmapData;
 import openfl.display.Sprite;
 
 import flixel.system.ui.FlxSoundTray;
@@ -8,6 +9,8 @@ import flixel.system.FlxAssets.FlxSoundAsset;
 
 class SoundTray extends FlxSoundTray {
     public static final GRAPHIC_SCALE:Float = 0.3;
+
+    public var barBitmapDatas:Map<Int, BitmapData> = [];
 
     public var trayContainer:Sprite;
     public var barDisplay:Bitmap;
@@ -53,7 +56,7 @@ class SoundTray extends FlxSoundTray {
 
         _bars = [];
         for(i in 1...11)
-            FlxG.assets.getBitmapData(Paths.image("ui/images/volume/bars_" + i));
+            barBitmapDatas.set(i * 10, FlxG.assets.getBitmapData(Paths.image("ui/images/volume/bars_" + i)));
         
         y = -88;
         visible = false;
@@ -65,16 +68,29 @@ class SoundTray extends FlxSoundTray {
 
         FlxG.sound.applySoundCurve = applySoundCurve;
         FlxG.sound.reverseSoundCurve = reverseSoundCurve;
+        FlxG.sound.amountChange = 0.1;
     }
 
-    public function applySoundCurve(x:Float):Float {
+    public static function applySoundCurve(x:Float):Float {
         x = Math.max(0, Math.min(1, x));
         return Math.exp(Math.log(0.001) * (1 - x));
     }
 
-    public function reverseSoundCurve(x:Float):Float {
+    public static function reverseSoundCurve(x:Float):Float {
         x = Math.max(0, Math.min(1, x));
         return 1 - (Math.log(Math.max(x, 0.001)) / Math.log(0.001));
+    }
+
+    public function destroy():Void {
+        for(bmp in barBitmapDatas) {
+            @:privateAccess {
+                if(bmp.__texture != null)
+                    bmp.__texture.dispose();
+            }
+            bmp.disposeImage();
+            bmp.dispose();
+        }
+        barBitmapDatas = null;
     }
 
     override function update(MS:Float):Void {
@@ -148,12 +164,8 @@ class SoundTray extends FlxSoundTray {
             FlxG.sound.play(sound);
         
         if(globalVolume != 0) {
-            final imgPath:String = Paths.image("ui/images/volume/bars_" + globalVolume);
-            if(FlxG.assets.exists(imgPath)) {
-                barDisplay.visible = true;
-                barDisplay.bitmapData = FlxG.assets.getBitmapData(imgPath);
-            } else
-                barDisplay.visible = false;
+            barDisplay.bitmapData = barBitmapDatas.get(globalVolume);
+            barDisplay.visible = true;
         } else
             barDisplay.visible = false;
         
