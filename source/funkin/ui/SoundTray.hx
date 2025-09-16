@@ -56,7 +56,7 @@ class SoundTray extends FlxSoundTray {
 
         _bars = [];
         for(i in 1...11)
-            barBitmapDatas.set(i * 10, FlxG.assets.getBitmapData(Paths.image("ui/images/volume/bars_" + i)));
+            barBitmapDatas.set(i, FlxG.assets.getBitmapData(Paths.image("ui/images/volume/bars_" + i)));
         
         y = -88;
         visible = false;
