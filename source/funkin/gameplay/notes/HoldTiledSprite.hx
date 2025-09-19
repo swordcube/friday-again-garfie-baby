@@ -1,6 +1,8 @@
 package funkin.gameplay.notes;
 
+import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
+
 import funkin.graphics.TiledSprite;
 
 import funkin.gameplay.notes.Note;
@@ -10,6 +12,8 @@ import funkin.gameplay.notes.NoteSkin;
  * Tiled sprite class specifically made for hold notes
  */
 class HoldTiledSprite extends TiledSprite {
+    public var defScale:FlxPoint = new FlxPoint(1, 1);
+
     public var holdTrail:HoldTrail;
     public var direction(default, set):Int;
     
@@ -37,6 +41,7 @@ class HoldTiledSprite extends TiledSprite {
 
         final json:NoteSkinData = NoteSkin.get(newSkin);
         loadSkinComplex(newSkin, json.hold, 'gameplay/noteskins/${newSkin}');
+        defScale.set(json.hold.scale, json.hold.scale);
 
         direction = direction; // force animation update
     }
@@ -48,8 +53,14 @@ class HoldTiledSprite extends TiledSprite {
         direction = newDirection;
         animation.play('${Constants.NOTE_DIRECTIONS[direction]} hold');
 
-        var oldHeight:Float = height;
+        final prevScaleX:Float = scale.x;
+        final prevScaleY:Float = scale.y;
+        
+        final oldHeight:Float = height;
+        scale.set(defScale.x, defScale.y);
         updateHitbox();
+
+        scale.set(prevScaleX, prevScaleY);
         height = oldHeight;
 
         return direction;

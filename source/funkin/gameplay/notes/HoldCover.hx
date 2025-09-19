@@ -1,11 +1,14 @@
 package funkin.gameplay.notes;
 
+import flixel.math.FlxPoint;
 import flixel.util.FlxSignal;
 
 import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
 
 class HoldCover extends SkinnableSprite {
+    public var defScale:FlxPoint = new FlxPoint(1, 1);
+
     public var strumLine:StrumLine;
     public var direction(default, set):Int;
 
@@ -49,7 +52,7 @@ class HoldCover extends SkinnableSprite {
     public function updateOffset():Void {
         centerOrigin();
         centerOffsets();
-        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
+        offset.add((skinData.offset[0] ?? 0.0), (skinData.offset[1] ?? 0.0));
     }
 
     override function loadSkin(newSkin:String):Void {
@@ -58,6 +61,7 @@ class HoldCover extends SkinnableSprite {
 
         final json:NoteSkinData = NoteSkin.get(newSkin);
         loadSkinComplex(newSkin, json.holdCovers, 'gameplay/noteskins/${newSkin}');
+        defScale.set(json.holdCovers.scale, json.holdCovers.scale);
 
         direction = direction; // force animation update
 
@@ -77,7 +81,13 @@ class HoldCover extends SkinnableSprite {
         if(animation.exists(animName))
             animation.play(animName);
 
+        final prevScaleX:Float = scale.x;
+        final prevScaleY:Float = scale.y;
+
+        scale.set(defScale.x, defScale.y);
         updateHitbox();
+
+        scale.set(prevScaleX, prevScaleY);
         updateOffset();
 
         return direction;

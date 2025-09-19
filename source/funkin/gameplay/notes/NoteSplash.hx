@@ -1,11 +1,14 @@
 package funkin.gameplay.notes;
 
+import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
 
 import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
 
 class NoteSplash extends SkinnableSprite {
+    public var defScale:FlxPoint = new FlxPoint(1, 1);
+
     public var strumLine:StrumLine;
     public var direction(default, set):Int;
     public var splashCount(default, null):Int;
@@ -43,7 +46,7 @@ class NoteSplash extends SkinnableSprite {
     public function updateOffset():Void {
         centerOrigin();
         centerOffsets();
-        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
+        offset.add((skinData.offset[0] ?? 0.0), (skinData.offset[1] ?? 0.0));
     }
 
     override function loadSkin(newSkin:String):Void {
@@ -52,6 +55,7 @@ class NoteSplash extends SkinnableSprite {
 
         final json:NoteSkinData = NoteSkin.get(newSkin);
         loadSkinComplex(newSkin, json.splash, 'gameplay/noteskins/${newSkin}');
+        defScale.set(json.splash.scale, json.splash.scale);
 
         splashCount = Lambda.count(json.splash.animation);
         direction = direction; // force animation update
@@ -80,7 +84,13 @@ class NoteSplash extends SkinnableSprite {
         if(animation.exists(animName))
             animation.play(animName);
 
+        final prevScaleX:Float = scale.x;
+        final prevScaleY:Float = scale.y;
+
+        scale.set(defScale.x, defScale.y);
         updateHitbox();
+
+        scale.set(prevScaleX, prevScaleY);
         updateOffset();
 
         return direction;

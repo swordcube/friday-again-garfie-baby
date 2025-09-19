@@ -113,10 +113,10 @@ class HoldTrail extends FlxSpriteContainer {
 
             if(tail.flipY) {
                 strip.y = y - calcHeight;
-                tail.y = strip.y - tail.height;
+                tail.y = strip.y - (tail.height * (tail.scale.y / tail.defScale.y));
             } else {
                 strip.y = y;
-                tail.y = y + calcHeight;
+                tail.y = y + (calcHeight - (tail.height * (1 -(tail.scale.y / tail.defScale.y))));
             }
             final strum:Strum = note.strumLine.strums.members[note.direction];
             final strumCenter:Float = (strum != null) ? strum.y + (strum.height * 0.5) : y;

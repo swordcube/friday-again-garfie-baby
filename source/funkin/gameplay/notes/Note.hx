@@ -1,11 +1,15 @@
 package funkin.gameplay.notes;
 
+import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
 
 import funkin.backend.events.NoteEvents;
 
 import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
+
+import funkin.gameplay.modchart.math.Vector3;
+import funkin.gameplay.modchart.IModifierObject;
 
 import funkin.states.PlayState;
 
@@ -23,6 +27,9 @@ class ScoreStep {
 }
 
 class Note extends SkinnableSprite {
+    public var objectType:ModifierObjectType = NOTE;
+    public var vec3Cache:Vector3 = new Vector3();
+
     public var strumLine:StrumLine;
 
     public var time:Float;
@@ -50,6 +57,8 @@ class Note extends SkinnableSprite {
     public var curScoreStep:Int = 0;
     public var scoreSteps:Array<ScoreStep> = [];
 
+    public var defScale:FlxPoint = new FlxPoint(1, 1); // for modcharting
+
     @:noCompletion
     public var hitEvent:NoteHitEvent; // meant for internal use, don't care enough to make it private :/
 
@@ -65,7 +74,9 @@ class Note extends SkinnableSprite {
 
     public function setup(strumLine:StrumLine, time:Float, direction:Int, length:Float, type:String, skin:String):Note {
         loadSkin(skin);
+
         scale.set(_skinData.scale * strumLine.scaleMult.x, _skinData.scale * strumLine.scaleMult.y);
+        defScale.copyFrom(scale);
 
         this.strumLine = strumLine;
         this.time = time;
@@ -136,7 +147,7 @@ class Note extends SkinnableSprite {
     public function updateOffset():Void {
         centerOrigin();
         centerOffsets();
-        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
+        offset.add((skinData.offset[0] ?? 0.0), (skinData.offset[1] ?? 0.0));
     }
 
     override function loadSkin(newSkin:String) {
@@ -145,6 +156,7 @@ class Note extends SkinnableSprite {
 
         final json:NoteSkinData = NoteSkin.get(newSkin);
         loadSkinComplex(newSkin, json.note, 'gameplay/noteskins/${newSkin}');
+        defScale.set(json.note.scale, json.note.scale);
 
         direction = direction; // force animation update
 
@@ -164,7 +176,13 @@ class Note extends SkinnableSprite {
         if(animation.exists(animName))
             animation.play(animName);
 
+        final prevScaleX:Float = scale.x;
+        final prevScaleY:Float = scale.y;
+
+        scale.set(defScale.x, defScale.y);
         updateHitbox();
+
+        scale.set(prevScaleX, prevScaleY);
         updateOffset();
 
         return direction;

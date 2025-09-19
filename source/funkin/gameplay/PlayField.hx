@@ -135,9 +135,9 @@ class PlayField extends FlxContainer {
             
             for(i in 0...strumLine.strums.length) {
                 final strum:Strum = strumLine.strums.members[i];
-                strum.y -= 10;
+                strum.offsetY -= 10;
                 strum.alpha = 0.001;
-                FlxTween.tween(strum, {alpha: 1, y: strum.y + 10}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+                FlxTween.tween(strum, {alpha: 1, offsetY: strum.offsetY + 10}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
             }
         }
         noteSpawner = new NoteSpawner(this);

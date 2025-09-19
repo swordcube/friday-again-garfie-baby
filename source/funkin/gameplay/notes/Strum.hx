@@ -1,12 +1,25 @@
 package funkin.gameplay.notes;
 
+import flixel.math.FlxPoint;
+
 import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
 
+import funkin.gameplay.modchart.math.Vector3;
+import funkin.gameplay.modchart.IModifierObject;
+
 class Strum extends SkinnableSprite {
+    public var objectType:ModifierObjectType = STRUM;
+    public var vec3Cache:Vector3 = new Vector3();
+
+    public var defScale:FlxPoint = new FlxPoint(1, 1); // for modcharting
+    
     public var strumLine:StrumLine;
     public var holdTime:Float = Math.POSITIVE_INFINITY;
     public var direction(default, set):Int;
+
+    public var offsetX:Float = 0;
+    public var offsetY:Float = 0;
 
     public function new(x:Float = 0, y:Float = 0, direction:Int = 0, skin:String) {
         super(x, y);
@@ -30,7 +43,7 @@ class Strum extends SkinnableSprite {
     public function updateOffset():Void {
         centerOrigin();
         centerOffsets();
-        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
+        offset.add((skinData.offset[0] ?? 0.0), (skinData.offset[1] ?? 0.0));
     }
 
     override function update(elapsed:Float) {
@@ -53,10 +66,9 @@ class Strum extends SkinnableSprite {
 
         final json:NoteSkinData = NoteSkin.get(newSkin);
         loadSkinComplex(newSkin, json.strum, 'gameplay/noteskins/${newSkin}');
+        defScale.set(json.strum.scale, json.strum.scale);
 
         direction = direction; // force animation update
-        updateHitbox();
-        updateOffset();
 
         final prevAlpha:Float = alpha;
         alpha = 0.0000001;
@@ -73,6 +85,15 @@ class Strum extends SkinnableSprite {
         final animName:String = '${Constants.NOTE_DIRECTIONS[direction]} static';
         if(animation.exists(animName))
             animation.play(animName);
+
+        final prevScaleX:Float = scale.x;
+        final prevScaleY:Float = scale.y;
+
+        scale.set(defScale.x, defScale.y);
+        updateHitbox();
+
+        scale.set(prevScaleX, prevScaleY);
+        updateOffset();
 
         return direction;
     }

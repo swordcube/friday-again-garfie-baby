@@ -56,6 +56,8 @@ import funkin.gameplay.stage.props.ComboProp;
 import funkin.gameplay.cutscenes.*;
 import funkin.gameplay.cutscenes.Cutscene;
 
+import funkin.gameplay.modchart.Manager as ModManager;
+
 import funkin.states.menus.StoryMenuState;
 import funkin.states.menus.FreeplayState;
 import funkin.states.editors.ChartEditor;
@@ -149,6 +151,8 @@ class PlayState extends FunkinState {
 
 	public var countdown:Countdown;
 	public var eventRunner:EventRunner;
+
+	public var modManager:ModManager;
 
 	public var songLength:Float = 0;
 	public var songPercent(get, never):Float;
@@ -674,13 +678,19 @@ class PlayState extends FunkinState {
 		playField.cameras = [camHUD];
 		add(playField);
 
+		scripts.call("onGeneratePlayFieldPost", [playField]);
+
+		modManager = new ModManager();
+		add(modManager);
+
 		if(lastParams.forceOpponentMode != null)
 			opponentMode = lastParams.forceOpponentMode;
 		
 		else if(Options.gameplayModifiers.get("opponentMode") == true && currentChart.meta.game.allowOpponentMode)
 			opponentMode = true;
 		
-		scripts.call("onGeneratePlayFieldPost", [playField]);
+		scripts.call("onGenerateModchart", [modManager]);
+		scripts.call("generateModchart", [modManager]);
 
 		final event:HUDGenerationEvent = cast Events.get(HUD_GENERATION);
 		event.recycle(hudSkin);

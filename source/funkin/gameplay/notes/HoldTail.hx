@@ -1,5 +1,6 @@
 package funkin.gameplay.notes;
 
+import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
 
 import funkin.graphics.SkinnableSprite;
@@ -9,6 +10,8 @@ import funkin.gameplay.notes.NoteSkin;
  * Tiled sprite class specifically made for hold tails
  */
 class HoldTail extends SkinnableSprite {
+    public var defScale:FlxPoint = new FlxPoint(1, 1);
+
     public var holdTrail:HoldTrail;
     public var direction(default, set):Int;
     
@@ -30,12 +33,19 @@ class HoldTail extends SkinnableSprite {
         return this;
     }
 
+    public function updateOffset():Void {
+        centerOrigin();
+        centerOffsets();
+        offset.add((skinData.offset[0] ?? 0.0), (skinData.offset[1] ?? 0.0));
+    }
+
     override function loadSkin(newSkin:String) {
         if(_skin == newSkin)
             return;
 
         final json:NoteSkinData = NoteSkin.get(newSkin);
         loadSkinComplex(newSkin, json.hold, 'gameplay/noteskins/${newSkin}');
+        defScale.set(json.hold.scale, json.hold.scale);
 
         direction = direction; // force animation update
     }
@@ -50,9 +60,15 @@ class HoldTail extends SkinnableSprite {
         if(animation.exists(animName))
             animation.play(animName);
 
-        centerOrigin();        
+        final prevScaleX:Float = scale.x;
+        final prevScaleY:Float = scale.y;
+        centerOrigin();
+        
+        scale.set(defScale.x, defScale.y);
         updateHitbox();
-        centerOffsets();
+
+        scale.set(prevScaleX, prevScaleY);
+        updateOffset();
 
         return direction;
     }

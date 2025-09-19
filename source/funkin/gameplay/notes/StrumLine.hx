@@ -270,6 +270,7 @@ class StrumLine extends FlxSpriteGroup {
         for(i in 0...Constants.KEY_COUNT) {
             final strum:Strum = strums.members[i];
             strum.scale.set(json.strum.scale * point.x, json.strum.scale * point.y);
+            strum.defScale.copyFrom(strum.scale);
             strum.updateHitbox();
             strum.updateOffset();
             strum.x = x + ((i - (Constants.KEY_COUNT * 0.5)) * Constants.STRUM_SPACING * point.x);

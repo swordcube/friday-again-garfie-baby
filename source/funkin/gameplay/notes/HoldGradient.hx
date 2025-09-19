@@ -1,9 +1,13 @@
 package funkin.gameplay.notes;
 
+import flixel.math.FlxPoint;
+
 import funkin.gameplay.notes.NoteSkin;
 import funkin.graphics.SkinnableSprite;
 
 class HoldGradient extends SkinnableSprite {
+    public var defScale:FlxPoint = new FlxPoint(1, 1);
+
     public var strumLine:StrumLine;
     public var direction(default, set):Int;
     public var holding:Bool = false;
@@ -19,7 +23,7 @@ class HoldGradient extends SkinnableSprite {
     public function updateOffset():Void {
         centerOrigin();
         centerOffsets();
-        offset.add((skinData.offset[0] ?? 0.0) * (strumLine?.scaleMult?.x ?? 1.0), (skinData.offset[1] ?? 0.0) * (strumLine?.scaleMult?.y ?? 1.0));
+        offset.add((skinData.offset[0] ?? 0.0), (skinData.offset[1] ?? 0.0));
     }
 
     override function update(elapsed:Float):Void {
@@ -39,6 +43,7 @@ class HoldGradient extends SkinnableSprite {
 
         final json:NoteSkinData = NoteSkin.get(newSkin);
         loadSkinComplex(newSkin, json.holdGradients, 'gameplay/noteskins/${newSkin}');
+        defScale.set(json.holdGradients.scale, json.holdGradients.scale);
 
         direction = direction; // force animation update
 
@@ -58,7 +63,13 @@ class HoldGradient extends SkinnableSprite {
         if(animation.exists(animName))
             animation.play(animName);
 
+        final prevScaleX:Float = scale.x;
+        final prevScaleY:Float = scale.y;
+
+        scale.set(defScale.x, defScale.y);
         updateHitbox();
+
+        scale.set(prevScaleX, prevScaleY);
         updateOffset();
         
         return direction;
