@@ -258,8 +258,8 @@ class Project extends HXProject {
 		setDefine("lime_disable_assets_version");
 
 		// generational gc on desktop
-		if (isDesktop())
-			setDefine("HXCPP_GC_GENERATIONAL");
+		// if (isDesktop())
+		// 	setDefine("HXCPP_GC_GENERATIONAL");
 
 		// self explanatory
 		setDefine("no-deprecation-warnings");
