@@ -47,8 +47,8 @@
       "name": "hxcpp",
       "type": "git",
       "dir": null,
-      "ref": "master",
-      "url": "https://github.com/HaxeFoundation/hxcpp"
+      "ref": "funkin",
+      "url": "https://github.com/FunkinCrew/hxcpp"
     },
     {
       "name": "hxdiscord_rpc",
