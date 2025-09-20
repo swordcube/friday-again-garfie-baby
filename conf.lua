@@ -1,5 +1,5 @@
 function love.conf(t)
-    t.identity = "GarfieBaby"
+    t.identity = "GarfieBabyFunkin"
     t.version = "12.0"
     t.console = false
 
@@ -8,7 +8,7 @@ function love.conf(t)
     t.highdpi = false
     t.usedpiscale = false
 
-    t.window.title = "Friday Again Garfie Baby"
+    t.window.title = "friday again garfie baby"
 
     t.window.width = 1280
     t.window.height = 720
@@ -18,4 +18,6 @@ function love.conf(t)
 
     t.window.resizable = true
     t.window.vsync = false
+
+    t.modules.audio = false -- we need to initialize alsoft stuff first
 end

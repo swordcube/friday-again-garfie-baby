@@ -1,5 +1,14 @@
-comet = require("thirdparty.comet")
+--- Similar to `require`, but returns from the `src` folder automatically
+--- 
+--- Recommended to add `@type` documentation to every line of `funkreq` for better autocompletion in VSCode
+--- 
+--- @param modname string
+--- @return unknown
+function funkreq(modname)
+    return require("src." .. modname)
+end
 
+comet = require("thirdparty.comet")
 comet.init({
     flags = require("flags"),
     settings = {
@@ -8,5 +17,5 @@ comet.init({
         dimensions = {1280, 720},
         parallelUpdate = false
     },
-    -- screen = function() return require("funkin.screens.initscreen"):new() end
+    screen = function() return funkreq("funkin.screens.initscreen"):new() end
 })
