@@ -1,7 +1,0 @@
-function onNoteHit(e:NoteHitEvent) {
-    e.playSingAnim = false;
-}
-
-function onNoteMiss(e:NoteMissEvent) {
-    e.playMissAnim = false;
-}

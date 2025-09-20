@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<TextureAtlas imagePath="placeholderpixel.png">
-    <SubTexture name="idle0000" x="0" y="36" width="39" height="31" frameX="-11" frameY="-14" frameWidth="60" frameHeight="60" />
-    <SubTexture name="confirm0000" x="76" y="0" width="42" height="26" frameX="-10" frameY="-18" frameWidth="60" frameHeight="60" />
-    <SubTexture name="confirm0001" x="0" y="0" width="37" height="36" frameX="-13" frameY="-11" frameWidth="60" frameHeight="60" />
-    <SubTexture name="confirm0002" x="37" y="0" width="39" height="32" frameX="-12" frameY="-14" frameWidth="60" frameHeight="60" />
-    <SubTexture name="confirm-hold0000" x="37" y="0" width="39" height="32" frameX="-12" frameY="-14" frameWidth="60" frameHeight="60" />
-</TextureAtlas>

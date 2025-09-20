@@ -1,7 +1,0 @@
-function onNoteHit(e:NoteHitEvent) {
-    e.singAnimSuffix = "-alt";
-}
-
-function onNoteMiss(e:NoteMissEvent) {
-    e.missAnimSuffix = "-alt";
-}

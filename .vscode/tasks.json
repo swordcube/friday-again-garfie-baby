@@ -1,13 +1,47 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "lime",
-			"command": "test",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		}
-	]
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Debug Game (Windows)",
+            "type": "shell",
+            "command": "./commands/debug.bat",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Debug Game (Unix)",
+            "type": "shell",
+            "command": "sh ./commands/debug.sh",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Publish Game (Windows)",
+            "type": "shell",
+            "command": "./commands/publish.bat",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Publish Game (Unix)",
+            "type": "shell",
+            "command": "sh ./commands/publish.sh",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        }
+    ]
 }
