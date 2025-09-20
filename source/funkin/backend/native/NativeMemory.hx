@@ -8,7 +8,7 @@ import cpp.SizeT;
  * @author Leather128 (Haxe) - David Robert Nadeau (Original C Header)
  */
 @:buildXml('<include name="../../../vendor/memory/build.xml" />')
-@:include("memory.h")
+@:include("memory.hpp")
 extern class NativeMemory {
 	/**
 	 * Returns the peak (maximum so far) resident set size (physical
@@ -35,12 +35,12 @@ class NativeMemory {
 	 * (Non cpp platform)
 	 * Returns 0.
 	 */
-	public static function getPeakUsage():Float return 0.0;
+	public static inline function getPeakUsage():UInt return 0;
 
 	/**
 	 * (Non cpp platform)
 	 * Returns 0.
 	 */
-	public static function getCurrentUsage():Float return 0.0;
+	public static inline function getCurrentUsage():UInt return 0;
 }
 #end
