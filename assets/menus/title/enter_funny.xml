@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Created with Funkin Packer v0.1.3 https://neeeoo.github.io/funkin-packer/
+-->
+<TextureAtlas imagePath="texture.png" width="676" height="414">
+	<SubTexture name="Press Enter to Begin0000" x="3" y="3" width="670" height="81" frameX="-10" frameY="-13" frameWidth="695" frameHeight="105"/>
+	<SubTexture name="Press Enter to Begin0001" x="3" y="87" width="670" height="81" frameX="-10" frameY="-13" frameWidth="695" frameHeight="105"/>
+	<SubTexture name="Press Enter to Begin0002" x="3" y="334" width="670" height="77" frameX="-10" frameY="-17" frameWidth="695" frameHeight="105"/>
+	<SubTexture name="Press Enter to Begin0003" x="3" y="253" width="669" height="78" frameX="-10" frameY="-16" frameWidth="695" frameHeight="105"/>
+	<SubTexture name="Press Enter to Begin0004" x="3" y="171" width="670" height="79" frameX="-10" frameY="-15" frameWidth="695" frameHeight="105"/>
+	<SubTexture name="ENTER PRESSED0000" x="3" y="3" width="670" height="81" frameX="-10" frameY="-13" frameWidth="695" frameHeight="105"/>
+	<SubTexture name="ENTER PRESSED0001" x="3" y="87" width="670" height="81" frameX="-10" frameY="-13" frameWidth="695" frameHeight="105"/>
+	<SubTexture name="ENTER PRESSED0002" x="3" y="334" width="670" height="77" frameX="-10" frameY="-17" frameWidth="695" frameHeight="105"/>
+	<SubTexture name="ENTER PRESSED0003" x="3" y="253" width="669" height="78" frameX="-10" frameY="-16" frameWidth="695" frameHeight="105"/>
+	<SubTexture name="ENTER PRESSED0004" x="3" y="171" width="670" height="79" frameX="-10" frameY="-15" frameWidth="695" frameHeight="105"/>
+</TextureAtlas>

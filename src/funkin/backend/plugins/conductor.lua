@@ -278,7 +278,7 @@ local function recursiveStep(object, step)
         recursiveStep(child, step)
     end
     if object.stepHit then
-        object.stepHit(step)
+        object:stepHit(step)
     end
 end
 
@@ -289,7 +289,7 @@ local function recursiveBeat(object, beat)
         recursiveBeat(child, beat)
     end
     if object.beatHit then
-        object.beatHit(beat)
+        object:beatHit(beat)
     end
 end
 
@@ -300,7 +300,7 @@ local function recursiveMeasure(object, measure)
         recursiveMeasure(child, measure)
     end
     if object.measureHit then
-        object.measureHit(measure)
+        object:measureHit(measure)
     end
 end
 

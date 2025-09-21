@@ -69,6 +69,30 @@ function Paths.image(name)
     return fallback(name, "Image")
 end
 
+function Paths.xml(name)
+    local newPath = Paths.getAsset(name .. ".xml", nil, false)
+    if fs.exists(newPath) then
+        return newPath
+    end
+    return fallback(name, "XML")
+end
+
+function Paths.json(name)
+    local newPath = Paths.getAsset(name .. ".json", nil, false)
+    if fs.exists(newPath) then
+        return newPath
+    end
+    return fallback(name, "json")
+end
+
+function Paths.csv(name)
+    local newPath = Paths.getAsset(name .. ".csv", nil, false)
+    if fs.exists(newPath) then
+        return newPath
+    end
+    return fallback(name, "CSV")
+end
+
 function Paths.font(name)
     local assetExts = Paths.FONT_EXTS
     for j = 1, #assetExts do
@@ -105,6 +129,14 @@ function Paths.vert(name)
         return newPath
     end
     return fallback(name, "Vertex shader")
+end
+
+function Paths.getSparrowAtlas(name)
+    -- TODO: caching
+    return FrameCollection.loadSparrowAtlas(
+        Paths.image(name),
+        Paths.xml(name)
+    )
 end
 
 return Paths
