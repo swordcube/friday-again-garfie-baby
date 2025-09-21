@@ -76,9 +76,9 @@ function DebugOverlay.init()
     local updateTimer = 0.0
     local graphUpdateTimer = 0.0
 
-    local debugFont = gfx.newFont("assets/fonts/jetbrains-mono/regular.ttf", 14, "light")
-    local debugFontSmall = gfx.newFont("assets/fonts/jetbrains-mono/regular.ttf", 10, "light")
-    local debugFontBold = gfx.newFont("assets/fonts/jetbrains-mono/bold.ttf", 14, "light")
+    local debugFont = gfx.newFont(Paths.font("fonts/jetbrains-mono/regular"), 14, "light")
+    local debugFontSmall = gfx.newFont(Paths.font("fonts/jetbrains-mono/regular"), 10, "light")
+    local debugFontBold = gfx.newFont(Paths.font("fonts/jetbrains-mono/bold"), 14, "light")
 
     local stats = {
         fps = 0,
@@ -244,12 +244,10 @@ function DebugOverlay.init()
             gfx.coloredRectangle("fill", 10, statY, w, h, fillColor)
             gfx.coloredRectangle("line", 10, statY, w, h, lineColor)
             
-            displayStat("Asset Loaders", "")
-            
+            displayStat("Asset Loaders", "")            
             for i = 1, #assetLoaders do
                 displayStat(nil, ("- %s (%s)"):format(assetLoaders[i].name, assetLoaders[i].displayedRoot))
             end
-            -- displayStat(nil, "- scs (content/scs)")
         end
     end)
     comet.signals.onInput:connect(function(e)

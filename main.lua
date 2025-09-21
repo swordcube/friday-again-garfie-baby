@@ -1,9 +1,5 @@
 comet = require("thirdparty.comet")
 
-function comet.load()
-    srcreq("funkin.gfx.debugoverlay").init()
-end
-
 comet.init({
     flags = require("flags"),
     settings = {
