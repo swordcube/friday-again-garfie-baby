@@ -91,4 +91,20 @@ function Paths.sound(name)
     return fallback(name, "Sound")
 end
 
+function Paths.frag(name)
+    local newPath = Paths.getAsset(name .. ".frag", nil, false)
+    if fs.exists(newPath) then
+        return newPath
+    end
+    return fallback(name, "Fragment shader")
+end
+
+function Paths.vert(name)
+    local newPath = Paths.getAsset(name .. ".vert", nil, false)
+    if fs.exists(newPath) then
+        return newPath
+    end
+    return fallback(name, "Vertex shader")
+end
+
 return Paths

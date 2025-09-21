@@ -18,9 +18,9 @@ vec3 hsv2rgb(vec3 c) {
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-void main() {
-    vec4 color = flixel_texture2D(bitmap, openfl_TextureCoordv);
-    vec3 hsv = rgb2hsv(color.rgb);
+vec4 effect(vec4 color, Image texture, vec2 textureCoords, vec2 screenCoords) {
+    vec4 pixel = Texel(texture, textureCoords);
+    vec3 hsv = rgb2hsv(pixel.rgb);
     hsv.x = VALUE;
-    gl_FragColor = vec4(hsv2rgb(hsv), color.a);
+    return vec4(hsv2rgb(hsv), pixel.a) * color;
 }
