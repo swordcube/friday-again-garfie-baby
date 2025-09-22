@@ -154,15 +154,15 @@ end
 
 function Conductor:setupTimingPoints(timingPoints)
     table.sort(timingPoints, function(a, b)
-        return a.time < b.time
+        return a.t < b.t
     end)
     local timeOffset = 0.0
     local stepOffset = 0.0
     local beatOffset = 0.0
     local measureOffset = 0.0
 
-    local lastTopNumber = timingPoints[1].timeSignature[1]
-    local lastBottomNumber = timingPoints[1].timeSignature[2]
+    local lastTopNumber = timingPoints[1].ts[1]
+    local lastBottomNumber = timingPoints[1].ts[2]
 
     local lastBPM = timingPoints[1].bpm
     for i = 2, #timingPoints do
@@ -174,23 +174,23 @@ function Conductor:setupTimingPoints(timingPoints)
         stepOffset = stepOffset + (beatDifference * lastBottomNumber)
 
         local newPoint = {
-            time = point.time,
+            time = point.t,
 
             step = stepOffset,
             beat = beatOffset,
             measure = measureOffset,
             
-            bpm = point.bpm,
-            timeSignature = point.timeSignature
+            bpm = point.b,
+            timeSignature = point.ts
         }
         table.insert(self.timingPoints, newPoint)
 
-        timeOffset = point.time
+        timeOffset = point.t
 
-        lastTopNumber = point.timeSignature[1]
-        lastBottomNumber = point.timeSignature[2]
+        lastTopNumber = point.ts[1]
+        lastBottomNumber = point.ts[2]
 
-        lastBPM = point.bpm
+        lastBPM = point.b
     end
     self._latestTimingPoint = self.timingPoints[1]
 end

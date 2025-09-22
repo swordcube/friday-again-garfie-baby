@@ -88,7 +88,10 @@ function DebugOverlay.init()
         peakGcMem = 0,
 
         taskMem = 0,
-        peakTaskMem = 0
+        peakTaskMem = 0,
+
+        videoMem = 0,
+        peakVideoMem = 0
     }
     local statY = 15
     local function displayStat(boldText, statText, otherStatText)
@@ -125,6 +128,10 @@ function DebugOverlay.init()
             if stats.taskMem > stats.peakTaskMem then
                 stats.peakTaskMem = stats.taskMem
             end
+            stats.videoMem = gfx.getStats().texturememory
+            if stats.videoMem > stats.peakVideoMem then
+                stats.peakVideoMem = stats.videoMem
+            end
             updateTimer = updateTimer - 1.0
         end
         if comet.settings.parallelUpdate then
@@ -140,7 +147,7 @@ function DebugOverlay.init()
         end
         local w, h = boxWidth, 145
         if DebugOverlay.overlayType == "advanced" then
-            h = comet.settings.parallelUpdate and 230 or 150
+            h = comet.settings.parallelUpdate and 245 or 165
         elseif DebugOverlay.overlayType == "basic" then
             h = comet.settings.parallelUpdate and 80 or 65
         end
@@ -158,6 +165,8 @@ function DebugOverlay.init()
         displayStat("TASK MEM: ", tostring(math.humanizeBytes(stats.taskMem)), " / " .. tostring(math.humanizeBytes(stats.peakTaskMem)))
         
         if DebugOverlay.overlayType == "advanced" then
+            displayStat("VRAM: ", tostring(math.humanizeBytes(stats.videoMem)), " / " .. tostring(math.humanizeBytes(stats.peakVideoMem)))
+            
             gfx.coloredLine(20, statY + 20, w - 20, 0, lineColor)
             statY = statY + 30
     

@@ -3,7 +3,7 @@ local InitScreen = Screen:subclass("InitScreen", ...)
 
 function InitScreen:enter()
     FLog = srcreq("funkin.util.flog") --- @type funkin.util.FLog
-
+    
     Paths = srcreq("funkin.backend.assets.paths") --- @type funkin.backend.assets.Paths
     Paths.initAssetSystem()
 
@@ -11,8 +11,12 @@ function InitScreen:enter()
     Conductor.instance = Conductor:new()
     Conductor.instance.dispatchToScreens = true
     comet.plugins:add(Conductor.instance)
+    
+    CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
 
+    srcreq("funkin.backend.crashhandler").init()
     srcreq("funkin.gfx.debugoverlay").init()
+
     self:forceSwitchTo(srcreq("funkin.screens.titlescreen"):new())
 end
 

@@ -2,22 +2,11 @@
 local TitleScreen = Screen:subclass("TitleScreen", ...)
 
 function TitleScreen:enter()
+    if not comet.mixer.music:isPlaying() then
+        CoolUtil.playMenuMusic()
+    end
     self.testCam = Camera:new() --- @type comet.gfx.Camera
-    self.testCam:setBackgroundColor(Color.RED)
     self.testCam.size:set(1280, 720)
-
-    local hueSet = comet.gfx:getShader(Paths.frag("shaders/hue_set"))
-    hueSet:send("VALUE", 0.5)
-
-    local hueOffset = comet.gfx:getShader(Paths.frag("shaders/hue_offset"))
-    hueOffset:send("OFFSET", -0.5)
-
-    local hueOffset2 = comet.gfx:getShader(Paths.frag("shaders/hue_offset"))
-    hueOffset2:send("OFFSET", 0.2)
-
-    local crt = comet.gfx:getShader(Paths.frag("shaders/crt"))
-    crt:send("percent", 1.0)
-    self.testCam:setShaders({hueSet, hueOffset, hueOffset2, crt})
 
     self.gf = AnimatedImage:new(comet.getDesiredWidth() * 0.4, comet.getDesiredHeight() * 0.07) --- @type comet.gfx.AnimatedImage
     self.gf:setFrameCollection(Paths.getSparrowAtlas("menus/title/gf"))
@@ -26,6 +15,13 @@ function TitleScreen:enter()
     self.gf:playAnimation("danceLeft")
     self.gf.centered = false
     self.testCam:addChild(self.gf)
+
+    self.logo = AnimatedImage:new(-150, -100) --- @type comet.gfx.AnimatedImage
+    self.logo:setFrameCollection(Paths.getSparrowAtlas("menus/title/logo"))
+    self.logo:addAnimation("idle", "logo bumpin", 24, false)
+    self.logo:playAnimation("idle")
+    self.logo.centered = false
+    self.testCam:addChild(self.logo)
 
     self:addChild(self.testCam)
 end
@@ -36,6 +32,7 @@ function TitleScreen:beatHit(beat)
     else
         self.gf:playAnimation("danceLeft")
     end
+    self.logo:playAnimation("idle", true)
 end
 
 return TitleScreen

@@ -104,6 +104,27 @@ function Paths.font(name)
     return fallback(name, "Font")
 end
 
+function Paths.music(name)
+    name = "menus/music/" .. name .. "/music"
+    local assetExts = Paths.SOUND_EXTS
+    for j = 1, #assetExts do
+        local newPath = Paths.getAsset(name .. assetExts[j], nil, false)
+        if fs.exists(newPath) then
+            return newPath
+        end
+    end
+    return fallback(name, "Sound")
+end
+
+function Paths.musicConfig(name)
+    name = "menus/music/" .. name .. "/config"
+    local newPath = Paths.getAsset(name .. ".json", nil, false)
+    if fs.exists(newPath) then
+        return newPath
+    end
+    return fallback(name, "json")
+end
+
 function Paths.sound(name)
     local assetExts = Paths.SOUND_EXTS
     for j = 1, #assetExts do
