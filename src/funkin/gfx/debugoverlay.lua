@@ -147,7 +147,7 @@ function DebugOverlay.init()
         end
         local w, h = boxWidth, 145
         if DebugOverlay.overlayType == "advanced" then
-            h = comet.settings.parallelUpdate and 245 or 165
+            h = comet.settings.parallelUpdate and 275 or 190
         elseif DebugOverlay.overlayType == "basic" then
             h = comet.settings.parallelUpdate and 80 or 65
         end
@@ -156,16 +156,27 @@ function DebugOverlay.init()
         gfx.coloredRectangle("line", 10, 10, w, h, lineColor)
         
         statY = 10
+
+        local textDrawCalls = 2
         displayStat("FPS: ", tostring(stats.fps))
         
         if comet.settings.parallelUpdate then
             displayStat("TPS: ", tostring(stats.tps))
+            textDrawCalls = textDrawCalls + 2
         end
         displayStat("GC MEM: ", tostring(math.humanizeBytes(stats.gcMem)), " / " .. tostring(math.humanizeBytes(stats.peakGcMem)))
+        textDrawCalls = textDrawCalls + 2
+
         displayStat("TASK MEM: ", tostring(math.humanizeBytes(stats.taskMem)), " / " .. tostring(math.humanizeBytes(stats.peakTaskMem)))
+        textDrawCalls = textDrawCalls + 2
         
         if DebugOverlay.overlayType == "advanced" then
+            local lstats = love.graphics.getStats()
             displayStat("VRAM: ", tostring(math.humanizeBytes(stats.videoMem)), " / " .. tostring(math.humanizeBytes(stats.peakVideoMem)))
+            textDrawCalls = textDrawCalls + 2
+            
+            displayStat("DRAW CALLS: ", tostring(lstats.drawcalls - textDrawCalls))
+            displayStat("BATCHED DRAW CALLS: ", tostring(lstats.drawcallsbatched - 3)) -- hardcoded but avoids counting draw calls from debugger
             
             gfx.coloredLine(20, statY + 20, w - 20, 0, lineColor)
             statY = statY + 30
