@@ -88,7 +88,7 @@ local function errorhandler(msg)
 		"AMERICAN MEGATRENDS !!",
 		"Frutiger Elmo",
 		"why did my nose make a phone",
-		"5 DOLLAR SRIMP SPECIAL",
+		"$6 SRIMP SPECIAL",
 		"Whoops! You need to put the CD up your ass",
 		"bjoner so big i float up like a hot air balloon #liftoff",
 		"we slurping sea monkeys by the gallon my tummy feel crazy",
