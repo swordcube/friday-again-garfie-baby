@@ -67,7 +67,7 @@ local function errorhandler(msg)
 		"uh oh that's probably bad",
 		"Well Well Well",
 		"subscribe to technoblade",
-		"mondays am i right" .. (os.date("%A") ~= "Monday" and "Wait it's not even a monday god damn it dude" or ""),
+		"mondays am i right" .. (os.date("%A") ~= "Monday" and "Wait it's not even a monday god damn it dude" or " or am i right"),
 		"help me i'm unda da water ooohhhh",
 		"woper",
 		"bim cAc",
@@ -95,7 +95,14 @@ local function errorhandler(msg)
 		"Chat Invitation to Fuck",
 		"Fuck",
 		"WHAT THIS IS COCK",
-		"NEBULA >:)" -- inside joke literally nobody but a specific friend group will get
+		"NEBULA >:)", -- inside joke literally nobody but a specific friend group will get
+		"I'm trapped in this text quote. To free me you must do the following:",
+		":boom:",
+		"Quite interesting. You have idiot disease.",
+		"oww dude that hurt crashing hurts man wtf >:(",
+		"UNCLE BEN WHAT HAPPENED\nSQUID GAMES",
+		"UNCLE BEN WHAT HAPPENED\nNULL OBJECT REFERENCE",
+		"IT'S TIME FOR THE"
 	}
 	table.insert(err, quotes[math.floor(love.math.random(1, #quotes))] .. "\n")
 	table.insert(err, sanitizedmsg)
