@@ -25,8 +25,12 @@ function InitScreen:enter()
         _G.LOVEVLC_LIB_DIRECTORY = ("thirdparty/lovevlc/lib/%s"):format(os:lower())
     end
     require("thirdparty.lovevlc")
+    
+    local handle = require("thirdparty.lovevlc.util.handle")
+    handle.initasync()
+
     comet.signals.onQuit:connect(function()
-        require("thirdparty.lovevlc.util.handle").quit()
+        handle.quit()
     end)
     Video = srcreq("funkin.gfx.video") --- @type funkin.gfx.Video
 
