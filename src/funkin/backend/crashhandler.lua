@@ -222,6 +222,11 @@ local function errorhandler(msg)
 end
 
 function CrashHandler.init()
+	comet.signals.onInput:connect(function(e)
+		if e.type == "key" and e.key == "f7" and e.pressed and (comet.keys:isPressed("lctrl") or comet.keys:isPressed("rctrl")) and (comet.keys:isPressed("lshift") or comet.keys:isPressed("rshift")) then
+			error("Manually initiated crash")
+		end
+	end)
     love.errorhandler = errorhandler
 end
 
