@@ -1,3 +1,6 @@
 [submodule "thirdparty/comet"]
 	path = thirdparty/comet
 	url = https://github.com/swordcube/comet.lua
+[submodule "thirdparty/lovevlc"]
+	path = thirdparty/lovevlc
+	url = https://github.com/swordcube/lovevlc
