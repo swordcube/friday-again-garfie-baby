@@ -17,6 +17,24 @@ function InitScreen:enter()
     srcreq("funkin.backend.crashhandler").init()
     srcreq("funkin.gfx.debugoverlay").init()
 
+    if not love.filesystem.isFused() then
+        local os = jit and jit.os or require("ffi").os
+        if os == "Windows" then
+            os = "win64"
+        end
+        _G.LOVEVLC_LIB_DIRECTORY = ("thirdparty/lovevlc/lib/%s"):format(os:lower())
+    end
+    require("thirdparty.lovevlc")
+    comet.signals.onQuit:connect(function()
+        require("thirdparty.lovevlc.util.handle").quit()
+    end)
+    Video = srcreq("funkin.gfx.video") --- @type funkin.gfx.Video
+
+    if love.filesystem.exists("icon.png") then
+        local icon = love.image.newImageData("icon.png")
+        love.window.setIcon(icon)
+        icon:release()
+    end
     self:forceSwitchTo(srcreq("funkin.screens.titlescreen"):new())
 end
 
