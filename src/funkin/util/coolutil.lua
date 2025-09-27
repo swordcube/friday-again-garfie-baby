@@ -28,4 +28,18 @@ function CoolUtil.playMenuMusic(volume)
     CoolUtil.playMusic("freakyMenu", volume, true)
 end
 
+--- @param data string
+--- @param sep  string?
+function CoolUtil.parseCSV(data, sep)
+    if not sep then
+        sep = ","
+    end
+    local result = {}
+    local lines = data:replace("\r", ""):split("\n")
+    for i = 1, #lines do
+        table.insert(result, lines[i]:split(sep))
+    end
+    return result
+end
+
 return CoolUtil

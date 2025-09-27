@@ -25,6 +25,9 @@ Paths.SOUND_EXTS = {
 --- @type funkin.backend.assets.loaders.AssetLoader[]
 Paths._registeredAssetLoaders = {} --- @protected
 
+--- @type table<string, comet.gfx.FrameCollection>
+Paths._atlasCache = {}
+
 local function fallback(name, assetType, printError)
     printError = printError ~= nil and printError or true
     if printError then
@@ -153,11 +156,21 @@ function Paths.vert(name)
 end
 
 function Paths.getSparrowAtlas(name)
-    -- TODO: caching
-    return FrameCollection.loadSparrowAtlas(
-        Paths.image(name),
-        Paths.xml(name)
-    )
+    local key = "#_SPARROW_ATLAS_" .. name
+    if not Paths._atlasCache[key] then
+        local atlas = FrameCollection.loadSparrowAtlas(
+            Paths.image(name),
+            Paths.xml(name)
+        )
+        local d = atlas.destroy
+        atlas.destroy = function(a)
+            -- remove from cache when destroyed
+            Paths._atlasCache[key] = nil
+            d(a)
+        end
+        Paths._atlasCache[key] = atlas
+    end
+    return Paths._atlasCache[key]
 end
 
 return Paths

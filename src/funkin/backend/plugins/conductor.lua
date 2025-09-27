@@ -275,7 +275,9 @@ local function recursiveStep(object, step)
     local children = object.children
     for i = 1, #children do
         local child = children[i]
-        recursiveStep(child, step)
+        if child and ((child.exists and child.active) or child.alwaysReceiveConductorEvents) then
+            recursiveStep(child, step)
+        end
     end
     if object.stepHit then
         object:stepHit(step)
@@ -286,7 +288,9 @@ local function recursiveBeat(object, beat)
     local children = object.children
     for i = 1, #children do
         local child = children[i]
-        recursiveBeat(child, beat)
+        if child and ((child.exists and child.active) or child.alwaysReceiveConductorEvents) then
+            recursiveBeat(child, beat)
+        end
     end
     if object.beatHit then
         object:beatHit(beat)
@@ -297,7 +301,9 @@ local function recursiveMeasure(object, measure)
     local children = object.children
     for i = 1, #children do
         local child = children[i]
-        recursiveMeasure(child, measure)
+        if child and ((child.exists and child.active) or child.alwaysReceiveConductorEvents) then
+            recursiveMeasure(child, measure)
+        end
     end
     if object.measureHit then
         object:measureHit(measure)
@@ -343,9 +349,9 @@ function Conductor:update(dt)
     if self.curStep > lastStep then
         for i = lastStep, self.curStep do
             if self.dispatchToScreens then
-                recursiveStep(ScreenManager.instance.current, i + 1)
+                recursiveStep(ScreenManager.instance.current, i)
             end
-            self.onStepHit:emit(i + 1)
+            self.onStepHit:emit(i)
         end
     end
     self.curDecBeat = self:getBeatAtTime(t, curTimingPoint)
@@ -359,9 +365,9 @@ function Conductor:update(dt)
         end
         for i = lastBeat, self.curBeat do
             if self.dispatchToScreens then
-                recursiveBeat(ScreenManager.instance.current, i + 1)
+                recursiveBeat(ScreenManager.instance.current, i)
             end
-            self.onBeatHit:emit(i + 1)
+            self.onBeatHit:emit(i)
         end
     end
     self.curDecMeasure = self:getMeasureAtTime(t, curTimingPoint)
@@ -370,9 +376,9 @@ function Conductor:update(dt)
     if self.curMeasure > lastMeasure then
         for i = lastMeasure, self.curMeasure do
             if self.dispatchToScreens then
-                recursiveMeasure(ScreenManager.instance.current, i + 1)
+                recursiveMeasure(ScreenManager.instance.current, i)
             end
-            self.onMeasureHit:emit(i + 1)
+            self.onMeasureHit:emit(i)
         end
     end
 end

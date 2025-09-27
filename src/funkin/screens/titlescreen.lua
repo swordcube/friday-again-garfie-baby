@@ -1,5 +1,11 @@
+local fs = love.filesystem
+
 --- @class funkin.screens.TitleScreen : comet.core.Screen
 local TitleScreen = Screen:subclass("TitleScreen", ...)
+
+TitleScreen.static.initialized = false
+
+-- TODO: the hue shader & cheat code thingie
 
 function TitleScreen:enter()
     if not comet.mixer.music:isPlaying() then
@@ -8,25 +14,127 @@ function TitleScreen:enter()
     self.testCam = Camera:new() --- @type comet.gfx.Camera
     self.testCam.size:set(1280, 720)
 
+    local availableQuotes = CoolUtil.parseCSV(fs.getContent(Paths.csv("menus/title/quotes")))
+    self.chosenQuotes = availableQuotes[math.floor(love.math.random(1, #availableQuotes))]
+
+    self.introSequence = {
+        [1]  = {lines = {"The", "Funkin Crew Inc"}},
+        [3]  = {lines = {"The", "Funkin Crew Inc", "Presents"}},
+        [4]  = {lines = {}},
+        [5]  = {lines = {"In association", "with"}},
+        [7]  = {lines = {"In association", "with", "Newgrounds"}, callback = function() self.ngSpr:revive() end},
+        [8]  = {lines = {}, callback = function() self.ngSpr:kill() end},
+        [9]  = {lines = {self.chosenQuotes[1]}},
+        [11] = {lines = self.chosenQuotes},
+        [12] = {lines = {}},
+        [13] = {lines = {"Friday"}},
+        [14] = {lines = {"Friday", "Night"}},
+        [15] = {lines = {"Friday", "Night", "Funkin"}}
+    }
+    self.introLength = 16
+
+    self.skippedIntro = false
+    self.transitioning = false
+
+    self.titleGroup = Object:new() --- @type comet.core.Object
+    self.titleGroup:kill()
+    self.testCam:addChild(self.titleGroup)
+
     self.gf = AnimatedImage:new(comet.getDesiredWidth() * 0.4, comet.getDesiredHeight() * 0.07) --- @type comet.gfx.AnimatedImage
     self.gf:setFrameCollection(Paths.getSparrowAtlas("menus/title/gf"))
     self.gf:addAnimationByIndices("danceLeft", "gfDance", table.numberList(1, 15), 24, false)
     self.gf:addAnimationByIndices("danceRight", "gfDance", table.numberList(16, 31), 24, false)
     self.gf:playAnimation("danceLeft")
     self.gf.centered = false
-    self.testCam:addChild(self.gf)
+    self.titleGroup:addChild(self.gf)
 
     self.logo = AnimatedImage:new(-150, -100) --- @type comet.gfx.AnimatedImage
     self.logo:setFrameCollection(Paths.getSparrowAtlas("menus/title/logo"))
     self.logo:addAnimation("idle", "logo bumpin", 24, false)
     self.logo:playAnimation("idle")
     self.logo.centered = false
-    self.testCam:addChild(self.logo)
+    self.titleGroup:addChild(self.logo)
+
+    self.titleText = AnimatedImage:new(100, comet.getDesiredHeight() * 0.8) --- @type comet.gfx.AnimatedImage
+    self.titleText:setFrameCollection(Paths.getSparrowAtlas("menus/title/enter"))
+    self.titleText:addAnimation("idle", "Press Enter to Begin", 24, true)
+    self.titleText:addAnimation("press", "ENTER PRESSED", 24, true)
+    self.titleText:playAnimation("idle")
+    self.titleText.centered = false
+    self.titleGroup:addChild(self.titleText)
+    
+    self.quoteText = AtlasText:new(0, 155, "bold", 1, "") --- @type funkin.ui.AtlasText
+    self.quoteText:setAlignment("center")
+    self.quoteText:screenCenter("x")
+    self.testCam:addChild(self.quoteText)
+
+    self.ngSpr = Image:new() --- @type comet.gfx.Image
+    self.ngSpr:loadTexture(Paths.image("menus/title/newgrounds")) -- TODO: the other variants
+    self.ngSpr.centered = false
+    self.ngSpr.scale:set(0.8, 0.8)
+    self.ngSpr:screenCenter("x")
+    self.ngSpr.position.y = comet.getDesiredHeight() * 0.52
+    self.ngSpr:kill()
+    self.testCam:addChild(self.ngSpr)
 
     self:addChild(self.testCam)
+    
+    if TitleScreen.initialized then
+        self:skipIntro()
+    end
+end
+
+function TitleScreen:update(dt)
+    if comet.keys:wasJustPressed("return") or comet.keys:wasJustPressed("kpenter") then
+        if not self.skippedIntro then
+            self:skipIntro()
+        
+        elseif not self.transitioning then
+            self.transitioning = true
+
+            self.testCam:flash(Color.WHITE, 1)
+            comet.mixer:play(Paths.sound("menus/sfx/select"))
+
+            self.titleText:playAnimation("press")
+            Timer.wait(2, function()
+                self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
+            end)
+        else
+            self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
+        end
+    end
+end
+
+function TitleScreen:skipIntro()
+    if self.skippedIntro then
+        return
+    end
+    self.skippedIntro = true
+    
+    self.quoteText:kill()
+    self.ngSpr:kill()
+    
+    self.titleGroup:revive()
+    self.testCam:flash(Color.WHITE, TitleScreen.initialized and 1 or 4)
+    
+    TitleScreen.initialized = true
 end
 
 function TitleScreen:beatHit(beat)
+    if not self.skippedIntro then
+        if beat >= self.introLength then
+            self:skipIntro()
+        else
+            local step = self.introSequence[beat]
+            if step then
+                self.quoteText:setText(table.concat(step.lines, "\n"))
+                self.quoteText:screenCenter("x")
+                if step.callback then
+                    step.callback()
+                end
+            end
+        end
+    end
     if beat % 2 == 0 then
         self.gf:playAnimation("danceRight")
     else
