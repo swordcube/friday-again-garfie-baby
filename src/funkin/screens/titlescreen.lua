@@ -93,13 +93,13 @@ function TitleScreen:enter()
 end
 
 function TitleScreen:update(dt)
-    if comet.keys:isPressed("left") then
+    if self.controls.justPressed.UI_LEFT then
         self.hueShader:send("OFFSET", self.hueShader:getUniformNumber("OFFSET") - (dt * 0.1))
     end
-    if comet.keys:isPressed("right") then
+    if self.controls.justPressed.UI_RIGHT then
         self.hueShader:send("OFFSET", self.hueShader:getUniformNumber("OFFSET") + (dt * 0.1))
     end
-    if comet.keys:wasJustPressed("return") or comet.keys:wasJustPressed("kpenter") then
+    if self.controls.justPressed.ACCEPT then
         if not self.skippedIntro then
             self:skipIntro()
         

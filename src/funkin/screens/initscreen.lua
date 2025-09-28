@@ -18,6 +18,9 @@ function InitScreen:enter()
     MusicBeatScreen = srcreq("funkin.screens.musicbeatscreen") --- @type funkin.screens.MusicBeatScreen
     MusicBeatScreen.static.skipNextTransIn = true
 
+    Controls = srcreq("funkin.backend.controls") --- @type funkin.backend.Controls
+    Controls.static.instance = Controls:new()
+
     CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
 
     AtlasText = srcreq("funkin.ui.atlastext") --- @type funkin.ui.AtlasText

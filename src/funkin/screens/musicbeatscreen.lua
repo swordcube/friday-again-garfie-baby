@@ -9,6 +9,9 @@ MusicBeatScreen.static.skipNextTransIn = false
 function MusicBeatScreen:__init__()
     super.__init__(self)
 
+    --- Shortcut to global controls instance
+    self.controls = Controls.static.instance --- @type funkin.backend.Controls
+
     --- Whether or not to stop updating this screen when a transition occurs.
     self.persistentUpdate = false
     
