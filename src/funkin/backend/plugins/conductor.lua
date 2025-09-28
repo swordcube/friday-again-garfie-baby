@@ -272,9 +272,8 @@ function Conductor:getTimeAtMeasure(measure)
 end
 
 local function recursiveStep(object, step)
-    local children = object.children
-    for i = 1, #children do
-        local child = children[i]
+    for i = 1, object:getChildCount() do
+        local child = object.children[i]
         if child and ((child.exists and child.active) or child.alwaysReceiveConductorEvents) then
             recursiveStep(child, step)
         end
@@ -285,27 +284,25 @@ local function recursiveStep(object, step)
 end
 
 local function recursiveBeat(object, beat)
-    local children = object.children
-    for i = 1, #children do
-        local child = children[i]
-        if child and ((child.exists and child.active) or child.alwaysReceiveConductorEvents) then
+    for i = 1, object:getChildCount() do
+        local child = object.children[i]
+        if child and ((child.exists and child:shouldUpdate()) or child.alwaysReceiveConductorEvents) then
             recursiveBeat(child, beat)
         end
     end
-    if object.beatHit then
+    if object.beatHit and ((object.exists and object:shouldUpdate()) or object.alwaysReceiveConductorEvents) then
         object:beatHit(beat)
     end
 end
 
 local function recursiveMeasure(object, measure)
-    local children = object.children
-    for i = 1, #children do
-        local child = children[i]
-        if child and ((child.exists and child.active) or child.alwaysReceiveConductorEvents) then
+    for i = 1, object:getChildCount() do
+        local child = object.children[i]
+        if child and ((child.exists and child:shouldUpdate()) or child.alwaysReceiveConductorEvents) then
             recursiveMeasure(child, measure)
         end
     end
-    if object.measureHit then
+    if object.measureHit and ((object.exists and object:shouldUpdate()) or object.alwaysReceiveConductorEvents) then
         object:measureHit(measure)
     end
 end

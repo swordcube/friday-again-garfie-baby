@@ -140,7 +140,7 @@ function Paths.sound(name)
 end
 
 function Paths.frag(name)
-    local newPath = Paths.getAsset(name .. ".frag", nil, false)
+    local newPath = Paths.getAsset("shaders/" .. name .. ".frag", nil, false)
     if fs.exists(newPath) then
         return newPath
     end
@@ -148,7 +148,7 @@ function Paths.frag(name)
 end
 
 function Paths.vert(name)
-    local newPath = Paths.getAsset(name .. ".vert", nil, false)
+    local newPath = Paths.getAsset("shaders/" .. name .. ".vert", nil, false)
     if fs.exists(newPath) then
         return newPath
     end

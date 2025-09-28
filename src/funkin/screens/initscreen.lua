@@ -12,6 +12,12 @@ function InitScreen:enter()
     Conductor.instance.dispatchToScreens = true
     comet.plugins:add(Conductor.instance)
     
+    Transition = srcreq("funkin.ui.transition") --- @type funkin.ui.Transition
+    Transition.setDefaultTransition(srcreq("funkin.ui.transition.gradientswipe"), true)
+
+    MusicBeatScreen = srcreq("funkin.screens.musicbeatscreen") --- @type funkin.screens.MusicBeatScreen
+    MusicBeatScreen.static.skipNextTransIn = true
+
     CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
 
     AtlasText = srcreq("funkin.ui.atlastext") --- @type funkin.ui.AtlasText
@@ -42,6 +48,7 @@ function InitScreen:enter()
         icon:release()
     end
     self:forceSwitchTo(srcreq("funkin.screens.titlescreen"):new())
+    MusicBeatScreen.static.skipNextTransIn = true
 end
 
 return InitScreen

@@ -38,7 +38,7 @@ gfx.coloredRectangle = function(mode, x, y, w, h, r, g, b, a)
     end
     local pr, pg, pb, pa = gfx.getColor()
     gfx.setColor(r * pr, g * pg, b * pb, a * pa)
-    gfx.rectangle(mode, x, y, w, h)
+    gfx.rectangle(mode, x, y, w, h, 10, 10)
     gfx.setColor(pr, pg, pb, pa)
 end
 
@@ -249,11 +249,11 @@ function DebugOverlay.init()
             displayStat("Objects: ", objectCount)
 
             local textureCount = 0
-            for _, _ in pairs(comet.gfx._cache) do
+            for k, _ in pairs(comet.gfx._cache) do
                 textureCount = textureCount + 1
             end
             displayStat("Textures: ", textureCount)
-            displayStat("Sounds: ", #comet.mixer.sounds.children)
+            displayStat("Sounds: ", comet.mixer.sounds:getChildCount())
             
             -- TODO: asset loader display
             

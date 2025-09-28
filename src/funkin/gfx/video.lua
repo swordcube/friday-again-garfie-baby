@@ -69,7 +69,9 @@ function Video:draw()
     end
     gfx.draw(self.video, transform)
 
-    gfx.setShader(prevShader)
+    if self.shader then
+        gfx.setShader(prevShader)
+    end
     gfx.setColor(pr, pg, pb, pa)
 
     if comet.settings.debugDraw then

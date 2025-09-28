@@ -76,7 +76,7 @@ function AtlasText:_regenText()
     local text = self._text
     local glyphX, glyphY, idx = 0, 0, 1
 
-    for i = 1, #self.children do
+    for i = 1, self:getChildCount() do
         local line = self.children[i]
         for j = 1, #line.children do
             local glyph = line.children[j] --- @type funkin.ui.AtlasText.Glyph
@@ -88,9 +88,8 @@ function AtlasText:_regenText()
     if not line then
         -- create first line of text
         line = Object2D:new() --- @type comet.gfx.Object2D
-        line.parent = self
         line:kill()
-        self.children[1] = line
+        self:addChild(line)
     end
     local lineCount = 1
     for i = 1, utf8.len(text) do
@@ -104,9 +103,8 @@ function AtlasText:_regenText()
             -- create this line of text if it doesn't exist yet
             if not line then
                 line = Object2D:new() --- @type comet.gfx.Object2D
-                line.parent = self
                 line:kill()
-                self.children[lineCount] = line
+                self:addChild(line)
             end
             -- visually progress to new line
             glyphX = 0
@@ -119,8 +117,7 @@ function AtlasText:_regenText()
         local glyph = line.children[idx] --- @type funkin.ui.AtlasText.Glyph
         if not glyph then
             glyph = Glyph:new(self) --- @type funkin.ui.AtlasText.Glyph
-            glyph.parent = line
-            line.children[idx] = glyph
+            line:addChild(glyph)
         end
         glyph:setup(glyphX, 0, rawGlyph, self._fontData.scale * self._size)
         
@@ -143,7 +140,7 @@ end
 --- @protected
 function AtlasText:_adjustAlignment()
     local totalWidth = self:getChildrenBoundingBox().width
-    for i = 1, #self.children do
+    for i = 1, self:getChildCount() do
         local line = self.children[i]
         if self._alignment == "left" then
             line.position.x = 0
