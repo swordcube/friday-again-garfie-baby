@@ -82,6 +82,9 @@ function MainMenuScreen:enter()
         self.grpButtons:addChild(button)
     end
     self.grpButtons:screenCenter("xy")
+    if #self.options < 4 then
+        self.grpButtons.position.y = 160
+    end
     self.grpButtons.scrollFactor:set(0, #self.options < 5 and 0 or (#self.options - 3) * 0.15)
     self.camera:addChild(self.grpButtons)
 
@@ -134,7 +137,7 @@ function MainMenuScreen:changeSelection(by, force)
             local box = button:getBoundingBox(button:getTransform(true, false)) --- @type comet.math.Rect
             self.camFollow.position:set(
                 self.grpButtons.position.x + button.position.x,
-                self.grpButtons.position.y + button.position.y + (box.height * 0.5)
+                self.grpButtons.position.y + button.position.y
             )
             button:playAnimation("selected")
         else

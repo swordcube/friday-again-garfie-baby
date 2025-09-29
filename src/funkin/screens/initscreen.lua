@@ -7,11 +7,6 @@ function InitScreen:enter()
     Paths = srcreq("funkin.backend.assets.paths") --- @type funkin.backend.assets.Paths
     Paths.initAssetSystem()
 
-    Conductor = srcreq("funkin.backend.plugins.conductor") --- @type funkin.backend.plugins.Conductor
-    Conductor.instance = Conductor:new()
-    Conductor.instance.dispatchToScreens = true
-    comet.plugins:add(Conductor.instance)
-    
     Transition = srcreq("funkin.ui.transition") --- @type funkin.ui.Transition
     Transition.setDefaultTransition(srcreq("funkin.ui.transition.gradientswipe"), true)
 
@@ -21,8 +16,14 @@ function InitScreen:enter()
     Controls = srcreq("funkin.backend.controls") --- @type funkin.backend.Controls
     Controls.static.instance = Controls:new()
 
-    CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
+    Conductor = srcreq("funkin.backend.plugins.conductor") --- @type funkin.backend.plugins.Conductor
+    Conductor.instance = Conductor:new()
+    Conductor.instance.dispatchToScreens = true
+    comet.plugins:add(Conductor.instance)
+    
+    comet.plugins:add(srcreq("funkin.backend.plugins.debugbinds"):new())
 
+    CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
     AtlasText = srcreq("funkin.ui.atlastext") --- @type funkin.ui.AtlasText
 
     srcreq("funkin.backend.crashhandler").init()

@@ -271,7 +271,7 @@ function DebugOverlay.init()
         end
     end)
     comet.signals.onInput:connect(function(e)
-        if e.type == "key" and e.key == "f3" and e.pressed then
+        if e.type == "key" and Controls.instance.justPressed.OVERLAY then
             DebugOverlay.overlayType = overlayTypes[(table.indexOf(overlayTypes, DebugOverlay.overlayType) % #overlayTypes) + 1]
         end
     end)

@@ -4,6 +4,8 @@ local Controls = Class("Controls", ...)
 Controls.static.instance = nil --- @type funkin.backend.Controls
 
 function Controls:__init__()
+    self._rawMappings = {}
+
     self._mappings = {}
     self._mappingNames = {}
     
@@ -20,12 +22,16 @@ function Controls:__init__()
 
         ACCEPT = {"key:return", "key:space"},
         BACK = {"key:backspace", "key:escape"},
-        RESET = {"key:r", "mouse:1"}
+        RESET = {"key:r", nil},
+
+        OVERLAY = {"key:f3", nil},
+        RELOAD = {"key:f5", nil},
+        EMERGENCY = {"key:f7", nil}
     })
 
     self.justPressed = {}
     self.pressed = {}
-    self.justPeleased = {}
+    self.justReleased = {}
     self.released = {}
 
     comet.signals.onInput:connect(function(e)
@@ -43,12 +49,25 @@ function Controls:updateBindNames()
     end
 end
 
+function Controls:getMappings()
+    return self._mappings
+end
+
+function Controls:getRawMappings()
+    return self._rawMappings
+end
+
 function Controls:setMappings(newMappings)
     self._mappings = {}
+    self._rawMappings = newMappings
+
     for key, binds in pairs(newMappings) do
         local set = {}
         for i = 1, #binds do
             local rawBind = binds[i] --- @type string
+            if not rawBind then
+                goto continue
+            end
             if rawBind:startsWith("key:") then
                 local bind = {type = "key", key = rawBind:sub(5)}
                 set[#set + 1] = bind
@@ -56,6 +75,7 @@ function Controls:setMappings(newMappings)
                 local bind = {type = "mouse", button = tonumber(rawBind:sub(7))}
                 set[#set + 1] = bind
             end
+            ::continue::
         end
         self._mappings[key] = set
     end
@@ -74,7 +94,7 @@ function Controls:onInput(e)
                         self.pressed[name] = true
                     
                     elseif not e.pressed and self.pressed[name] then
-                        self.justPeleased[name] = true
+                        self.justReleased[name] = true
                         self.pressed[name] = false
                     end
                     break
@@ -92,7 +112,7 @@ function Controls:onInput(e)
                         self.pressed[name] = true
                     
                     elseif not e.pressed and self.pressed[name] then
-                        self.justPeleased[name] = true
+                        self.justReleased[name] = true
                         self.pressed[name] = false
                     end
                     break
@@ -106,7 +126,7 @@ function Controls:update()
     for i = 1, #self._mappingNames do
         local name = self._mappingNames[i]
         self.justPressed[name] = false
-        self.justPeleased[name] = false
+        self.justReleased[name] = false
     end
 end
 
