@@ -48,7 +48,6 @@ function MainMenuScreen:enter()
     self:addChild(self.camFollow)
 
     self.camera = Camera:new() --- @type comet.gfx.Camera
-    self.camera:setBackgroundColor(Color.CYAN)
     self.camera:follow(self.camFollow, 0.06)
     self:addChild(self.camera)
 
