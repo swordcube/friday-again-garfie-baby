@@ -59,8 +59,6 @@ function Video:draw()
     local prevShader = gfx.getShader()
     if self.shader then
         gfx.setShader(self.shader)
-    else
-        gfx.setShader()
     end
     local img = self.video.image --- @type love.Image
     if img then
