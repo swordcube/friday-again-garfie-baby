@@ -29,13 +29,14 @@ function AtlasTextMenu:update(dt)
         item.position:lerp((offset * 20) + 90, targetY, dt * 9.6)
 
         local t = math.min(math.abs(item.position.y - centerY) / 156, 1)
-        item:setAlpha(1 - (0.4 * t)) -- 1 near center, 0.6 at farthest
+        item:setAlpha(1 - (0.5 * t)) -- 1 near center, 0.5 at farthest
     end
     if self.enabled then
-        if Controls.instance.justPressed.UI_UP then
+        local wheel = comet.mouse.wheel.y
+        if Controls.instance.justPressed.UI_UP or wheel < 0 then
             self:changeSelection(-1)
         end
-        if Controls.instance.justPressed.UI_DOWN then
+        if Controls.instance.justPressed.UI_DOWN or wheel > 0 then
             self:changeSelection(1)
         end
         if Controls.instance.justPressed.ACCEPT then

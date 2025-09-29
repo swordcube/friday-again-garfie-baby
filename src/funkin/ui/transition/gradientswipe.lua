@@ -31,23 +31,31 @@ function GradientSwipe:enter()
         self.gradient.position.y = -self.gradient:getHeight()
         self.container.position.y = 0.0
         
-        local t = Tween:new() --- @type comet.gfx.Tween
-        t:target({target = self.container.position, properties = {y = self.blackRect:getHeight() + self.gradient:getHeight()}})
-        t:start({duration = duration, ease = "outSine"})
-        t.onComplete:connect(function()
+        self.posTween = Tween:new() --- @type comet.gfx.Tween
+        self.posTween:target({target = self.container.position, properties = {y = self.blackRect:getHeight() + self.gradient:getHeight()}})
+        self.posTween:start({duration = duration, ease = "outSine"})
+        self.posTween.onComplete:connect(function()
             self:finish()
         end)
     else
         self.gradient.position.y = self.blackRect:getHeight()
         self.container.position.y = -(self.blackRect:getHeight() + self.gradient:getHeight())
         
-        local t = Tween:new() --- @type comet.gfx.Tween
-        t:target({target = self.container.position, properties = {y = 0}})
-        t:start({duration = duration, ease = "outSine"})
-        t.onComplete:connect(function()
+        self.posTween = Tween:new() --- @type comet.gfx.Tween
+        self.posTween:target({target = self.container.position, properties = {y = 0}})
+        self.posTween:start({duration = duration, ease = "outSine"})
+        self.posTween.onComplete:connect(function()
             self:finish()
         end)
     end
+end
+
+function GradientSwipe:destroy()
+    if self.posTween then
+        self.posTween:cancel()
+        self.posTween = nil
+    end
+    super.destroy(self)
 end
 
 return GradientSwipe

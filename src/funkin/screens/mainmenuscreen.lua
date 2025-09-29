@@ -112,6 +112,11 @@ function MainMenuScreen:update(dt)
     if self.controls.justPressed.UI_DOWN or wheel > 0 then
         self:changeSelection(1)
     end
+    if self.controls.justPressed.BACK then
+        self.persistentUpdate = false
+        self:switchTo(srcreq("funkin.screens.titlescreen"):new())
+        comet.mixer:play(Paths.sound("menus/sfx/cancel"))
+    end
     if self.controls.justPressed.ACCEPT then
         self:onSelect()
     end

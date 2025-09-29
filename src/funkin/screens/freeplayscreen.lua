@@ -18,4 +18,12 @@ function FreeplayScreen:enter()
     self:addChild(self.menu)
 end
 
+function FreeplayScreen:update(dt)
+    if self.controls.justPressed.BACK then
+        self.persistentUpdate = false
+        self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
+        comet.mixer:play(Paths.sound("menus/sfx/cancel"))
+    end
+end
+
 return FreeplayScreen
