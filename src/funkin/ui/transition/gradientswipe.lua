@@ -1,7 +1,7 @@
 local Transition = srcreq("funkin.ui.transition") --- @type funkin.ui.Transition
 
 --- @class funkin.ui.Transition.GradientSwipe : funkin.ui.Transition
-local GradientSwipe = Transition:subclass("GradientSwipe", ...)
+local GradientSwipe, super = Transition:subclass("GradientSwipe", ...)
 
 function GradientSwipe:enter()
     local type = self.type
@@ -48,10 +48,6 @@ function GradientSwipe:enter()
             self:finish()
         end)
     end
-end
-
-function GradientSwipe:update(dt)
-    
 end
 
 return GradientSwipe

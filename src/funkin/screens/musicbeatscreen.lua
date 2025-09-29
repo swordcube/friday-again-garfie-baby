@@ -24,6 +24,7 @@ end
 
 function MusicBeatScreen:startIntro()
     if not MusicBeatScreen.static.skipNextTransIn then
+        local lastUpdateMode = self.updateMode
         if not self.persistentUpdate then
             self.updateMode = "never"
         end
@@ -36,6 +37,10 @@ function MusicBeatScreen:startIntro()
         self.currentTransition = Transition.static.currentType:new("in") --- @type funkin.ui.Transition
         self.currentTransition.updateMode = "always"
         self.currentTransition:enter()
+        self.currentTransition.onFinish:connect(function()
+            self.showingTransition = false
+            self.updateMode = lastUpdateMode
+        end)
         self:addChild(self.currentTransition)
     end
     MusicBeatScreen.static.skipNextTransIn = false
@@ -47,6 +52,7 @@ function MusicBeatScreen:measureHit(measure) end
 
 function MusicBeatScreen:startOutro(onOutroComplete)
     if not MusicBeatScreen.skipNextTransOut then
+        local lastUpdateMode = self.updateMode
         if not self.persistentUpdate then
             self.updateMode = "never"
         end
@@ -59,6 +65,10 @@ function MusicBeatScreen:startOutro(onOutroComplete)
         self.currentTransition = Transition.static.currentType:new("out", onOutroComplete) --- @type funkin.ui.Transition
         self.currentTransition.updateMode = "always"
         self.currentTransition:enter()
+        self.currentTransition.onFinish:connect(function()
+            self.showingTransition = false
+            self.updateMode = lastUpdateMode
+        end)
         self:addChild(self.currentTransition)
     else
         onOutroComplete()

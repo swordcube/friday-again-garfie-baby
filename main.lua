@@ -4,10 +4,10 @@ comet.init({
     flags = require("flags"),
     settings = {
         srcDirectory = "src",
-        fpsCap = 240,
+        fpsCap = 0,
         bgColor = {0.0, 0.0, 0.0, 1.0},
         dimensions = {1280, 720},
-        parallelUpdate = true
+        parallelUpdate = false
     },
     screen = function() return srcreq("funkin.screens.initscreen"):new() end
 })

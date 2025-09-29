@@ -18,6 +18,7 @@ function AtlasText:__init__(x, y, font, size, text)
     self._text = text --- @type string
 
     self._alignment = "left" --- @type "left"|"center"|"right"
+    self._alpha = 1.0 --- @type number
 
     self:setFont(font)
 end
@@ -69,6 +70,21 @@ end
 function AtlasText:setAlignment(alignment)
     self._alignment = alignment
     self:_adjustAlignment()
+end
+
+function AtlasText:getAlpha()
+    return self._alpha
+end
+
+function AtlasText:setAlpha(alpha)
+    self._alpha = alpha
+    for i = 1, self:getChildCount() do
+        local line = self.children[i]
+        for j = 1, #line.children do
+            local glyph = line.children[j] --- @type funkin.ui.AtlasText.Glyph
+            glyph.alpha = alpha
+        end
+    end
 end
 
 --- @protected
