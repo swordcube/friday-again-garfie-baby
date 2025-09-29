@@ -48,7 +48,7 @@ function MainMenuScreen:enter()
     self:addChild(self.camFollow)
 
     self.camera = Camera:new() --- @type comet.gfx.Camera
-    self.camera:follow(self.camFollow, 0.06)
+    self.camera:follow(self.camFollow, "lockon", 0.06)
     self:addChild(self.camera)
 
     self.bgLayer = Parallax2D:new() --- @type comet.gfx.Parallax2D
