@@ -4,6 +4,9 @@ local MainMenuScreen = MusicBeatScreen:subclass("MainMenuScreen", ...)
 function MainMenuScreen:enter()
     self.persistentUpdate = true
 
+    if not comet.mixer.music:isPlaying() then
+        CoolUtil.playMenuMusic()
+    end
     self.options = {
         {
             id = "storymode",

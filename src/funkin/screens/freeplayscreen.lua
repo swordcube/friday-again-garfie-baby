@@ -7,6 +7,9 @@ local FreeplayScreen = MusicBeatScreen:subclass("FreeplayScreen", ...)
 function FreeplayScreen:enter()
     self.persistentUpdate = true
 
+    if not comet.mixer.music:isPlaying() then
+        CoolUtil.playMenuMusic()
+    end
     self.bg = Image:new() --- @type comet.gfx.Image
     self.bg:loadTexture(Paths.image("menus/bg_blue"))
     self.bg:screenCenter("xy")

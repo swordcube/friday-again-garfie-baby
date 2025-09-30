@@ -27,13 +27,18 @@ if you're seeking to compile a final release build, uhhh not yet buddy sorry!
 you are free to suggest features in the [issues tab](https://github.com/swordcube/friday-again-garfie-baby/issues), but i'm not going to add absolutely everything that's requested, because i'm not necessarily trying to make the next psych or the next codename or anything like that
 
 # ❓ compatibility with the legacy version
-no
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-✨ *there is none* ✨
-
 ![sorry nothing](./art/sorry%20nothing.png)
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<sup>..well there might be a *little* compatibility but probably not very much</sup>
