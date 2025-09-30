@@ -6,7 +6,7 @@ local CoolUtil = {}
 
 function CoolUtil.playMusic(name, volume, looping)
     volume = volume or 1.0
-    looping = looping or false
+    looping = looping or true
 
     comet.mixer.music:setSource(comet.mixer:getSource(Paths.music(name)))
     comet.mixer.music:setVolume(volume)
@@ -40,6 +40,25 @@ function CoolUtil.parseCSV(data, sep)
         table.insert(result, lines[i]:split(sep))
     end
     return result
+end
+
+--- Parses a JSON file into a table and returns it
+--- 
+--- If an error occured while parsing, a nil table will be returned
+--- alongside an error message string
+--- 
+--- @param data string A file path to a JSON or the JSON contents as a string
+--- @return table, string
+function CoolUtil.parseJson(data)
+    -- i didn't feel like constantly requiring json so fuck you i'm putting it in CoolUtil
+    if fs.exists(data) then
+        data = fs.getContent(data)
+    end
+    local success, result = pcall(json.parse, data)
+    if success then
+        return result, nil
+    end
+    return nil, result
 end
 
 return CoolUtil

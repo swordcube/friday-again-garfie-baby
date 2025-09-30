@@ -1,0 +1,19 @@
+{
+    "name": "Week 7",
+
+    "tagline": "MUSICAL MILITARY (FT. JOHNNYUTAH)",
+    "characters": ["tankman", "bf", "gf"],
+
+    "hiddenSongs": {
+        "story": [],
+        "freeplay": []
+    },
+    "songs": ["ugh", "guns", "stress"],
+    "freeplayCategory": "main",
+
+    "mixes": ["erect"],
+    "difficulties": {
+        "default": ["easy", "normal", "hard"],
+        "erect": ["erect", "nightmare"]
+    }
+}

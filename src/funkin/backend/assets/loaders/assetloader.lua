@@ -7,6 +7,7 @@ local AssetLoader = Class("AssetLoader", ...)
 --- @param root string
 --- @param displayedRoot string?
 function AssetLoader:__init__(name, root, displayedRoot)
+    self.id = nil --- only used internally by Paths
     self.name = name
     self.root = root
     self.displayedRoot = displayedRoot or root

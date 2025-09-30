@@ -1,0 +1,19 @@
+{
+    "name": "Week 6",
+
+    "tagline": "16-BIT ROMANCE (FT. MOAWLING)",
+    "characters": ["senpai", "bf", "gf"],
+
+    "hiddenSongs": {
+        "story": ["thorns"],
+        "freeplay": []
+    },
+    "songs": ["senpai", "roses", "thorns"],
+    "freeplayCategory": "main",
+
+    "mixes": ["erect"],
+    "difficulties": {
+        "default": ["easy", "normal", "hard"],
+        "erect": ["erect", "nightmare"]
+    }
+}

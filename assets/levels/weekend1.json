@@ -1,0 +1,22 @@
+{
+    "name": "Weekend 1",
+
+    "tagline": "DUE DEBTS",
+    "characters": ["darnell", "pico-player", "nene"],
+
+    "hiddenSongs": {
+        "story": ["blazin"],
+        "freeplay": []
+    },
+    "songs": ["darnell", "lit-up", "2hot", "blazin"],
+    "freeplayCategory": "main",
+
+    "mixes": ["erect", "bf"],
+    "storyMixes": [],
+    "character": "pico",
+
+    "difficulties": {
+        "default": ["easy", "normal", "hard"]
+    },
+    "banner": "#413CAE"
+}

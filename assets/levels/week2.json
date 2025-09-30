@@ -1,0 +1,19 @@
+{
+    "name": "Week 2",
+    
+    "tagline": "THE SPOOKY MANSION",
+    "characters": ["spooky-kids", "bf", "gf"],
+
+    "hiddenSongs": {
+        "story": ["monster"],
+        "freeplay": []
+    },
+    "songs": ["spookeez", "south", "monster"],
+    "freeplayCategory": "main",
+
+    "mixes": ["erect"],
+    "difficulties": {
+        "default": ["easy", "normal", "hard"],
+        "erect": ["erect", "nightmare"]
+    }
+}

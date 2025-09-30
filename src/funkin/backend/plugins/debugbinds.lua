@@ -7,9 +7,9 @@ function DebugBinds:input(_)
     if Controls.instance.justReleased.RELOAD then
         local current = ScreenManager.instance.current --- @type comet.core.Screen
         if comet.keys:isPressed("lshift") or comet.keys:isPressed("rshift") then
-            current:forceSwitchTo(require(current.class.rawPath):new())
+            current:forceSwitchTo(current._constructor and current.constructor() or require(current.class.rawPath):new())
         else
-            current:switchTo(require(current.class.rawPath):new())
+            current:switchTo(current._constructor and current.constructor or require(current.class.rawPath):new())
         end
     end
     if Controls.instance.justReleased.EMERGENCY then

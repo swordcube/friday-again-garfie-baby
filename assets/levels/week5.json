@@ -1,0 +1,19 @@
+{
+    "name": "Week 5",
+
+    "tagline": "UNDER THE MALL'S SNOWY ROOF",
+    "characters": ["parents-christmas", "bf", "gf"],
+
+    "hiddenSongs": {
+        "story": ["winter-horrorland"],
+        "freeplay": []
+    },
+    "songs": ["cocoa", "eggnog", "winter-horrorland"],
+    "freeplayCategory": "main",
+
+    "mixes": ["erect"],
+    "difficulties": {
+        "default": ["easy", "normal", "hard"],
+        "erect": ["erect", "nightmare"]
+    }
+}

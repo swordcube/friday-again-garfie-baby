@@ -1,0 +1,19 @@
+{
+    "name": "Week 3",
+
+    "tagline": "SOUL FOR SOME CASH",
+    "characters": ["pico", "bf", "gf"],
+
+    "hiddenSongs": {
+        "story": [],
+        "freeplay": []
+    },
+    "songs": ["pico", "philly-nice", "blammed"],
+    "freeplayCategory": "main",
+
+    "mixes": ["erect"],
+    "difficulties": {
+        "default": ["easy", "normal", "hard"],
+        "erect": ["erect", "nightmare"]
+    }
+}

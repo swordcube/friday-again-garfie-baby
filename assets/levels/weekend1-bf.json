@@ -1,0 +1,23 @@
+{
+    "name": "Weekend 1",
+
+    "tagline": "DUE DEBTS",
+    "characters": ["darnell", "pico-player", "nene"],
+
+    "hiddenSongs": {
+        "story": [],
+        "freeplay": []
+    },
+    "songs": ["darnell-bf-mix", "lit-up-bf-mix"],
+    "freeplayCategory": "main",
+
+    "mixes": [],
+    "storyMixes": [],
+    "character": "bf",
+
+    "difficulties": {
+        "default": ["easy", "normal", "hard"]
+    },
+    "showInStory": false,
+    "banner": "#413CAE"
+}

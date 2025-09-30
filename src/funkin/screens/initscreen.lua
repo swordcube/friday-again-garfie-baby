@@ -25,6 +25,7 @@ function InitScreen:enter()
 
     CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
     AtlasText = srcreq("funkin.ui.atlastext") --- @type funkin.ui.AtlasText
+    PlayScreen = srcreq("funkin.screens.playscreen") --- @type funkin.screens.PlayScreen
 
     srcreq("funkin.backend.crashhandler").init()
     srcreq("funkin.gfx.debugoverlay").init()
