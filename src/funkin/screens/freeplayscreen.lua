@@ -68,7 +68,7 @@ function FreeplayScreen:addSong(id, contentPack)
     self.menu:addItem(metadata and metadata.songName or id)
 end
 
-function FreeplayScreen:update(dt)
+function FreeplayScreen:input(_)
     if self.controls.justPressed.BACK then
         self.persistentUpdate = false
         self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())

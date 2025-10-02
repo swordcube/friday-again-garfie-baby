@@ -106,7 +106,7 @@ function MainMenuScreen:enter()
     self:changeSelection(0, true)
 end
 
-function MainMenuScreen:update(dt)
+function MainMenuScreen:input(_)
     if self.transitioning then
         return
     end

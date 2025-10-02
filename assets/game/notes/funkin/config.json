@@ -42,28 +42,28 @@
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -3]
                 },
                 "down": {
                     "prefix": "down press",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -3]
                 },
                 "up": {
                     "prefix": "up press",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -5]
                 },
                 "right": {
                     "prefix": "right press",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -5]
                 }
             },
             "confirm": {

@@ -25,6 +25,7 @@ function Strum:__init__(x, y, keyCount, direction, skin)
         else
             self:addAnimation(name, animData.prefix, animData.fps, animData.looped)
         end
+        self:setAnimationOffset(name, (animData and animData.offset) and animData.offset[1] or 0.0, (animData and animData.offset) and animData.offset[2] or 0.0)
     end
     self.scale:set(self.skinData.strum.scale, self.skinData.strum.scale)
     self:playAnimation("static")

@@ -39,6 +39,7 @@ function Note:loadSkin(skin)
             else
                 self:addAnimation(dir .. name, animData.prefix, animData.fps, animData.looped)
             end
+            self:setAnimationOffset(dir .. name, (animData and animData.offset) and animData.offset[1] or 0.0, (animData and animData.offset) and animData.offset[2] or 0.0)
         end
     end
     self.scale:set(self.skinData.note.scale, self.skinData.note.scale)

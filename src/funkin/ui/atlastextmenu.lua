@@ -31,6 +31,9 @@ function AtlasTextMenu:update(dt)
         local t = math.min(math.abs(item.position.y - centerY) / 156, 1)
         item:setAlpha(1 - (0.5 * t)) -- 1 near center, 0.5 at farthest
     end
+end
+
+function AtlasTextMenu:input(_)
     if self.enabled then
         local wheel = comet.mouse.wheel.y
         if Controls.instance.justPressed.UI_UP or wheel < 0 then
