@@ -34,7 +34,7 @@ function Controls:__init__()
     self.justReleased = {}
     self.released = {}
 
-    comet.signals.onInput:connect(function(e)
+    comet.signals.preInput:connect(function(e)
         self:onInput(e)
     end)
     comet.signals.postUpdate:connect(function()

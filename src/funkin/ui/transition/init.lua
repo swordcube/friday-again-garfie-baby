@@ -1,7 +1,7 @@
 local Signal = cometreq("util.signal") --- @type comet.util.Signal
 
---- @class funkin.ui.Transition : comet.core.Object
-local Transition, super = Object:subclass("Transition", ...)
+--- @class funkin.ui.Transition : comet.core.Screen
+local Transition, super = Screen:subclass("Transition", ...)
 
 Transition.static.defaultType = nil --- @type funkin.ui.Transition
 Transition.static.currentType = Transition.defaultType
@@ -37,7 +37,7 @@ end
 function Transition:finish()
     self.onFinish:emit()
     if self.type == "in" then
-        self:destroy()
+        self:close()
     end
 end
 

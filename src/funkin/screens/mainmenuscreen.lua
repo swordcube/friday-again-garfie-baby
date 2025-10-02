@@ -125,6 +125,9 @@ function MainMenuScreen:update(dt)
     if self.controls.justPressed.ACCEPT then
         self:onSelect()
     end
+    if comet.keys:wasJustPressed("f7") then
+        
+    end
 end
 
 function MainMenuScreen:changeSelection(by, force)

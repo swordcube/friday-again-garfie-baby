@@ -14,34 +14,12 @@ function MusicBeatScreen:__init__()
 
     --- Whether or not to stop updating this screen when a transition occurs.
     self.persistentUpdate = false
-    
-    --- Whether or not a transition is currently occuring.
-    self.showingTransition = false
-
-    --- The currently active transition.
-    self.currentTransition = nil --- @type funkin.ui.Transition
 end
 
 function MusicBeatScreen:startIntro()
     if not MusicBeatScreen.static.skipNextTransIn then
-        local lastUpdateMode = self.updateMode
-        if not self.persistentUpdate then
-            self.updateMode = "never"
-        end
-        if self.showingTransition and self.currentTransition then
-            self.currentTransition:destroy()
-            self.currentTransition = nil
-        end
-        self.showingTransition = true
-
         self.currentTransition = Transition.static.currentType:new("in") --- @type funkin.ui.Transition
-        self.currentTransition.updateMode = "always"
-        self.currentTransition:enter()
-        self.currentTransition.onFinish:connect(function()
-            self.showingTransition = false
-            self.updateMode = lastUpdateMode
-        end)
-        self:addChild(self.currentTransition)
+        self:openSubScreen(self.currentTransition)
     end
     MusicBeatScreen.static.skipNextTransIn = false
 end
@@ -52,24 +30,8 @@ function MusicBeatScreen:measureHit(measure) end
 
 function MusicBeatScreen:startOutro(onOutroComplete)
     if not MusicBeatScreen.skipNextTransOut then
-        local lastUpdateMode = self.updateMode
-        if not self.persistentUpdate then
-            self.updateMode = "never"
-        end
-        if self.showingTransition and self.currentTransition then
-            self.currentTransition:destroy()
-            self.currentTransition = nil
-        end
-        self.showingTransition = true
-
         self.currentTransition = Transition.static.currentType:new("out", onOutroComplete) --- @type funkin.ui.Transition
-        self.currentTransition.updateMode = "always"
-        self.currentTransition:enter()
-        self.currentTransition.onFinish:connect(function()
-            self.showingTransition = false
-            self.updateMode = lastUpdateMode
-        end)
-        self:addChild(self.currentTransition)
+        self:openSubScreen(self.currentTransition)
     else
         onOutroComplete()
     end

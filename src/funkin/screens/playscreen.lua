@@ -1,5 +1,6 @@
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 local StrumLine = srcreq("funkin.gameplay.notes.strumline") --- @type funkin.gameplay.notes.StrumLine
+local PlayField = srcreq("funkin.gameplay.playfield") --- @type funkin.gameplay.PlayField
 
 --- @class funkin.screens.PlayScreen : funkin.screens.MusicBeatScreen
 local PlayScreen, super = MusicBeatScreen:subclass("PlayScreen", ...)
@@ -17,6 +18,11 @@ function PlayScreen:__init__(params)
 end
 
 function PlayScreen:enter()
+    self.persistentUpdate = true
+
+    self.startingSong = true
+    self.endingSong = false
+
     comet.mixer.music:stop()
     comet.mixer.music:setSource(Paths.inst(self.currentSong, self.currentMix, self.parentContentPack))
     comet.mixer.music:setLooping(false)
@@ -26,7 +32,7 @@ function PlayScreen:enter()
     self.inst.onComplete:connect(function()
         self:endSong()
     end)
-    self.currentChart = {}
+    self.currentChart = CoolUtil.parseJson(Paths.json(("songs/%s/%s/chart"):format(self.currentSong, self.currentMix), self.parentContentPack))
     self.currentChart.meta = CoolUtil.parseJson(Paths.json(("songs/%s/%s/metadata"):format(self.currentSong, self.currentMix), self.parentContentPack))
 
     NoteSkin.clearCache()
@@ -41,20 +47,36 @@ function PlayScreen:enter()
         local track = comet.mixer:load(tracks[i])
         track:setPitch(1)
         track:seek(0)
-        track:play()
         table.insert(self.vocalTracks, track)
     end
     self.inst:setPitch(1)
     self.inst:seek(0)
-    self.inst:play()
 
+    local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
+    c.music = nil
+    c:setCurrentRawTime(c:getCurrentBeatLength() * -5)
+
+    self.playField = PlayField:new() --- @type funkin.gameplay.PlayField
+    self.playField:prepareChart(self.currentChart, self.currentDifficulty)
+    self:addChild(self.playField)
+end
+
+function PlayScreen:update(dt)
+    local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
+    if self.startingSong and c:getCurrentRawTime() >= 0.0 then
+        self:startSong()
+    end
+end
+
+function PlayScreen:startSong()
+    self.startingSong = false
+    
+    self.inst:play()
     Conductor.instance.music = self.inst
 
-    self.opponentStrums = StrumLine:new(comet.getDesiredWidth() * 0.25, 100) --- @type funkin.gameplay.notes.StrumLine
-    self:addChild(self.opponentStrums)
-
-    self.playerStrums = StrumLine:new(comet.getDesiredWidth() * 0.75, 100) --- @type funkin.gameplay.notes.StrumLine
-    self:addChild(self.playerStrums)
+    for i = 1, #self.vocalTracks do
+        self.vocalTracks[i]:play()
+    end
 end
 
 function PlayScreen:endSong()
