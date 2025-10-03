@@ -3,6 +3,10 @@ local Native = cometreq("native") --- @type comet.Native
 --- @class funkin.util.FLog
 local FLog = {}
 
+function FLog.init()
+    print = FLog.print
+end
+
 function FLog.output(type, fgColor, bgColor, ...)
     Native.setConsoleColors(Native.ConsoleColor.NONE, bgColor)
     

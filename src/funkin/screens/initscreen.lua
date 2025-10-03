@@ -3,6 +3,7 @@ local InitScreen = Screen:subclass("InitScreen", ...)
 
 function InitScreen:enter()
     FLog = srcreq("funkin.util.flog") --- @type funkin.util.FLog
+    FLog.init()
     
     Paths = srcreq("funkin.backend.assets.paths") --- @type funkin.backend.assets.Paths
     Paths.initAssetSystem()

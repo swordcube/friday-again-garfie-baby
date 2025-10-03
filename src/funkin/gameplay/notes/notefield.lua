@@ -21,6 +21,7 @@ function NoteField:update(dt)
             break
         end
         local note = Note:new() --- @type funkin.gameplay.notes.Note
+        note.playField = self.playField
         note:setup(noteData.t, noteData.d % strumLine.keyCount, noteData.l, noteData.k, strumLine)
         note:updatePosition()
         self:addChild(note)

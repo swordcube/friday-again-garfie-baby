@@ -18,6 +18,7 @@ function Note:__init__()
 
     self.wasHit = false
     self.strumLine = nil --- @type funkin.gameplay.notes.StrumLine
+    self.playField = nil --- @type funkin.gameplay.PlayField
 
     self.offsetX, self.offsetY = 0.0, 0.0
 end
@@ -81,13 +82,11 @@ end
 function Note:update(dt)
     self:updatePosition()
 
-    if self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() then
-        local strum = self.strumLine:getChild(self.lane + 1) --- @type funkin.gameplay.notes.Strum
-        strum:glow(true)
-        self:destroy()
+    if self.strumLine.botplay and self.time <= Conductor.instance:getCurrentRawPlayhead() then
+        self.playField:hitNote(self)
     end
-    if not self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() - (350 / self.strumLine.scrollSpeed) then
-        self:destroy()
+    if not self.strumLine.botplay and self.time <= Conductor.instance:getCurrentRawPlayhead() - (350 / self.strumLine.scrollSpeed) then
+        self.playField:missNote(self)
     end
 end
 

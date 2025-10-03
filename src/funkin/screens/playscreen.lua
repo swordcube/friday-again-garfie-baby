@@ -1,5 +1,6 @@
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
-local StrumLine = srcreq("funkin.gameplay.notes.strumline") --- @type funkin.gameplay.notes.StrumLine
+local UISkin = srcreq("funkin.gameplay.ui.uiskin") --- @type funkin.gameplay.ui.UISkin
+
 local PlayField = srcreq("funkin.gameplay.playfield") --- @type funkin.gameplay.PlayField
 
 --- @class funkin.screens.PlayScreen : funkin.screens.MusicBeatScreen
@@ -36,6 +37,11 @@ function PlayScreen:enter()
     self.currentChart.meta = CoolUtil.parseJson(Paths.json(("songs/%s/%s/metadata"):format(self.currentSong, self.currentMix), self.parentContentPack))
 
     NoteSkin.clearCache()
+    UISkin.clearCache()
+
+    -- preload current note & ui skin
+    NoteSkin.get(self.currentChart.meta.playData.noteStyle)
+    UISkin.get(self.currentChart.meta.playData.noteStyle)
 
     local tracks = {
         Paths.vocalTrack(self.currentSong, self.currentMix, "vocals-" .. self.currentChart.meta.playData.characters.opponent, self.parentContentPack),

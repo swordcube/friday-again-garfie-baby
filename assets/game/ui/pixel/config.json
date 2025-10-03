@@ -1,0 +1,130 @@
+{
+    "rating": {
+        "folder": "images/score",
+        "scale": 4.7,
+        "animation": {
+            "killer": {
+                "prefix": "killer",
+                "offset": [0, 0]
+            },
+            "sick": {
+                "prefix": "sick",
+                "offset": [0, 0]
+            },
+            "good": {
+                "prefix": "good",
+                "offset": [0, 0]
+            },
+            "bad": {
+                "prefix": "bad",
+                "offset": [0, 0]
+            },
+            "shit": {
+                "prefix": "shit",
+                "offset": [0, 0]
+            },
+            "miss": {
+                "prefix": "miss",
+                "offset": [0, 0]
+            }
+        }
+    },
+    "combo": {
+        "folder": "images/score",
+        "scale": 4.5,
+        "animation": {
+            "minus": {
+                "prefix": "minus",
+                "texture": "minus",
+                "offset": [0, 0]
+            },
+            "0": {
+                "prefix": "0",
+                "texture": "num0",
+                "offset": [0, 0]
+            },
+            "1": {
+                "prefix": "1",
+                "texture": "num1",
+                "offset": [0, 0]
+            },
+            "2": {
+                "prefix": "2",
+                "texture": "num2",
+                "offset": [0, 0]
+            },
+            "3": {
+                "prefix": "3",
+                "texture": "num3",
+                "offset": [0, 0]
+            },
+            "4": {
+                "prefix": "4",
+                "texture": "num4",
+                "offset": [0, 0]
+            },
+            "5": {
+                "prefix": "5",
+                "texture": "num5",
+                "offset": [0, 0]
+            },
+            "6": {
+                "prefix": "6",
+                "texture": "num6",
+                "offset": [0, 0]
+            },
+            "7": {
+                "prefix": "7",
+                "texture": "num7",
+                "offset": [0, 0]
+            },
+            "8": {
+                "prefix": "8",
+                "texture": "num8",
+                "offset": [0, 0]
+            },
+            "9": {
+                "prefix": "9",
+                "texture": "num9",
+                "offset": [0, 0]
+            }
+        }
+    },
+    "countdown": {
+        "folder": "images/countdown",
+        "steps": [
+            {
+                "name": "prepare",
+                "soundPath": "sfx/intro3",
+                "visible": false
+            },
+            {
+                "name": "ready",
+                "soundPath": "sfx/intro2"
+            },
+            {
+                "name": "set",
+                "soundPath": "sfx/intro1"
+            },
+            {
+                "name": "go",
+                "soundPath": "sfx/introGo"
+            }
+        ],
+        "scale": 6,
+        "animation": {
+            "ready": {
+                "prefix": "ready",
+                "offset": [0, 0]
+            },
+            "set": {
+                "prefix": "set",
+                "offset": [0, 0]
+            },
+            "go": {
+                "prefix": "go",
+                "offset": [0, 0]
+            }
+        }
+    }
+}

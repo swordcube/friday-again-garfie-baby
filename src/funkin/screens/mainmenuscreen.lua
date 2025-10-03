@@ -102,7 +102,6 @@ function MainMenuScreen:enter()
     self:addChild(self.leftWatermark)
 
     self.magentaTween = nil --- @type comet.gfx.Tween
-
     self:changeSelection(0, true)
 end
 

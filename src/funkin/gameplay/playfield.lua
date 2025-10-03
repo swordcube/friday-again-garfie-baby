@@ -1,5 +1,6 @@
 local StrumLine = srcreq("funkin.gameplay.notes.strumline") --- @type funkin.gameplay.notes.StrumLine
 local NoteField = srcreq("funkin.gameplay.notes.notefield") --- @type funkin.gameplay.notes.NoteField
+local ScoreDisplay = srcreq("funkin.gameplay.ui.scoredisplay") --- @type funkin.gameplay.ui.ScoreDisplay
 
 --- @class funkin.gameplay.PlayField : comet.gfx.Object2D
 local PlayField, super = Object2D:subclass("PlayField", ...)
@@ -14,6 +15,9 @@ function PlayField:__init__()
 
     self.strumLines = Object2D:new() --- @type comet.gfx.Object2D
     self:addChild(self.strumLines)
+    
+    self.scoreDisplay = ScoreDisplay:new(comet.getDesiredWidth() * 0.55, comet.getDesiredHeight() * 0.5) --- @type funkin.gameplay.ui.ScoreDisplay
+    self:addChild(self.scoreDisplay)
 
     local downscroll = true
 
@@ -44,8 +48,28 @@ function PlayField:prepareChart(chart, difficulty)
     self.notes.curNoteIndex = 1
 
     for i = 1, self.strumLines:getChildCount() do
-        self.strumLines:getChild(i).scrollSpeed = self.currentChart.scrollSpeed[difficulty] or 1.0
+        self.strumLines:getChild(i).scrollSpeed = chart.scrollSpeed[difficulty] or 1.0
     end
+    self.scoreDisplay:loadSkin(chart.meta.playData.noteStyle)
+end
+
+--- @param note funkin.gameplay.notes.Note
+function PlayField:hitNote(note)
+    note.wasHit = true
+    note:destroy()
+
+    local strum = note.strumLine:getChild(note.lane + 1) --- @type funkin.gameplay.notes.Strum
+    strum:glow(note.strumLine.botplay)
+
+    if note.strumLine == self.playerStrumLine then
+        self.scoreDisplay:showRating("killer")
+        self.scoreDisplay:showCombo(0)
+    end
+end
+
+--- @param note funkin.gameplay.notes.Note
+function PlayField:missNote(note)
+    note:destroy()
 end
 
 function PlayField:input(e)
@@ -80,10 +104,10 @@ function PlayField:input(e)
         local note = validNotes[1] --- @type funkin.gameplay.notes.Note
         local strum = plr:getChild(lane + 1) --- @type funkin.gameplay.notes.Strum
         if note then
-            note.wasHit = true
-            note:destroy()
+            self:hitNote(note)
+        else
+            strum:playAnimation("press", true)
         end
-        strum:playAnimation(note and "confirm" or "press", true)
     else
         local strum = plr:getChild(lane + 1) --- @type funkin.gameplay.notes.Strum
         strum:playAnimation("static", true)
