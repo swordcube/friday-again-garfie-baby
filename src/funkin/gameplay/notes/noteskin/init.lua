@@ -7,7 +7,7 @@ local NoteSkin = {}
 NoteSkin._cache = {} --- @protected
 
 function NoteSkin.clearCache()
-    
+    NoteSkin._cache = {}
 end
 
 function NoteSkin.get(name)

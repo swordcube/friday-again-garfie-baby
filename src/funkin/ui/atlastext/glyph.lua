@@ -32,7 +32,7 @@ function Glyph:setup(x, y, glyph, size)
         self:kill()
         return
     end
-    self:addAnimation("idle", name, fontData.fps or 24, true)
+    self:addAnimationByName("idle", name, fontData.fps or 24, true)
 
     if self:hasAnimation("idle") then
         self:playAnimation("idle", true)

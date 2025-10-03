@@ -14,6 +14,8 @@ function Strum:__init__(x, y, keyCount, direction, skin)
     self.skin = skin or "funkin"
     self.skinData = NoteSkin.get(self.skin)
 
+    self.holdTimer = 0.0
+
     -- TODO: more than just sparrow atlas!!
 
     self:setFrameCollection(Paths.getSparrowAtlas(("game/notes/%s/%s"):format(self.skin, self.skinData.strum.atlas.path)))
@@ -23,7 +25,7 @@ function Strum:__init__(x, y, keyCount, direction, skin)
         if animData.indices and #animData.indices > 0 then
             self:addAnimationByIndices(name, animData.prefix, animData.indices, animData.fps, animData.looped)
         else
-            self:addAnimation(name, animData.prefix, animData.fps, animData.looped)
+            self:addAnimationByName(name, animData.prefix, animData.fps, animData.looped)
         end
         self:setAnimationOffset(name, (animData and animData.offset) and animData.offset[1] or 0.0, (animData and animData.offset) and animData.offset[2] or 0.0)
     end
@@ -31,6 +33,20 @@ function Strum:__init__(x, y, keyCount, direction, skin)
     self:playAnimation("static")
 
     self.antialiasing = self.skinData.strum.antialiasing ~= nil and self.skinData.strum.antialiasing or true
+end
+
+function Strum:update(dt)
+    self.holdTimer = self.holdTimer - (dt * 1000.0)
+    if self.holdTimer <= 0.0 then
+        self:playAnimation("static")
+        self.holdTimer = math.huge
+    end
+    super.update(self, dt)
+end
+
+function Strum:glow(bot)
+    self.holdTimer = bot and math.max(Conductor.instance:getCurrentStepLength(), 150) or math.huge
+    self:playAnimation("confirm", true)
 end
 
 return Strum

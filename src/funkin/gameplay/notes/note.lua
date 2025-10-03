@@ -37,7 +37,7 @@ function Note:loadSkin(skin)
             if animData.indices and #animData.indices > 0 then
                 self:addAnimationByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
             else
-                self:addAnimation(dir .. name, animData.prefix, animData.fps, animData.looped)
+                self:addAnimationByName(dir .. name, animData.prefix, animData.fps, animData.looped)
             end
             self:setAnimationOffset(dir .. name, (animData and animData.offset) and animData.offset[1] or 0.0, (animData and animData.offset) and animData.offset[2] or 0.0)
         end
@@ -82,6 +82,8 @@ function Note:update(dt)
     self:updatePosition()
 
     if self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() then
+        local strum = self.strumLine:getChild(self.lane + 1) --- @type funkin.gameplay.notes.Strum
+        strum:glow(true)
         self:destroy()
     end
     if not self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() - (350 / self.strumLine.scrollSpeed) then

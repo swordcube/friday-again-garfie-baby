@@ -77,8 +77,8 @@ function MainMenuScreen:enter()
         local buttonData = self.options[i]
         local button = AnimatedImage:new() --- @type comet.gfx.AnimatedImage
         button:setFrameCollection(Paths.getSparrowAtlas("menus/main/" .. buttonData.id))
-        button:addAnimation("idle", ("%s idle"):format(buttonData.id), 24, true)
-        button:addAnimation("selected", ("%s selected"):format(buttonData.id), 24, true)
+        button:addAnimationByName("idle", ("%s idle"):format(buttonData.id), 24, true)
+        button:addAnimationByName("selected", ("%s selected"):format(buttonData.id), 24, true)
         button:playAnimation("idle")
         button.position:set(0, (i - 1) * 160)
         self.grpButtons:addChild(button)
@@ -126,7 +126,7 @@ function MainMenuScreen:input(_)
         self:onSelect()
     end
     if comet.keys:wasJustPressed("f7") then
-        
+        self:openSubScreen(srcreq("funkin.screens.debug.chartconverter"):new())
     end
 end
 

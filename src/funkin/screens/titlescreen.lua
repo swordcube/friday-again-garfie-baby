@@ -58,15 +58,15 @@ function TitleScreen:enter()
 
     self.logo = AnimatedImage:new(-150, -100) --- @type comet.gfx.AnimatedImage
     self.logo:setFrameCollection(Paths.getSparrowAtlas("menus/title/logo"))
-    self.logo:addAnimation("idle", "logo bumpin", 24, false)
+    self.logo:addAnimationByName("idle", "logo bumpin", 24, false)
     self.logo:playAnimation("idle")
     self.logo.centered = false
     self.titleGroup:addChild(self.logo)
 
     self.titleText = AnimatedImage:new(100, comet.getDesiredHeight() * 0.8) --- @type comet.gfx.AnimatedImage
     self.titleText:setFrameCollection(Paths.getSparrowAtlas("menus/title/enter"))
-    self.titleText:addAnimation("idle", "Press Enter to Begin", 24, true)
-    self.titleText:addAnimation("press", "ENTER PRESSED", 24, true)
+    self.titleText:addAnimationByName("idle", "Press Enter to Begin", 24, true)
+    self.titleText:addAnimationByName("press", "ENTER PRESSED", 24, true)
     self.titleText:playAnimation("idle")
     self.titleText.centered = false
     self.titleGroup:addChild(self.titleText)
