@@ -82,6 +82,8 @@ class InitState extends FlxState {
         // init some flixel stuff
         FlxUtil.init();
         SwipeUtil.init();
+
+        FlxCamera.useOptimizedFill = true; // it's disabled by default because psych engine, but we ain't psych engine so we can enable it
         Paths.initAssetSystem();
         
         FlxG.scaleMode = new RatioScaleModeEx();
