@@ -14,6 +14,8 @@ function InitScreen:enter()
     MusicBeatScreen = srcreq("funkin.screens.musicbeatscreen") --- @type funkin.screens.MusicBeatScreen
     MusicBeatScreen.static.skipNextTransIn = true
 
+    MusicBeatSubScreen = srcreq("funkin.screens.musicbeatsubscreen") --- @type funkin.screens.MusicBeatSubScreen
+
     Controls = srcreq("funkin.backend.controls") --- @type funkin.backend.Controls
     Controls.static.instance = Controls:new()
 

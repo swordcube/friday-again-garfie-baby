@@ -82,10 +82,10 @@ end
 function Note:update(dt)
     self:updatePosition()
 
-    if self.strumLine.botplay and self.time <= Conductor.instance:getCurrentRawPlayhead() then
+    if self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() then
         self.playField:hitNote(self)
     end
-    if not self.strumLine.botplay and self.time <= Conductor.instance:getCurrentRawPlayhead() - (350 / self.strumLine.scrollSpeed) then
+    if not self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() - (350 / self.strumLine.scrollSpeed) then
         self.playField:missNote(self)
     end
 end

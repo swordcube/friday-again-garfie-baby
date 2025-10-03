@@ -60,6 +60,7 @@ function PlayScreen:enter()
 
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     c.music = nil
+    c.offset = 50
     c:setCurrentRawTime(c:getCurrentBeatLength() * -5)
 
     self.playField = PlayField:new() --- @type funkin.gameplay.PlayField
@@ -95,6 +96,9 @@ function PlayScreen:exit()
         tracks[i]:destroy()
     end
     self.vocalTracks = {}
+
+    local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
+    c.offset = 0
     
     PlayScreen.static.instance = nil
 end

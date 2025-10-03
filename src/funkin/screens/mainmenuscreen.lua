@@ -124,8 +124,9 @@ function MainMenuScreen:input(_)
     if self.controls.justPressed.ACCEPT then
         self:onSelect()
     end
-    if comet.keys:wasJustPressed("f7") then
-        self:openSubScreen(srcreq("funkin.screens.debug.chartconverter"):new())
+    if comet.keys:wasJustPressed("7") then
+        self.persistentUpdate = false
+        self:openSubScreen(srcreq("funkin.screens.debug.editorpicker"):new())
     end
 end
 

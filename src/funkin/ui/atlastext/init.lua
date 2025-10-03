@@ -20,6 +20,9 @@ function AtlasText:__init__(x, y, font, size, text)
     self._alignment = "left" --- @type "left"|"center"|"right"
     self._alpha = 1.0 --- @type number
 
+    --- Tweenable alpha property, to set alpha immediately, use `setAlpha()`
+    self.alpha = 1.0 --- @type number
+    
     self:setFont(font)
 end
 
@@ -77,7 +80,7 @@ function AtlasText:getAlpha()
 end
 
 function AtlasText:setAlpha(alpha)
-    self._alpha = alpha
+    self._alpha, self.alpha = alpha, alpha
     for i = 1, self:getChildCount() do
         local line = self.children[i]
         for j = 1, #line.children do
@@ -153,20 +156,51 @@ function AtlasText:_regenText()
     self:_adjustAlignment()
 end
 
+function AtlasText:screenCenter(axes)
+    -- TODO: this is a dumb hack to make text centering work
+    if axes == "x" or axes == "xy" then
+        self.position.x = 0.0
+    end
+    if axes == "y" or axes == "xy" then
+        self.position.y = 0.0
+    end
+    super.screenCenter(self, axes)
+end
+
 --- @protected
 function AtlasText:_adjustAlignment()
-    local totalWidth = self:getChildrenBoundingBox().width
+    local fullWidth = 0
+    for i = 1, self:getChildCount() do
+        local line = self.children[i]
+        local w = line:getChildrenBoundingBox().width
+        if w > fullWidth then
+            fullWidth = w
+        end
+    end
     for i = 1, self:getChildCount() do
         local line = self.children[i]
         if self._alignment == "left" then
             line.position.x = 0
         
         elseif self._alignment == "center" then
-            line.position.x = (totalWidth - line:getChildrenBoundingBox().width) * 0.5
+            line.position.x = (fullWidth - line:getChildrenBoundingBox().width) * 0.5
         
         elseif self._alignment == "right" then
-            line.position.x = totalWidth - line:getChildrenBoundingBox().width
+            line.position.x = fullWidth - line:getChildrenBoundingBox().width
         end
+    end
+end
+
+function AtlasText:_draw()
+    if self._alpha ~= self.alpha then
+        self:setAlpha(self.alpha)
+    end
+    super._draw(self)
+    if comet.settings.debugDraw then
+        love.graphics.setLineWidth(4)
+
+        local r = self:getChildrenBoundingBox()
+        love.graphics.rectangle("line", r.x, r.y, r.width, r.height)
     end
 end
 
