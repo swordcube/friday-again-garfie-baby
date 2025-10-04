@@ -1,5 +1,7 @@
 local StrumLine = srcreq("funkin.gameplay.notes.strumline") --- @type funkin.gameplay.notes.StrumLine
 local NoteField = srcreq("funkin.gameplay.notes.notefield") --- @type funkin.gameplay.notes.NoteField
+
+local Scoring = srcreq("funkin.gameplay.scoring") --- @type funkin.gameplay.Scoring
 local ScoreDisplay = srcreq("funkin.gameplay.ui.scoredisplay") --- @type funkin.gameplay.ui.ScoreDisplay
 
 --- @class funkin.gameplay.PlayField : comet.gfx.Object2D
@@ -13,6 +15,25 @@ function PlayField:__init__()
     self.currentChart = nil
     self.currentDifficulty = "unknown"
 
+    self.stats = {
+        ratings = {
+            killer = 0,
+            sick = 0,
+            good = 0,
+            bad = 0,
+            shit = 0
+        },
+        combo = 0,
+        missCombo = 0,
+
+        comboBreaks = 0,
+        misses = 0,
+
+        accuracyScore = 0,
+        totalNotesHit = 0,
+
+        accuracy = 0,
+    }
     self.strumLines = Object2D:new() --- @type comet.gfx.Object2D
     self:addChild(self.strumLines)
     
@@ -62,14 +83,28 @@ function PlayField:hitNote(note)
     strum:glow(note.strumLine.botplay)
 
     if note.strumLine == self.playerStrumLine then
-        self.scoreDisplay:showRating("killer")
-        self.scoreDisplay:showCombo(0)
+        self.stats.combo = self.stats.combo + 1
+        self.stats.missCombo = 0
+
+        self.scoreDisplay:showRating(Scoring.judgeNote(note.time, Conductor.instance:getCurrentTime()))
+        self.scoreDisplay:showCombo(self.stats.combo)
     end
 end
 
 --- @param note funkin.gameplay.notes.Note
 function PlayField:missNote(note)
     note:destroy()
+
+    if note.strumLine == self.playerStrumLine then
+        if self.stats.combo > 0 then
+            self.stats.combo = 0
+            self.stats.comboBreaks = self.stats.comboBreaks + 1
+        end
+        self.stats.missCombo = self.stats.missCombo + 1
+
+        self.scoreDisplay:showRating("miss")
+        self.scoreDisplay:showCombo(self.stats.missCombo, true)
+    end
 end
 
 function PlayField:input(e)

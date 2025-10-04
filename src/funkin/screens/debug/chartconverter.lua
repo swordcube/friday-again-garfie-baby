@@ -44,6 +44,7 @@ function ChartConverter:enter()
         {id = "fnf_psych", name = "Psych Engine (0.x)", icon = 1},
         {id = "fnf_psych_1x", name = "Psych Engine (1.x)", icon = 1},
         {id = "fnf_codename", name = "Codename Engine", icon = 1},
+        {id = "fnf_garfie_baby", name = "Friday Again Garfie Baby", icon = 1},
         {id = "guitar_hero", name = "Guitar Hero", icon = 2},
         {id = "osu_mania", name = "osu!mania", icon = 3},
         {id = "quaver", name = "Quaver", icon = 4},
@@ -52,6 +53,10 @@ function ChartConverter:enter()
     self.curSelected = 1
     self.canInput = false
 
+    self.fromFormat = 1
+    self.toFormat = 1
+
+    self.curState = "from"
     self:regenItems()
 end
 
@@ -61,16 +66,43 @@ function ChartConverter:update(dt)
         comet.mixer:play(Paths.sound("menus/sfx/cancel"))
     end
     self.selectorBox.position.y = math.lerp(self.selectorBox.position.y, self.grpIcons:getChild(self.curSelected).position.y - 5, dt * 25)
-    self.selectorBox.scale.y = 1 + math.abs((self.selectorBox.position.y - (self.grpIcons:getChild(self.curSelected).position.y - 5)) / 60)
+    -- self.selectorBox.scale.y = 1 + math.abs((self.selectorBox.position.y - (self.grpIcons:getChild(self.curSelected).position.y - 5)) / 60)
 end
 
 function ChartConverter:input(_)
+    if not self.canInput then
+        return
+    end
     local wheel = comet.mouse.wheel.y
     if self.controls.justPressed.UI_UP or wheel < 0 then
         self:changeSelection(-1)
     end
     if self.controls.justPressed.UI_DOWN or wheel > 0 then
         self:changeSelection(1)
+    end
+    if self.controls.justPressed.ACCEPT then
+        if self.curState == "from" then
+            self.fromFormat = self.curSelected
+            self.curSelected = 1
+            
+            self.curState = "to"
+
+            self.noteText.text = "Now select a format to convert to!"
+            self.noteText.position.x = comet.getDesiredWidth() - self.noteText:getWidth() - 15
+            
+            self:regenItems()
+            
+        elseif self.curState == "to" then
+            self.toFormat = self.curSelected
+            self.curState = "converting"
+
+            self.canInput = false
+            self.noteText.text = "Converting..."
+            self.noteText.position.x = comet.getDesiredWidth() - self.noteText:getWidth() - 15
+
+        elseif self.curState == "converting" then
+            self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
+        end
     end
 end
 
@@ -91,6 +123,14 @@ function ChartConverter:changeSelection(by, force)
 end
 
 function ChartConverter:regenItems()
+    while #self.grpIcons.children > 0 do
+        table.removeItem(self.grpIcons.children, self.grpIcons.children[1])
+    end
+    while #self.grpTexts.children > 0 do
+        table.removeItem(self.grpTexts.children, self.grpTexts.children[1])
+    end
+    self.grpIcons._childCount, self.grpTexts._childCount = 0, 0
+
     self.canInput = false
     Timer.wait(#self.formats / 9, function()
         self.canInput = true
@@ -103,13 +143,13 @@ function ChartConverter:regenItems()
         icon:addAnimation("idle", {format.icon}, 0, false)
         icon:playAnimation("idle")
         icon:setGraphicSize(50, 50)
-        icon.position:set(90, (60 * (i - 1)) + 70)
+        icon.position:set(90, (60 * (i - 1)) + 60)
         icon.centered = false
         icon.alpha = 0
         self.grpIcons:addChild(icon)
 
         local text = AtlasText:new(0, 0, "bold", 0.78, format.name) --- @type funkin.ui.AtlasText
-        text.position:set(170, (60 * (i - 1)) + 10)
+        text.position:set(170, (60 * (i - 1)) + 0)
         text:setAlpha(0.0)
         self.grpTexts:addChild(text)
 

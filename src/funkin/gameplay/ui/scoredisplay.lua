@@ -44,7 +44,7 @@ function ScoreDisplay:showRating(rating)
     spr:setFrameCollection(self._scoreAtlas)
     spr:addAnimationByName("r", rating, 0, false)
     spr:playAnimation("r", true)
-    spr.position:set(40, -60)
+    spr.position:set((spr:getWidth() * 0.5) - 140, -60)
     spr.acceleration.y = 550
     spr.velocity.x = math.floor(love.math.random(0, -10))
     spr.velocity.y = math.floor(love.math.random(-140, -175))
@@ -63,7 +63,7 @@ function ScoreDisplay:showRating(rating)
     t:start({duration = 0.2, delay = Conductor.instance:getCurrentBeatLength() * 0.001})
 end
 
-function ScoreDisplay:showCombo(combo)
+function ScoreDisplay:showCombo(combo, miss)
     local comboStr = tostring(math.abs(combo))
     while #comboStr < 3 do
         comboStr = "0" .. comboStr
@@ -85,8 +85,10 @@ function ScoreDisplay:showCombo(combo)
         spr.velocity.x = love.math.random(-5, 5)
         spr.velocity.y = math.floor(love.math.random(-140, -160))
         spr.scale:set(self._skinData.combo.scale * 0.95, self._skinData.combo.scale * 0.95)
+        if miss then
+            spr:setTint(0xFFc84040)
+        end
         self:addChild(spr)
-
         local t = Tween:new() --- @type comet.gfx.Tween
         t:target({target = spr.scale, properties = {x = self._skinData.combo.scale, y = self._skinData.combo.scale}})
         t:start({duration = 0.2})
