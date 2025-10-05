@@ -35,7 +35,7 @@ function ScoreDisplay:loadSkin(newSkin)
         self._scoreAtlas:dereference()
         self._scoreAtlas = nil
     end
-    self._scoreAtlas = ta:toFrameCollection()
+    self._scoreAtlas = ta:toFrameCollection() --- @type comet.gfx.FrameCollection
     self._scoreAtlas:reference()
 end
 

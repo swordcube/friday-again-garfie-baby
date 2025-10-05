@@ -128,10 +128,11 @@ baseAtlas.toFrameCollection = function(self)
         self:hardBake()
     end
     local frames = FrameCollection:new() --- @type comet.gfx.FrameCollection
+    local texture = Texture:new(self.image, ("#_RTA_%s"):format(tostring(love.math.random(0, 100000000)))) --- @type comet.gfx.Texture
     for id, _ in pairs(ids) do
         local x, y, w, h = self.quads[id]:getViewport()
         local frame = AnimationFrame:new(
-            id, Texture:new(self.image, ("#_RTA_%s_%s"):format(tostring(love.math.random(0, 100000000)), id)),
+            id, texture,
             x, y, 0, 0,
             w, h, w, h, 0
         )
