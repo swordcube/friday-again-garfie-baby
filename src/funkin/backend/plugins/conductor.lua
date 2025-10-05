@@ -1,6 +1,8 @@
 local Plugin = cometreq("core.plugin") --- @type comet.core.Plugin
 local Signal = cometreq("util.signal") --- @type comet.util.Signal
 
+local math = math
+
 --- @class funkin.backend.plugins.Conductor : comet.core.Plugin
 local Conductor = Plugin:subclass("Conductor", ...)
 Conductor.static.instance = nil --- @type funkin.backend.plugins.Conductor

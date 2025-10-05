@@ -12,6 +12,7 @@ local grid = require(path .. "packing")
 local lg = love.graphics
 local newImageData = love.image.newImageData
 local sort = table.sort
+local math = math
 
 dynamicSizeTA.new = function(padding, extrude, spacing)
   return setmetatable(baseAtlas.new(padding, extrude, spacing), dynamicSizeTA)

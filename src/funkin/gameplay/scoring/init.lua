@@ -24,4 +24,8 @@ function Scoring.getHoldScoreBonus()
     return Scoring.currentSystem:getHoldScoreBonus()
 end
 
+function Scoring.hasNoteSplash(rating)
+    return Scoring.currentSystem:hasNoteSplash(rating)
+end
+
 return Scoring

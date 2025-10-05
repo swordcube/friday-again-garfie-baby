@@ -19,4 +19,8 @@ function ScoringSystem:getHoldScoreBonus()
     return 0
 end
 
+function ScoringSystem:hasNoteSplash(rating)
+    return false
+end
+
 return ScoringSystem

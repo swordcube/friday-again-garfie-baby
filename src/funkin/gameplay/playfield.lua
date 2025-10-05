@@ -7,6 +7,7 @@ local ScoreDisplay = srcreq("funkin.gameplay.ui.scoredisplay") --- @type funkin.
 --- @class funkin.gameplay.PlayField : comet.gfx.Object2D
 local PlayField, super = Object2D:subclass("PlayField", ...)
 
+local math = math
 local upperDirs = {"LEFT", "DOWN", "UP", "RIGHT"}
 
 function PlayField:__init__()
@@ -47,7 +48,7 @@ function PlayField:__init__()
     self.strumLines:addChild(self.opponentStrumLine)
     
     self.playerStrumLine = StrumLine:new(comet.getDesiredWidth() * 0.75, downscroll and comet.getDesiredHeight() - 100 or 100, downscroll) --- @type funkin.gameplay.notes.StrumLine
-    self.playerStrumLine.botplay = false
+    self.playerStrumLine.botplay = true
     self.strumLines:addChild(self.playerStrumLine)
 
     self.notes = NoteField:new() --- @type funkin.gameplay.notes.NoteField

@@ -5,6 +5,8 @@ local AnimatedVelocityImage = srcreq("funkin.gfx.animatedvelocityimage") --- @ty
 --- @class funkin.gameplay.ui.ScoreDisplay : comet.gfx.Object2D
 local ScoreDisplay, super = Object2D:subclass("ScoreDisplay", ...)
 
+local math, lmath = math, love.math
+
 function ScoreDisplay:__init__(x, y)
     super.__init__(self, x, y)
 
@@ -45,8 +47,8 @@ function ScoreDisplay:showRating(rating)
     spr:addAnimationByName("r", rating, 0, false)
     spr:playAnimation("r", true)
     spr.acceleration.y = 550
-    spr.velocity.x = math.floor(love.math.random(0, -10))
-    spr.velocity.y = math.floor(love.math.random(-140, -175))
+    spr.velocity.x = math.floor(lmath.random(0, -10))
+    spr.velocity.y = math.floor(lmath.random(-140, -175))
 
     spr.scale:set(self._skinData.rating.scale, self._skinData.rating.scale)
     spr.position:set((spr:getWidth() * 0.5) - 40, -60)
@@ -86,9 +88,9 @@ function ScoreDisplay:showCombo(combo, miss)
         spr:setFrameCollection(self._scoreAtlas)
         spr:addAnimationByName("c", char, 0, false)
         spr:playAnimation("c", true)
-        spr.acceleration.y = math.floor(love.math.random(200, 300))
-        spr.velocity.x = love.math.random(-5, 5)
-        spr.velocity.y = math.floor(love.math.random(-140, -160))
+        spr.acceleration.y = math.floor(lmath.random(200, 300))
+        spr.velocity.x = lmath.random(-5, 5)
+        spr.velocity.y = math.floor(lmath.random(-140, -160))
         
         spr.scale:set(self._skinData.combo.scale, self._skinData.combo.scale)
         spr.position:set((spr:getWidth() * 0.5) + (((i - (combo < 0 and 2 or 1)) * 43) - 90), 60)

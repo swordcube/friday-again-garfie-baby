@@ -6,6 +6,8 @@
 
 local path = select(1, ...):match("(.-)[^%.]+$")
 local util = require(path .. "util")
+
+local math = math
 local lg = love.graphics
 local insert, remove = table.insert, table.remove
 

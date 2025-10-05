@@ -3,6 +3,7 @@ local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gamep
 --- @class funkin.gameplay.notes.Strum : comet.gfx.AnimatedImage
 local Strum, super = AnimatedImage:subclass("Strum", ...)
 
+local math = math
 local dirs = {"left", "down", "up", "right"}
 
 function Strum:__init__(x, y, keyCount, direction, skin)

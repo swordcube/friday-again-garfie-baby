@@ -9,6 +9,8 @@ fixedSizeTA.__index = fixedSizeTA
 
 local lg = love.graphics
 local newImageData = love.image.newImageData
+
+local math = math
 local ceil, floor, sqrt = math.ceil, math.sqrt, math.floor
 
 fixedSizeTA.new = function(width, height, padding, extrude, spacing)

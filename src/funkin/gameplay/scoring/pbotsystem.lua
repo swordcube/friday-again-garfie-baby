@@ -3,6 +3,8 @@ local ScoringSystem = srcreq("funkin.gameplay.scoring.scoringsystem") --- @type 
 --- @class funkin.gameplay.scoring.PBotSystem : funkin.gameplay.scoring.ScoringSystem
 local PBotSystem = ScoringSystem:subclass("PBotSystem", ...)
 
+local math = math
+
 PBotSystem.static.PERFECT_THRESHOLD = 5.0
 PBotSystem.static.MISS_THRESHOLD = 160.0
 PBotSystem.static.MISS_SCORE = 0
@@ -45,6 +47,10 @@ end
 
 function PBotSystem:getHoldScoreBonus()
     return 145
+end
+
+function PBotSystem:hasNoteSplash(rating)
+    return rating == "killer" or rating == "sick"
 end
 
 return PBotSystem

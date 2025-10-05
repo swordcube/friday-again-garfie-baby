@@ -7,6 +7,7 @@ local overlayTypes = {
     "advanced"
 }
 
+local math = math
 local gfx = love.graphics
 local bit = require("bit")
 
