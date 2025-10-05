@@ -44,10 +44,13 @@ function ScoreDisplay:showRating(rating)
     spr:setFrameCollection(self._scoreAtlas)
     spr:addAnimationByName("r", rating, 0, false)
     spr:playAnimation("r", true)
-    spr.position:set((spr:getWidth() * 0.5) - 140, -60)
     spr.acceleration.y = 550
     spr.velocity.x = math.floor(love.math.random(0, -10))
     spr.velocity.y = math.floor(love.math.random(-140, -175))
+
+    spr.scale:set(self._skinData.rating.scale, self._skinData.rating.scale)
+    spr.position:set((spr:getWidth() * 0.5) - 40, -60)
+
     spr.scale:set(self._skinData.rating.scale * 0.95, self._skinData.rating.scale * 0.95)
     self:addChild(spr)
 
@@ -64,6 +67,9 @@ function ScoreDisplay:showRating(rating)
 end
 
 function ScoreDisplay:showCombo(combo, miss)
+    if miss then
+        combo = -math.abs(combo)
+    end
     local comboStr = tostring(math.abs(combo))
     while #comboStr < 3 do
         comboStr = "0" .. comboStr
@@ -80,10 +86,13 @@ function ScoreDisplay:showCombo(combo, miss)
         spr:setFrameCollection(self._scoreAtlas)
         spr:addAnimationByName("c", char, 0, false)
         spr:playAnimation("c", true)
-        spr.position:set(((i - (combo < 0 and 2 or 1)) * 43) - 100, 60)
         spr.acceleration.y = math.floor(love.math.random(200, 300))
         spr.velocity.x = love.math.random(-5, 5)
         spr.velocity.y = math.floor(love.math.random(-140, -160))
+        
+        spr.scale:set(self._skinData.combo.scale, self._skinData.combo.scale)
+        spr.position:set((spr:getWidth() * 0.5) + (((i - (combo < 0 and 2 or 1)) * 43) - 90), 60)
+        
         spr.scale:set(self._skinData.combo.scale * 0.95, self._skinData.combo.scale * 0.95)
         if miss then
             spr:setTint(0xFFc84040)

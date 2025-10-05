@@ -64,8 +64,7 @@ function FreeplayScreen:addSong(id, contentPack)
     if not metadata then
         FLog.warn(("Failed to load default song metadata for %s from %s: %s"):format(id, contentPack, err))
     end
-    -- TODO: parsin vslice metadata temporarily i just wanna get something working here
-    self.menu:addItem(metadata and metadata.songName or id)
+    self.menu:addItem(metadata and metadata.song.title or id)
 end
 
 function FreeplayScreen:input(_)

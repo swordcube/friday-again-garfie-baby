@@ -47,7 +47,7 @@ function PlayField:__init__()
     self.strumLines:addChild(self.opponentStrumLine)
     
     self.playerStrumLine = StrumLine:new(comet.getDesiredWidth() * 0.75, downscroll and comet.getDesiredHeight() - 100 or 100, downscroll) --- @type funkin.gameplay.notes.StrumLine
-    self.playerStrumLine.botplay = false
+    self.playerStrumLine.botplay = true
     self.strumLines:addChild(self.playerStrumLine)
 
     self.notes = NoteField:new() --- @type funkin.gameplay.notes.NoteField
@@ -57,7 +57,7 @@ end
 
 function PlayField:prepareChart(chart, difficulty)
     self.currentChart = chart
-    for _, notes in pairs(self.currentChart.notes) do
+    for _, notes in pairs(chart.n) do
         table.sort(notes, function(a, b)
             if a.t ~= b.t then
                 return a.t < b.t
@@ -65,13 +65,13 @@ function PlayField:prepareChart(chart, difficulty)
             return a.d < b.d
         end)
     end
-    self.notes.pendingNotes = chart.notes[difficulty]
+    self.notes.pendingNotes = chart.n[difficulty]
     self.notes.curNoteIndex = 1
 
     for i = 1, self.strumLines:getChildCount() do
-        self.strumLines:getChild(i).scrollSpeed = chart.scrollSpeed[difficulty] or 1.0
+        self.strumLines:getChild(i).scrollSpeed = chart.meta.game.scrollSpeed[difficulty] or 1.0
     end
-    self.scoreDisplay:loadSkin(chart.meta.playData.noteStyle)
+    self.scoreDisplay:loadSkin(chart.meta.game.uiSkin)
 end
 
 --- @param note funkin.gameplay.notes.Note

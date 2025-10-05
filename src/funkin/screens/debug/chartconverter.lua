@@ -1,3 +1,5 @@
+local Charty = srcreq("charty") --- @type charty.Charty
+
 --- @class funkin.screens.debug.ChartConverter : funkin.screens.MusicBeatScreen
 local ChartConverter = MusicBeatScreen:subclass("ChartConverter", ...)
 
@@ -99,6 +101,89 @@ function ChartConverter:input(_)
             self.canInput = false
             self.noteText.text = "Converting..."
             self.noteText.position.x = comet.getDesiredWidth() - self.noteText:getWidth() - 15
+
+            local filters = {
+                {"Friday Night Funkin' Chart (*.json)", "json"},
+                {"StepMania Chart (*.sm)", "sm"},
+                {"osu!mania chart (*.osu)", "osu"},
+                {"Quaver Chart (*.qua)", "qua"},
+                {"Clone Hero Chart (*.chart;*.mid)", "chart;mid"},
+                {"All Files (*.*)", "*"}
+            }
+            local fromFormat = Charty.getFormat(self.formats[self.fromFormat].id):new() --- @type charty.Format
+            love.timer.sleep(0.5)
+            
+            local function saveStuff(chartPaths, metaPath)
+                love.timer.sleep(0.5)
+                local metaStringCheese = nil
+
+                local curPath = 1
+                local function saveMeta(meta)
+                    if not fromFormat.requiresMetaFile then
+                        self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
+                        return
+                    end
+                    comet.native.showFileDialog("savefile", function(paths)
+                        local path = paths[1]
+                        if not path or #path == 0 then
+                            self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
+                            return
+                        end
+                        local file = love.filesystem.openNativeFile(path, "w") --- @type love.File
+                        file:write(meta)
+                        file:close()
+                        
+                        self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
+                    end, {title = "Save metadata", defaultname = "metadata.json", filters = filters})
+                end
+                local function saveChart()
+                    local toFormat = Charty.getFormat(self.formats[self.toFormat].id):new() --- @type charty.Format
+                    toFormat:fromFormat(fromFormat:fromFile(chartPaths[curPath], metaPath))
+                    
+                    local stringCheese = toFormat:stringify()
+                    if not metaStringCheese then
+                        metaStringCheese = stringCheese.meta
+                    end
+                    comet.native.showFileDialog("savefile", function(paths)
+                        local path = paths[1]
+                        if path and #path ~= 0 then
+                            local file = love.filesystem.openNativeFile(path, "w") --- @type love.File
+                            file:write(stringCheese.chart)
+                            file:close()
+                        end
+                        love.timer.sleep(0.5)
+                        curPath = curPath + 1
+
+                        if curPath > #chartPaths then
+                            saveMeta(stringCheese.meta)
+                        else
+                            saveChart()
+                        end
+                    end, {title = "Save chart", defaultname = "chart.json", filters = filters})
+                end
+                saveChart()
+            end
+            local function openMeta(chartPaths)
+                love.timer.sleep(0.5)
+                comet.native.showFileDialog("openfile", function(files)
+                    if #files == 0 then
+                        self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
+                        return
+                    end
+                    saveStuff(chartPaths, files[1])
+                end, {title = "Select a metadata file to convert", defaultname = "metadata.json", filters = filters})
+            end
+            comet.native.showFileDialog("openfile", function(files)
+                if #files == 0 then
+                    self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
+                    return
+                end
+                if fromFormat.requiresMetaFile then
+                    openMeta(files)
+                else
+                    saveStuff(files, nil)
+                end
+            end, {title = fromFormat.requiresMultipleCharts and "Select each difficulty to convert" or "Select a chart file to convert", defaultname = "chart.json", filters = filters, multiselect = fromFormat.requiresMultipleCharts})
 
         elseif self.curState == "converting" then
             self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())

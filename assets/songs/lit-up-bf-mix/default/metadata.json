@@ -1,32 +1,53 @@
 {
-  "version": "2.2.4",
-  "songName": "Lit Up (BF Mix)",
-  "artist": "Saruky",
-  "charter": "fabs + Spazkid",
-  "divisions": 96,
-  "looped": false,
-  "playData": {
-    "songVariations": [],
-    "difficulties": ["easy", "normal", "hard"],
-    "characters": {
-      "player": "bf",
-      "girlfriend": "gf",
-      "opponent": "darnell",
-      "instrumental": "bf",
-      "altInstrumentals": [],
-      "opponentVocals": ["darnell"],
-      "playerVocals": ["bf"]
-    },
-    "stage": "phillyStreetsErect",
-    "noteStyle": "funkin",
-    "album": "expansion2",
-    "ratings": { "easy": 4, "normal": 5, "hard": 6 },
-    "previewStart": 0,
-    "previewEnd": 0
-  },
-  "generatedBy": "Friday Night Funkin' - v0.5.3",
-  "timeFormat": "ms",
-  "timeChanges": [
-    { "t": 0, "b": 0, "bpm": 176, "n": 4, "d": 4, "bt": [4, 4, 4, 4] }
-  ]
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "darnell",
+			"player": "bf",
+			"spectator": "gf"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2.4,
+			"hard": 3,
+			"normal": 2.8
+		},
+		"stage": "phillyStreetsErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Saruky",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"normal",
+			"easy",
+			"hard"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 176,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Lit Up (BF Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-darnell"
+			],
+			"player": [
+				"vocals-bf"
+			],
+			"spectator": []
+		}
+	}
 }

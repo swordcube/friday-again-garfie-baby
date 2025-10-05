@@ -16,7 +16,7 @@ function NoteField:update(dt)
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     while self.curNoteIndex <= #self.pendingNotes do
         local noteData = self.pendingNotes[self.curNoteIndex]
-        local strumLine = self.playField.strumLines:getChild(noteData.d < 4 and 2 or 1)
+        local strumLine = self.playField.strumLines:getChild(noteData.d < 4 and 1 or 2)
         if c:getCurrentRawTime() < noteData.t - 2500 then
             break
         end

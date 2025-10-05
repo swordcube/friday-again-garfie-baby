@@ -37,19 +37,44 @@ function PlayScreen:enter()
     self.currentChart = CoolUtil.parseJson(Paths.json(("songs/%s/%s/chart"):format(self.currentSong, self.currentMix), self.parentContentPack))
     self.currentChart.meta = CoolUtil.parseJson(Paths.json(("songs/%s/%s/metadata"):format(self.currentSong, self.currentMix), self.parentContentPack))
 
+    local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
+    c.music = nil
+    c.offset = 50
+    c:reset(self.currentChart.meta.song.timingPoints[1].b, self.currentChart.meta.song.timingPoints[1].ts)
+    c:setupTimingPoints(self.currentChart.meta.song.timingPoints)
+    c:setCurrentRawTime(c:getCurrentBeatLength() * -5)
+
     Scoring.resetSystem()
 
     NoteSkin.clearCache()
     UISkin.clearCache()
 
     -- preload current note & ui skin
-    NoteSkin.get(self.currentChart.meta.playData.noteStyle)
-    UISkin.get(self.currentChart.meta.playData.noteStyle)
+    NoteSkin.get(self.currentChart.meta.game.noteSkin)
+    UISkin.get(self.currentChart.meta.game.uiSkin)
 
-    local tracks = {
-        Paths.vocalTrack(self.currentSong, self.currentMix, "vocals-" .. self.currentChart.meta.playData.characters.opponent, self.parentContentPack),
-        Paths.vocalTrack(self.currentSong, self.currentMix, "vocals-" .. self.currentChart.meta.playData.characters.player, self.parentContentPack)
-    }
+    local tracks = self.currentChart.meta.song.tracks
+    if tracks then
+        local tempTracks = {}
+        for i = 1, #tracks.opponent do
+            local track = tracks.opponent[i]
+            tempTracks[#tempTracks + 1] = Paths.vocalTrack(self.currentSong, self.currentMix, track, self.parentContentPack)
+        end
+        for i = 1, #tracks.player do
+            local track = tracks.player[i]
+            tempTracks[#tempTracks + 1] = Paths.vocalTrack(self.currentSong, self.currentMix, track, self.parentContentPack)
+        end
+        for i = 1, #tracks.spectator do
+            local track = tracks.spectator[i]
+            tempTracks[#tempTracks + 1] = Paths.vocalTrack(self.currentSong, self.currentMix, track, self.parentContentPack)
+        end
+        tracks = tempTracks
+    else
+        tracks = {
+            Paths.vocalTrack(self.currentSong, self.currentMix, "vocals-" .. self.currentChart.meta.game.characters.opponent, self.parentContentPack),
+            Paths.vocalTrack(self.currentSong, self.currentMix, "vocals-" .. self.currentChart.meta.game.characters.player, self.parentContentPack)
+        }
+    end
     self.vocalTracks = {}
 
     for i = 1, #tracks do
@@ -60,11 +85,6 @@ function PlayScreen:enter()
     end
     self.inst:setPitch(1)
     self.inst:seek(0)
-
-    local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
-    c.music = nil
-    c.offset = 50
-    c:setCurrentRawTime(c:getCurrentBeatLength() * -5)
 
     self.playField = PlayField:new() --- @type funkin.gameplay.PlayField
     self.playField:prepareChart(self.currentChart, self.currentDifficulty)
