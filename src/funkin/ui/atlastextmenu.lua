@@ -30,6 +30,7 @@ function AtlasTextMenu:update(dt)
 
         local t = math.min(math.abs(item.position.y - centerY) / 156, 1)
         item:setAlpha(1 - (0.5 * t)) -- 1 near center, 0.5 at farthest
+        item.visible = item.position.y < (centerY + 780) and item.position.y > (centerY - 780)
     end
 end
 

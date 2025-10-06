@@ -65,7 +65,7 @@ function Video:draw()
         local filter = self.antialiasing and "linear" or "nearest"
         img:setFilter(filter, filter)
     end
-    gfx.draw(self.video, transform)
+    gfx.draw(self.video, transform:getRenderValues())
 
     if self.shader then
         gfx.setShader(prevShader)
