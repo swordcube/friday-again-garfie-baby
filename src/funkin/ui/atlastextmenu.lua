@@ -34,6 +34,17 @@ function AtlasTextMenu:update(dt)
     end
 end
 
+function AtlasTextMenu:_draw()
+    -- Prevent offscreen checks since we do it ourselves
+    -- Too many sprites on-screen can get really laggy if they're
+    -- all checking if they're off-screen
+    AnimatedImage.NO_OFF_SCREEN_CHECKS = true
+    super._draw(self)
+
+    -- Then re-enable offscreen checks for other objects
+    AnimatedImage.NO_OFF_SCREEN_CHECKS = false
+end
+
 function AtlasTextMenu:input(_)
     if self.enabled then
         local wheel = comet.mouse.wheel.y
