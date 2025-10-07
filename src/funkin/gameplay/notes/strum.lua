@@ -33,6 +33,7 @@ function Strum:__init__(x, y, keyCount, direction, skin)
     self.scale:set(self.skinData.strum.scale, self.skinData.strum.scale)
     self:playAnimation("static")
 
+    self.alpha = self.skinData.strum.alpha or 1.0
     self.antialiasing = self.skinData.strum.antialiasing ~= nil and self.skinData.strum.antialiasing or true
 end
 

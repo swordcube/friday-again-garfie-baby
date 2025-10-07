@@ -11,7 +11,7 @@ function GradientSwipe:enter()
 
     self.blackRect = Rectangle:new() --- @type comet.gfx.Rectangle
     self.blackRect.size:set(comet.getDesiredWidth(), comet.getDesiredHeight())
-    self.blackRect:setTint(Color.BLACK)
+    self.blackRect:setColor(Color.BLACK)
     self.blackRect.centered = false
     self.container:addChild(self.blackRect)
 

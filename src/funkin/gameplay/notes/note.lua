@@ -43,6 +43,7 @@ function Note:loadSkin(skin)
             self:setAnimationOffset(dir .. name, (animData and animData.offset) and animData.offset[1] or 0.0, (animData and animData.offset) and animData.offset[2] or 0.0)
         end
     end
+    self.alpha = self.skinData.note.alpha or 1.0
     self.scale:set(self.skinData.note.scale, self.skinData.note.scale)
     self.antialiasing = self.skinData.note.antialiasing ~= nil and self.skinData.note.antialiasing or true
 end
@@ -80,6 +81,7 @@ function Note:updatePosition()
 end
 
 function Note:update(dt)
+    super.update(self, dt)
     self:updatePosition()
 
     if self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() then

@@ -1,5 +1,3 @@
-local json = cometreq("lib.json") --- @type comet.lib.Json
-
 --- @class funkin.gameplay.notes.NoteSkin
 local NoteSkin = {}
 

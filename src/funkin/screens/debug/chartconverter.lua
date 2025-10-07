@@ -19,7 +19,7 @@ function ChartConverter:enter()
     self.selectorBox.size:set(comet.getDesiredWidth(), 60)
     self.selectorBox.centered = false
     self.selectorBox:screenCenter("x")
-    self.selectorBox:setTint(Color.WHITE)
+    self.selectorBox:setColor(Color.WHITE)
     self.selectorBox.alpha = 0.1
     self:addChild(self.selectorBox)
 

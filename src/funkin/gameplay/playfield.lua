@@ -1,6 +1,9 @@
 local StrumLine = srcreq("funkin.gameplay.notes.strumline") --- @type funkin.gameplay.notes.StrumLine
 local NoteField = srcreq("funkin.gameplay.notes.notefield") --- @type funkin.gameplay.notes.NoteField
 
+local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
+local NoteSplash = srcreq("funkin.gameplay.notes.notesplash") --- @type funkin.gameplay.notes.NoteSplash
+
 local Scoring = srcreq("funkin.gameplay.scoring") --- @type funkin.gameplay.Scoring
 local ScoreDisplay = srcreq("funkin.gameplay.ui.scoredisplay") --- @type funkin.gameplay.ui.ScoreDisplay
 
@@ -54,6 +57,23 @@ function PlayField:__init__()
     self.notes = NoteField:new() --- @type funkin.gameplay.notes.NoteField
     self.notes.playField = self
     self:addChild(self.notes)
+
+    self.splashes = Object2D:new() --- @type comet.gfx.Object2D
+    self:addChild(self.splashes)
+
+    -- atlases to deref when this playfield is destroyed
+    self.atlasCache = {} --- @type table<string, comet.gfx.FrameCollection>
+
+    local splashy = Paths.getSparrowAtlas(("game/notes/%s/%s"):format(self.playerStrumLine.skin, NoteSkin.get(self.playerStrumLine.skin).splash.atlas.path))
+    self:cacheAtlas(("#_SPLASH_%s"):format(self.playerStrumLine.skin), splashy)
+end
+
+function PlayField:cacheAtlas(id, atlas)
+    if self.atlasCache[id] or not atlas then
+        return
+    end
+    atlas:reference()
+    self.atlasCache[id] = atlas
 end
 
 function PlayField:prepareChart(chart, difficulty)
@@ -87,9 +107,24 @@ function PlayField:hitNote(note)
         self.stats.combo = self.stats.combo + 1
         self.stats.missCombo = 0
 
-        self.scoreDisplay:showRating(Scoring.judgeNote(note.time, Conductor.instance:getCurrentTime()))
+        local rating = Scoring.judgeNote(note.time, Conductor.instance:getCurrentTime())
+        self.scoreDisplay:showRating(rating)
         self.scoreDisplay:showCombo(self.stats.combo)
+
+        if Scoring.hasNoteSplash(rating) then
+            self:showNoteSplash(note.lane, note.skin, note.strumLine)
+        end
     end
+end
+
+--- @param lane      integer
+--- @param skin      string
+--- @param strumLine funkin.gameplay.notes.StrumLine
+function PlayField:showNoteSplash(lane, skin, strumLine)
+    local splash = NoteSplash:new() --- @type funkin.gameplay.notes.NoteSplash
+    splash.playField = self
+    splash:setup(lane, skin, strumLine)
+    self.splashes:addChild(splash)
 end
 
 --- @param note funkin.gameplay.notes.Note
@@ -147,6 +182,13 @@ function PlayField:input(e)
     else
         local strum = plr:getChild(lane + 1) --- @type funkin.gameplay.notes.Strum
         strum:playAnimation("static", true)
+    end
+end
+
+function PlayField:destroy()
+    super.destroy(self)
+    for _, ass in pairs(self.atlasCache) do
+        ass:dereference()
     end
 end
 

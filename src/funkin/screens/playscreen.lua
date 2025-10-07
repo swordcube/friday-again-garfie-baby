@@ -20,6 +20,7 @@ function PlayScreen:__init__(params)
 end
 
 function PlayScreen:enter()
+    comet.settings.bgColor = Color.GRAY
     self.persistentUpdate = true
 
     self.startingSong = true
@@ -114,6 +115,8 @@ function PlayScreen:endSong()
 end
 
 function PlayScreen:exit()
+    comet.settings.bgColor = Color.BLACK
+    
     local tracks = self.vocalTracks
     for i = 1, #tracks do
         tracks[i]:destroy()
