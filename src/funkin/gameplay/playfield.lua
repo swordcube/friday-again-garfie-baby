@@ -20,6 +20,11 @@ function PlayField:__init__()
     self.currentDifficulty = "unknown"
 
     self.stats = {
+        health = 0.5,
+        
+        minHealth = 0,
+        maxHealth = 1,
+
         ratings = {
             killer = 0,
             sick = 0,
@@ -36,6 +41,7 @@ function PlayField:__init__()
         accuracyScore = 0,
         totalNotesHit = 0,
 
+        score = 0,
         accuracy = 0,
     }
     self.strumLines = Object2D:new() --- @type comet.gfx.Object2D
@@ -45,13 +51,14 @@ function PlayField:__init__()
     self:addChild(self.scoreDisplay)
 
     local downscroll = true
+    self.hud = nil --- @type funkin.gameplay.huds.BaseHUD
 
     self.opponentStrumLine = StrumLine:new(comet.getDesiredWidth() * 0.25, downscroll and comet.getDesiredHeight() - 100 or 100, downscroll) --- @type funkin.gameplay.notes.StrumLine
     self.opponentStrumLine.botplay = true
     self.strumLines:addChild(self.opponentStrumLine)
     
     self.playerStrumLine = StrumLine:new(comet.getDesiredWidth() * 0.75, downscroll and comet.getDesiredHeight() - 100 or 100, downscroll) --- @type funkin.gameplay.notes.StrumLine
-    self.playerStrumLine.botplay = true
+    self.playerStrumLine.botplay = false
     self.strumLines:addChild(self.playerStrumLine)
 
     self.notes = NoteField:new() --- @type funkin.gameplay.notes.NoteField
@@ -111,8 +118,15 @@ function PlayField:hitNote(note)
         self.scoreDisplay:showRating(rating)
         self.scoreDisplay:showCombo(self.stats.combo)
 
+        self.stats.score = self.stats.score + Scoring.scoreNote(note.time, Conductor.instance:getCurrentTime())
+        self.stats.health = math.clamp(self.stats.health + 0.0115, self.stats.minHealth, self.stats.maxHealth)
+
         if Scoring.hasNoteSplash(rating) then
             self:showNoteSplash(note.lane, note.skin, note.strumLine)
+        end
+        if self.hud then
+            self.hud:updateHealthBar(self.stats.health, self.stats.minHealth, self.stats.maxHealth)
+            self.hud:updatePlayerStats(self.stats)
         end
     end
 end
@@ -138,6 +152,13 @@ function PlayField:missNote(note)
         end
         self.stats.missCombo = self.stats.missCombo + 1
 
+        self.stats.score = self.stats.score - 100
+        self.stats.health = math.clamp(self.stats.health - 0.02375, self.stats.minHealth, self.stats.maxHealth)
+        
+        if self.hud then
+            self.hud:updateHealthBar(self.stats.health, self.stats.minHealth, self.stats.maxHealth)
+            self.hud:updatePlayerStats(self.stats)
+        end
         self.scoreDisplay:showRating("miss")
         self.scoreDisplay:showCombo(self.stats.missCombo, true)
     end

@@ -182,28 +182,28 @@
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, -30]
+                    "offset": [0, -35]
                 },
                 "down": {
                     "prefix": "note splash 2 down",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, -30]
+                    "offset": [0, -35]
                 },
                 "up": {
                     "prefix": "note splash 2 up",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, -30]
+                    "offset": [0, -35]
                 },
                 "right": {
                     "prefix": "note splash 2 right",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, -30]
+                    "offset": [0, -35]
                 }
             }
         }

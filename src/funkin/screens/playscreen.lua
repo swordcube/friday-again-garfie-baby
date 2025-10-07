@@ -90,6 +90,12 @@ function PlayScreen:enter()
     self.playField = PlayField:new() --- @type funkin.gameplay.PlayField
     self.playField:prepareChart(self.currentChart, self.currentDifficulty)
     self:addChild(self.playField)
+
+    local hud = srcreq("funkin.gameplay.huds.defaulthud"):new(self.playField) --- @type funkin.gameplay.huds.BaseHUD
+    hud:updatePlayerStats(self.playField.stats)
+
+    self.playField.hud = hud
+    self.playField:insertChild(1, hud)
 end
 
 function PlayScreen:update(dt)

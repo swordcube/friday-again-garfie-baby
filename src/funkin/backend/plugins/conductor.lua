@@ -346,7 +346,7 @@ function Conductor:update(dt)
     self.curStep = math.floor(self.curDecStep)
 
     if self.curStep > lastStep then
-        for i = lastStep, self.curStep do
+        for i = lastStep + 1, self.curStep do
             if self.dispatchToScreens then
                 recursiveStep(ScreenManager.instance.current, i)
             end
@@ -362,7 +362,7 @@ function Conductor:update(dt)
             self.metronome:seek(0.0)
             self.metronome:play()
         end
-        for i = lastBeat, self.curBeat do
+        for i = lastBeat + 1, self.curBeat do
             if self.dispatchToScreens then
                 recursiveBeat(ScreenManager.instance.current, i)
             end
@@ -373,7 +373,7 @@ function Conductor:update(dt)
     self.curMeasure = math.floor(self.curDecMeasure)
 
     if self.curMeasure > lastMeasure then
-        for i = lastMeasure, self.curMeasure do
+        for i = lastMeasure + 1, self.curMeasure do
             if self.dispatchToScreens then
                 recursiveMeasure(ScreenManager.instance.current, i)
             end
