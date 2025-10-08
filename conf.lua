@@ -4,6 +4,7 @@ function love.conf(t)
     t.console = false
 
     t.graphics.gammacorrect = false
+    t.graphics.renderers = {"opengl"}
 
     t.highdpi = false
     t.usedpiscale = false

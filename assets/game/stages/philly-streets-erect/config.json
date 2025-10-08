@@ -1,0 +1,55 @@
+{
+    "zoom": 0.77,
+    "directory": "game/stages",
+    
+    "layers": 3,
+    "props": [
+        {
+            "name": "phillySkyline",
+            "assetPath": "philly-streets-erect/images/phillySkyline",
+
+            "position": [-545, -273],
+            "scroll": [0.2, 0.2],
+            "centered": false,
+            
+            "scale": [1, 1],
+            "rotation": 0,
+            "alpha": 1,
+
+            "atlasType": "none",
+            "animations": null
+        },
+        {
+            "name": "phillyForegroundCity",
+            "assetPath": "philly-streets-erect/images/phillyForegroundCity",
+
+            "position": [600, 69],
+            "scroll": [0.3, 0.3],
+            "centered": false,
+            
+            "scale": [1, 1],
+            "rotation": 0,
+            "alpha": 1,
+
+            "atlasType": "none",
+            "animations": null
+        },
+        {
+            "name": "phillyForegroundCity2",
+            "assetPath": "philly-streets-erect/images/phillyForegroundCity",
+
+            "position": [1860, 185],
+            "scroll": [0.3, 0.3],
+            "centered": false,
+            
+            "scale": [1, 1],
+            "flipX": true,
+            
+            "rotation": 5,
+            "alpha": 1,
+
+            "atlasType": "none",
+            "animations": null
+        }
+    ]
+}

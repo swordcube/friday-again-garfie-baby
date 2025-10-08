@@ -1,3 +1,5 @@
+local Stage = srcreq("funkin.gameplay.stage") --- @type funkin.gameplay.Stage
+
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 local UISkin = srcreq("funkin.gameplay.ui.uiskin") --- @type funkin.gameplay.ui.UISkin
 
@@ -20,11 +22,22 @@ function PlayScreen:__init__(params)
 end
 
 function PlayScreen:enter()
-    comet.settings.bgColor = Color.GRAY
     self.persistentUpdate = true
 
     self.startingSong = true
     self.endingSong = false
+
+    self.camGame = Camera:new() --- @type comet.gfx.Camera
+    self.camGame:setBackgroundColor(Color.TRANSPARENT)
+    self:addChild(self.camGame)
+
+    self.camHUD = Camera:new() --- @type comet.gfx.Camera
+    self.camHUD:setBackgroundColor(Color.TRANSPARENT)
+    self:addChild(self.camHUD)
+
+    self.camOther = Camera:new() --- @type comet.gfx.Camera
+    self.camOther:setBackgroundColor(Color.TRANSPARENT)
+    self:addChild(self.camOther)
 
     comet.mixer.music:stop()
     comet.mixer.music:setSource(Paths.inst(self.currentSong, self.currentMix, self.parentContentPack))
@@ -37,7 +50,7 @@ function PlayScreen:enter()
     end)
     self.currentChart = CoolUtil.parseJson(Paths.json(("songs/%s/%s/chart"):format(self.currentSong, self.currentMix), self.parentContentPack))
     self.currentChart.meta = CoolUtil.parseJson(Paths.json(("songs/%s/%s/metadata"):format(self.currentSong, self.currentMix), self.parentContentPack))
-
+    
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     c.music = nil
     c.offset = 50
@@ -45,8 +58,54 @@ function PlayScreen:enter()
     c:setupTimingPoints(self.currentChart.meta.song.timingPoints)
     c:setCurrentRawTime(c:getCurrentBeatLength() * -5)
 
-    Scoring.resetSystem()
+    --- Controls how many beats it will take to bop the camera
+    self.camZoomingInterval = -1
+    
+    --- How many beats it has taken to bop the camera
+    self.camZoomingOffset = -1
 
+    --- The default zoom for the game camera
+    self.defaultCamZoom = 1
+
+    --- The default zoom for the hud camera
+    self.defaultHUDZoom = 1
+
+    --- Multipler for how fast the camera should zoom back to default, `1` being instantaneously and `0` being not at all
+    self.camZoomingSpeed = 0.05
+
+    local fadeShader = Shader:new(Paths.frag("gradient_fade")) --- @type comet.gfx.Shader
+    fadeShader:reference()
+
+    local test = AnimatedImage:new() --- @type comet.gfx.AnimatedImage
+    test:setFrameCollection(Paths.getSparrowAtlas("game/characters/bf/sprite"))
+    test:addAnimationByName("idle", "BF idle dance", 24, true)
+    test:playAnimation("idle")
+    test.scale:set(0.5, 0.5)
+    test.centered = false
+    test.onDraw = function(_)
+        local prevAlpha = test.alpha
+        test.flipY = not test.flipY
+        test.alpha = 0.5 * prevAlpha
+        test.position.y = test.position.y + (test:getHeight(1) - 10)
+        fadeShader:send("quad", {test._frame.quad:getViewport()})
+        test:setShader(fadeShader)
+        test:_draw()
+        
+        test.flipY = not test.flipY
+        test.alpha = prevAlpha
+        test.position.y = test.position.y - (test:getHeight(1) - 10)
+        test:setShader()
+        test:_draw()
+    end
+    local old = test.destroy
+    test.destroy = function(o)
+        fadeShader:dereference()
+        old(o)
+    end
+    self:addChild(test)
+
+    Scoring.resetSystem()
+    
     NoteSkin.clearCache()
     UISkin.clearCache()
 
@@ -89,7 +148,7 @@ function PlayScreen:enter()
 
     self.playField = PlayField:new() --- @type funkin.gameplay.PlayField
     self.playField:prepareChart(self.currentChart, self.currentDifficulty)
-    self:addChild(self.playField)
+    self.camHUD:addChild(self.playField)
 
     local hud = srcreq("funkin.gameplay.huds.defaulthud"):new(self.playField) --- @type funkin.gameplay.huds.BaseHUD
     hud:updatePlayerStats(self.playField.stats)
@@ -98,11 +157,26 @@ function PlayScreen:enter()
     self.playField:insertChild(1, hud)
 end
 
+function PlayScreen:addChild(object, tag, camera)
+    if not self.inst then
+        super.addChild(self, object, tag)
+        return
+    end
+    if not camera then
+        camera = self.camGame
+    end
+    camera:addChild(object, tag)
+end
+
 function PlayScreen:update(dt)
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     if self.startingSong and c:getCurrentRawTime() >= 0.0 then
         self:startSong()
     end
+    local gz, hz = self.defaultCamZoom, self.defaultHUDZoom
+    local ratio = math.getElapsedLerp(self.camZoomingSpeed, dt)
+    self.camGame.zoom:lerp(gz, gz, ratio)
+    self.camHUD.zoom:lerp(hz, hz, ratio)
 end
 
 function PlayScreen:startSong()
@@ -120,9 +194,19 @@ function PlayScreen:endSong()
     self:switchTo(srcreq("funkin.screens.freeplayscreen"):new())
 end
 
+function PlayScreen:beatHit(beat)
+    local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
+
+    local zoomInterval = self.camZoomingInterval >= 0 and self.camZoomingInterval or c:getCurrentTimeSignature()[1]
+    local beatOffset = self.camZoomingOffset >= 0 and beat + self.camZoomingOffset or math.floor(beat - c._latestTimingPoint.beat)
+
+    if beat > 0 and beatOffset % zoomInterval == 0 then
+        self.camGame.zoom:set(self.camGame.zoom.x + 0.015, self.camGame.zoom.y + 0.015)
+        self.camHUD.zoom:set(self.camHUD.zoom.x + 0.03, self.camHUD.zoom.y + 0.03)
+    end
+end
+
 function PlayScreen:exit()
-    comet.settings.bgColor = Color.BLACK
-    
     local tracks = self.vocalTracks
     for i = 1, #tracks do
         tracks[i]:destroy()

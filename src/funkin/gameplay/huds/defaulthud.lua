@@ -50,8 +50,6 @@ end
 
 function DefaultHUD:updateHealthBar(health, min, max)
     local percent = health / max
-    self.healthBar:setProgress(percent)
-
     self.iconP2:setHealth(1 - percent)
     self.iconP1:setHealth(percent)
 
@@ -72,6 +70,7 @@ end
 
 function DefaultHUD:update(dt)
     super.update(self, dt)
+    self.healthBar:setProgress(math.lerp(self.healthBar:getProgress(), self.playField.stats.health / self.playField.stats.maxHealth, dt * 10))
 
     self.iconProg = self.iconProg - (dt * 6)
     if self.iconProg < 0.0 then

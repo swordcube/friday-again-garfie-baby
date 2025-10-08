@@ -10,6 +10,7 @@ function HealthIcon:__init__(character, isPlayer)
     --- @type number
     self._health = 0.5 --- @protected
 
+    self.flipX = isPlayer
     self:loadCharacter(character)
 end
 
@@ -48,16 +49,6 @@ function HealthIcon:setHealth(newHealth)
         self:playAnimation("winning")
     else
         self:playAnimation("idle")
-    end
-end
-
-function HealthIcon:draw()
-    if self.isPlayer then
-        self.scale.x = -self.scale.x
-    end
-    super.draw(self)
-    if self.isPlayer then
-        self.scale.x = -self.scale.x
     end
 end
 

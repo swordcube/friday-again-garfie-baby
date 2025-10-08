@@ -19,9 +19,9 @@ vec2 curve(vec2 uv)
 vec4 effect(vec4 color, Image texture, vec2 textureCoords, vec2 screenCoords)
 {
     vec2 uv = curve(textureCoords);
-	vec4 flixelCol = Texel(texture, uv);
+	vec4 baseCol = Texel(texture, uv);
 
-    vec3 oricol = flixelCol.xyz;
+    vec3 oricol = baseCol.xyz;
     vec3 col = oricol;
 	float x =  sin(0.3*TIME+uv.y*21.0)*sin(0.7*TIME+uv.y*29.0)*sin(0.3+0.33*TIME+uv.y*31.0)*0.0017;
 

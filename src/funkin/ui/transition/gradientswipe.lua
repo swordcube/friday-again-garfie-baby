@@ -26,7 +26,7 @@ function GradientSwipe:enter()
     
     local duration = 0.66
     if type == "in" then
-        self.gradient.scale.y = -self.gradient.scale.y
+        self.gradient.flipY = true
 
         self.gradient.position.y = -self.gradient:getHeight()
         self.container.position.y = 0.0

@@ -18,7 +18,6 @@ function TitleScreen:enter()
     self.hueShader:send("OFFSET", 0)
 
     self.camera = Camera:new() --- @type comet.gfx.Camera
-    self.camera.size:set(1280, 720)
     self.camera:setShaders({self.hueShader})
     self:addChild(self.camera)
 
@@ -93,10 +92,10 @@ function TitleScreen:enter()
 end
 
 function TitleScreen:update(dt)
-    if self.controls.justPressed.UI_LEFT then
+    if self.controls.pressed.UI_LEFT then
         self.hueShader:send("OFFSET", self.hueShader:getUniformNumber("OFFSET") - (dt * 0.1))
     end
-    if self.controls.justPressed.UI_RIGHT then
+    if self.controls.pressed.UI_RIGHT then
         self.hueShader:send("OFFSET", self.hueShader:getUniformNumber("OFFSET") + (dt * 0.1))
     end
     if self.controls.justPressed.ACCEPT then
