@@ -157,7 +157,7 @@ function PlayScreen:enter()
     hud:updatePlayerStats(self.playField.stats)
 
     self.playField.hud = hud
-    self.playField:insertChild(1, hud)
+    self.playField:insertChild(4, hud)
 end
 
 function PlayScreen:addChild(object, tag, camera)

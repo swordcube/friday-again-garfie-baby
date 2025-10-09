@@ -44,11 +44,11 @@ function PlayField:__init__()
         score = 0,
         accuracy = 0,
     }
-    self.strumLines = Object2D:new() --- @type comet.gfx.Object2D
-    self:addChild(self.strumLines)
-    
     self.scoreDisplay = ScoreDisplay:new(comet.getDesiredWidth() * 0.55, comet.getDesiredHeight() * 0.5) --- @type funkin.gameplay.ui.ScoreDisplay
     self:addChild(self.scoreDisplay)
+
+    self.strumLines = Object2D:new() --- @type comet.gfx.Object2D
+    self:addChild(self.strumLines)
 
     local downscroll = Options.downscroll
     self.hud = nil --- @type funkin.gameplay.huds.BaseHUD
@@ -67,6 +67,20 @@ function PlayField:__init__()
 
     self.splashes = Object2D:new() --- @type comet.gfx.Object2D
     self:addChild(self.splashes)
+
+    self.opponentUnderlay = Rectangle:new(self.opponentStrumLine.position.x) --- @type comet.gfx.Rectangle
+    self.opponentUnderlay.size:set(468, comet.getDesiredHeight())
+    self.opponentUnderlay:setColor(Color.BLACK)
+    self.opponentUnderlay:screenCenter("y")
+    self.opponentUnderlay.alpha = Options.laneUnderlay
+    self:insertChild(2, self.opponentUnderlay)
+
+    self.playerUnderlay = Rectangle:new(self.playerStrumLine.position.x) --- @type comet.gfx.Rectangle
+    self.playerUnderlay.size:set(468, comet.getDesiredHeight())
+    self.playerUnderlay:setColor(Color.BLACK)
+    self.playerUnderlay:screenCenter("y")
+    self.playerUnderlay.alpha = Options.laneUnderlay
+    self:insertChild(2, self.playerUnderlay)
 
     -- atlases to deref when this playfield is destroyed
     self.atlasCache = {} --- @type table<string, comet.gfx.FrameCollection>

@@ -2,7 +2,8 @@ local project = require("project")
 
 --- @class funkin.backend.Options
 local Options = {
-    downscroll = false
+    downscroll = false,
+    laneUnderlay = 0,
 }
 -- this weird shit is done because the options class
 -- above is for vscode documentation stuff
