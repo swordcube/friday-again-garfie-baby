@@ -17,18 +17,18 @@ function DefaultHUD:__init__(playField)
     self.healthBar:setEmptyColor(Color.RED)
     self.healthBar:setFillColor(Color.LIME)
     self.healthBar.size:set(self.healthBarBG:getWidth() - 8, self.healthBarBG:getHeight() - 8)
-    self.healthBar.position.y = 80
+    self.healthBar.position.y = self.healthBarBG.position.y
     self.healthBar:screenCenter("x")
     self.healthBar.fillStyle = "right-to-left"
     self:addChild(self.healthBar)
 
     local chars = self.playField.currentChart.meta.game.characters
     self.iconP2 = HealthIcon:new(chars.opponent or "face", false) --- @type funkin.gameplay.ui.HealthIcon
-    self.iconP2.position.y = 80
+    self.iconP2.position.y = self.healthBar.position.y
     self:addChild(self.iconP2)
 
     self.iconP1 = HealthIcon:new(chars.player or "face", true) --- @type funkin.gameplay.ui.HealthIcon
-    self.iconP1.position.y = 80
+    self.iconP1.position.y = self.healthBar.position.y
     self:addChild(self.iconP1)
 
     self.scoreText = Label:new() --- @type comet.gfx.Label

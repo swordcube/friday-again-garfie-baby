@@ -73,6 +73,9 @@ function PlayScreen:enter()
     --- Multipler for how fast the camera should zoom back to default, `1` being instantaneously and `0` being not at all
     self.camZoomingSpeed = 0.05
 
+    self.stage = Stage:new() --- @type funkin.gameplay.Stage
+    self:addChild(self.stage)
+
     local fadeShader = Shader:new(Paths.frag("gradient_fade")) --- @type comet.gfx.Shader
     fadeShader:reference()
 

@@ -113,6 +113,7 @@ function DebugOverlay.init()
     local fpsGraph = cometreq("gfx.graph"):new("custom", 0, 0, boxWidth - 20, 40, 0.05, "") --- @type comet.gfx.Graph
     local tpsGraph = comet.settings.parallelUpdate and cometreq("gfx.graph"):new("custom", 0, 0, boxWidth - 20, 40, 0.05, "") or nil --- @type comet.gfx.Graph
     
+    local rname, rversion, _, rdevice = gfx.getRendererInfo()
     comet.signals.postUpdate:connect(function()
         local dt = comet.getFullDeltaTime()
         updateTimer = updateTimer + dt
@@ -148,7 +149,7 @@ function DebugOverlay.init()
         end
         local w, h = boxWidth, 145
         if DebugOverlay.overlayType == "advanced" then
-            h = comet.settings.parallelUpdate and 275 or 190
+            h = comet.settings.parallelUpdate and 305 or 220
         elseif DebugOverlay.overlayType == "basic" then
             h = comet.settings.parallelUpdate and 80 or 65
         end
@@ -178,6 +179,8 @@ function DebugOverlay.init()
             
             displayStat("DRAW CALLS: ", tostring(lstats.drawcalls - textDrawCalls))
             displayStat("BATCHED DRAW CALLS: ", tostring(lstats.drawcallsbatched - 3)) -- hardcoded but avoids counting draw calls from debugger
+            displayStat("API: ", ("%s %s"):format(rname, rversion))
+            displayStat("GPU: ", rdevice)
             
             gfx.coloredLine(20, statY + 20, w - 20, 0, lineColor)
             statY = statY + 30
