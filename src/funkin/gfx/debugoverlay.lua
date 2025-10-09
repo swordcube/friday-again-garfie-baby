@@ -73,6 +73,38 @@ gfx.coloredLine = function(x, y, w, h, r, g, b, a)
     gfx.setColor(pr, pg, pb, pa)
 end
 
+local function cleanRendererVersion(version)
+    if not version or version == "" then
+        return "N/A"
+    end
+    local base = version:match("%d+%.%d+")
+    local profile = version:match("%b()")
+
+    if base and profile then
+        return base .. " " .. profile
+    elseif base then
+        return base
+    end
+    return version
+end
+
+local function cleanGPUName(name)
+    if not name or name == "" then
+        return "N/A"
+    end
+    -- remove parentheses and contents
+    name = name:gsub("%s*%b()", "")
+
+    -- remove stuff like "/PCIe/SSE2" or "/ 550 Series"
+    name = name:gsub("/[%w%s_%-%.]+", "")
+
+    -- remove trailing junk like "(TM)", "(R)", "Graphics", etc
+    name = name:gsub("%(TM%)", ""):gsub("%(R%)", "")
+    name = name:gsub("%s+Graphics%s*$", ""):gsub("%s+$", ""):gsub("^%s+", "")
+
+    return name
+end
+
 function DebugOverlay.init()
     local updateTimer = 0.0
     local graphUpdateTimer = 0.0
@@ -114,6 +146,8 @@ function DebugOverlay.init()
     local tpsGraph = comet.settings.parallelUpdate and cometreq("gfx.graph"):new("custom", 0, 0, boxWidth - 20, 40, 0.05, "") or nil --- @type comet.gfx.Graph
     
     local rname, rversion, _, rdevice = gfx.getRendererInfo()
+    rversion, rdevice = cleanRendererVersion(rversion), cleanGPUName(rdevice)
+
     comet.signals.postUpdate:connect(function()
         local dt = comet.getFullDeltaTime()
         updateTimer = updateTimer + dt
