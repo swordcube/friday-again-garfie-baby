@@ -14,6 +14,9 @@ vec4 effect(vec4 color, Image texture, vec2 textureCoords, vec2 screenCoords) {
     localY = clamp(localY, 0.0, 1.0);
 
     float fade = flip ? mix(1.0, 0.0, localY) : localY;
+    pixel.rgb /= pixel.a; // the woes of premultiplied alpha,,,
     pixel.a *= fade;
+    pixel.rgb *= pixel.a; // the woes of premultiplied alpha,,,
+    
     return pixel * color;
 }

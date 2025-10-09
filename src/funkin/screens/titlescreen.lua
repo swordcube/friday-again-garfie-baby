@@ -12,7 +12,13 @@ function TitleScreen:enter()
     comet.mixer:setMasterVolume(0.3)
     
     if not comet.mixer.music:isPlaying() then
-        CoolUtil.playMenuMusic()
+        CoolUtil.playMenuMusic(0)
+
+        comet.mixer.music:pause()
+        comet.mixer.music:seek(0.0)
+        comet.mixer.music:play()
+        
+        comet.mixer.music:fadeIn(4, 0, 1)
     end
     self.hueShader = Shader:new(Paths.frag("hue_offset")) --- @type comet.gfx.Shader
     self.hueShader:send("OFFSET", 0)

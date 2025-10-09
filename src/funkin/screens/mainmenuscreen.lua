@@ -105,6 +105,12 @@ function MainMenuScreen:enter()
     self:changeSelection(0, true)
 end
 
+function MainMenuScreen:update(dt)
+    if comet.mixer.music:getVolume() < 0.8 then
+        comet.mixer.music:setVolume(comet.mixer.music:getVolume() + (dt * 0.5))
+    end
+end
+
 function MainMenuScreen:input(_)
     if self.transitioning then
         return
