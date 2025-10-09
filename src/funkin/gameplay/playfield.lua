@@ -50,7 +50,7 @@ function PlayField:__init__()
     self.scoreDisplay = ScoreDisplay:new(comet.getDesiredWidth() * 0.55, comet.getDesiredHeight() * 0.5) --- @type funkin.gameplay.ui.ScoreDisplay
     self:addChild(self.scoreDisplay)
 
-    local downscroll = true
+    local downscroll = Options.downscroll
     self.hud = nil --- @type funkin.gameplay.huds.BaseHUD
 
     self.opponentStrumLine = StrumLine:new(comet.getDesiredWidth() * 0.25, downscroll and comet.getDesiredHeight() - 100 or 100, downscroll) --- @type funkin.gameplay.notes.StrumLine

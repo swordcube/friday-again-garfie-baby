@@ -1,5 +1,7 @@
+local project = require("project")
+
 function love.conf(t)
-    t.identity = "GarfieBabyFunkin"
+    t.identity = project.identity
     t.version = "12.0"
     t.console = false
 
@@ -9,7 +11,7 @@ function love.conf(t)
     -- t.highdpi = false
     -- t.usedpiscale = false
 
-    t.window.title = "friday again garfie baby"
+    t.window.title = project.title
 
     t.window.width = 1280
     t.window.height = 720

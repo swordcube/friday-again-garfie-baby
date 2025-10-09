@@ -10,7 +10,7 @@ function DefaultHUD:__init__(playField)
     self.healthBarBG = Image:new() --- @type comet.gfx.Image
     self.healthBarBG:loadTexture(self:getHUDImage("healthBar"))
     self.healthBarBG:screenCenter("x")
-    self.healthBarBG.position.y = 80
+    self.healthBarBG.position.y = Options.downscroll and 80 or comet.getDesiredHeight() * 0.9
     self:addChild(self.healthBarBG)
 
     self.healthBar = ProgressBar:new() --- @type comet.gfx.ProgressBar

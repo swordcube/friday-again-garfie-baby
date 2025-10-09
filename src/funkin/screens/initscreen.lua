@@ -16,6 +16,9 @@ function InitScreen:enter()
 
     MusicBeatSubScreen = srcreq("funkin.screens.musicbeatsubscreen") --- @type funkin.screens.MusicBeatSubScreen
 
+    Options = srcreq("funkin.backend.options") --- @type funkin.backend.Options
+    Options.init()
+
     Controls = srcreq("funkin.backend.controls") --- @type funkin.backend.Controls
     Controls.static.instance = Controls:new()
 
