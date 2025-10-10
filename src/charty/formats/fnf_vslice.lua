@@ -137,7 +137,7 @@ function FNFVSlice:toBasicFormat()
         local event = self.chart.events[i]
         basic.chart.events[i] = {
             time = event.t,
-            params = type(event.v) == "table" and event.v or {v = event.v},
+            params = type(event.v) == "table" and (event.v[1] ~= nil and {array = event.v} or event.v) or {v = event.v},
             type = event.e,
         }
     end

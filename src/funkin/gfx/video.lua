@@ -54,6 +54,7 @@ function Video:draw()
         return
     end
     local pr, pg, pb, pa = gfx.getColor()
+    gfx.setBlendMode("alpha", "alphamultiply")
     gfx.setColor(self._tint.r, self._tint.g, self._tint.b, self._tint.a * self.alpha)
 
     local prevShader = gfx.getShader()

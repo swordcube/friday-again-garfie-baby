@@ -52,7 +52,7 @@ function FNFGarfieBaby:fromBasicFormat(basicFormat, _)
         local event = basicFormat.chart.events[i]
         self.chart.e[i] = {
             t = event.time,
-            p = event.params[1] and {array = event.params} or event.params,
+            p = type(event.params) == "table" and (event.params[1] ~= nil and {array = event.params} or event.params) or {v = event.params},
             k = event.type
         }
     end
