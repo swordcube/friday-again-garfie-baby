@@ -1,0 +1,55 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "mom-car",
+			"player": "bf-car",
+			"spectator": "gf-car"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 1.6,
+			"hard": 1.8,
+			"normal": 1.6
+		},
+		"stage": "limoRide",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "ninjamuffin99 + MtH + Spazkid",
+		"difficulties": [
+			"normal",
+			"easy",
+			"hard"
+		],
+		"mixes": [
+			"erect"
+		],
+		"timingPoints": [
+			{
+				"b": 110,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Satin Panties",
+		"tracks": {
+			"opponent": [
+				"vocals-mom-car"
+			],
+			"player": [
+				"vocals-bf-car"
+			],
+			"spectator": []
+		}
+	}
+}
