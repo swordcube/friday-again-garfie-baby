@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "spooky-dark",
+			"player": "pico-dark",
+			"spectator": "nene-dark"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2.3,
+			"hard": 2.6,
+			"normal": 2.4
+		},
+		"stage": "spookyMansionErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Six Impala (feat. Saster)",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"normal",
+			"hard",
+			"easy"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 150,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Spookeez (Pico Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-spooky-dark"
+			],
+			"player": [
+				"vocals-pico-dark"
+			],
+			"spectator": []
+		}
+	}
+}

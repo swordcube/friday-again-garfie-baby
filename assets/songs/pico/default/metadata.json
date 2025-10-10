@@ -1,0 +1,56 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "pico",
+			"player": "bf",
+			"spectator": "gf"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 1.5,
+			"hard": 1.6,
+			"normal": 1.6
+		},
+		"stage": "phillyTrain",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "ninjamuffin99 + MtH",
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [
+			"erect",
+			"pico"
+		],
+		"timingPoints": [
+			{
+				"b": 150,
+				"t": -1,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Pico",
+		"tracks": {
+			"opponent": [
+				"vocals-pico"
+			],
+			"player": [
+				"vocals-bf"
+			],
+			"spectator": []
+		}
+	}
+}

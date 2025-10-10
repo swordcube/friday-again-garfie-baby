@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "tankman",
+			"player": "pico-playable",
+			"spectator": "nene"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2.1,
+			"hard": 2.6,
+			"normal": 2.3
+		},
+		"stage": "tankmanBattlefieldErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "tsuyunoshi (ft. Saruky)",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"normal",
+			"hard",
+			"easy"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 185,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Guns (Pico Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-tankman"
+			],
+			"player": [
+				"vocals-pico-playable"
+			],
+			"spectator": []
+		}
+	}
+}

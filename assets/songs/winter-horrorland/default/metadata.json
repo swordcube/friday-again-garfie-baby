@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "monster-christmas",
+			"player": "bf-christmas",
+			"spectator": "gf-christmas"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 1.4,
+			"hard": 1.7,
+			"normal": 1.6
+		},
+		"stage": "mallEvil",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Bassetfilms",
+		"charter": "ninjamuffin99 + MtH",
+		"difficulties": [
+			"hard",
+			"easy",
+			"normal"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 159,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Winter Horrorland",
+		"tracks": {
+			"opponent": [
+				"vocals-monster-christmas"
+			],
+			"player": [
+				"vocals-bf-christmas"
+			],
+			"spectator": []
+		}
+	}
+}

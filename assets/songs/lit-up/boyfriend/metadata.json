@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "darnell",
+			"player": "bf",
+			"spectator": "gf"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2.4,
+			"hard": 3,
+			"normal": 2.8
+		},
+		"stage": "phillyStreetsErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Saruky",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"normal",
+			"easy",
+			"hard"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 176,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Lit Up (BF Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-darnell"
+			],
+			"player": [
+				"vocals-bf"
+			],
+			"spectator": []
+		}
+	}
+}

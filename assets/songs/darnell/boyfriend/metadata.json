@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "darnell",
+			"player": "bf",
+			"spectator": "gf"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2,
+			"hard": 2.6,
+			"normal": 2.3
+		},
+		"stage": "phillyStreetsErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Saruky",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"normal",
+			"hard",
+			"easy"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 155,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Darnell (BF Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-darnell"
+			],
+			"player": [
+				"vocals-bf"
+			],
+			"spectator": []
+		}
+	}
+}

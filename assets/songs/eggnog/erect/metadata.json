@@ -1,0 +1,59 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "parents-christmas",
+			"player": "bf-christmas",
+			"spectator": "gf-christmas"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"erect": 2.4,
+			"nightmare": 2.7
+		},
+		"stage": "mallXmasErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Saruky",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"nightmare",
+			"erect"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 140,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			},
+			{
+				"b": 80,
+				"t": 122000,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Eggnog Erect",
+		"tracks": {
+			"opponent": [
+				"vocals-parents-christmas"
+			],
+			"player": [
+				"vocals-bf-christmas"
+			],
+			"spectator": []
+		}
+	}
+}

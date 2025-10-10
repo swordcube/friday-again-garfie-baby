@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "darnell",
+			"player": "pico-playable",
+			"spectator": "nene"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2.7,
+			"hard": 2.8,
+			"normal": 2.7
+		},
+		"stage": "phillyStreets",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "Jenny Crowe + Spazkid + ninjamuffin99",
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 182,
+				"t": -1,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "2hot",
+		"tracks": {
+			"opponent": [
+				"vocals-darnell"
+			],
+			"player": [
+				"vocals-pico-playable"
+			],
+			"spectator": []
+		}
+	}
+}

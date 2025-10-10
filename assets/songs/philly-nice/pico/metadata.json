@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "pico",
+			"player": "pico-playable",
+			"spectator": "nene"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2.3,
+			"hard": 2.6,
+			"normal": 2.6
+		},
+		"stage": "phillyTrainErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "tsuyunoshi (ft. Saruky)",
+		"charter": "Spazkid",
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 175,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Philly Nice (Pico Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-pico"
+			],
+			"player": [
+				"vocals-pico-playable"
+			],
+			"spectator": []
+		}
+	}
+}

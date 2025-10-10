@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "senpai",
+			"player": "pico-pixel",
+			"spectator": "nene-pixel"
+		},
+		"noteSkin": "pixel",
+		"scrollSpeed": {
+			"easy": 2.1,
+			"hard": 2.4,
+			"normal": 2.2
+		},
+		"stage": "schoolPico",
+		"uiSkin": "pixel"
+	},
+	"song": {
+		"artist": "Tee Lopes (Feat. Saruky)",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"normal",
+			"hard",
+			"easy"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 144,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Senpai (Pico Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-senpai"
+			],
+			"player": [
+				"vocals-pico-pixel"
+			],
+			"spectator": []
+		}
+	}
+}

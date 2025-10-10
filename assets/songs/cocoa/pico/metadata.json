@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "parents-christmas",
+			"player": "pico-christmas",
+			"spectator": "nene-christmas"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2.3,
+			"hard": 2.7,
+			"normal": 2.6
+		},
+		"stage": "mallXmasErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Six Impala (feat. Saruky)",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"normal",
+			"hard",
+			"easy"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 100,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Cocoa (Pico Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-parents-christmas"
+			],
+			"player": [
+				"vocals-pico-christmas"
+			],
+			"spectator": []
+		}
+	}
+}

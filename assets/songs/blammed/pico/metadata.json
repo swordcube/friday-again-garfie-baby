@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "pico",
+			"player": "pico-playable",
+			"spectator": "nene"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2.4,
+			"hard": 2.6,
+			"normal": 2.5
+		},
+		"stage": "phillyTrainErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Metaroom (feat. Saruky)",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 165,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Blammed (Pico Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-pico"
+			],
+			"player": [
+				"vocals-pico-playable"
+			],
+			"spectator": []
+		}
+	}
+}

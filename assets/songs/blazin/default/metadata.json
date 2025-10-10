@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "darnell-blazin",
+			"player": "pico-blazin",
+			"spectator": "nene"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2,
+			"hard": 3.2,
+			"normal": 2.4
+		},
+		"stage": "phillyBlazin",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "fabs + PhantomArcade",
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 180,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Blazin'",
+		"tracks": {
+			"opponent": [
+				"vocals-darnell-blazin"
+			],
+			"player": [
+				"vocals-pico-blazin"
+			],
+			"spectator": []
+		}
+	}
+}

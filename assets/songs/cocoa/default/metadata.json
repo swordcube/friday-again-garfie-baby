@@ -1,0 +1,56 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "parents-christmas",
+			"player": "bf-christmas",
+			"spectator": "gf-christmas"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 1.5,
+			"hard": 1.5,
+			"normal": 1.5
+		},
+		"stage": "mallXmas",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "ninjamuffin99 + MtH",
+		"difficulties": [
+			"normal",
+			"easy",
+			"hard"
+		],
+		"mixes": [
+			"erect",
+			"pico"
+		],
+		"timingPoints": [
+			{
+				"b": 100,
+				"t": -1,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Cocoa",
+		"tracks": {
+			"opponent": [
+				"vocals-parents-christmas"
+			],
+			"player": [
+				"vocals-bf-christmas"
+			],
+			"spectator": []
+		}
+	}
+}
