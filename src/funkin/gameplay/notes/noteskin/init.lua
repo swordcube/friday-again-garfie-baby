@@ -10,11 +10,11 @@ end
 
 function NoteSkin.get(name)
     if not NoteSkin._cache[name] then
-        local success, result = pcall(CoolUtil.parseJson, Paths.json(("game/notes/%s/config"):format(name)))
-        if success then
+        local result, err = CoolUtil.parseJson(Paths.json(("game/notes/%s/config"):format(name)))
+        if result then
             NoteSkin._cache[name] = result
         else
-            FLog.warn(("Failed to load note skin config for %s: %s"):format(name, result))
+            FLog.warn(("Failed to load note skin config for %s: %s"):format(name, err))
             NoteSkin._cache[name] = {}
         end
     end

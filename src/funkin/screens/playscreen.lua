@@ -1,4 +1,5 @@
 local Stage = srcreq("funkin.gameplay.stage") --- @type funkin.gameplay.Stage
+local CharacterConfig = srcreq("funkin.gameplay.character.config") --- @type funkin.gameplay.character.Config
 
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 local UISkin = srcreq("funkin.gameplay.ui.uiskin") --- @type funkin.gameplay.ui.UISkin
@@ -73,39 +74,10 @@ function PlayScreen:enter()
     --- Multipler for how fast the camera should zoom back to default, `1` being instantaneously and `0` being not at all
     self.camZoomingSpeed = 0.05
 
+    CharacterConfig.clearCache()
+
     self.stage = Stage:new() --- @type funkin.gameplay.Stage
     self:addChild(self.stage)
-
-    local fadeShader = Shader:new(Paths.frag("gradient_fade")) --- @type comet.gfx.Shader
-    fadeShader:reference()
-
-    local test = AnimatedImage:new() --- @type comet.gfx.AnimatedImage
-    test:setFrameCollection(Paths.getSparrowAtlas("game/characters/bf/sprite"))
-    test:addAnimationByName("idle", "BF idle dance", 24, true)
-    test:playAnimation("idle")
-    test.scale:set(0.5, 0.5)
-    test.centered = false
-    test.onDraw = function(_)
-        local prevAlpha = test.alpha
-        test.flipY = not test.flipY
-        test.alpha = 0.5 * prevAlpha
-        test.position.y = test.position.y + (test:getHeight(1) - 10)
-        fadeShader:send("quad", {test._frame.quad:getViewport()})
-        test:setShader(fadeShader)
-        test:_draw()
-        
-        test.flipY = not test.flipY
-        test.alpha = prevAlpha
-        test.position.y = test.position.y - (test:getHeight(1) - 10)
-        test:setShader()
-        test:_draw()
-    end
-    local old = test.destroy
-    test.destroy = function(o)
-        fadeShader:dereference()
-        old(o)
-    end
-    self:addChild(test)
 
     Scoring.resetSystem()
     

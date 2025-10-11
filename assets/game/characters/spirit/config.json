@@ -1,0 +1,45 @@
+{
+	"healthIcon": {
+		"isPixel": true,
+		"scale": 1,
+		"offset": [
+			0,
+			0
+		],
+		"color": "#31B0D1"
+	},
+	"atlas": {
+		"type": "sparrow",
+		"path": "sprite",
+		"gridSize": null
+	},
+	"animations": {},
+	"position": [
+		0,
+		0
+	],
+	"camera": [
+		0,
+		0
+	],
+	"scale": 1,
+	"flipX": true,
+	"isPlayer": true,
+	"antialiasing": true,
+	"singDuration": 4,
+	"danceSteps": [
+		"idle"
+	],
+	"singSteps": [
+		"singLEFT",
+		"singDOWN",
+		"singUP",
+		"singRIGHT"
+	],
+	"missSteps": [
+		"singLEFTmiss",
+		"singDOWNmiss",
+		"singUPmiss",
+		"singRIGHTmiss"
+	]
+}

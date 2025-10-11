@@ -4,6 +4,8 @@ local HealthIcon = srcreq("funkin.gameplay.ui.healthicon") --- @type funkin.game
 --- @class funkin.gameplay.huds.DefaultHUD : funkin.gameplay.huds.BaseHUD
 local DefaultHUD, super = BaseHUD:subclass("DefaultHUD", ...)
 
+-- TODO: the pixel icons randomly disappear for one frame sometimes and i have no clue why
+
 function DefaultHUD:__init__(playField)
     super.__init__(self, playField, "funkin")
 
@@ -76,9 +78,17 @@ function DefaultHUD:update(dt)
     if self.iconProg < 0.0 then
         self.iconProg = 0.0
     end
-    local scale = 1 + ((1 - Ease.outSine(1 - self.iconProg)) * 0.2)
-    self.iconP2.scale:set(scale, scale)
-    self.iconP1.scale:set(scale, scale)
+    local scale = math.abs(1 + ((1 - Ease.outSine(1 - self.iconProg)) * 0.2))
+    if self.iconP2:getOriginalWidth() > self.iconP2:getOriginalHeight() then
+        self.iconP2:setGraphicSize(math.floor(150 * scale), 0)
+    else
+        self.iconP2:setGraphicSize(0, math.floor(150 * scale))
+    end
+    if self.iconP1:getOriginalWidth() > self.iconP1:getOriginalHeight() then
+        self.iconP1:setGraphicSize(math.floor(150 * scale), 0)
+    else
+        self.iconP1:setGraphicSize(0, math.floor(150 * scale))
+    end
     self:updateIcons()
 end
 
