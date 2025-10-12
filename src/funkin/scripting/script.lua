@@ -106,6 +106,7 @@ function Script:__init__(path)
         local chunk = fs.load(self.path)
         if chunk then
             -- preset vars/funcs`
+			self:set("game", PlayScreen.instance)
             self:set("close", function() self:close() end)
 
             -- sandbox the chunk then run it
