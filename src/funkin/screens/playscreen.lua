@@ -153,6 +153,13 @@ function PlayScreen:addChild(object, tag, camera)
     camera:addChild(object, tag)
 end
 
+function PlayScreen:resyncVocals()
+    for i = 1, #self.vocalTracks do
+        local track = self.vocalTracks[i] --- @type comet.mixer.Sound
+        track:seek(self.inst:tell())
+    end
+end
+
 function PlayScreen:update(dt)
     if comet.keys:wasJustPressed("h") then
         self.camHUD.visible = not self.camHUD.visible
@@ -171,6 +178,15 @@ function PlayScreen:update(dt)
     end
     if comet.keys:isPressed("down") then
         self.camGame.scroll.y = self.camGame.scroll.y + (300 * dt)
+    end
+    if not self.startingSong then
+        for i = 1, #self.vocalTracks do
+            local track = self.vocalTracks[i] --- @type comet.mixer.Sound
+            if math.abs(track:tell() - self.inst:tell()) > 30 then
+                self:resyncVocals()
+                break
+            end
+        end
     end
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     if self.startingSong and c:getCurrentRawTime() >= 0.0 then
