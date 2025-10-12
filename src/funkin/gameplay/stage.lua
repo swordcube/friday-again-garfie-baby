@@ -1,3 +1,4 @@
+local json = cometreq("lib.json") --- @type comet.lib.Json
 local Character = srcreq("funkin.gameplay.character") --- @type funkin.gameplay.Character
 
 --- @class funkin.gameplay.Stage : comet.gfx.Object2D
@@ -39,7 +40,7 @@ function Stage:__init__(name)
                 local anims = propData.animations or {}
                 for j = 1, #anims do
                     local anim = anims[j]
-                    if anim.indices and #anim.indices ~= 0 then
+                    if anim.indices and anim.indices ~= json.null and #anim.indices ~= 0 then
                         prop:addAnimationByIndices(anim.shortcut or anim.name, anim.prefix or anim.name, anim.indices, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
                     else
                         prop:addAnimationByName(anim.shortcut or anim.name, anim.prefix or anim.name, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)

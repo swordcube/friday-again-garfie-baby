@@ -1,3 +1,4 @@
+local json = cometreq("lib.json") --- @type comet.lib.Json
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 
 --- @class funkin.gameplay.notes.Note : comet.gfx.AnimatedImage
@@ -35,7 +36,7 @@ function Note:loadSkin(skin)
             local dir = dirs[i]
             local animData = d[dir]
     
-            if animData.indices and #animData.indices > 0 then
+            if animData.indices and animData.indices ~= json.null and #animData.indices > 0 then
                 self:addAnimationByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
             else
                 self:addAnimationByName(dir .. name, animData.prefix, animData.fps, animData.looped)

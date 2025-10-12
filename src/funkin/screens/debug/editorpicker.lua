@@ -26,8 +26,13 @@ function EditorPicker:enter()
         {
             name = "Chart Converter",
             callback = function()
-                local screen = ScreenManager.instance.current --- @type comet.core.Screen
-                screen:switchTo(srcreq("funkin.screens.debug.chartconverter"):new())
+                self:switchTo(srcreq("funkin.screens.debug.chartconverter"):new())
+            end
+        },
+        {
+            name = "Character Editor",
+            callback = function()
+                self:switchTo(srcreq("funkin.screens.debug.charactereditor"):new())
             end
         }
     }

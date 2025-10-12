@@ -1,3 +1,4 @@
+local json = cometreq("lib.json") --- @type comet.lib.Json
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 
 --- @class funkin.gameplay.notes.Strum : comet.gfx.AnimatedImage
@@ -23,7 +24,7 @@ function Strum:__init__(x, y, keyCount, direction, skin)
     for name, d in pairs(self.skinData.strum.animation) do
         local animData = d[dirs[self.direction + 1]]
 
-        if animData.indices and #animData.indices > 0 then
+        if animData.indices and animData.indices ~= json.null and #animData.indices > 0 then
             self:addAnimationByIndices(name, animData.prefix, animData.indices, animData.fps, animData.looped)
         else
             self:addAnimationByName(name, animData.prefix, animData.fps, animData.looped)

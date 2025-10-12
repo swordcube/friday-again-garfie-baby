@@ -1,3 +1,4 @@
+local json = cometreq("lib.json") --- @type comet.lib.Json
 local CharacterConfig = srcreq("funkin.gameplay.character.config") --- @type funkin.gameplay.character.Config
 
 --- @class funkin.gameplay.Character : comet.gfx.AnimatedImage
@@ -12,6 +13,10 @@ function Character:__init__(x, y, name, isPlayer)
     self.isPlayer = isPlayer --- @type boolean
 
     self.curDanceStep = 1
+    self.debugMode = false
+
+    self.holdTimer = 0.0
+    self.lastAnimContext = "dance" --- @type "none"|"dance"|"sing"|"lock"
 
     self.config = nil --- @type funkin.gameplay.character.Config.ConfigData
     self:loadCharacter(name)
@@ -34,12 +39,22 @@ function Character:loadCharacter(newCharacter)
     local anims = self.config.animations
     for i = 1, #anims do
         local anim = anims[i]
-        if anim.indices and #anim.indices ~= 0 then
+        if anim.indices and anim.indices ~= json.null and #anim.indices ~= 0 then
             self:addAnimationByIndices(anim.shortcut or anim.name, anim.prefix or anim.name, anim.indices, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
         else
             self:addAnimationByName(anim.shortcut or anim.name, anim.prefix or anim.name, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
         end
         self:setAnimationOffset(anim.shortcut or anim.name, anim.offset[1] or 0.0, anim.offset[2] or 0.0)
+    end
+    local localIsPlayer = self.config.isPlayer
+    if localIsPlayer == nil then
+        localIsPlayer = false
+    end
+    if self.isPlayer ~= localIsPlayer then
+        -- swap left & right sing anims if player-intended character is used on non-player character instance
+        local old = self._animations[self.config.singSteps[1]]
+        self._animations[self.config.singSteps[1]] = self._animations[self.config.singSteps[4]]
+        self._animations[self.config.singSteps[4]] = old
     end
     self.scale:set(
         self.config.scale and self.config.scale or 1.0,
@@ -71,11 +86,26 @@ function Character:loadCharacter(newCharacter)
 end
 
 function Character:dance(force)
-    self:playAnimation(self.config.danceSteps[self.curDanceStep], force)
+    self:playAnimation(self.config.danceSteps[self.curDanceStep], "dance", force)
 end
 
-function Character:playAnimation(name, force)
+function Character:playSingAnimation(dir)
+    self.holdTimer = Conductor.instance:getCurrentStepLength() * self.singDuration
+    self:playAnimation(self.config.singSteps[(dir % #self.config.singSteps) + 1], "sing", true)
+end
+
+function Character:playMissAnimation(dir)
+    self.holdTimer = Conductor.instance:getCurrentStepLength() * self.singDuration
+    self:playAnimation(self.config.missSteps[(dir % #self.config.missSteps) + 1], "sing", true)
+end
+
+---@param name string
+---@param context "none"|"dance"|"sing"|"lock"
+---@param force any
+function Character:playAnimation(name, context, force)
+    self.lastAnimContext = context
     super.playAnimation(self, name, force)
+
     if self.centered then
         self.offset.x = 0.0
         self.offset.y = self:getHeight(1) * -0.5
@@ -85,6 +115,29 @@ function Character:playAnimation(name, force)
     end
     self.offset.x = self.offset.x + (self.config.offset and self.config.position[1] or 0.0)
     self.offset.y = self.offset.y + (self.config.offset and self.config.position[2] or 0.0)
+end
+
+function Character:update(dt)
+    super.update(self, dt)
+
+    -- dance is handled by beatHit
+    -- "none" waits until the current anim is done playing to start automatically dancing again
+    -- "sing" waits until the hold timer reaches 0 (and if player, all note inputs to be released) to start automatically dancing again
+
+    -- "lock" prevents the character from dancing automatically until dance() is called again
+    -- lock doesn't need to do anything, so there's no code for it lol
+
+    if self.lastAnimContext == "sing" then
+        local holdingAnyNoteInput = Controls.instance.pressed.NOTE_LEFT or Controls.instance.pressed.NOTE_DOWN or Controls.instance.pressed.NOTE_UP or Controls.instance.pressed.NOTE_RIGHT
+        self.holdTimer = self.holdTimer - (dt * 1000.0)
+
+        if self.holdTimer <= 0.0 and (not self.isPlayer or (self.isPlayer and not holdingAnyNoteInput)) then
+            self.curDanceStep = 1
+            self:dance()
+        end
+    elseif self.lastAnimContext == "none" and not self:isPlaying() then
+        self:dance()
+    end
 end
 
 function Character:draw()
@@ -98,7 +151,7 @@ function Character:draw()
 end
 
 function Character:beatHit(beat)
-    if not table.contains(self.config.singSteps, self:getCurrentAnimation()) and beat % self.danceInterval == 0 then
+    if not self.debugMode and self.lastAnimContext == "dance" and beat % self.danceInterval == 0 then
         self:dance()
     end
 end

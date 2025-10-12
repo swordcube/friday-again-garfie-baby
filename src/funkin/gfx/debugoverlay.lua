@@ -302,7 +302,7 @@ function DebugOverlay.init()
             gfx.coloredRectangle("fill", 10, statY, w, h, fillColor)
             gfx.coloredRectangle("line", 10, statY, w, h, lineColor)
             
-            displayStat("Asset Loaders", "")            
+            displayStat("Asset Loaders", "")
             for i = 1, #assetLoaders do
                 displayStat(nil, ("- %s (%s)"):format(assetLoaders[i].name, assetLoaders[i].displayedRoot))
             end

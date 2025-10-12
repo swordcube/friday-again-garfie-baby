@@ -142,6 +142,16 @@ function PlayField:hitNote(note)
             self.hud:updateHealthBar(self.stats.health, self.stats.minHealth, self.stats.maxHealth)
             self.hud:updatePlayerStats(self.stats)
         end
+        local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
+        if game then
+            game.player:playSingAnimation(note.lane)
+        end
+    
+    elseif note.strumLine == self.opponentStrumLine then
+        local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
+        if game then
+            game.opponent:playSingAnimation(note.lane)
+        end
     end
 end
 
@@ -175,6 +185,11 @@ function PlayField:missNote(note)
         end
         self.scoreDisplay:showRating("miss")
         self.scoreDisplay:showCombo(self.stats.missCombo, true)
+
+        local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
+        if game then
+            game.player:playMissAnimation(note.lane)
+        end
     end
 end
 

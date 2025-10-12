@@ -1,137 +1,167 @@
 {
-	"healthIcon": {
-		"isPixel": false,
-		"scale": 1,
-		"offset": [
-			0,
-			0
-		],
-		"color": "#31B0D1"
-	},
-	"atlas": {
-		"type": "sparrow",
-		"path": "sprite",
-		"gridSize": null
-	},
 	"animations": [
 		{
-			"name": "scared",
-			"prefix": "BF idle shaking",
-			"texture": null,
-			"indices": null,
 			"fps": 24,
-			"looped": true,
-			"offset": [5, -1]
-		},
-		{
-			"name": "singRIGHTmiss",
-			"prefix": "BF NOTE RIGHT MISS",
-			"texture": null,
 			"indices": null,
-			"fps": 24,
 			"looped": false,
-			"offset": [43, -21]
-		},
-		{
-			"name": "singDOWN",
-			"prefix": "BF NOTE DOWN",
-			"texture": null,
-			"indices": null,
-			"fps": 24,
-			"looped": false,
-			"offset": [14, 51]
-		},
-		{
-			"name": "singLEFTmiss",
-			"prefix": "BF NOTE LEFT MISS",
-			"texture": null,
-			"indices": null,
-			"fps": 24,
-			"looped": false,
-			"offset": [-1, -19]
-		},
-		{
-			"name": "singUP",
-			"prefix": "BF NOTE UP",
-			"texture": null,
-			"indices": null,
-			"fps": 24,
-			"looped": false,
-			"offset": [46, -26]
-		},
-		{
 			"name": "idle",
+			"offset": [
+				5,
+				-1
+			],
 			"prefix": "BF idle dance",
-			"texture": null,
-			"indices": null,
-			"fps": 24,
-			"looped": false,
-			"offset": [5, -1]
+			"texture": null
 		},
 		{
-			"name": "singRIGHT",
-			"prefix": "BF NOTE RIGHT",
-			"texture": null,
-			"indices": null,
 			"fps": 24,
-			"looped": false,
-			"offset": [48, 5]
+			"indices": null,
+			"looped": true,
+			"name": "scared",
+			"offset": [
+				5,
+				18
+			],
+			"prefix": "BF idle shaking",
+			"texture": null
 		},
 		{
-			"name": "singDOWNmiss",
-			"prefix": "BF NOTE DOWN MISS",
-			"texture": null,
-			"indices": null,
 			"fps": 24,
-			"looped": false,
-			"offset": [15, 19]
-		},
-		{
-			"name": "singUPmiss",
-			"prefix": "BF NOTE UP MISS",
-			"texture": null,
 			"indices": null,
-			"fps": 24,
 			"looped": false,
-			"offset": [42, -26]
-		},
-		{
 			"name": "singLEFT",
+			"offset": [
+				-16,
+				18
+			],
 			"prefix": "BF NOTE LEFT",
-			"texture": null,
-			"indices": null,
+			"texture": null
+		},
+		{
 			"fps": 24,
+			"indices": null,
 			"looped": false,
-			"offset": [-5, 6]
+			"name": "singLEFTmiss",
+			"offset": [
+				-15,
+				-8
+			],
+			"prefix": "BF NOTE LEFT MISS",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singDOWN",
+			"offset": [
+				-2,
+				14
+			],
+			"prefix": "BF NOTE DOWN",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singDOWNmiss",
+			"offset": [
+				-4,
+				-17
+			],
+			"prefix": "BF NOTE DOWN MISS",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singUP",
+			"offset": [
+				30,
+				27
+			],
+			"prefix": "BF NOTE UP",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singUPmiss",
+			"offset": [
+				25,
+				27
+			],
+			"prefix": "BF NOTE UP MISS",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singRIGHT",
+			"offset": [
+				48,
+				18
+			],
+			"prefix": "BF NOTE RIGHT",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singRIGHTmiss",
+			"offset": [
+				43,
+				-10
+			],
+			"prefix": "BF NOTE RIGHT MISS",
+			"texture": null
 		}
 	],
-	"position": [
-		0,
-		0
-	],
+	"antialiasing": true,
+	"atlas": {
+		"gridSize": null,
+		"path": "sprite",
+		"type": "sparrow"
+	},
 	"camera": [
 		0,
 		0
 	],
-	"scale": 1,
-	"flipX": true,
-	"isPlayer": true,
-	"antialiasing": true,
 	"centered": false,
-	"singDuration": 4,
 	"danceSteps": [
 		"idle"
 	],
-	"singSteps": [
-		"singLEFT",
-		"singDOWN",
-		"singUP",
-		"singRIGHT"
-	],
+	"flipX": true,
+	"healthIcon": {
+		"color": "#31B0D1",
+		"isPixel": false,
+		"offset": [
+			0,
+			0
+		],
+		"scale": 1
+	},
+	"isPlayer": true,
 	"missSteps": [
 		"singLEFTmiss",
 		"singDOWNmiss",
 		"singUPmiss",
 		"singRIGHTmiss"
+	],
+	"position": [
+		0,
+		0
+	],
+	"scale": 1,
+	"singDuration": 8,
+	"singSteps": [
+		"singLEFT",
+		"singDOWN",
+		"singUP",
+		"singRIGHT"
 	]
 }

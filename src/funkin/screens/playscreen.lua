@@ -15,8 +15,7 @@ PlayScreen.static.lastParams = nil
 
 function PlayScreen:__init__(params)
     super.__init__(self)
-    PlayScreen.static.instance = self
-
+    
     if PlayScreen.static.lastParams then
         params = PlayScreen.static.lastParams
         PlayScreen.static.lastParams = nil
@@ -30,6 +29,7 @@ function PlayScreen:__init__(params)
 end
 
 function PlayScreen:enter()
+    PlayScreen.static.instance = self
     self.persistentUpdate = true
 
     self.startingSong = true
@@ -85,6 +85,10 @@ function PlayScreen:enter()
 
     self.stage = Stage:new(self.currentChart.meta.game.stage) --- @type funkin.gameplay.Stage
     self:addChild(self.stage)
+
+    self.spectator = self.stage.props.spectator --- @type funkin.gameplay.Character
+    self.opponent = self.stage.props.opponent --- @type funkin.gameplay.Character
+    self.player = self.stage.props.player --- @type funkin.gameplay.Character
 
     self.defaultCamZoom = self.stage.config.zoom
     self.camGame.zoom:set(self.defaultCamZoom, self.defaultCamZoom)
@@ -167,16 +171,16 @@ function PlayScreen:update(dt)
     if comet.mouse.wheel.y ~= 0 then
         self.defaultCamZoom = self.defaultCamZoom - ((comet.mouse.wheel.y * 0.1) * self.defaultCamZoom)
     end
-    if comet.keys:isPressed("left") then
+    if comet.keys:isPressed("j") then
         self.camGame.scroll.x = self.camGame.scroll.x - (300 * dt)
     end
-    if comet.keys:isPressed("right") then
+    if comet.keys:isPressed("l") then
         self.camGame.scroll.x = self.camGame.scroll.x + (300 * dt)
     end
-    if comet.keys:isPressed("up") then
+    if comet.keys:isPressed("i") then
         self.camGame.scroll.y = self.camGame.scroll.y - (300 * dt)
     end
-    if comet.keys:isPressed("down") then
+    if comet.keys:isPressed("k") then
         self.camGame.scroll.y = self.camGame.scroll.y + (300 * dt)
     end
     if not self.startingSong then
