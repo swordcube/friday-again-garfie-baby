@@ -23,7 +23,8 @@
         "param-type-mismatch",
         "assign-type-mismatch",
         "return-type-mismatch",
-        "inject-field"
+        "inject-field",
+        "undefined-global"
     ],
     "Lua.runtime.unicodeName": true
 }

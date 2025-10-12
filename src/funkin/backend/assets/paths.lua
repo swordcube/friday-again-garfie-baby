@@ -179,6 +179,14 @@ function Paths.csv(name, contentPack, useFallback)
     return useFallback and fallback(name, "CSV") or nil
 end
 
+function Paths.script(name, contentPack, useFallback)
+    local newPath = Paths.getAsset(name .. ".lua", contentPack, useFallback, nil, false)
+    if fs.exists(newPath) then
+        return newPath
+    end
+    return useFallback and fallback(name, "Lua script") or nil
+end
+
 function Paths.font(name, contentPack, useFallback)
     local assetExts = Paths.FONT_EXTS
     for j = 1, #assetExts do

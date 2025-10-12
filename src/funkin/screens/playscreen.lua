@@ -11,11 +11,18 @@ local PlayField = srcreq("funkin.gameplay.playfield") --- @type funkin.gameplay.
 local PlayScreen, super = MusicBeatScreen:subclass("PlayScreen", ...)
 
 PlayScreen.static.instance = nil --- @type funkin.screens.PlayScreen
+PlayScreen.static.lastParams = nil
 
 function PlayScreen:__init__(params)
     super.__init__(self)
     PlayScreen.static.instance = self
 
+    if PlayScreen.static.lastParams then
+        params = PlayScreen.static.lastParams
+        PlayScreen.static.lastParams = nil
+    else
+        PlayScreen.static.lastParams = params
+    end
     self.currentSong = params.song
     self.currentDifficulty = params.difficulty
     self.currentMix = params.mix or "default"
@@ -76,8 +83,11 @@ function PlayScreen:enter()
 
     CharacterConfig.clearCache()
 
-    self.stage = Stage:new() --- @type funkin.gameplay.Stage
+    self.stage = Stage:new(self.currentChart.meta.game.stage) --- @type funkin.gameplay.Stage
     self:addChild(self.stage)
+
+    self.defaultCamZoom = self.stage.config.zoom
+    self.camGame.zoom:set(self.defaultCamZoom, self.defaultCamZoom)
 
     Scoring.resetSystem()
     
@@ -144,6 +154,24 @@ function PlayScreen:addChild(object, tag, camera)
 end
 
 function PlayScreen:update(dt)
+    if comet.keys:wasJustPressed("h") then
+        self.camHUD.visible = not self.camHUD.visible
+    end
+    if comet.mouse.wheel.y ~= 0 then
+        self.defaultCamZoom = self.defaultCamZoom - ((comet.mouse.wheel.y * 0.1) * self.defaultCamZoom)
+    end
+    if comet.keys:isPressed("left") then
+        self.camGame.scroll.x = self.camGame.scroll.x - (300 * dt)
+    end
+    if comet.keys:isPressed("right") then
+        self.camGame.scroll.x = self.camGame.scroll.x + (300 * dt)
+    end
+    if comet.keys:isPressed("up") then
+        self.camGame.scroll.y = self.camGame.scroll.y - (300 * dt)
+    end
+    if comet.keys:isPressed("down") then
+        self.camGame.scroll.y = self.camGame.scroll.y + (300 * dt)
+    end
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     if self.startingSong and c:getCurrentRawTime() >= 0.0 then
         self:startSong()

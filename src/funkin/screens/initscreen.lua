@@ -52,13 +52,16 @@ function InitScreen:enter()
         handle.quit()
     end)
     Video = srcreq("funkin.gfx.video") --- @type funkin.gfx.Video
+    Script = srcreq("funkin.scripting.script") --- @type funkin.scripting.Script
 
     if love.filesystem.exists("icon.png") then
         local icon = love.image.newImageData("icon.png")
         love.window.setIcon(icon)
         icon:release()
     end
+    comet.mixer:setMasterVolume(0.3)
     self:forceSwitchTo(srcreq("funkin.screens.titlescreen"):new())
+    
     MusicBeatScreen.static.skipNextTransIn = true
 end
 

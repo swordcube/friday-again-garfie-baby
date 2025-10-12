@@ -9,7 +9,6 @@ TitleScreen.static.initialized = false
 
 function TitleScreen:enter()
     self.persistentUpdate = true
-    comet.mixer:setMasterVolume(0.3)
     
     if not comet.mixer.music:isPlaying() then
         CoolUtil.playMenuMusic(0)
