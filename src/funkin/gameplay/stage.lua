@@ -1,3 +1,5 @@
+local Character = srcreq("funkin.gameplay.character") --- @type funkin.gameplay.Character
+
 --- @class funkin.gameplay.Stage : comet.gfx.Object2D
 local Stage, super = Object2D:subclass("Stage", ...)
 
@@ -22,11 +24,11 @@ function Stage:__init__(name)
 
     for i = 1, #propDatas do
         local propData = propDatas[i]
-        local propType = propData.type or "sprite" --- @type "sprite"|"box"
+        local propType = propData.type or "sprite" --- @type "sprite"|"box"|"opponent"|"spectator"|"player"
 
         local prop = nil --- @type any
         if propType == "sprite" then
-            local atlasType = propData.atlasType or "none" --- @type "none"|"sparrow"|"opponent"|"spectator"|"player"
+            local atlasType = propData.atlasType or "none" --- @type "none"|"sparrow"
             if atlasType == "none" then
                 prop = Image:new(Paths.image(("%s/%s"):format(self.config.directory, propData.assetPath))) --- @type comet.gfx.Image
             
@@ -58,6 +60,7 @@ function Stage:__init__(name)
             )
             prop.alpha = propData.alpha or 1.0
             prop.rotation = propData.rotation or 0.0
+
             if propData.centered ~= nil then
                 prop.centered = propData.centered
             else
@@ -70,19 +73,28 @@ function Stage:__init__(name)
             -- TODO: box prop type
 
         elseif propType == "opponent" or propType == "spectator" or propType == "player" then
-            prop = Rectangle:new() --- @type comet.gfx.Rectangle
+            -- local marker = Rectangle:new() --- @type comet.gfx.Rectangle
+            -- marker.position:set(
+            --     propData.position and (propData.position[1] or 0.0) or 0.0,
+            --     propData.position and (propData.position[2] or 0.0) or 0.0
+            -- )
+            -- marker.size:set(20, 20)
+            -- marker:setColor(Color.RED)
+            -- self:addProp(propType .. "_marker", marker, propData.scroll)
+
+            local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
+            prop = Character:new(0, 0, game.currentChart.meta.game.characters[propType], propType == "player") --- @type funkin.gameplay.Character
             prop.position:set(
                 propData.position and (propData.position[1] or 0.0) or 0.0,
                 propData.position and (propData.position[2] or 0.0) or 0.0
             )
-            prop.size:set(20, 20)
-            prop:setColor(Color.RED)
-
+            self.script:call("onCharacterAdd", prop)
             propData.name = propType
         end
         if not propData.scroll then
             propData.scroll = {1.0, 1.0}
         end
+        self.script:call("onPropAdd", prop)
         self:addProp(propData.name, prop, propData.scroll)
     end
     self.script:call("onLoadPost")

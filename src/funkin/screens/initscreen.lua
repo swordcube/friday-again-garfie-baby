@@ -60,7 +60,15 @@ function InitScreen:enter()
         icon:release()
     end
     comet.mixer:setMasterVolume(0.3)
-    self:forceSwitchTo(srcreq("funkin.screens.titlescreen"):new())
+
+    if table.contains(arg, "--gameplay") then
+        self:forceSwitchTo(srcreq("funkin.screens.playscreen"):new({
+            song = "lit-up-bf-mix",
+            difficulty = "hard"
+        }))
+    else
+        self:forceSwitchTo(srcreq("funkin.screens.titlescreen"):new())
+    end
     
     MusicBeatScreen.static.skipNextTransIn = true
 end

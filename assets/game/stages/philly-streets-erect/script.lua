@@ -1,3 +1,13 @@
+local colorShader = nil --- @type comet.gfx.Shader
+
+function onLoad()
+    colorShader = Shader:new(Paths.frag("adjust_color")) --- @type comet.gfx.Shader
+    colorShader:send("hue", -5)
+    colorShader:send("saturation", -40)
+    colorShader:send("contrast", -25)
+    colorShader:send("brightness", -20)
+end
+
 function onLoadPost()
     local layer1 = Parallax2D:new() --- @type comet.gfx.Parallax2D
     layer1.scrollFactor:set(0.1, 0.1)
@@ -96,6 +106,12 @@ function onLoadPost()
     props.paper.onComplete:connect(function(_)
         props.paper:kill()
     end)
+    props.paper:pause()
+    props.paper:kill()
+end
+
+function onCharacterAdd(char)
+    char:setShader(colorShader)
 end
 
 local timer = 0
@@ -110,11 +126,11 @@ function onUpdate(dt)
     props.mist5.position.y = -80 + (math.fastsin(timer * 0.08) * 100)
 end
 
-local paperOffset = math.floor(love.math.random(20, 30))
+local paperOffset = math.floor(love.math.random(20, 40))
 
 function onBeatHit(b)
-    if b >= paperOffset and love.math.chance(6) and not props.paper:isPlaying() then
-        paperOffset = paperOffset + math.floor(love.math.random(20, 30))
+    if b >= paperOffset and love.math.chance(1) and not props.paper:isPlaying() then
+        paperOffset = b + math.floor(love.math.random(20, 40))
 
         props.paper.position.y = 608 + math.random(-150, 150)
         props.paper:playAnimation("idle", true)
