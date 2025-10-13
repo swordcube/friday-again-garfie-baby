@@ -320,14 +320,14 @@
             "type": "opponent",
 
             "position": [920, 1310],
-            "camera": [500, -100],
+            "camera": [250, 0],
             "scroll": [1, 1]
         },
         {
             "type": "player",
 
             "position": [2151, 1228],
-            "camera": [-350, -100],
+            "camera": [-250, 0],
             "scroll": [1, 1]
         },
         {

@@ -11,8 +11,13 @@ function Stage:__init__(name)
 
     self.name = name or "stage"
     self.config = CoolUtil.parseJson(Paths.json(("game/stages/%s/config"):format(self.name)))
-    self.props = {}
 
+    self.props = {}
+    self.cameraOffsets = {
+        opponent = Vec2:new(),
+        player = Vec2:new(),
+        spectator = Vec2:new()
+    }
     if not self.config.directory then
         self.config.directory = ("game/stages/%s/images"):format(self.name)
     end
@@ -97,6 +102,10 @@ function Stage:__init__(name)
                 self.script:call("onCharacterAdd", prop)
             end
             propData.name = propType
+
+            if propData.camera then
+                self.cameraOffsets[propType]:set(propData.camera[1], propData.camera[2])
+            end
         end
         if not propData.scroll then
             propData.scroll = {1.0, 1.0}

@@ -222,13 +222,15 @@ function PlayScreen:update(dt)
             self.defaultCamZoom = self.defaultCamZoom - ((comet.mouse.wheel.y * 0.1) * self.defaultCamZoom)
         end
     end
-    local focusedCharacter = self.opponent
+    local focusedCharacter, focusedCharacterType = self.opponent, "opponent"
     if self.curCameraTarget == 2 then
-        focusedCharacter = self.player
+        focusedCharacter, focusedCharacterType = self.player, "player"
     elseif self.curCameraTarget == 3 then
-        focusedCharacter = self.spectator
+        focusedCharacter, focusedCharacterType = self.spectator, "spectator"
     end
     local camX, camY = focusedCharacter:getCameraPosition()
+    camX = camX + self.stage.cameraOffsets[focusedCharacterType].x
+    camY = camY + self.stage.cameraOffsets[focusedCharacterType].y
     self.camFollow.position:set(camX, camY)
 
     if not self.startingSong and not self.endingSong then

@@ -126,7 +126,7 @@ function Character:getCameraPosition()
     local camera = self.config.camera or defaultCamOffset
     local offset = self.config.offset or defaultCamOffset -- default offset should be 0,0 so we can reuse defaultCamOffset here
 
-    local x, y = self.position.x + self.midpoint.x + offset[1], self.position.y - self.midpoint.y + offset[2]
+    local x, y = self.position.x + offset[1], self.position.y - self.midpoint.y + offset[2]
     x = x + (camera[1] + (self.isPlayer and -100 or 150))
     y = y + (camera[2] - 100)
     return x, y
