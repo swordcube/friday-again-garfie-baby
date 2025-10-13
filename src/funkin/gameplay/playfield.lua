@@ -144,14 +144,12 @@ function PlayField:hitNote(note)
         end
         local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
         if game then
-            game.curCameraTarget = 2
             game.player:playSingAnimation(note.lane)
         end
         
     elseif note.strumLine == self.opponentStrumLine then
         local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
         if game then
-            game.curCameraTarget = 1
             game.opponent:playSingAnimation(note.lane)
         end
     end

@@ -1,3 +1,5 @@
+local fs = love.filesystem
+
 local Path = cometreq("util.path") --- @type comet.util.Path
 
 local Stage = srcreq("funkin.gameplay.stage") --- @type funkin.gameplay.Stage
@@ -11,6 +13,8 @@ local PlayField = srcreq("funkin.gameplay.playfield") --- @type funkin.gameplay.
 
 local Script = srcreq("funkin.scripting.script") --- @type funkin.scripting.Script
 local ScriptPack = srcreq("funkin.scripting.scriptpack") --- @type funkin.scripting.ScriptPack
+
+local EventRunner = srcreq("funkin.gameplay.events.eventrunner") --- @type funkin.gameplay.events.EventRunner
 
 --- @class funkin.screens.PlayScreen : funkin.screens.MusicBeatScreen
 local PlayScreen, super = MusicBeatScreen:subclass("PlayScreen", ...)
@@ -60,12 +64,6 @@ function PlayScreen:enter()
     comet.mixer.music:setLooping(false)
     comet.mixer.music:setVolume(1.0)
 
-    self.finishSong = function()
-        self:endSong()
-    end
-    self.inst = comet.mixer.music
-    self.inst.onComplete:connect(self.finishSong)
-
     self.currentChart = CoolUtil.parseJson(Paths.json(("songs/%s/%s/chart"):format(self.currentSong, self.currentMix), self.parentContentPack))
     self.currentChart.meta = CoolUtil.parseJson(Paths.json(("songs/%s/%s/metadata"):format(self.currentSong, self.currentMix), self.parentContentPack))
     
@@ -75,6 +73,15 @@ function PlayScreen:enter()
     c:reset(self.currentChart.meta.song.timingPoints[1].b, self.currentChart.meta.song.timingPoints[1].ts)
     c:setupTimingPoints(self.currentChart.meta.song.timingPoints)
     c:setCurrentRawTime(c:getCurrentBeatLength() * -5)
+
+    self.finishSong = function()
+        Timer.wait(c.offset / 1000, function()
+            self:endSong()
+        end)
+        self.inst.onComplete:disconnect(self.finishSong)
+    end
+    self.inst = comet.mixer.music
+    self.inst.onComplete:connect(self.finishSong)
 
     --- Controls how many beats it will take to bop the camera
     self.camZoomingInterval = -1
@@ -95,6 +102,13 @@ function PlayScreen:enter()
 
     self.scripts = ScriptPack:new() --- @type funkin.scripting.ScriptPack
     self.scripts:linkObject(self)
+
+    self.eventRunner = EventRunner:new() --- @type funkin.gameplay.events.EventRunner
+    self.eventRunner.onExecute:connect(function(name, time, params)
+        self.scripts:call("onEvent", name, time, params)
+    end)
+    self.eventRunner:setEvents(self.currentChart.e)
+    self:addChild(self.eventRunner)
 
     self.stage = Stage:new(self.currentChart.meta.game.stage) --- @type funkin.gameplay.Stage
     self:addChild(self.stage)
@@ -221,6 +235,10 @@ end
 
 function PlayScreen:update(dt)
     if comet.isDebug() then
+        if comet.keys:wasJustPressed("f6") then
+            self.playField.playerStrumLine.botplay = not self.playField.playerStrumLine.botplay
+            self.playField.hud:updatePlayerStats(self.playField.stats)
+        end
         if comet.keys:wasJustPressed("h") then
             self.camHUD.visible = not self.camHUD.visible
         end
@@ -274,6 +292,14 @@ end
 function PlayScreen:endSong()
     if self.endingSong then
         return
+    end
+    self.inst:stop()
+    self.inst:setVolume(0.0)
+
+    for i = 1, #self.vocalTracks do
+        local track = self.vocalTracks[i] --- @type comet.mixer.Sound
+        track:stop()
+        track:setVolume(0.0)
     end
     self:switchTo(srcreq("funkin.screens.freeplayscreen"):new())
 

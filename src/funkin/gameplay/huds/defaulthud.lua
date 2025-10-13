@@ -59,7 +59,11 @@ function DefaultHUD:updateHealthBar(health, min, max)
 end
 
 function DefaultHUD:updatePlayerStats(stats)
-    self.scoreText.text = ("Score: %s"):format(math.formatMoney(stats.score, false, true))
+    if self.playField.playerStrumLine.botplay then
+        self.scoreText.text = "Botplay Enabled"
+    else
+        self.scoreText.text = ("Score: %s"):format(math.formatMoney(stats.score, false, true))
+    end
 end
 
 function DefaultHUD:updateIcons()
