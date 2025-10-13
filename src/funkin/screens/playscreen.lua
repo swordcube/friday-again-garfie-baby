@@ -23,10 +23,9 @@ function PlayScreen:__init__(params)
     
     if PlayScreen.static.lastParams then
         params = PlayScreen.static.lastParams
-        PlayScreen.static.lastParams = nil
-    else
-        PlayScreen.static.lastParams = params
     end
+    PlayScreen.static.lastParams = params
+    
     self.currentSong = params.song
     self.currentDifficulty = params.difficulty
     self.currentMix = params.mix or "default"
