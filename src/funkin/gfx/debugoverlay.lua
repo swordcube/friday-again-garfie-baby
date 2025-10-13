@@ -174,6 +174,17 @@ function DebugOverlay.init()
             tpsGraph:update(dt, dt * 1000)
         end
     end)
+    local function stopMakingTheWidthTooFuckingSmall(baseWidth, boldText, statText, otherStatText) -- i don't know what to name the function lol
+        local simw = 20 + (boldText and debugFontBold:getWidth(boldText) or 0)
+        simw = simw + debugFont:getWidth(statText)
+        if otherStatText then
+            simw = simw + debugFont:getWidth(otherStatText)
+        end
+        if simw > baseWidth then
+            baseWidth = simw
+        end
+        return baseWidth
+    end
     comet.signals.postDraw:connect(function()
         local drawDt = comet.getDeltaTime()
         fpsGraph:update(drawDt, drawDt * 1000)
@@ -188,8 +199,13 @@ function DebugOverlay.init()
             h = comet.settings.parallelUpdate and 80 or 65
         end
         local fillColor, lineColor = "CA282A30", "CA696E7E"
-        gfx.coloredRectangle("fill", 10, 10, w, h, fillColor)
-        gfx.coloredRectangle("line", 10, 10, w, h, lineColor)
+
+        local gw = w
+        gw = stopMakingTheWidthTooFuckingSmall(gw, "API: ", ("%s %s"):format(rname, rversion))
+        gw = stopMakingTheWidthTooFuckingSmall(gw, "GPU: ", rdevice)
+
+        gfx.coloredRectangle("fill", 10, 10, gw, h, fillColor)
+        gfx.coloredRectangle("line", 10, 10, gw, h, lineColor)
         
         statY = 10
 
@@ -255,9 +271,7 @@ function DebugOverlay.init()
             
             statY = statY + 30
             h = 80
-            gfx.coloredRectangle("fill", 10, statY, w, h, fillColor)
-            gfx.coloredRectangle("line", 10, statY, w, h, lineColor)
-            
+
             local screenPath = "N/A"
             if ScreenManager.instance.current then
                 local src = comet.settings.srcDirectory .. "."
@@ -271,6 +285,12 @@ function DebugOverlay.init()
                     screenPath = ScreenManager.instance.current.class.name
                 end
             end
+            local cw = w -- width for comet specific info
+            cw = stopMakingTheWidthTooFuckingSmall(cw, "Screen: ", screenPath)
+            
+            gfx.coloredRectangle("fill", 10, statY, cw, h, fillColor)
+            gfx.coloredRectangle("line", 10, statY, cw, h, lineColor)
+            
             displayStat("Screen: ", screenPath)
 
             local objectCount = 0
@@ -299,8 +319,12 @@ function DebugOverlay.init()
             h = 35 + (#assetLoaders * 15)
             statY = statY + 30
             
-            gfx.coloredRectangle("fill", 10, statY, w, h, fillColor)
-            gfx.coloredRectangle("line", 10, statY, w, h, lineColor)
+            local aw = w -- width for ass-set loaders
+            for i = 1, #assetLoaders do
+                aw = stopMakingTheWidthTooFuckingSmall(aw, nil, ("- %s (%s)"):format(assetLoaders[i].name, assetLoaders[i].displayedRoot))
+            end
+            gfx.coloredRectangle("fill", 10, statY, aw, h, fillColor)
+            gfx.coloredRectangle("line", 10, statY, aw, h, lineColor)
             
             displayStat("Asset Loaders", "")
             for i = 1, #assetLoaders do

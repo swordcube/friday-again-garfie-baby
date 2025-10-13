@@ -1,7 +1,10 @@
 local fs = love.filesystem
 local json = cometreq("lib.json") --- @type comet.lib.Json
 
+local CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
+
 local DefaultAssetLoader = srcreq("funkin.backend.assets.loaders.defaultassetloader") --- @type funkin.backend.assets.loaders.AssetLoader
+local ModAssetLoader = srcreq("funkin.backend.assets.loaders.modassetloader") --- @type funkin.backend.assets.loaders.ModAssetLoader
 
 --- @class funkin.backend.assets.Paths
 local Paths = {}
@@ -26,6 +29,7 @@ Paths.SOUND_EXTS = {
 Paths.SCRIPT_EXTS = {
     ".lua"
 }
+Paths.MODS_DIRECTORY = "mods"
 
 --- @type funkin.backend.assets.loaders.AssetLoader[]
 Paths._registeredAssetLoaders = {} --- @protected
@@ -33,11 +37,26 @@ Paths._registeredAssetLoaders = {} --- @protected
 --- @type table<string, funkin.backend.assets.loaders.AssetLoader>
 Paths._registeredAssetLoadersCache = {} --- @protected
 
+--- @type string[]
+Paths.modFolders = {}
+
+--- @type string[]
+Paths.mods = {}
+
+--- @type table<string, string>
+Paths.modsToFolders = {}
+
+--- @type table<string, string>
+Paths.foldersToMods = {}
+
 --- @type table<string, table>
-Paths.contentMetadata = {}
+Paths.modMetadata = {}
 
 --- @type table<string, comet.gfx.FrameCollection>
-Paths._atlasCache = {}
+Paths._atlasCache = {} --- @protected
+
+--- @type table
+Paths._existingPathCache = {} --- @protected
 
 Paths.forceContentPack = nil
 
@@ -63,14 +82,49 @@ function Paths.registerAssetLoader(id, loader)
     table.insert(Paths._registeredAssetLoaders, 1, loader)
 end
 
-function Paths.reloadContent()
-    Paths._registeredAssetLoaders, Paths._registeredAssetLoadersMap, Paths.contentMetadata = {}, {}, {}
-    Paths.contentMetadata["default"] = json.parse(fs.getContent("assets/metadata.json"))
+function Paths.reloadMods()
+    Paths._registeredAssetLoaders, Paths._registeredAssetLoadersMap, Paths.modMetadata, Paths._existingPathCache = {}, {}, {}, {}
+    Paths.modsToFolders, Paths.foldersToMods, Paths.modFolders, Paths.mods = {}, {}, {}, {}
+
+    Paths.modMetadata["default"] = json.parse(fs.getContent("assets/metadata.json"))
     Paths.registerAssetLoader("default", DefaultAssetLoader:new())
+
+    local mdir = Paths.MODS_DIRECTORY
+    if fs.isDirectory(mdir) then
+        local function iterate(d)
+            local items = fs.getDirectoryItems(d)
+            for i = 1, #items do
+                local item = ("%s/%s"):format(d, items[i])
+                if fs.isDirectory(item) then
+                    local metaPath = ("%s/metadata.json"):format(item)
+                    if fs.isFile(metaPath) then
+                        FLog.verbose(("%s has metadata, we gonna try to load it!"):format(item))
+
+                        local meta = CoolUtil.parseJson(metaPath)
+                        if meta.id then
+                            local folder = item:sub(#mdir + 2)
+                            Paths.modsToFolders[meta.id] = folder
+                            Paths.foldersToMods[folder] = meta.id
+                            
+                            table.insert(Paths.modFolders, folder)
+                            table.insert(Paths.mods, meta.id)
+
+                            Paths.registerAssetLoader(meta.id, ModAssetLoader:new(folder))
+                        else
+                            FLog.error(("%s does not specify an ID, we skipping it!"):format(item))
+                        end
+                    else
+                        iterate(item)
+                    end
+                end
+            end
+        end
+        iterate(mdir)
+    end
 end
 
 function Paths.initAssetSystem()
-    Paths.reloadContent()
+    Paths.reloadMods()
 end
 
 --- @param dir        string
@@ -104,31 +158,41 @@ function Paths.getAsset(name, contentPack, useFallback, assetType, printError)
     if useFallback == nil then
         useFallback = true
     end
+    local existingPathCache = Paths._existingPathCache
     if contentPack == nil or #contentPack == 0 then
         local assetLoaders = Paths._registeredAssetLoaders
         for i = 1, #assetLoaders do
             local loader = assetLoaders[i] --- @type funkin.backend.assets.loaders.AssetLoader
             local path = loader:getPath(name)
-            if fs.exists(path) then
+            if not existingPathCache[path] and fs.exists(path) then
+                existingPathCache[path] = true
+            end
+            if existingPathCache[path] then
                 return path
             end
         end
     else
         local loader = Paths._registeredAssetLoadersCache[contentPack] --- @type funkin.backend.assets.loaders.AssetLoader
         local path = loader:getPath(name)
-        if fs.exists(path) then
+        if not existingPathCache[path] or fs.exists(path) then
+            existingPathCache[path] = true
+        end
+        if existingPathCache[path] then
             return path
         
         elseif useFallback then
             local assetLoaders = Paths._registeredAssetLoaders
             for i = 1, #assetLoaders do
                 loader = assetLoaders[i] --- @type funkin.backend.assets.loaders.AssetLoader
-                local contentMetadata = Paths.contentMetadata[loader.id]
-                if contentMetadata and not contentMetadata.runGlobally and Paths.forceContentPack ~= loader.id then
+                local modMetadata = Paths.modMetadata[loader.id]
+                if modMetadata and not modMetadata.runGlobally and Paths.forceContentPack ~= loader.id then
                     goto continue
                 end
                 path = loader:getPath(name)
-                if fs.exists(path) then
+                if not existingPathCache[path] and fs.exists(path) then
+                    existingPathCache[path] = true
+                end
+                if existingPathCache[path] then
                     return path
                 end
                 ::continue::
@@ -270,6 +334,26 @@ function Paths.getSparrowAtlas(name, contentPack, useFallback)
         Paths._atlasCache[key] = atlas
     end
     return Paths._atlasCache[key]
+end
+
+function Paths.getModFolderFromPath(path, includeContainerFolders)
+    if includeContainerFolders == nil then
+        includeContainerFolders = false
+    end
+    path = path:replace("\\", "/") -- i hate windows
+
+    local modFolders = Paths.modFolders
+    for i = 1, #modFolders do
+        local rawModFolder = modFolders[i]
+        if path:startsWith(("%s/%s"):format(Paths.MODS_DIRECTORY, rawModFolder)) then
+            return (not includeContainerFolders) and rawModFolder:sub(1, rawModFolder:lastIndexOf("/") + 1) or rawModFolder
+        end
+    end
+    return "assets"
+end
+
+function Paths.getModFromPath(path)
+    return Paths.foldersToMods[Paths.getModFolderFromPath(path, true)]
 end
 
 return Paths

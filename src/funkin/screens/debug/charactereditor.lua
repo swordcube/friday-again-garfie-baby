@@ -77,10 +77,15 @@ function CharacterEditor:input(e)
         if holdinCtrl and comet.keys:wasJustPressed("s") then
             local jsonStr = json.beautify(self.character.config, {newline = "\n", indent = "\t", depth = 0})
             local success, err = fs.write(Paths.json("game/characters/" .. self.character.name .. "/config"), jsonStr)
-            if not success then
+            if success then
+                print(("Saved character config for %s successfully"):format(self.character.name))
+            else
                 FLog.error(("Failed to save character config: %s"):format(err))
             end
         else
+            if comet.keys:wasJustPressed("space") then
+                self.character:playAnimation(self.character:getCurrentAnimation(), self.character.lastAnimContext, true)
+            end
             if comet.keys:wasJustPressed("w") then
                 self:changeSelection(-1)
             end

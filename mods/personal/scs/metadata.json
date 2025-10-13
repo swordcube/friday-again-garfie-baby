@@ -1,0 +1,127 @@
+{
+    "id": "swords-cubical-saturday",
+
+    "title": "Sword's Cubical Saturday",
+    "description": "Face off against a bunch of friendly fellas with the power of singing!\n\nExpect a bit of challenge though, this mod may be a bit difficult for casual players!",
+
+    "apiVersion": "0.1.0",
+    "modVersion": "1.0.0",
+
+    "runGlobally": false,
+    "allowUnsafeScripts": true,
+
+    "levels": [
+        {
+            "id": "chapter1",
+            "name": "Chapter 1",
+
+            "tagline": "JUST ANOTHER SATURDAY",
+            "characters": [null, "bf", null],
+
+            "hiddenSongs": {
+                "story": ["krust"],
+                "freeplay": []
+            },
+            "difficulties": {
+                "default": ["hard"]
+            },
+            "songs": ["messabout", "bounceabout", "splooble", "krust"],
+            "freeplayCategory": "sword"
+        },
+        {
+            "id": "chapter2",
+            "name": "Chapter 2",
+
+            "tagline": "A TASTY CHEESY SNACK",
+            "characters": [null, "bf", null],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "difficulties": {
+                "default": ["hard"]
+            },
+            "songs": ["retro-bouncin", "starburst", "comacopian"],
+            "freeplayCategory": "chiplet"
+        },
+        {
+            "id": "chapter3",
+            "name": "Chapter 3",
+
+            "tagline": "INTERDIMENSIONAL FOES",
+            "characters": [null, "bf", null],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "difficulties": {
+                "default": ["hard"]
+            },
+            "songs": ["ink", "tripartite", "beancore"],
+            "freeplayCategory": "interdimensional-foes"
+        },
+        {
+            "id": "sidequests",
+            "name": "Sidequests",
+
+            "tagline": "THE SIDEQUESTS EVER",
+            "characters": [null, "bf", null],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "showInStory": false,
+
+            "difficulties": {
+                "default": ["hard"]
+            },
+            "songs": ["sticky-keys", "beancore-g-sides", "android", "squidward-yell", "shucks-yell"],
+            "freeplayCategory": "sidequests"
+        },
+        {
+            "id": "legacy-songs",
+            "name": "Legacy Songs",
+
+            "tagline": "JUST LIKE OLD TIMES",
+            "characters": [null, "bf", null],
+
+            "hiddenSongs": {
+                "story": [],
+                "freeplay": []
+            },
+            "showInStory": true,
+
+            "difficulties": {
+                "default": ["hard"]
+            },
+            "songs": ["messabout-legacy", "bounceabout-legacy", "splooble-legacy", "krust-legacy", "retro-bouncin-legacy", "sticky-keys-legacy"],
+            "freeplayCategory": "legacy-songs"
+        }
+    ],
+    "freeplayCategories": [
+        {
+            "id": "sword",
+            "name": "Sword's Cubical Saturday - Sword"
+        },
+        {
+            "id": "chiplet",
+            "name": "Sword's Cubical Saturday - Chiplet"
+        },
+        {
+            "id": "interdimensional-foes",
+            "name": "Sword's Cubical Saturday - Interdimensional Foes"
+        },
+        {
+            "id": "sidequests",
+            "name": "Sword's Cubical Saturday - The Sidequests Ever"
+        },
+        {
+            "id": "legacy-songs",
+            "name": "Sword's Cubical Saturday - Legacy Songs"
+        }
+    ],
+    "defaultCategory": "sword"
+}

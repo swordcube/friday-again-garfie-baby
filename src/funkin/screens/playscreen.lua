@@ -51,15 +51,21 @@ function PlayScreen:enter()
     self.camOther:setBackgroundColor(Color.TRANSPARENT)
     self:addChild(self.camOther)
 
+    local instPath = Paths.inst(self.currentSong, self.currentMix, self.parentContentPack)
+    if not self.parentContentPack and instPath:startsWith(Paths.MODS_DIRECTORY .. "/") then
+        self.parentContentPack = Paths.getModFromPath(instPath)
+    end
     comet.mixer.music:stop()
-    comet.mixer.music:setSource(Paths.inst(self.currentSong, self.currentMix, self.parentContentPack))
+    comet.mixer.music:setSource(instPath)
     comet.mixer.music:setLooping(false)
     comet.mixer.music:setVolume(1.0)
 
-    self.inst = comet.mixer.music
-    self.inst.onComplete:connect(function()
+    self.finishSong = function()
         self:endSong()
-    end)
+    end
+    self.inst = comet.mixer.music
+    self.inst.onComplete:connect(self.finishSong)
+
     self.currentChart = CoolUtil.parseJson(Paths.json(("songs/%s/%s/chart"):format(self.currentSong, self.currentMix), self.parentContentPack))
     self.currentChart.meta = CoolUtil.parseJson(Paths.json(("songs/%s/%s/metadata"):format(self.currentSong, self.currentMix), self.parentContentPack))
     
@@ -303,6 +309,7 @@ function PlayScreen:exit()
     for i = 1, #tracks do
         tracks[i]:destroy()
     end
+    self.inst.onComplete:disconnect(self.finishSong)
     self.vocalTracks = nil
 
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor

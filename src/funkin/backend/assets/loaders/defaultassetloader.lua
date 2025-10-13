@@ -7,7 +7,7 @@ local AssetLoader = srcreq("funkin.backend.assets.loaders.assetloader") --- @typ
 local DefaultAssetLoader, super = AssetLoader:subclass("DefaultAssetLoader", ...)
 
 function DefaultAssetLoader:__init__()
-    super.__init__(self, "assets", "assets")
+    super.__init__(self, "DefaultAssetLoader", "assets")
     if nativefs.exists(Path.join({comet.sourceBaseDirectory, "assets"})) then
         self.displayedRoot = "./" .. self.root
     end

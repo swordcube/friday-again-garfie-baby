@@ -7,7 +7,7 @@
 			"name": "idle",
 			"offset": [
 				5,
-				-1
+				0
 			],
 			"prefix": "BF idle dance",
 			"texture": null
@@ -19,7 +19,7 @@
 			"name": "scared",
 			"offset": [
 				5,
-				18
+				19
 			],
 			"prefix": "BF idle shaking",
 			"texture": null
@@ -30,8 +30,8 @@
 			"looped": false,
 			"name": "singLEFT",
 			"offset": [
-				-16,
-				18
+				-15,
+				20
 			],
 			"prefix": "BF NOTE LEFT",
 			"texture": null
@@ -43,7 +43,7 @@
 			"name": "singLEFTmiss",
 			"offset": [
 				-15,
-				-8
+				-6
 			],
 			"prefix": "BF NOTE LEFT MISS",
 			"texture": null
@@ -90,7 +90,7 @@
 			"looped": false,
 			"name": "singUPmiss",
 			"offset": [
-				25,
+				26,
 				27
 			],
 			"prefix": "BF NOTE UP MISS",

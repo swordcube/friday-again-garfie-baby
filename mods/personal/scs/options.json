@@ -1,0 +1,35 @@
+{
+    "pages": ["SCS Options"],
+    "options": [
+        {
+            "name": "12-hour time",
+            "description": "Changes whether or not time will be displayed in 12-hour format.",
+
+            "id": "use12HourTime",
+            "defaultValue": true,
+            
+            "type": "bool",
+            "page": "SCS Options"
+        },
+        {
+            "name": "MM/DD Dates",
+            "description": "Changes whether or not dates will be displayed in MM/DD format.",
+
+            "id": "useMMDDFormat",
+            "defaultValue": false,
+            
+            "type": "bool",
+            "page": "SCS Options"
+        },
+        {
+            "name": "Custom Menus",
+            "description": "Changes whether or not the Sword's Cubical Saturday menus will be displayed\ninstead of the normal base game menus.",
+
+            "id": "customMenus",
+            "defaultValue": true,
+            
+            "type": "bool",
+            "page": "SCS Options"
+        }
+    ]
+}

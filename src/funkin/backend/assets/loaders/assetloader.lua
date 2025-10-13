@@ -16,7 +16,8 @@ end
 
 function AssetLoader:getPath(asset)
     local potentialPath = Path.normalize(Path.join({self.root, asset}))
-    if fs.exists(potentialPath) then
+    if Paths._existingPathCache[potentialPath] or fs.exists(potentialPath) then
+        Paths._existingPathCache[potentialPath] = true
         return potentialPath
     end
     return Path.normalize(asset)
