@@ -1,4 +1,6 @@
+local fs = love.filesystem
 local json = cometreq("lib.json") --- @type comet.lib.Json
+
 local Character = srcreq("funkin.gameplay.character") --- @type funkin.gameplay.Character
 
 --- @class funkin.gameplay.Stage : comet.gfx.Object2D
@@ -14,10 +16,12 @@ function Stage:__init__(name)
     if not self.config.directory then
         self.config.directory = ("game/stages/%s/images"):format(self.name)
     end
-    self.script = Script:new(Paths.script(("game/stages/%s/script"):format(self.name))) --- @type funkin.scripting.Script
-    self.script:linkObject(self)
-    self.script:call("onLoad")
-
+    local scriptPath = Paths.script(("game/stages/%s/script"):format(self.name))
+    if fs.exists(scriptPath) then
+        self.script = Script:new(Paths.script(("game/stages/%s/script"):format(self.name))) --- @type funkin.scripting.Script
+        self.script:linkObject(self)
+        self.script:call("onLoad")
+    end
     self.lastLayer = nil --- @type comet.gfx.Parallax2D
     self.lastScrollFactor = Vec2:new(-math.huge, -math.huge) --- @type comet.math.Vec2
 
@@ -89,20 +93,26 @@ function Stage:__init__(name)
                 propData.position and (propData.position[1] or 0.0) or 0.0,
                 propData.position and (propData.position[2] or 0.0) or 0.0
             )
-            self.script:call("onCharacterAdd", prop)
+            if self.script then                
+                self.script:call("onCharacterAdd", prop)
+            end
             propData.name = propType
         end
         if not propData.scroll then
             propData.scroll = {1.0, 1.0}
         end
-        self.script:call("onPropAdd", prop)
+        if self.script then
+            self.script:call("onPropAdd", prop)
+        end
         self:addProp(propData.name, prop, propData.scroll)
     end
-    self.script:call("onLoadPost")
-
-    local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
-    if game then
-        game.scripts:add(self.script)
+    if self.script then
+        local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
+        self.script:call("onLoadPost")
+        
+        if game then
+            game.scripts:add(self.script)
+        end
     end
 end
 
