@@ -1,3 +1,5 @@
+local Path = cometreq("util.path") --- @type comet.util.Path
+
 local Stage = srcreq("funkin.gameplay.stage") --- @type funkin.gameplay.Stage
 local CharacterConfig = srcreq("funkin.gameplay.character.config") --- @type funkin.gameplay.character.Config
 
@@ -98,9 +100,11 @@ function PlayScreen:enter()
     }
     for i = 1, #directoriesToIterate do
         Paths.iterateDirectory(directoriesToIterate[i], function(itemPath)
-            FLog.verbose("Loading script: " .. itemPath)
-            local scr = Script:new(itemPath) --- @type funkin.scripting.Script
-            self.scripts:add(scr)
+            if table.contains(Paths.SCRIPT_EXTS, "." .. Path.extension(itemPath)) then
+                FLog.verbose("Loading script: " .. itemPath)
+                local scr = Script:new(itemPath) --- @type funkin.scripting.Script
+                self.scripts:add(scr)
+            end
         end, true)
     end
     self.scripts:call("onEnter")

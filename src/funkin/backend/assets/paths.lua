@@ -23,6 +23,9 @@ Paths.SOUND_EXTS = {
     ".wav",
     ".mp3"
 }
+Paths.SCRIPT_EXTS = {
+    ".lua"
+}
 
 --- @type funkin.backend.assets.loaders.AssetLoader[]
 Paths._registeredAssetLoaders = {} --- @protected
