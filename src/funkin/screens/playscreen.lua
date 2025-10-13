@@ -215,11 +215,13 @@ function PlayScreen:_update(dt)
 end
 
 function PlayScreen:update(dt)
-    if comet.keys:wasJustPressed("h") then
-        self.camHUD.visible = not self.camHUD.visible
-    end
-    if comet.mouse.wheel.y ~= 0 then
-        self.defaultCamZoom = self.defaultCamZoom - ((comet.mouse.wheel.y * 0.1) * self.defaultCamZoom)
+    if comet.isDebug() then
+        if comet.keys:wasJustPressed("h") then
+            self.camHUD.visible = not self.camHUD.visible
+        end
+        if comet.mouse.wheel.y ~= 0 then
+            self.defaultCamZoom = self.defaultCamZoom - ((comet.mouse.wheel.y * 0.1) * self.defaultCamZoom)
+        end
     end
     local focusedCharacter = self.opponent
     if self.curCameraTarget == 2 then
@@ -230,7 +232,7 @@ function PlayScreen:update(dt)
     local camX, camY = focusedCharacter:getCameraPosition()
     self.camFollow.position:set(camX, camY)
 
-    if not self.startingSong then
+    if not self.startingSong and not self.endingSong then
         for i = 1, #self.vocalTracks do
             local track = self.vocalTracks[i] --- @type comet.mixer.Sound
             if math.abs(track:tell() - self.inst:tell()) > 30 then
@@ -263,10 +265,15 @@ function PlayScreen:startSong()
 end
 
 function PlayScreen:endSong()
+    if self.endingSong then
+        return
+    end
     self:switchTo(srcreq("funkin.screens.freeplayscreen"):new())
 
-    self.scripts:call("onEndSong")
-    self.scripts:call("onSongEnd")
+    if self.scripts then
+        self.scripts:call("onEndSong")
+        self.scripts:call("onSongEnd")
+    end
 end
 
 function PlayScreen:beatHit(beat)

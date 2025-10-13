@@ -6,7 +6,7 @@ it's written in LÖVE, it's also slightly themed after garfield because funny
 very experimental, gonna be used for sword's cubical saturday, which is my (currently unreleased) mod
 
 > [!NOTE]  
-> This only works for LÖVE 12.0 and above, you can download it from the main [LÖVE GitHub Repository](https://github.com/love2d/love) [Actions](https://github.com/love2d/love/actions).
+> This only works for LÖVE 12.0 and above, you can download it from the main [LÖVE GitHub Repository Actions](https://github.com/love2d/love/actions).
 > 
 > Download the latest *successful* build, and find the appropriate version for your OS and architecture (`love-windows-x64` for example)
 
