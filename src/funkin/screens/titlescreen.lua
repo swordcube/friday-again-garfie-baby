@@ -23,6 +23,7 @@ function TitleScreen:enter()
     self.hueShader:send("OFFSET", 0)
 
     self.camera = Camera:new() --- @type comet.gfx.Camera
+    self.camera:setBackgroundColor(Color.TRANSPARENT)
     self.camera:setShaders({self.hueShader})
     self:addChild(self.camera)
 
