@@ -2,6 +2,7 @@
     "zoom": 0.77,
     "directory": "game/stages",
     
+    "initialCamPos": [1520, 980],
     "props": [
         {
             "type": "sprite",

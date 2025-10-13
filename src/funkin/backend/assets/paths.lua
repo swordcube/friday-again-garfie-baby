@@ -83,12 +83,11 @@ function Paths.iterateDirectory(dir, callback, recursive)
         end
         local dirItems = fs.getDirectoryItems(dirPath)
         for j = 1, #dirItems do
-            local item = dirItems[i] --- @type string
-            local itemPath = ("%s/%s"):format(dirPath, item)
+            local itemPath = ("%s/%s"):format(dirPath, dirItems[j])
             if recursive and fs.getInfo(itemPath, "directory") ~= nil then
-                Paths.iterateDirectory(item, callback, recursive)
+                Paths.iterateDirectory(itemPath, callback, recursive)
             else
-                callback()
+                callback(itemPath)
             end
         end
         ::continue::

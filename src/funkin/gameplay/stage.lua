@@ -99,6 +99,11 @@ function Stage:__init__(name)
         self:addProp(propData.name, prop, propData.scroll)
     end
     self.script:call("onLoadPost")
+
+    local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
+    if game then
+        game.scripts:add(self.script)
+    end
 end
 
 function Stage:getStageImage(img)
@@ -137,20 +142,6 @@ function Stage:insertProp(name, prop, scroll, layerIndex)
     else
         self.lastLayer:insertChild(layerIndex, prop)
     end
-end
-
-function Stage:_update(dt)
-    self.script:call("onUpdatePre", dt)
-    super._update(self, dt)
-    self.script:call("onUpdatePost", dt)
-end
-
-function Stage:update(dt)
-    self.script:call("onUpdate", dt)
-end
-
-function Stage:beatHit(beat)
-    self.script:call("onBeatHit", beat)
 end
 
 function Stage:destroy()

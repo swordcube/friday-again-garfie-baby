@@ -99,7 +99,8 @@ function Script:__init__(path)
     self.variables = {}
     self.closed = false
 
-    self.__failedfunc = {}
+	self.linkedObject = nil --- @type any
+    self.__failedfunc = {} --- @protected
 
     local s, err = pcall(function()
         local vars = self.variables
@@ -107,6 +108,10 @@ function Script:__init__(path)
         if chunk then
             -- preset vars/funcs`
 			self:set("game", PlayScreen.instance)
+			self:set("print", function(...)
+				local info = debug.getinfo(2, "Sln")
+				print(("%s:%s: %s"):format(info.short_src, info.currentline, table.concat({...}, ", ")))
+			end)
             self:set("close", function() self:close() end)
 
             -- sandbox the chunk then run it
@@ -138,6 +143,8 @@ end
 
 function Script:linkObject(link)
 	local cur = getmetatable(self.variables)
+	self.linkedObject = link
+
 	local s = self.variables
 	if not s then return end
 	local new = {
@@ -186,6 +193,7 @@ function Script:close()
     if self.closed then
         return
     end
+	self:call("onClose")
     self.closed = true
 
     if self.chunk then

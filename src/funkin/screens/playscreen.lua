@@ -7,6 +7,9 @@ local UISkin = srcreq("funkin.gameplay.ui.uiskin") --- @type funkin.gameplay.ui.
 local Scoring = srcreq("funkin.gameplay.scoring") --- @type funkin.gameplay.Scoring
 local PlayField = srcreq("funkin.gameplay.playfield") --- @type funkin.gameplay.PlayField
 
+local Script = srcreq("funkin.scripting.script") --- @type funkin.scripting.Script
+local ScriptPack = srcreq("funkin.scripting.scriptpack") --- @type funkin.scripting.ScriptPack
+
 --- @class funkin.screens.PlayScreen : funkin.screens.MusicBeatScreen
 local PlayScreen, super = MusicBeatScreen:subclass("PlayScreen", ...)
 
@@ -83,12 +86,43 @@ function PlayScreen:enter()
 
     CharacterConfig.clearCache()
 
+    self.scripts = ScriptPack:new() --- @type funkin.scripting.ScriptPack
+    self.scripts:linkObject(self)
+
     self.stage = Stage:new(self.currentChart.meta.game.stage) --- @type funkin.gameplay.Stage
     self:addChild(self.stage)
 
+    local directoriesToIterate = {
+        "game/scripts",
+        ("songs/%s/%s/scripts"):format(self.currentSong, self.currentMix)
+    }
+    for i = 1, #directoriesToIterate do
+        Paths.iterateDirectory(directoriesToIterate[i], function(itemPath)
+            FLog.verbose("Loading script: " .. itemPath)
+            local scr = Script:new(itemPath) --- @type funkin.scripting.Script
+            self.scripts:add(scr)
+        end, true)
+    end
+    self.scripts:call("onEnter")
+    self.scripts:call("onCreate")
+
+    local initCamPos = self.stage.config.initialCamPos or {0, 0}
     self.spectator = self.stage.props.spectator --- @type funkin.gameplay.Character
     self.opponent = self.stage.props.opponent --- @type funkin.gameplay.Character
     self.player = self.stage.props.player --- @type funkin.gameplay.Character
+
+    --- Determines which character the camera should focus on
+    --- - `1` focuses on opponent
+    --- - `2` focuses on player
+    --- - `3` focuses on spectator
+    self.curCameraTarget = 1
+
+    self.camFollow = Object2D:new() --- @type comet.gfx.Object2D
+    self.camFollow.position:set(initCamPos[1], initCamPos[2])
+    self:addChild(self.camFollow)
+
+    self.camGame:follow(self.camFollow, "lockon", 0.05)
+    self.camGame:snapToTarget()
 
     self.defaultCamZoom = self.stage.config.zoom
     self.camGame.zoom:set(self.defaultCamZoom, self.defaultCamZoom)
@@ -146,6 +180,11 @@ function PlayScreen:enter()
     self.playField:insertChild(4, hud)
 end
 
+function PlayScreen:postEnter()
+    self.scripts:call("onEnterPost")
+    self.scripts:call("onCreatePost")
+end
+
 function PlayScreen:addChild(object, tag, camera)
     if not self.inst then
         super.addChild(self, object, tag)
@@ -162,6 +201,13 @@ function PlayScreen:resyncVocals()
         local track = self.vocalTracks[i] --- @type comet.mixer.Sound
         track:seek(self.inst:tell())
     end
+    self.scripts:call("onResyncVocals")
+end
+
+function PlayScreen:_update(dt)
+    self.scripts:call("onUpdate", dt)
+    super._update(self, dt)
+    self.scripts:call("onUpdatePost", dt)
 end
 
 function PlayScreen:update(dt)
@@ -171,18 +217,15 @@ function PlayScreen:update(dt)
     if comet.mouse.wheel.y ~= 0 then
         self.defaultCamZoom = self.defaultCamZoom - ((comet.mouse.wheel.y * 0.1) * self.defaultCamZoom)
     end
-    if comet.keys:isPressed("j") then
-        self.camGame.scroll.x = self.camGame.scroll.x - (300 * dt)
+    local focusedCharacter = self.opponent
+    if self.curCameraTarget == 2 then
+        focusedCharacter = self.player
+    elseif self.curCameraTarget == 3 then
+        focusedCharacter = self.spectator
     end
-    if comet.keys:isPressed("l") then
-        self.camGame.scroll.x = self.camGame.scroll.x + (300 * dt)
-    end
-    if comet.keys:isPressed("i") then
-        self.camGame.scroll.y = self.camGame.scroll.y - (300 * dt)
-    end
-    if comet.keys:isPressed("k") then
-        self.camGame.scroll.y = self.camGame.scroll.y + (300 * dt)
-    end
+    local camX, camY = focusedCharacter:getCameraPosition()
+    self.camFollow.position:set(camX, camY)
+
     if not self.startingSong then
         for i = 1, #self.vocalTracks do
             local track = self.vocalTracks[i] --- @type comet.mixer.Sound
@@ -211,10 +254,15 @@ function PlayScreen:startSong()
     for i = 1, #self.vocalTracks do
         self.vocalTracks[i]:play()
     end
+    self.scripts:call("onStartSong")
+    self.scripts:call("onSongStart")
 end
 
 function PlayScreen:endSong()
     self:switchTo(srcreq("funkin.screens.freeplayscreen"):new())
+
+    self.scripts:call("onEndSong")
+    self.scripts:call("onSongEnd")
 end
 
 function PlayScreen:beatHit(beat)
@@ -227,6 +275,15 @@ function PlayScreen:beatHit(beat)
         self.camGame.zoom:set(self.camGame.zoom.x + 0.015, self.camGame.zoom.y + 0.015)
         self.camHUD.zoom:set(self.camHUD.zoom.x + 0.03, self.camHUD.zoom.y + 0.03)
     end
+    self.scripts:call("onBeatHit", beat)
+end
+
+function PlayScreen:stepHit(step)
+    self.scripts:call("onStepHit", step)
+end
+
+function PlayScreen:measureHit(measure)
+    self.scripts:call("onMeasureHit", measure)
 end
 
 function PlayScreen:exit()
@@ -234,11 +291,14 @@ function PlayScreen:exit()
     for i = 1, #tracks do
         tracks[i]:destroy()
     end
-    self.vocalTracks = {}
+    self.vocalTracks = nil
 
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     c.offset = 0
     
+    self.scripts:close()
+    self.scripts = nil
+
     PlayScreen.static.instance = nil
 end
 

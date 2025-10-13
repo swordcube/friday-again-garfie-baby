@@ -17,6 +17,8 @@ function Character:__init__(x, y, name, isPlayer)
 
     self.holdTimer = 0.0
     self.lastAnimContext = "dance" --- @type "none"|"dance"|"sing"|"lock"
+    
+    self.midpoint = Vec2:new() --- @type comet.math.Vec2
 
     self.config = nil --- @type funkin.gameplay.character.Config.ConfigData
     self:loadCharacter(name)
@@ -82,7 +84,9 @@ function Character:loadCharacter(newCharacter)
     end
     self.danceInterval = self.config.danceInterval or 2
     self.singDuration = self.config.singDuration or 4.0
+
     self:dance()
+    self.midpoint:set(self:getWidth(1) * 0.5, self:getHeight(1) * 0.5)
 end
 
 function Character:dance(force)
@@ -115,6 +119,17 @@ function Character:playAnimation(name, context, force)
     end
     self.offset.x = self.offset.x + (self.config.offset and self.config.position[1] or 0.0)
     self.offset.y = self.offset.y + (self.config.offset and self.config.position[2] or 0.0)
+end
+
+local defaultCamOffset = {0, 0}
+function Character:getCameraPosition()
+    local camera = self.config.camera or defaultCamOffset
+    local offset = self.config.offset or defaultCamOffset -- default offset should be 0,0 so we can reuse defaultCamOffset here
+
+    local x, y = self.position.x + self.midpoint.x + offset[1], self.position.y - self.midpoint.y + offset[2]
+    x = x + (camera[1] + (self.isPlayer and -100 or 150))
+    y = y + (camera[2] - 100)
+    return x, y
 end
 
 function Character:update(dt)

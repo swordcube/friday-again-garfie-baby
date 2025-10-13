@@ -1,3 +1,4 @@
+local fs = love.filesystem
 local Path = cometreq("util.path") --- @type comet.util.Path
 
 --- @class funkin.backend.assets.loaders.AssetLoader
@@ -14,7 +15,11 @@ function AssetLoader:__init__(name, root, displayedRoot)
 end
 
 function AssetLoader:getPath(asset)
-    return Path.normalize(Path.join({self.root, asset}))
+    local potentialPath = Path.normalize(Path.join({self.root, asset}))
+    if fs.exists(potentialPath) then
+        return potentialPath
+    end
+    return Path.normalize(asset)
 end
 
 return AssetLoader
