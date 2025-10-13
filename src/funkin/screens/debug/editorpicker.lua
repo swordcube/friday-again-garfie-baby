@@ -13,7 +13,7 @@ function EditorPicker:enter()
 
     self.camera = Camera:new() --- @type comet.gfx.Camera
     self.camera:setBackgroundColor(Color.TRANSPARENT)
-    self.camera:follow(self.camFollow, "lock/on", 0.16)
+    self.camera:follow(self.camFollow, "lockon", 0.16)
     self:addChild(self.camera)
 
     self.items = {
