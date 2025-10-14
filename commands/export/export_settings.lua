@@ -32,7 +32,7 @@ local settings = {
     EXPORT_DIR = "../../export",
 
     FOLDERS_TO_COPY = {"assets", "mods"},
-    FILES_TO_INCLUDE = {"thirdparty", "src", "conf.lua", "main.lua", "flags.lua"},
+    FILES_TO_INCLUDE = {"thirdparty", "src", "conf.lua", "main.lua", "flags.lua", "project.lua"},
     FILES_TO_EXCLUDE = {},
 
     EXTERNAL_FILES = {
