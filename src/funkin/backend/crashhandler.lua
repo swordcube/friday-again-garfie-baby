@@ -102,7 +102,9 @@ local function errorhandler(msg)
 		"oww dude that hurt crashing hurts man wtf >:(",
 		"UNCLE BEN WHAT HAPPENED\nSQUID GAMES",
 		"UNCLE BEN WHAT HAPPENED\nNULL OBJECT REFERENCE",
-		"IT'S TIME FOR THE"
+		"IT'S TIME FOR THE",
+		"woah-oah sometimes\ni get a cum feeling",
+		"https://party.xavicloud.com/misc/cum%20feeling.mp4"
 	}
 	table.insert(err, quotes[math.floor(love.math.random(1, #quotes))] .. "\n")
 	table.insert(err, sanitizedmsg)
