@@ -1,6 +1,7 @@
 local fs = love.filesystem
 local json = cometreq("lib.json") --- @type comet.lib.Json
 
+local Path = cometreq("util.path") --- @type comet.util.Path
 local CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
 
 local DefaultAssetLoader = srcreq("funkin.backend.assets.loaders.defaultassetloader") --- @type funkin.backend.assets.loaders.AssetLoader
@@ -127,6 +128,17 @@ function Paths.initAssetSystem()
     Paths.reloadMods()
 end
 
+--- @param path string
+function Paths.exists(path)
+    if not path then
+        return false
+    end
+    if path:charAt(1) == "." or Path.withoutDirectory(path):charAt(1) == "." then
+        return false
+    end
+    return fs.exists(path)
+end
+
 --- @param dir        string
 --- @param callback   function
 --- @param recursive  boolean?
@@ -135,15 +147,15 @@ function Paths.iterateDirectory(dir, callback, recursive)
     for i = 1, #assetLoaders do
         local loader = assetLoaders[i] --- @type funkin.backend.assets.loaders.AssetLoader
         local dirPath = loader:getPath(dir)
-        if not fs.exists(dirPath) then
+        if not Paths.exists(dirPath) then
             goto continue
         end
         local dirItems = fs.getDirectoryItems(dirPath)
         for j = 1, #dirItems do
             local itemPath = ("%s/%s"):format(dirPath, dirItems[j])
-            if recursive and fs.getInfo(itemPath, "directory") ~= nil then
+            if recursive and Paths.exists(itemPath) and fs.getInfo(itemPath, "directory") ~= nil then
                 Paths.iterateDirectory(itemPath, callback, recursive)
-            else
+            elseif Paths.exists(itemPath) then
                 callback(itemPath)
             end
         end
@@ -164,7 +176,7 @@ function Paths.getAsset(name, contentPack, useFallback, assetType, printError)
         for i = 1, #assetLoaders do
             local loader = assetLoaders[i] --- @type funkin.backend.assets.loaders.AssetLoader
             local path = loader:getPath(name)
-            if not existingPathCache[path] and fs.exists(path) then
+            if not existingPathCache[path] and Paths.exists(path) then
                 existingPathCache[path] = true
             end
             if existingPathCache[path] then
@@ -174,7 +186,7 @@ function Paths.getAsset(name, contentPack, useFallback, assetType, printError)
     else
         local loader = Paths._registeredAssetLoadersCache[contentPack] --- @type funkin.backend.assets.loaders.AssetLoader
         local path = loader:getPath(name)
-        if not existingPathCache[path] or fs.exists(path) then
+        if not existingPathCache[path] or Paths.exists(path) then
             existingPathCache[path] = true
         end
         if existingPathCache[path] then
@@ -189,7 +201,7 @@ function Paths.getAsset(name, contentPack, useFallback, assetType, printError)
                     goto continue
                 end
                 path = loader:getPath(name)
-                if not existingPathCache[path] and fs.exists(path) then
+                if not existingPathCache[path] and Paths.exists(path) then
                     existingPathCache[path] = true
                 end
                 if existingPathCache[path] then
@@ -206,7 +218,7 @@ function Paths.image(name, contentPack, useFallback)
     local assetExts = Paths.IMAGE_EXTS
     for j = 1, #assetExts do
         local newPath = Paths.getAsset(name .. assetExts[j], contentPack, useFallback, nil, false)
-        if fs.exists(newPath) then
+        if Paths.exists(newPath) then
             return newPath
         end
     end
@@ -215,7 +227,7 @@ end
 
 function Paths.xml(name, contentPack, useFallback)
     local newPath = Paths.getAsset(name .. ".xml", contentPack, useFallback, nil, false)
-    if fs.exists(newPath) then
+    if Paths.exists(newPath) then
         return newPath
     end
     return useFallback and fallback(name, "XML") or nil
@@ -223,7 +235,7 @@ end
 
 function Paths.txt(name, contentPack, useFallback)
     local newPath = Paths.getAsset(name .. ".txt", contentPack, useFallback, nil, false)
-    if fs.exists(newPath) then
+    if Paths.exists(newPath) then
         return newPath
     end
     return useFallback and fallback(name, "TXT") or nil
@@ -231,7 +243,7 @@ end
 
 function Paths.json(name, contentPack, useFallback)
     local newPath = Paths.getAsset(name .. ".json", contentPack, useFallback, nil, false)
-    if fs.exists(newPath) then
+    if Paths.exists(newPath) then
         return newPath
     end
     return useFallback and fallback(name, "Json") or nil
@@ -239,7 +251,7 @@ end
 
 function Paths.csv(name, contentPack, useFallback)
     local newPath = Paths.getAsset(name .. ".csv", contentPack, useFallback, nil, false)
-    if fs.exists(newPath) then
+    if Paths.exists(newPath) then
         return newPath
     end
     return useFallback and fallback(name, "CSV") or nil
@@ -247,7 +259,7 @@ end
 
 function Paths.script(name, contentPack, useFallback)
     local newPath = Paths.getAsset(name .. ".lua", contentPack, useFallback, nil, false)
-    if fs.exists(newPath) then
+    if Paths.exists(newPath) then
         return newPath
     end
     return useFallback and fallback(name, "Lua script") or nil
@@ -257,7 +269,7 @@ function Paths.font(name, contentPack, useFallback)
     local assetExts = Paths.FONT_EXTS
     for j = 1, #assetExts do
         local newPath = Paths.getAsset(name .. assetExts[j], contentPack, useFallback, nil, false)
-        if fs.exists(newPath) then
+        if Paths.exists(newPath) then
             return newPath
         end
     end
@@ -269,7 +281,7 @@ function Paths.music(name, contentPack, useFallback)
     local assetExts = Paths.SOUND_EXTS
     for j = 1, #assetExts do
         local newPath = Paths.getAsset(name .. assetExts[j], contentPack, useFallback, nil, false)
-        if fs.exists(newPath) then
+        if Paths.exists(newPath) then
             return newPath
         end
     end
@@ -279,7 +291,7 @@ end
 function Paths.musicConfig(name, contentPack, useFallback)
     name = "menus/music/" .. name .. "/config"
     local newPath = Paths.getAsset(name .. ".json", contentPack, useFallback, nil, false)
-    if fs.exists(newPath) then
+    if Paths.exists(newPath) then
         return newPath
     end
     return useFallback and fallback(name, "json") or nil
@@ -289,7 +301,7 @@ function Paths.sound(name, contentPack, useFallback)
     local assetExts = Paths.SOUND_EXTS
     for j = 1, #assetExts do
         local newPath = Paths.getAsset(name .. assetExts[j], contentPack, useFallback, nil, false)
-        if fs.exists(newPath) then
+        if Paths.exists(newPath) then
             return newPath
         end
     end
@@ -306,7 +318,7 @@ end
 
 function Paths.frag(name, contentPack, useFallback)
     local newPath = Paths.getAsset("shaders/" .. name .. ".frag", contentPack, useFallback, nil, false)
-    if fs.exists(newPath) then
+    if Paths.exists(newPath) then
         return newPath
     end
     return useFallback and fallback(name, "Fragment shader") or nil
@@ -314,7 +326,7 @@ end
 
 function Paths.vert(name, contentPack, useFallback)
     local newPath = Paths.getAsset("shaders/" .. name .. ".vert", contentPack, useFallback, nil, false)
-    if fs.exists(newPath) then
+    if Paths.exists(newPath) then
         return newPath
     end
     return useFallback and fallback(name, "Vertex shader") or nil
