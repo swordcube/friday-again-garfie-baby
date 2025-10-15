@@ -1,0 +1,107 @@
+{
+	"animations": [
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "idle",
+			"offset": [
+				0,
+				0
+			],
+			"prefix": "Idle",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singLEFT",
+			"offset": [
+				0,
+				-11
+			],
+			"prefix": "Pose Left",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singDOWN",
+			"offset": [
+				-4,
+				-51
+			],
+			"prefix": "Pose Down",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singUP",
+			"offset": [
+				-15,
+				79
+			],
+			"prefix": "Pose Up",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "singRIGHT",
+			"offset": [
+				-2,
+				14
+			],
+			"prefix": "Pose Right",
+			"texture": null
+		}
+	],
+	"antialiasing": true,
+	"atlas": {
+		"gridSize": null,
+		"path": "sprite",
+		"type": "sparrow"
+	},
+	"camera": [
+		0,
+		0
+	],
+	"centered": false,
+	"danceSteps": [
+		"idle"
+	],
+	"flipX": false,
+	"healthIcon": {
+		"color": "#31B0D1",
+		"isPixel": false,
+		"offset": [
+			0,
+			0
+		],
+		"scale": 1
+	},
+	"isPlayer": false,
+	"missSteps": [
+		"singLEFTmiss",
+		"singDOWNmiss",
+		"singUPmiss",
+		"singRIGHTmiss"
+	],
+	"position": [
+		0,
+		0
+	],
+	"scale": 1,
+	"singDuration": 8,
+	"singSteps": [
+		"singLEFT",
+		"singDOWN",
+		"singUP",
+		"singRIGHT"
+	]
+}

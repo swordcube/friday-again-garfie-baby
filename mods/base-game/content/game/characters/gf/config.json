@@ -1,0 +1,73 @@
+{
+	"animations": [
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "danceLeft",
+			"offset": [
+				0,
+				0
+			],
+			"prefix": "speakers",
+			"texture": null
+		},
+		{
+			"fps": 24,
+			"indices": null,
+			"looped": false,
+			"name": "danceRight",
+			"offset": [
+				0,
+				0
+			],
+			"prefix": "speakers",
+			"texture": null
+		}
+	],
+	"antialiasing": true,
+	"atlas": {
+		"gridSize": null,
+		"path": "speakers",
+		"type": "sparrow"
+	},
+	"camera": [
+		-150,
+		50
+	],
+	"centered": false,
+	"danceSteps": [
+		"danceLeft",
+		"danceRight"
+	],
+	"danceInterval": 1,
+	"flipX": false,
+	"healthIcon": {
+		"color": "#31B0D1",
+		"isPixel": false,
+		"offset": [
+			0,
+			0
+		],
+		"scale": 1
+	},
+	"isPlayer": false,
+	"missSteps": [
+		"singLEFTmiss",
+		"singDOWNmiss",
+		"singUPmiss",
+		"singRIGHTmiss"
+	],
+	"position": [
+		0,
+		0
+	],
+	"scale": 1,
+	"singDuration": 8,
+	"singSteps": [
+		"singLEFT",
+		"singDOWN",
+		"singUP",
+		"singRIGHT"
+	]
+}

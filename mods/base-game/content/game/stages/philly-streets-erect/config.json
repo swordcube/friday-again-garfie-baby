@@ -319,8 +319,8 @@
         {
             "type": "opponent",
 
-            "position": [920, 1310],
-            "camera": [250, 0],
+            "position": [920, 1138],
+            "camera": [330, 130],
             "scroll": [1, 1]
         },
         {

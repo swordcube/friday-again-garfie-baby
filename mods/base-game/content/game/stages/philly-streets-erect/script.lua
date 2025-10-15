@@ -1,5 +1,7 @@
 local colorShader = nil --- @type comet.gfx.Shader
 
+-- TODO: the cars lmao
+
 function onLoad()
     colorShader = Shader:new(Paths.frag("adjust_color")) --- @type comet.gfx.Shader
     colorShader:send("hue", -5)

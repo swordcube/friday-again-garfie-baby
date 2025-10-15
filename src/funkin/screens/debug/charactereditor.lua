@@ -15,14 +15,16 @@ function CharacterEditor:enter()
     self.camera:setBackgroundColor(Color.GRAY)
     self:addChild(self.camera)
 
-    local config = CharacterConfig.get("bf")
-    self.shadowCharacter = Character:new(0, 0, "bf", config.isPlayer) --- @type funkin.gameplay.Character
+    local chosenCharacter = "darnell"
+    local config = CharacterConfig.get(chosenCharacter)
+
+    self.shadowCharacter = Character:new(0, 0, chosenCharacter, config.isPlayer) --- @type funkin.gameplay.Character
     self.shadowCharacter.debugMode = true
     self.shadowCharacter:setTint(Color.BLACK)
     self.shadowCharacter.alpha = 0.45
     self.camera:addChild(self.shadowCharacter)
     
-    self.character = Character:new(0, 0, "bf", config.isPlayer) --- @type funkin.gameplay.Character
+    self.character = Character:new(0, 0, chosenCharacter, config.isPlayer) --- @type funkin.gameplay.Character
     self.character.debugMode = true
     self.camera:addChild(self.character)
 

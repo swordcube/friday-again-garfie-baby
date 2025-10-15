@@ -1,4 +1,6 @@
+local fs = love.filesystem
 local json = cometreq("lib.json") --- @type comet.lib.Json
+
 local CharacterConfig = srcreq("funkin.gameplay.character.config") --- @type funkin.gameplay.character.Config
 
 --- @class funkin.gameplay.Character : comet.gfx.AnimatedImage
@@ -18,6 +20,7 @@ function Character:__init__(x, y, name, isPlayer)
     self.holdTimer = 0.0
     self.lastAnimContext = "dance" --- @type "none"|"dance"|"sing"|"lock"
     
+    self.script = nil --- @type funkin.scripting.Script
     self.midpoint = Vec2:new() --- @type comet.math.Vec2
 
     self.config = nil --- @type funkin.gameplay.character.Config.ConfigData
@@ -34,6 +37,18 @@ function Character:loadCharacter(newCharacter)
     if not self.config.animations then
         self.name = Character.FALLBACK_CHARACTER
         self.config = CharacterConfig.get(self.name)
+    end
+    if self.script then
+        self.script:close()
+        self.script = nil
+    end
+    local scriptPath = Paths.script(("game/characters/%s/script"):format(self.name))
+    if fs.isFile(scriptPath) then
+        self.script = Script:new(scriptPath) --- @type funkin.scripting.Script
+    end
+    if self.script then
+        self.script:linkObject(self)
+        self.script:call("onLoad")
     end
     -- TODO: more atlas type support than just sparrow
     self:setFrameCollection(Paths.getSparrowAtlas(("game/characters/%s/%s"):format(self.name, self.config.atlas.path or "sprite")))
@@ -87,10 +102,22 @@ function Character:loadCharacter(newCharacter)
 
     self:dance()
     self.midpoint:set(self:getWidth(1) * 0.5, self:getHeight(1) * 0.5)
+
+    if self.script then
+        self.script:call("onLoadPost")
+    end
 end
 
 function Character:dance(force)
+    if self.script then
+        self.script:call("onDance")
+    end
     self:playAnimation(self.config.danceSteps[self.curDanceStep], "dance", force)
+    self.curDanceStep = (self.curDanceStep % #self.config.danceSteps) + 1
+    
+    if self.script then
+        self.script:call("onDancePost")
+    end
 end
 
 function Character:playSingAnimation(dir)
@@ -119,6 +146,10 @@ function Character:playAnimation(name, context, force)
     end
     self.offset.x = self.offset.x + (self.config.offset and self.config.position[1] or 0.0)
     self.offset.y = self.offset.y + (self.config.offset and self.config.position[2] or 0.0)
+
+    if self.script then
+        self.script:call("onPlayAnimation", name, context, force)
+    end
 end
 
 local defaultCamOffset = {0, 0}
@@ -133,6 +164,9 @@ function Character:getCameraPosition()
 end
 
 function Character:update(dt)
+    if self.script then
+        self.script:call("onUpdate", dt)
+    end
     super.update(self, dt)
 
     -- dance is handled by beatHit
@@ -153,9 +187,15 @@ function Character:update(dt)
     elseif self.lastAnimContext == "none" and not self:isPlaying() then
         self:dance()
     end
+    if self.script then
+        self.script:call("onUpdatePost", dt)
+    end
 end
 
 function Character:draw()
+    if self.script then
+        self.script:call("onDraw")
+    end
     if self.isPlayer then
         self.flipX = not self.flipX
     end
@@ -163,11 +203,29 @@ function Character:draw()
     if self.isPlayer then
         self.flipX = not self.flipX
     end
+    if self.script then
+        self.script:call("onDrawPost")
+    end
 end
 
 function Character:beatHit(beat)
     if not self.debugMode and self.lastAnimContext == "dance" and beat % self.danceInterval == 0 then
         self:dance()
+    end
+    if self.script then
+        self.script:call("onBeatHit", beat)
+    end
+end
+
+function Character:stepHit(step)
+    if self.script then
+        self.script:call("onStepHit", step)
+    end
+end
+
+function Character:measureHit(note)
+    if self.script then
+        self.script:call("onMeasureHit", note)
     end
 end
 
