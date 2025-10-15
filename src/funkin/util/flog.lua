@@ -8,6 +8,21 @@ function FLog.init()
 end
 
 function FLog.output(type, fgColor, bgColor, ...)
+    Native.setConsoleColors(Native.ConsoleColor.NONE, Native.ConsoleColor.NONE)
+
+    io.stdout:write("[ ")
+    io.stdout:flush()
+
+    Native.setConsoleColors(Native.ConsoleColor.MAGENTA, Native.ConsoleColor.NONE)
+    
+    io.stdout:write(os.date("%H:%M:%S"))
+    io.stdout:flush()
+
+    Native.setConsoleColors(Native.ConsoleColor.NONE, Native.ConsoleColor.NONE)
+
+    io.stdout:write(" ] ")
+    io.stdout:flush()
+    
     Native.setConsoleColors(Native.ConsoleColor.NONE, bgColor)
     
     io.stdout:write("[ ")

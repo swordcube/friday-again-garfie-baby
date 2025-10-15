@@ -1,6 +1,5 @@
 local colorShader = nil --- @type comet.gfx.Shader
 
--- TODO: rain shader
 -- TODO: the cars lmao
 
 function onLoad()
@@ -24,6 +23,7 @@ function onLoadPost()
         scrollingSky.position.x + (scrollingSky:getOriginalWidth() - scrollingSky:getWidth()),
         scrollingSky.position.y + (scrollingSky:getOriginalHeight() - scrollingSky:getHeight())
     )
+    scrollingSky.velocity.x = -22
     scrollingSky.centered = false -- just to better match flixel positioning
     layer1:addChild(scrollingSky)
 
@@ -154,6 +154,27 @@ function onLoadPost()
         char.reflectionOffY = 0
     end
     props.opponent.reflectionOffY = 60
+
+    rainShader = Shader:new(Paths.frag("rain")) --- @type comet.gfx.Shader
+    rainShader:send("distortionStrength", 0.5)
+    rainShader:send("scale", comet.getDesiredHeight() / 200)
+
+    rainStartIntensity, rainEndIntensity = 0, 0
+    if game.currentSong == "darnell-bf-mix" then
+        rainStartIntensity = 0
+        rainEndIntensity = 0.1
+    elseif game.currentSong == "lit-up-bf-mix" then
+        rainStartIntensity = 0.1
+        rainEndIntensity = 0.2
+    elseif game.currentSong == "2hot" then
+        rainStartIntensity = 0.2
+        rainEndIntensity = 0.4
+    end
+    rainShader:send("intensity", rainStartIntensity)
+    rainShader:send("time", 0)
+
+    local hue = Shader:new(Paths.frag("hue_offset")) --- @type comet.gfx.Shader
+    game.camGame:setShaders({rainShader, hue})
 end
 
 function onCharacterAdd(char)
@@ -170,6 +191,18 @@ function onUpdate(dt)
     props.mist3.position.y = 230 + (math.fastsin(timer * 0.3) * 70)
     props.mist4.position.y = 170 + (math.fastsin(timer * 0.35) * 50)
     props.mist5.position.y = -80 + (math.fastsin(timer * 0.08) * 100)
+
+    local intensityValue = 0.0
+    if comet.mixer.music:isPlaying() then
+        intensityValue = math.remapToRange(
+            Conductor.instance:getCurrentTime(), 0, comet.mixer.music:getDuration(),
+            rainStartIntensity, rainEndIntensity
+        )
+    else
+        intensityValue = rainStartIntensity
+    end
+    rainShader:send("intensity", intensityValue)
+    rainShader:send("time", rainShader:getUniformNumber("time") + dt)
 end
 
 local paperOffset = math.floor(love.math.random(20, 40))
