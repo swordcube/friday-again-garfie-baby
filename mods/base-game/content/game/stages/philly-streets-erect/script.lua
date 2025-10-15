@@ -111,6 +111,49 @@ function onLoadPost()
     end)
     props.paper:pause()
     props.paper:kill()
+
+    local chars = {
+        props.opponent,
+        props.player,
+        props.spectator
+    }
+    local fadeShader = Shader:new(Paths.frag("gradient_fade"))
+    fadeShader:reference()
+
+    for i, char in ipairs(chars) do
+        -- i probably should aim the reflections more towards the road
+        -- but comet transforms don't have shear/skewing, so i can't
+        -- and i'm tired and lazy so fuck you
+        char.onDraw = function(spr)
+            local prevAlpha, prevShader = spr.alpha, spr:getShader()
+            spr.alpha = prevAlpha * 0.25
+            spr.flipY = not spr.flipY
+
+            fadeShader:send("quad", {spr._frame.quad:getViewport()})
+            spr:setShader(fadeShader)
+
+            local woman = props.spectator.script:get("woman")
+            woman.visible = not woman.visible
+
+            spr.position.y = spr.position.y + ((spr:getHeight(1) * 0.98) + spr.reflectionOffY)
+            spr:_draw()
+            
+            spr.alpha = prevAlpha
+            spr.flipY = not spr.flipY
+            spr:setShader(prevShader)
+            spr.position.y = spr.position.y - ((spr:getHeight(1) * 0.98) + spr.reflectionOffY)
+            
+            woman.visible = not woman.visible
+            spr:_draw()
+        end
+        local d = char.destroy
+        char.destroy = function(c)
+            fadeShader:dereference()
+            d(c)
+        end
+        char.reflectionOffY = 0
+    end
+    props.opponent.reflectionOffY = 60
 end
 
 function onCharacterAdd(char)

@@ -110,7 +110,7 @@ function Script:__init__(path)
 			self:set("game", PlayScreen.instance)
 			self:set("print", function(...)
 				local info = debug.getinfo(2, "Sln")
-				print(("%s:%s: %s"):format(info.short_src, info.currentline, table.concat({...}, ", ")))
+				print(("%s:%s: %s"):format(info.short_src, info.currentline, table.concat(table.pack(...), ", ")))
 			end)
             self:set("close", function() self:close() end)
 
