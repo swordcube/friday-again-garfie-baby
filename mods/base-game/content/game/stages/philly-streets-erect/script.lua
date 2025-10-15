@@ -1,5 +1,6 @@
 local colorShader = nil --- @type comet.gfx.Shader
 
+-- TODO: rain shader
 -- TODO: the cars lmao
 
 function onLoad()
