@@ -71,7 +71,7 @@ function Note:setup(time, lane, length, type, strumLine)
 
     self.wasHit = false
     self.wasMissed = false
-    self.alpha = 1
+    self.alpha, self.visible = 1, true
 
     local strum = strumLine:getChild(lane + 1) --- @type funkin.gameplay.notes.Strum
     self:loadSkin(strum.skin)
@@ -113,11 +113,11 @@ function Note:update(dt)
     end
     if self.wasHit and not self.wasMissed and self.time <= Conductor.instance:getCurrentPlayhead() - self.length then
         -- if note is held all the way through, destroy it cuz it isn't needed anymore
-        self:destroy()
+        self:kill()
     end
     if self.wasMissed and self.time <= Conductor.instance:getCurrentPlayhead() - ((350 / self.strumLine.scrollSpeed) + self.length) then
         -- if note was missed and it goes off screen, destroy it
-        self:destroy()
+        self:kill()
     end
 end
 

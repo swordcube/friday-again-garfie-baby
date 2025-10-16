@@ -20,7 +20,7 @@ function NoteSplash:__init__()
     self.offsetX, self.offsetY = 0.0, 0.0
 
     self.onComplete:connect(function()
-        self:destroy()
+        self:kill()
     end)
 end
 

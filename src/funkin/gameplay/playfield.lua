@@ -122,7 +122,7 @@ function PlayField:hitNote(note)
     if note.length > 0 then
         note.visible = false
     else
-        note:destroy()
+        note:kill()
     end
     local strum = note.strumLine:getChild(note.lane + 1) --- @type funkin.gameplay.notes.Strum
     strum:glow(note.strumLine.botplay, note.length)
@@ -164,10 +164,10 @@ end
 --- @param skin      string
 --- @param strumLine funkin.gameplay.notes.StrumLine
 function PlayField:showNoteSplash(lane, skin, strumLine)
-    local splash = NoteSplash:new() --- @type funkin.gameplay.notes.NoteSplash
+    local splash = self.splashes:recycle(NoteSplash) --- @type funkin.gameplay.notes.NoteSplash
     splash.playField = self
     splash:setup(lane, skin, strumLine)
-    self.splashes:addChild(splash)
+    self.splashes:moveChild(splash, self.splashes:getChildCount())
 end
 
 --- @param note funkin.gameplay.notes.Note

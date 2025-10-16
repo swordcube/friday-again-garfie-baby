@@ -42,19 +42,21 @@ function ScoreDisplay:loadSkin(newSkin)
 end
 
 function ScoreDisplay:showRating(rating)
-    local spr = AnimatedVelocityImage:new() --- @type funkin.gfx.AnimatedVelocityImage
+    local spr = self:recycle(AnimatedVelocityImage) --- @type funkin.gfx.AnimatedVelocityImage
     spr:setFrameCollection(self._scoreAtlas)
     spr:addAnimationByName("r", rating, 0, false)
     spr:playAnimation("r", true)
     spr.acceleration.y = 550
     spr.velocity.x = math.floor(lmath.random(0, -10))
     spr.velocity.y = math.floor(lmath.random(-140, -175))
+    spr:setTint(Color.WHITE)
+    spr.alpha = 1
 
     spr.scale:set(self._skinData.rating.scale, self._skinData.rating.scale)
     spr.position:set((spr:getWidth() * 0.5) - 40, -60)
 
     spr.scale:set(self._skinData.rating.scale * 0.95, self._skinData.rating.scale * 0.95)
-    self:addChild(spr)
+    self:moveChild(spr, self:getChildCount())
 
     local t = Tween:new() --- @type comet.gfx.Tween
     t:target({target = spr.scale, properties = {x = self._skinData.rating.scale, y = self._skinData.rating.scale}})
@@ -62,7 +64,7 @@ function ScoreDisplay:showRating(rating)
 
     local t = Tween:new() --- @type comet.gfx.Tween
     t.onComplete:connect(function()
-        spr:destroy()
+        spr:kill()
     end)
     t:target({target = spr, properties = {alpha = 0}})
     t:start({duration = 0.2, delay = Conductor.instance:getCurrentBeatLength() * 0.001})
@@ -84,7 +86,7 @@ function ScoreDisplay:showCombo(combo, miss)
         if char == "-" then
             char = "minus"
         end
-        local spr = AnimatedVelocityImage:new() --- @type funkin.gfx.AnimatedVelocityImage
+        local spr = self:recycle(AnimatedVelocityImage) --- @type funkin.gfx.AnimatedVelocityImage
         spr:setFrameCollection(self._scoreAtlas)
         spr:addAnimationByName("c", char, 0, false)
         spr:playAnimation("c", true)
@@ -99,14 +101,16 @@ function ScoreDisplay:showCombo(combo, miss)
         if miss then
             spr:setTint(0xFFc84040)
         end
-        self:addChild(spr)
+        spr.alpha = 1
+        self:moveChild(spr, self:getChildCount())
+
         local t = Tween:new() --- @type comet.gfx.Tween
         t:target({target = spr.scale, properties = {x = self._skinData.combo.scale, y = self._skinData.combo.scale}})
         t:start({duration = 0.2})
 
         local t = Tween:new() --- @type comet.gfx.Tween
         t.onComplete:connect(function()
-            spr:destroy()
+            spr:kill()
         end)
         t:target({target = spr, properties = {alpha = 0}})
         t:start({duration = 0.2, delay = Conductor.instance:getCurrentBeatLength() * 0.002})
