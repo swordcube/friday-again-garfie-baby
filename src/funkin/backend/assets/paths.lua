@@ -4,6 +4,8 @@ local json = cometreq("lib.json") --- @type comet.lib.Json
 local Path = cometreq("util.path") --- @type comet.util.Path
 local CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
 
+local GlobalScript = srcreq("funkin.scripting.globalscript") --- @type funkin.scripting.GlobalScript
+
 local DefaultAssetLoader = srcreq("funkin.backend.assets.loaders.defaultassetloader") --- @type funkin.backend.assets.loaders.AssetLoader
 local ModAssetLoader = srcreq("funkin.backend.assets.loaders.modassetloader") --- @type funkin.backend.assets.loaders.ModAssetLoader
 
@@ -122,9 +124,11 @@ function Paths.reloadMods()
         end
         iterate(mdir)
     end
+    GlobalScript.reloadScripts()
 end
 
 function Paths.initAssetSystem()
+    GlobalScript.init()
     Paths.reloadMods()
 end
 

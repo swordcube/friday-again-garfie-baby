@@ -1,3 +1,5 @@
+local fs = love.filesystem
+
 --- @class funkin.scripting.ScriptPack : comet.util.Class
 local ScriptPack = Class("ScriptPack", ...)
 
@@ -5,7 +7,15 @@ function ScriptPack:__init__()
     self.scripts = {} --- @type funkin.scripting.Script[]
 
     self.linkedObject = nil --- @type any
-    self.additionalDefaultVars = {}
+    self.additionalDefaultVars = {
+        importScript = function(path)
+            local scriptPath = Paths.script(path)
+            if fs.isFile(scriptPath) then
+                local script = Script:new() --- @type funkin.scripting.Script
+                self:add(script)
+            end
+        end
+    }
 end
 
 function ScriptPack:linkObject(obj)

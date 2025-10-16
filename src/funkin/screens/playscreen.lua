@@ -38,6 +38,8 @@ end
 
 function PlayScreen:enter()
     PlayScreen.static.instance = self
+    super.enter(self)
+
     self.persistentUpdate = true
 
     self.startingSong = true
@@ -204,6 +206,7 @@ function PlayScreen:enter()
 end
 
 function PlayScreen:postEnter()
+    super.postEnter(self)
     self.scripts:call("onEnterPost")
     self.scripts:call("onCreatePost")
 end
@@ -310,6 +313,7 @@ function PlayScreen:endSong()
 end
 
 function PlayScreen:beatHit(beat)
+    super.beatHit(self, beat)
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
 
     local zoomInterval = self.camZoomingInterval >= 0 and self.camZoomingInterval or c:getCurrentTimeSignature()[1]
@@ -323,14 +327,17 @@ function PlayScreen:beatHit(beat)
 end
 
 function PlayScreen:stepHit(step)
+    super.stepHit(self, step)
     self.scripts:call("onStepHit", step)
 end
 
 function PlayScreen:measureHit(measure)
+    super.measureHit(self, measure)
     self.scripts:call("onMeasureHit", measure)
 end
 
 function PlayScreen:exit()
+    super.exit(self)
     local tracks = self.vocalTracks
     for i = 1, #tracks do
         tracks[i]:destroy()
@@ -341,6 +348,8 @@ function PlayScreen:exit()
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     c.offset = 0
     
+    self.scripts:call("onExit")
+    self.scripts:call("onDestroy")
     self.scripts:close()
     self.scripts = nil
 

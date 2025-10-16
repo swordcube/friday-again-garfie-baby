@@ -92,6 +92,30 @@ local mtEnv = {
 	end
 }
 
+function Script:preset()
+	self:set("MusicBeatScreen", MusicBeatScreen)
+	self:set("MusicBeatState", MusicBeatScreen)
+
+	self:set("MusicBeatSubScreen", MusicBeatSubScreen)
+	self:set("MusicBeatSubState", MusicBeatSubScreen)
+
+	self:set("ScriptedScreen", ScriptedScreen)
+	self:set("ScriptedState", ScriptedScreen)
+	
+	self:set("ScriptedSubScreen", ScriptedSubScreen)
+	self:set("ScriptedSubState", ScriptedSubScreen)
+
+	self:set("PlayState", PlayScreen)
+	self:set("PlayScreen", PlayScreen)
+	
+	self:set("Character", Character)
+	self:set("Note", srcreq("funkin.gameplay.notes.note"))
+	self:set("Strum", srcreq("funkin.gameplay.notes.strum"))
+	self:set("StrumLine", srcreq("funkin.gameplay.notes.strumline"))
+	self:set("NoteSkin", srcreq("funkin.gameplay.notes.noteskin"))
+	self:set("UISkin", srcreq("funkin.gameplay.ui.uiskin"))
+end
+
 function Script:__init__(path)
     self.path = path --- @type string
     self.chunk = nil --- @type function
@@ -113,6 +137,7 @@ function Script:__init__(path)
 				print(("%s:%s: %s"):format(info.short_src, info.currentline, table.concat(table.pack(...), ", ")))
 			end)
             self:set("close", function() self:close() end)
+			self:preset()
 
             -- sandbox the chunk then run it
             setfenv(chunk, setmetatable(vars, mtEnv))
