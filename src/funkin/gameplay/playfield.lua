@@ -61,9 +61,9 @@ function PlayField:__init__()
     self.playerStrumLine.botplay = false
     self.strumLines:addChild(self.playerStrumLine)
 
-    self.notes = NoteField:new() --- @type funkin.gameplay.notes.NoteField
-    self.notes.playField = self
-    self:addChild(self.notes)
+    self.noteField = NoteField:new() --- @type funkin.gameplay.notes.NoteField
+    self.noteField.playField = self
+    self:addChild(self.noteField)
 
     self.splashes = Object2D:new() --- @type comet.gfx.Object2D
     self:addChild(self.splashes)
@@ -107,8 +107,8 @@ function PlayField:prepareChart(chart, difficulty)
             return a.d < b.d
         end)
     end
-    self.notes.pendingNotes = chart.n[difficulty]
-    self.notes.curNoteIndex = 1
+    self.noteField.pendingNotes = chart.n[difficulty]
+    self.noteField.curNoteIndex = 1
 
     for i = 1, self.strumLines:getChildCount() do
         self.strumLines:getChild(i).scrollSpeed = chart.meta.game.scrollSpeed[difficulty] or 1.0
@@ -119,10 +119,13 @@ end
 --- @param note funkin.gameplay.notes.Note
 function PlayField:hitNote(note)
     note.wasHit = true
-    note:destroy()
-
+    if note.length > 0 then
+        note.visible = false
+    else
+        note:destroy()
+    end
     local strum = note.strumLine:getChild(note.lane + 1) --- @type funkin.gameplay.notes.Strum
-    strum:glow(note.strumLine.botplay)
+    strum:glow(note.strumLine.botplay, note.length)
 
     if note.strumLine == self.playerStrumLine then
         self.stats.combo = self.stats.combo + 1
@@ -145,12 +148,14 @@ function PlayField:hitNote(note)
         local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
         if game then
             game.player:playSingAnimation(note.lane)
+            game.player.holdTimer = game.player.holdTimer + note.length
         end
         
     elseif note.strumLine == self.opponentStrumLine then
         local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
         if game then
             game.opponent:playSingAnimation(note.lane)
+            game.opponent.holdTimer = game.opponent.holdTimer + note.length
         end
     end
 end
@@ -167,7 +172,10 @@ end
 
 --- @param note funkin.gameplay.notes.Note
 function PlayField:missNote(note)
-    note:destroy()
+    note.wasMissed = true
+
+    note.alpha = 0.3
+    note.sustain.alpha = 0.3
 
     if note.strumLine == self.playerStrumLine then
         if self.stats.combo > 0 then
@@ -216,8 +224,8 @@ function PlayField:input(e)
     end
     if e.pressed then
         local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
-        local validNotes = table.filter(self.notes.children, function(n)
-            return n and not n.wasHit and math.abs(n.time - c:getCurrentTime()) <= 216 and n.strumLine == plr and n.lane == lane
+        local validNotes = table.filter(self.noteField.notes.children, function(n)
+            return n and not n.wasHit and not n.wasMissed and math.abs(n.time - c:getCurrentTime()) <= 216 and n.strumLine == plr and n.lane == lane
         end)
         table.sort(validNotes, function(a, b)
             return a.time < b.time

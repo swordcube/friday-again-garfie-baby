@@ -10,9 +10,17 @@ function NoteField:__init__()
     self.curNoteIndex = 1
 
     self.playField = nil --- @type funkin.gameplay.PlayField
+
+    self.sustains = Object2D:new() --- @type comet.gfx.Object2D
+    self:addChild(self.sustains)
+
+    self.notes = Object2D:new() --- @type comet.gfx.Object2D
+    self:addChild(self.notes)
 end
 
 function NoteField:update(dt)
+    -- TODO: some form of note pooling/recycling might be necessary
+    -- because the gc is going crazy
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     while self.curNoteIndex <= #self.pendingNotes do
         local noteData = self.pendingNotes[self.curNoteIndex]
@@ -22,12 +30,24 @@ function NoteField:update(dt)
         end
         local note = Note:new() --- @type funkin.gameplay.notes.Note
         note.playField = self.playField
-        note:setup(noteData.t, noteData.d % strumLine.keyCount, noteData.l, noteData.k, strumLine)
+
+        note:setup(noteData.t, noteData.d % strumLine.keyCount, math.max((noteData.l or 0.0) - Conductor.instance:getCurrentStepLength(), 0.0), noteData.k or "default", strumLine)
         note:updatePosition()
-        self:addChild(note)
+
+        note.sustain:setup(note)
+        note.sustain:updateVisuals()
+
+        self.notes:addChild(note)
+        self.sustains:addChild(note.sustain)
 
         self.curNoteIndex = self.curNoteIndex + 1
     end
+end
+
+function NoteField:_draw()
+    Image.NO_OFF_SCREEN_CHECKS, AnimatedImage.NO_OFF_SCREEN_CHECKS = true, true
+    super._draw(self)
+    Image.NO_OFF_SCREEN_CHECKS, AnimatedImage.NO_OFF_SCREEN_CHECKS = false, false
 end
 
 return NoteField

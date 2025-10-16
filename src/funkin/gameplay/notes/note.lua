@@ -1,10 +1,13 @@
 local json = cometreq("lib.json") --- @type comet.lib.Json
+
+local Sustain = srcreq("funkin.gameplay.notes.sustain") --- @type funkin.gameplay.notes.Sustain
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 
 --- @class funkin.gameplay.notes.Note : comet.gfx.AnimatedImage
 local Note, super = AnimatedImage:subclass("Note", ...)
 
 local dirs = {"left", "down", "up", "right"}
+local upperDirs = {"LEFT", "DOWN", "UP", "RIGHT"}
 
 function Note:__init__()
     super.__init__(self)
@@ -18,9 +21,14 @@ function Note:__init__()
     self.skinData = nil
 
     self.wasHit = false
+    self.wasMissed = false
+
     self.strumLine = nil --- @type funkin.gameplay.notes.StrumLine
     self.playField = nil --- @type funkin.gameplay.PlayField
 
+    self.sustain = Sustain:new() --- @type funkin.gameplay.notes.Sustain
+    self.sustain.note = self
+    
     self.offsetX, self.offsetY = 0.0, 0.0
 end
 
@@ -60,11 +68,15 @@ function Note:setup(time, lane, length, type, strumLine)
     self.length = length
     self.type = type
     self.strumLine = strumLine
+
     self.wasHit = false
+    self.wasMissed = false
+    self.alpha = 1
 
     local strum = strumLine:getChild(lane + 1) --- @type funkin.gameplay.notes.Strum
     self:loadSkin(strum.skin)
 
+    self.offsetX, self.offsetY = 0.0, 0.0
     self:playAnimation(dirs[lane + 1] .. "scroll", true)
 end
 
@@ -83,14 +95,38 @@ end
 
 function Note:update(dt)
     super.update(self, dt)
+    if not self.sustain then
+        return
+    end
     self:updatePosition()
 
-    if self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() then
+    if not self.wasHit and self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() then
         self.playField:hitNote(self)
     end
-    if not self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() - (350 / self.strumLine.scrollSpeed) then
+    if not self.wasHit and not self.wasMissed and not self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() - 150 then
+        -- if note is too late to hit, miss
         self.playField:missNote(self)
     end
+    if self.wasHit and not self.wasMissed and Controls.instance.justReleased["NOTE_" .. upperDirs[self.lane + 1]] then
+        -- if you let go too early, miss
+        self.playField:missNote(self)
+    end
+    if self.wasHit and not self.wasMissed and self.time <= Conductor.instance:getCurrentPlayhead() - self.length then
+        -- if note is held all the way through, destroy it cuz it isn't needed anymore
+        self:destroy()
+    end
+    if self.wasMissed and self.time <= Conductor.instance:getCurrentPlayhead() - ((350 / self.strumLine.scrollSpeed) + self.length) then
+        -- if note was missed and it goes off screen, destroy it
+        self:destroy()
+    end
+end
+
+function Note:destroy()
+    if self.sustain then
+        self.sustain:destroy()
+        self.sustain = nil
+    end
+    super.destroy(self)
 end
 
 return Note

@@ -9,6 +9,7 @@ function EventBehavior:__init__(name)
     local scriptPath = Paths.script(("game/events/%s"):format(name), nil, false)
     if fs.isFile(scriptPath) then
         self.script = Script:new(scriptPath) --- @type funkin.scripting.Script
+        self.script:linkObject(PlayScreen.instance)
     end
 end
 

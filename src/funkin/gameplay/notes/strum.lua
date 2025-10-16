@@ -34,6 +34,8 @@ function Strum:__init__(x, y, keyCount, direction, skin)
     self.scale:set(self.skinData.strum.scale, self.skinData.strum.scale)
     self:playAnimation("static")
 
+    self.initialWidth, self.initialHeight = self:getWidth(), self:getHeight()
+
     self.alpha = self.skinData.strum.alpha or 1.0
     self.antialiasing = self.skinData.strum.antialiasing ~= nil and self.skinData.strum.antialiasing or true
 end
@@ -47,8 +49,8 @@ function Strum:update(dt)
     super.update(self, dt)
 end
 
-function Strum:glow(bot)
-    self.holdTimer = bot and math.max(Conductor.instance:getCurrentStepLength(), 150) or math.huge
+function Strum:glow(bot, susLength)
+    self.holdTimer = bot and math.max(susLength, 150) or math.huge
     self:playAnimation("confirm", true)
 end
 
