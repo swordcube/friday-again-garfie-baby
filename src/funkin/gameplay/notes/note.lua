@@ -71,7 +71,7 @@ function Note:setup(time, lane, length, type, strumLine)
 
     self.wasHit = false
     self.wasMissed = false
-    self.alpha, self.visible = 1, true
+    self.alpha, self.sustain.alpha, self.visible = 1, 1, true
 
     local strum = strumLine:getChild(lane + 1) --- @type funkin.gameplay.notes.Strum
     self:loadSkin(strum.skin)

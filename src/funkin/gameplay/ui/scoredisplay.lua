@@ -100,6 +100,8 @@ function ScoreDisplay:showCombo(combo, miss)
         spr.scale:set(self._skinData.combo.scale * 0.95, self._skinData.combo.scale * 0.95)
         if miss then
             spr:setTint(0xFFc84040)
+        else
+            spr:setTint(Color.WHITE)
         end
         spr.alpha = 1
         self:moveChild(spr, self:getChildCount())

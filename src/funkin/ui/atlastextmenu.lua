@@ -45,7 +45,10 @@ function AtlasTextMenu:_draw()
     AnimatedImage.NO_OFF_SCREEN_CHECKS = false
 end
 
-function AtlasTextMenu:input(_)
+function AtlasTextMenu:input(e)
+    if e.type == "text" then
+        return
+    end
     if self.enabled then
         local wheel = comet.mouse.wheel.y
         if Controls.instance.justPressed.UI_UP or wheel < 0 then

@@ -113,8 +113,8 @@ function MainMenuScreen:update(dt)
     end
 end
 
-function MainMenuScreen:input(_)
-    if self.transitioning then
+function MainMenuScreen:input(e)
+    if self.transitioning or e.type == "text" then
         return
     end
     local wheel = comet.mouse.wheel.y
