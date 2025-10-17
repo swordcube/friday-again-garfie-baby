@@ -92,30 +92,6 @@ local mtEnv = {
 	end
 }
 
-function Script:preset()
-	self:set("MusicBeatScreen", MusicBeatScreen)
-	self:set("MusicBeatState", MusicBeatScreen)
-
-	self:set("MusicBeatSubScreen", MusicBeatSubScreen)
-	self:set("MusicBeatSubState", MusicBeatSubScreen)
-
-	self:set("ScriptedScreen", ScriptedScreen)
-	self:set("ScriptedState", ScriptedScreen)
-	
-	self:set("ScriptedSubScreen", ScriptedSubScreen)
-	self:set("ScriptedSubState", ScriptedSubScreen)
-
-	self:set("PlayState", PlayScreen)
-	self:set("PlayScreen", PlayScreen)
-	
-	self:set("Character", Character)
-	self:set("Note", srcreq("funkin.gameplay.notes.note"))
-	self:set("Strum", srcreq("funkin.gameplay.notes.strum"))
-	self:set("StrumLine", srcreq("funkin.gameplay.notes.strumline"))
-	self:set("NoteSkin", srcreq("funkin.gameplay.notes.noteskin"))
-	self:set("UISkin", srcreq("funkin.gameplay.ui.uiskin"))
-end
-
 function Script:__init__(path)
     self.path = path --- @type string
     self.chunk = nil --- @type function
@@ -131,10 +107,9 @@ function Script:__init__(path)
         local chunk = fs.load(self.path)
         if chunk then
             -- preset vars/funcs`
-			self:set("game", PlayScreen.instance)
 			self:set("print", function(...)
 				local info = debug.getinfo(2, "Sln")
-				print(("%s:%s: %s"):format(info.short_src, info.currentline, table.concat(table.pack(...), ", ")))
+				print(("%s:%s: %s"):format(info.short_src, info.currentline, table.join(table.pack(...), ", ")))
 			end)
             self:set("close", function() self:close() end)
 			self:preset()
@@ -155,6 +130,35 @@ function Script:__init__(path)
     end
 end
 
+function Script:preset()
+	if PlayScreen.instance then
+		self:set("game", PlayScreen.instance)
+	end
+	self:set("ScreenManager", ScreenManager)
+	
+	self:set("MusicBeatScreen", MusicBeatScreen)
+	self:set("MusicBeatState", MusicBeatScreen)
+
+	self:set("MusicBeatSubScreen", MusicBeatSubScreen)
+	self:set("MusicBeatSubState", MusicBeatSubScreen)
+
+	self:set("ScriptedScreen", srcreq("funkin.screens.scriptedscreen"))
+	self:set("ScriptedState", srcreq("funkin.screens.scriptedscreen"))
+	
+	self:set("ScriptedSubScreen", srcreq("funkin.screens.scriptedsubscreen"))
+	self:set("ScriptedSubState", srcreq("funkin.screens.scriptedsubscreen"))
+
+	self:set("PlayState", PlayScreen)
+	self:set("PlayScreen", PlayScreen)
+	
+	self:set("Character", srcreq("funkin.gameplay.character"))
+	self:set("Note", srcreq("funkin.gameplay.notes.note"))
+	self:set("Strum", srcreq("funkin.gameplay.notes.strum"))
+	self:set("StrumLine", srcreq("funkin.gameplay.notes.strumline"))
+	self:set("NoteSkin", srcreq("funkin.gameplay.notes.noteskin"))
+	self:set("UISkin", srcreq("funkin.gameplay.ui.uiskin"))
+end
+
 function Script:get(var)
     if self.closed then return nil end
     return rawget(self.variables, var)
@@ -162,14 +166,20 @@ end
 
 function Script:set(var, value)
 	if self.closed then return end
+	if value == nil then
+		FLog.warn(("You are setting %s to nil in %s!"):format(var, self.path))
+	end
 	rawset(self.variables, var, value)
 end
-
 
 function Script:linkObject(link)
 	local cur = getmetatable(self.variables)
 	self.linkedObject = link
 
+	if link == nil then
+		setmetatable(self.variables, cur)
+		return
+	end
 	local s = self.variables
 	if not s then return end
 	local new = {

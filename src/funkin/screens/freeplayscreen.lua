@@ -5,6 +5,7 @@ local AtlasTextMenu = srcreq("funkin.ui.atlastextmenu") --- @type funkin.ui.Atla
 local FreeplayScreen = MusicBeatScreen:subclass("FreeplayScreen", ...)
 
 function FreeplayScreen:enter()
+    super.enter(self)
     self.persistentUpdate = true
 
     if not comet.mixer.music:isPlaying() then

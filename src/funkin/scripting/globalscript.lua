@@ -1,4 +1,6 @@
 local fs = love.filesystem
+
+local Script = srcreq("funkin.scripting.script") --- @type funkin.scripting.Script
 local ScriptPack = srcreq("funkin.scripting.scriptpack") --- @type funkin.scripting.ScriptPack
 
 --- @class funkin.scripting.GlobalScript

@@ -4,9 +4,6 @@ local InitScreen = Screen:subclass("InitScreen", ...)
 function InitScreen:enter()
     FLog = srcreq("funkin.util.flog") --- @type funkin.util.FLog
     FLog.init()
-    
-    Paths = srcreq("funkin.backend.assets.paths") --- @type funkin.backend.assets.Paths
-    Paths.initAssetSystem()
 
     Transition = srcreq("funkin.ui.transition") --- @type funkin.ui.Transition
     Transition.setDefaultTransition(srcreq("funkin.ui.transition.gradientswipe"), true)
@@ -15,6 +12,13 @@ function InitScreen:enter()
     MusicBeatScreen.static.skipNextTransIn = true
 
     MusicBeatSubScreen = srcreq("funkin.screens.musicbeatsubscreen") --- @type funkin.screens.MusicBeatSubScreen
+
+    CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
+    AtlasText = srcreq("funkin.ui.atlastext") --- @type funkin.ui.AtlasText
+    PlayScreen = srcreq("funkin.screens.playscreen") --- @type funkin.screens.PlayScreen
+
+    Paths = srcreq("funkin.backend.assets.paths") --- @type funkin.backend.assets.Paths
+    Paths.initAssetSystem()
 
     Options = srcreq("funkin.backend.options") --- @type funkin.backend.Options
     Options.init()
@@ -28,10 +32,6 @@ function InitScreen:enter()
     comet.plugins:add(Conductor.instance)
     
     comet.plugins:add(srcreq("funkin.backend.plugins.debugbinds"):new())
-
-    CoolUtil = srcreq("funkin.util.coolutil") --- @type funkin.util.CoolUtil
-    AtlasText = srcreq("funkin.ui.atlastext") --- @type funkin.ui.AtlasText
-    PlayScreen = srcreq("funkin.screens.playscreen") --- @type funkin.screens.PlayScreen
 
     srcreq("funkin.backend.crashhandler").init()
     srcreq("funkin.gfx.debugoverlay").init()

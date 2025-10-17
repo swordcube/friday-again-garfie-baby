@@ -1,13 +1,14 @@
 local fs = love.filesystem
 
 --- @class funkin.screens.TitleScreen : funkin.screens.MusicBeatScreen
-local TitleScreen = MusicBeatScreen:subclass("TitleScreen", ...)
+local TitleScreen, super = MusicBeatScreen:subclass("TitleScreen", ...)
 
 TitleScreen.static.initialized = false
 
 -- TODO: the hue shader & cheat code thingie
 
 function TitleScreen:enter()
+    super.enter(self)
     self.persistentUpdate = true
     
     if not comet.mixer.music:isPlaying() then
@@ -98,6 +99,7 @@ function TitleScreen:enter()
 end
 
 function TitleScreen:update(dt)
+    super.update(self, dt)
     if self.controls.pressed.UI_LEFT then
         self.hueShader:send("OFFSET", self.hueShader:getUniformNumber("OFFSET") - (dt * 0.1))
     end
@@ -167,6 +169,7 @@ function TitleScreen:beatHit(beat)
         self.gf:playAnimation("danceLeft")
     end
     self.logo:playAnimation("idle", true)
+    super.beatHit(self, beat)
 end
 
 return TitleScreen

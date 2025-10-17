@@ -284,6 +284,9 @@ function DebugOverlay.init()
                 elseif ScreenManager.instance.current.class.name then
                     screenPath = ScreenManager.instance.current.class.name
                 end
+                if screenPath == "funkin.screens.ScriptedScreen" then
+                    screenPath = screenPath .. (" (%s)"):format(ScreenManager.instance.current.scriptName)
+                end
             end
             local cw = w -- width for comet specific info
             cw = stopMakingTheWidthTooFuckingSmall(cw, "Screen: ", screenPath)
