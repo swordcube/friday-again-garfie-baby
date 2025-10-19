@@ -8,6 +8,9 @@ local Conductor = Plugin:subclass("Conductor", ...)
 Conductor.static.instance = nil --- @type funkin.backend.plugins.Conductor
 
 function Conductor:__init__()
+    --- @protected
+    self._paused = false
+    
     self.offset = 0.0
     self.rate = 1.0
 
@@ -273,6 +276,14 @@ function Conductor:getTimeAtMeasure(measure)
     return curTimingPoint.time + self:getMeasureLengthFromTimingPoint(curTimingPoint) * (measure - curTimingPoint.measure)
 end
 
+function Conductor:setPause(bool)
+    self._paused = bool
+end
+
+function Conductor:isPaused()
+    return self._paused
+end
+
 local function recursiveStep(object, step)
     for i = 1, object:getChildCount() do
         local child = object.children[i]
@@ -310,6 +321,10 @@ local function recursiveMeasure(object, measure)
 end
 
 function Conductor:update(dt)
+    if self:isPaused() then
+        return
+    end
+
     local music = self.music
     if music and music:isPlaying() then
         local mt = music:getTime()

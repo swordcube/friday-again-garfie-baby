@@ -15,6 +15,8 @@ function Controls:__init__()
         NOTE_UP = {"key:w", "key:up"},
         NOTE_RIGHT = {"key:d", "key:right"},
 
+        PAUSE = {"key:return", "key:escape"},
+
         UI_LEFT = {"key:a", "key:left"},
         UI_DOWN = {"key:s", "key:down"},
         UI_UP = {"key:w", "key:up"},
