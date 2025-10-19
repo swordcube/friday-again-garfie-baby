@@ -76,7 +76,7 @@ function FNFGarfieBaby:fromBasicFormat(basicFormat, _)
         },
         freeplay = {
             ratings = basicFormat.meta.extraData.SONG_RATINGS or {},
-            icon = "face",
+            icon = basicFormat.meta.extraData.SONG_ICON or "face",
             album = basicFormat.meta.extraData.SONG_ALBUM or "vol1"
         },
         game = {
@@ -95,6 +95,79 @@ function FNFGarfieBaby:fromBasicFormat(basicFormat, _)
             hudSkin = basicFormat.meta.extraData.hudSkin
         }
     }
+    for _, notes in pairs(self.chart.n) do
+        table.sort(notes, function(a, b)
+            if a.t ~= b.t then
+                return a.t < b.t
+            end
+            return a.d < b.d
+        end)
+    end
+    table.sort(self.chart.e, function(a, b)
+        return a.t < b.t
+    end)
+end
+
+--- @return {chart: any, meta: any}
+function FNFGarfieBaby:toBasicFormat()
+    local basic = {
+        chart = {
+            diffs = {}, --- @type table<string, table[]>
+            events = {} --- @type table[]
+        },
+        meta = {
+            title = self.meta.song.title or "Unknown",
+            bpmChanges = {}, --- @type table[]
+            scrollSpeeds = self.meta.game.scrollSpeed, --- @type table<string, number>
+            offset = 0.0,
+            extraData = {
+                PLAYER_1 = self.meta.game.characters.player or "bf",
+                PLAYER_2 = self.meta.game.characters.opponent or "dad",
+                PLAYER_3 = self.meta.game.characters.spectator or "gf",
+
+                STAGE = self.meta.game.stage or "stage",
+                
+                SONG_ARTIST = self.meta.song.artist,
+                SONG_CHARTER = self.meta.song.charter,
+
+                SONG_RATINGS = self.meta.freeplay and (self.meta.freeplay.ratings or {}) or {},
+                SONG_VARIATIONS = self.meta.song.mixes or {},
+
+                SONG_NOTE_SKIN = self.meta.game.noteSkin or "funkin",
+            }, --- @type table<string, any>
+        }
+    }
+    for diff, notes in pairs(self.chart.notes) do
+        local basicNotes = {}
+        for i = 1, #notes do
+            local note = notes[i]
+            basicNotes[#basicNotes + 1] = {
+                time = note.t,
+                lane = note.d,
+                length = note.l,
+                type = note.k
+            }
+        end
+        basic.chart.diffs[diff] = basicNotes
+    end
+    for i = 1, #self.chart.events do
+        local event = self.chart.events[i]
+        basic.chart.events[i] = {
+            time = event.t,
+            params = type(event.p) == "table" and (event.p[1] ~= nil and {array = event.p} or event.p) or {v = event.p},
+            type = event.e,
+        }
+    end
+    for i = 1, #self.meta.song.timingPoints do
+        local tc = self.meta.song.timingPoints[i]
+        basic.meta.bpmChanges[i] = {
+            time = tc.t,
+            bpm = tc.b,
+            beatsPerMeasure = tc.ts[1],
+            stepsPerBeat = tc.ts[2]
+        }
+    end
+    return basic
 end
 
 return FNFGarfieBaby

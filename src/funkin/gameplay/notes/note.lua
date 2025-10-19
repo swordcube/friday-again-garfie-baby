@@ -15,7 +15,7 @@ function Note:__init__()
     self.time = 0.0
     self.lane = 0
     self.length = 0.0
-    self.type = "default"
+    self.type = "Default"
 
     self.skin = "funkin"
     self.skinData = nil

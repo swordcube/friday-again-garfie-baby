@@ -1,0 +1,2 @@
+- [ ] somehow allow multiple charts to be loaded into one format instance
+    - because the gbe chart converter will only use certain values (scroll speeds, note types) from the first chart specified

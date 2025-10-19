@@ -1,3 +1,4 @@
+local Path = cometreq("util.path") --- @type comet.util.Path
 local Charty = srcreq("charty") --- @type charty.Charty
 
 --- @class funkin.screens.debug.ChartConverter : funkin.screens.MusicBeatScreen
@@ -115,7 +116,6 @@ function ChartConverter:input(_)
             
             local function saveStuff(chartPaths, metaPath)
                 love.timer.sleep(0.5)
-                local metaStringCheese = nil
 
                 local curPath = 1
                 local function saveMeta(meta)
@@ -138,12 +138,9 @@ function ChartConverter:input(_)
                 end
                 local function saveChart()
                     local toFormat = Charty.getFormat(self.formats[self.toFormat].id):new() --- @type charty.Format
-                    toFormat:fromFormat(fromFormat:fromFile(chartPaths[curPath], metaPath))
+                    toFormat:fromFormat(fromFormat:fromFile(chartPaths[curPath], metaPath), Path.withoutExtension(Path.withoutDirectory(chartPaths[curPath])))
                     
                     local stringCheese = toFormat:stringify()
-                    if not metaStringCheese then
-                        metaStringCheese = stringCheese.meta
-                    end
                     comet.native.showFileDialog("savefile", function(paths)
                         local path = paths[1]
                         if path and #path ~= 0 then

@@ -172,9 +172,7 @@ function onLoadPost()
     end
     rainShader:send("intensity", rainStartIntensity)
     rainShader:send("time", 0)
-
-    local hue = Shader:new(Paths.frag("hue_offset")) --- @type comet.gfx.Shader
-    game.camGame:setShaders({rainShader, hue})
+    game.camGame:setShaders({rainShader})
 end
 
 function onCharacterAdd(char)
