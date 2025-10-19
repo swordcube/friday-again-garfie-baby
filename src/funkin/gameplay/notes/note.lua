@@ -36,6 +36,10 @@ function Note:loadSkin(skin)
     self.skin = skin or "funkin"
     self.skinData = NoteSkin.get(self.skin)
 
+    if not self.skinData.note then
+        self.skin = "funkin"
+        self.skinData = NoteSkin.get("funkin")
+    end
     -- TODO: more than just sparrow atlas!!
 
     self:setFrameCollection(Paths.getSparrowAtlas(("game/notes/%s/%s"):format(self.skin, self.skinData.note.atlas.path)))
@@ -107,7 +111,7 @@ function Note:update(dt)
         -- if note is too late to hit, miss
         self.playField:missNote(self)
     end
-    if self.wasHit and not self.wasMissed and Controls.instance.justReleased["NOTE_" .. upperDirs[self.lane + 1]] then
+    if self.wasHit and not self.wasMissed and not self.strumLine.botplay and Controls.instance.justReleased["NOTE_" .. upperDirs[self.lane + 1]] then
         -- if you let go too early, miss
         self.playField:missNote(self)
     end

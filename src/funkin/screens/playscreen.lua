@@ -72,6 +72,8 @@ function PlayScreen:enter()
     if not self.parentContentPack and instPath:startsWith(Paths.MODS_DIRECTORY .. "/") then
         self.parentContentPack = Paths.getModFromPath(instPath)
     end
+    assert(fs.isFile(instPath), ("Instrumental doesn't exist for %s [%s / %s]"):format(self.currentSong, self.currentMix, self.currentDifficulty))
+    
     comet.mixer.music:stop()
     comet.mixer.music:setSource(instPath)
     comet.mixer.music:setLooping(false)

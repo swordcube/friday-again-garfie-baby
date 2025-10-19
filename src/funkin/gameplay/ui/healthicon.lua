@@ -1,3 +1,4 @@
+local fs = love.filesystem
 local CharacterConfig = srcreq("funkin.gameplay.character.config") --- @type funkin.gameplay.character.Config
 
 --- @class funkin.gameplay.ui.HealthIcon : comet.gfx.AnimatedImage
@@ -33,7 +34,11 @@ function HealthIcon:loadCharacter(character)
     self.antialiasing = not self.config.isPixel and (self.config.antialiasing ~= nil and self.config.antialiasing or true) or false
 
     local gridSize = self.config.isPixel and 32 or 150
-    self:setFrameCollection(FrameCollection.fromTexture(Paths.image(("game/icons/%s"):format(character)), gridSize, gridSize))
+    local iconPath = Paths.image(("game/icons/%s"):format(character))
+    if not fs.isFile(iconPath) then
+        iconPath = Paths.image("game/icons/face")
+    end
+    self:setFrameCollection(FrameCollection.fromTexture(iconPath, gridSize, gridSize))
 
     self:addAnimation("idle", {1}, 0, true)
     self:addAnimation("losing", {2}, 0, true)

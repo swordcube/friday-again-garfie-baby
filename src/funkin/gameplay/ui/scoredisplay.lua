@@ -22,7 +22,11 @@ function ScoreDisplay:loadSkin(newSkin)
     end
     self._skin = newSkin or "funkin"
     self._skinData = UISkin.get(self._skin)
-    
+
+    if not self._skinData.rating then
+        self._skin = "funkin"
+        self._skinData = UISkin.get("funkin")
+    end
     -- combine the rating and combo textures into one singular atlas for batching 🤑🤑🤑🤑🤑
     local ta = RuntimeTextureAtlas.newDynamicSize()
     for rating, data in pairs(self._skinData.rating.animation) do
@@ -117,6 +121,12 @@ function ScoreDisplay:showCombo(combo, miss)
         t:target({target = spr, properties = {alpha = 0}})
         t:start({duration = 0.2, delay = Conductor.instance:getCurrentBeatLength() * 0.002})
     end
+end
+
+function ScoreDisplay:_draw()
+    Image.NO_OFF_SCREEN_CHECKS, AnimatedImage.NO_OFF_SCREEN_CHECKS = true, true
+    super._draw(self)
+    Image.NO_OFF_SCREEN_CHECKS, AnimatedImage.NO_OFF_SCREEN_CHECKS = false, false
 end
 
 return ScoreDisplay

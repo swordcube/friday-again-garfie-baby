@@ -36,21 +36,26 @@ function InitScreen:enter()
     srcreq("funkin.backend.crashhandler").init()
     srcreq("funkin.gfx.debugoverlay").init()
 
-    if not love.filesystem.isFused() then
-        local os = jit and jit.os or require("ffi").os
-        if os == "Windows" then
-            os = "win64"
+    -- macOS is currently unsupported, along with Android and iOS
+    -- On those platforms ogv videos will be required
+    local supportedOSes = {"Windows", "Linux"}
+    if table.contains(supportedOSes, love.system.getOS()) then
+        if not love.filesystem.isFused() then
+            local os = jit and jit.os or require("ffi").os
+            if os == "Windows" then
+                os = "win64"
+            end
+            _G.LOVEVLC_LIB_DIRECTORY = ("thirdparty/lovevlc/lib/%s"):format(os:lower())
         end
-        _G.LOVEVLC_LIB_DIRECTORY = ("thirdparty/lovevlc/lib/%s"):format(os:lower())
-    end
-    require("thirdparty.lovevlc")
+        require("thirdparty.lovevlc")
+        
+        local handle = require("thirdparty.lovevlc.util.handle")
+        handle.initasync()
     
-    local handle = require("thirdparty.lovevlc.util.handle")
-    handle.initasync()
-
-    comet.signals.onQuit:connect(function()
-        handle.quit()
-    end)
+        comet.signals.onQuit:connect(function()
+            handle.quit()
+        end)
+    end
     Video = srcreq("funkin.gfx.video") --- @type funkin.gfx.Video
     Script = srcreq("funkin.scripting.script") --- @type funkin.scripting.Script
 

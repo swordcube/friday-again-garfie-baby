@@ -15,7 +15,7 @@ function EventRunner:__init__()
     self.onExecute = Signal:new():type("string", "number", "table", "void") --- @type comet.util.Signal
 end
 
-function EventRunner:update(dt)
+function EventRunner:update(_)
     local playhead = Conductor.instance:getCurrentRawPlayhead()
     while self.curEventIndex <= #self.events do
         local event = self.events[self.curEventIndex]

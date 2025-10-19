@@ -10,8 +10,35 @@ function Stage:__init__(name)
     super.__init__(self)
 
     self.name = name or "stage"
-    self.config = CoolUtil.parseJson(Paths.json(("game/stages/%s/config"):format(self.name)))
+    self.config = CoolUtil.parseJson(Paths.json(("game/stages/%s/config"):format(self.name))) or {
+        zoom = 1.05,
+        directory = "game/stages",
 
+        initialCamPos = {0, 0},
+        props = {
+            {
+                type = "spectator",
+
+                position = {752, 787},
+                camera = {0, 0},
+                scroll = {1, 1}
+            },
+            {
+                type = "opponent",
+
+                position = {335, 885},
+                camera = {0, 0},
+                scroll = {1, 1}
+            },
+            {
+                type = "player",
+
+                position = {990, 885},
+                camera = {0, 0},
+                scroll = {1, 1}
+            }
+        }
+    }
     self.props = {}
     self.cameraOffsets = {
         opponent = Vec2:new(),

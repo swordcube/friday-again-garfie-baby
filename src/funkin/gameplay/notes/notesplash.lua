@@ -28,6 +28,10 @@ function NoteSplash:loadSkin(skin)
     self.skin = skin or "funkin"
     self.skinData = NoteSkin.get(self.skin)
 
+    if not self.skinData.splash then
+        self.skin = "funkin"
+        self.skinData = NoteSkin.get("funkin")
+    end
     -- TODO: more than just sparrow atlas!!
 
     self.animCount = 0

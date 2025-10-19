@@ -16,6 +16,10 @@ function Strum:__init__(x, y, keyCount, direction, skin)
     self.skin = skin or "funkin"
     self.skinData = NoteSkin.get(self.skin)
 
+    if not self.skinData.strum then
+        self.skin = "funkin"
+        self.skinData = NoteSkin.get("funkin")
+    end
     self.holdTimer = 0.0
 
     -- TODO: more than just sparrow atlas!!

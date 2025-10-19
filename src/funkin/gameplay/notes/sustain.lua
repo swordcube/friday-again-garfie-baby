@@ -33,6 +33,10 @@ local function loadSkin(self, skin)
     self.skin = skin or "funkin"
     self.skinData = NoteSkin.get(self.skin)
 
+    if not self.skinData.hold then
+        self.skin = "funkin"
+        self.skinData = NoteSkin.get("funkin")
+    end
     -- TODO: more than just sparrow atlas!!
 
     self:setFrameCollection(Paths.getSparrowAtlas(("game/notes/%s/%s"):format(self.skin, self.skinData.hold.atlas.path)))
