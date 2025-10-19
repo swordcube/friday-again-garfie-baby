@@ -22,6 +22,7 @@ function CoolUtil.playMusic(name, volume, looping)
     c:reset(result.timingPoints[1].b, result.timingPoints[1].ts)
     c:setupTimingPoints(result.timingPoints)
     c.music = comet.mixer.music
+    c:resume()
 end
 
 function CoolUtil.playMenuMusic(volume)
