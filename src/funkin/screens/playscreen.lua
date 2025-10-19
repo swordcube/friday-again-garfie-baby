@@ -40,7 +40,12 @@ function PlayScreen:enter()
     PlayScreen.static.instance = self
     super.enter(self)
 
+    if Conductor.instance:isPaused() then
+        Conductor.instance:setPause(false)
+    end
+
     self.persistentUpdate = true
+    self.persistentDraw = true
 
     self.startingSong = true
     self.endingSong = false
@@ -194,6 +199,10 @@ function PlayScreen:enter()
     self.inst:setPitch(1)
     self.inst:seek(0)
 
+    self.paused = false
+    self.pauseScreen = srcreq("funkin.screens.pausescreen") --- @type funkin.screens.PauseScreen
+    self.canPause = false
+
     self.playField = PlayField:new() --- @type funkin.gameplay.PlayField
     self.playField:prepareChart(self.currentChart, self.currentDifficulty)
     self.camHUD:addChild(self.playField)
@@ -249,6 +258,11 @@ function PlayScreen:update(dt)
             self.defaultCamZoom = self.defaultCamZoom - ((comet.mouse.wheel.y * 0.1) * self.defaultCamZoom)
         end
     end
+
+    if self.controls.justPressed.PAUSE then
+        self:pauseGame()
+    end
+
     local focusedCharacter, focusedCharacterType = self.opponent, "opponent"
     if self.curCameraTarget == 2 then
         focusedCharacter, focusedCharacterType = self.player, "player"
@@ -281,6 +295,7 @@ end
 
 function PlayScreen:startSong()
     self.startingSong = false
+    self.canPause = true
     
     self.inst:play()
     Conductor.instance.music = self.inst
@@ -310,6 +325,53 @@ function PlayScreen:endSong()
         self.scripts:call("onEndSong")
         self.scripts:call("onSongEnd")
     end
+end
+
+function PlayScreen:pauseGame()
+    local canNotPause = self.paused or not self.canPause
+    if canNotPause then
+        return
+    end
+
+    self.scripts:call("onPauseGame")
+
+    self.persistentUpdate = false
+    self.paused = true
+
+    local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
+    c:setPause(true)
+
+    self.inst:pause()
+    for i = 1, #self.vocalTracks do
+        local track = self.vocalTracks[i] --- @type comet.mixer.Sound
+        track:pause()
+    end
+
+    self:openSubScreen(self.pauseScreen:new())
+
+    self.scripts:call("onPauseGamePost")
+end
+
+function PlayScreen:resumeGame()
+    self.scripts:call("onResumeGame")
+    
+    self.persistentUpdate = true
+
+    self.paused = false
+    self.canPause = false
+
+    local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
+    c:setPause(false)
+
+    self.inst:play()
+    for i = 1, #self.vocalTracks do
+        local track = self.vocalTracks[i] --- @type comet.mixer.Sound
+        track:play()
+    end
+
+    local t = Timer.wait(0.01, function() self.canPause = true end) --- @type comet.util.Timer
+
+    self.scripts:call("onResumeGamePost")
 end
 
 function PlayScreen:beatHit(beat)
@@ -347,6 +409,8 @@ function PlayScreen:exit()
 
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     c.offset = 0
+
+    self.canPause = false
     
     self.scripts:call("onExit")
     self.scripts:call("onDestroy")
