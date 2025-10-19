@@ -78,9 +78,16 @@ function CharacterEditor:input(e)
         
         if holdinCtrl and comet.keys:wasJustPressed("s") then
             local jsonStr = json.beautify(self.character.config, {newline = "\n", indent = "\t", depth = 0})
-            local success, err = fs.write(Paths.json("game/characters/" .. self.character.name .. "/config"), jsonStr)
+            local success, result = pcall(love.filesystem.openNativeFile, Paths.json("game/characters/" .. self.character.name .. "/config"), "w") --- @type love.File
             if success then
-                print(("Saved character config for %s successfully"):format(self.character.name))
+                local file = result --- @type love.File
+                local fsuccess, ferr = file:write(jsonStr)
+                if fsuccess then
+                    print(("Saved character config for %s successfully"):format(self.character.name))
+                else
+                    FLog.error(("Failed to save character config: %s"):format(ferr))
+                end
+                file:close()
             else
                 FLog.error(("Failed to save character config: %s"):format(err))
             end

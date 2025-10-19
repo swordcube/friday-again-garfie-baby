@@ -137,12 +137,13 @@ function Character:playAnimation(name, context, force)
     self.lastAnimContext = context
     super.playAnimation(self, name, force)
 
+    local posX, posY = self.config.position and self.config.position[1] or 0.0, self.config.position and self.config.position[2] or 0.0
     if self.centered then
-        self.offset.x = 0.0
-        self.offset.y = self:getHeight(1) * -0.5
+        self.offset.x = posX
+        self.offset.y = posY + (self:getHeight(1) * -0.5)
     else
-        self.offset.x = self:getWidth(1) * -0.5
-        self.offset.y = -self:getHeight(1)
+        self.offset.x = posX + (self:getWidth(1) * -0.5)
+        self.offset.y = posY - self:getHeight(1)
     end
     self.offset.x = self.offset.x + (self.config.offset and self.config.position[1] or 0.0)
     self.offset.y = self.offset.y + (self.config.offset and self.config.position[2] or 0.0)

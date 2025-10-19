@@ -8,8 +8,8 @@ function love.conf(t)
     t.graphics.gammacorrect = false
 
     -- i think high dpi doesn't break text anymore??
-    -- t.highdpi = false
-    -- t.usedpiscale = false
+    t.highdpi = true
+    t.usedpiscale = true
 
     t.window.title = project.title
 
