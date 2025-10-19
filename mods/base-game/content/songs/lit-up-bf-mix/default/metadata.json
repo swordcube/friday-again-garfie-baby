@@ -24,8 +24,8 @@
 		"artist": "Saruky",
 		"charter": "fabs + Spazkid",
 		"difficulties": [
-			"normal",
 			"easy",
+			"normal",
 			"hard"
 		],
 		"mixes": [],

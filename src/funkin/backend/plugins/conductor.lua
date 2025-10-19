@@ -276,8 +276,12 @@ function Conductor:getTimeAtMeasure(measure)
     return curTimingPoint.time + self:getMeasureLengthFromTimingPoint(curTimingPoint) * (measure - curTimingPoint.measure)
 end
 
-function Conductor:setPause(bool)
-    self._paused = bool
+function Conductor:pause()
+    self._paused = true
+end
+
+function Conductor:resume()
+    self._paused = false
 end
 
 function Conductor:isPaused()

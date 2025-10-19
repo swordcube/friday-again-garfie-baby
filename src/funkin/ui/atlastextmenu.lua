@@ -9,6 +9,17 @@ function AtlasTextMenu:__init__(x, y)
     self.enabled = true
 end
 
+function AtlasTextMenu:clearItems()
+    for i = 1, self:getChildCount() do
+        local item = self:getChild(i) --- @type funkin.ui.AtlasText
+        item:destroy()
+    end
+    self.children = {}
+    self._childCount = 0
+    
+    self.curSelected = 1
+end
+
 function AtlasTextMenu:addItem(text, font, onAccept, onSelect)
     local item = AtlasText:new(0, 0, font or "bold", 1, text) --- @type funkin.ui.AtlasText
     item.onAccept = onAccept

@@ -15,12 +15,14 @@ local Script = srcreq("funkin.scripting.script") --- @type funkin.scripting.Scri
 local ScriptPack = srcreq("funkin.scripting.scriptpack") --- @type funkin.scripting.ScriptPack
 
 local EventRunner = srcreq("funkin.gameplay.events.eventrunner") --- @type funkin.gameplay.events.EventRunner
+local PauseScreen = srcreq("funkin.screens.pausescreen") --- @type funkin.screens.PauseScreen
 
 --- @class funkin.screens.PlayScreen : funkin.screens.MusicBeatScreen
 local PlayScreen, super = MusicBeatScreen:subclass("PlayScreen", ...)
 
 PlayScreen.static.instance = nil --- @type funkin.screens.PlayScreen
 PlayScreen.static.lastParams = nil
+PlayScreen.static.deathCounter = 0
 
 function PlayScreen:__init__(params)
     super.__init__(self)
@@ -36,14 +38,18 @@ function PlayScreen:__init__(params)
     self.parentContentPack = params.contentPack
 end
 
+function PlayScreen.resetStatics()
+    PlayScreen.static.instance = nil
+    PlayScreen.static.deathCounter = 0
+end
+
 function PlayScreen:enter()
     PlayScreen.static.instance = self
     super.enter(self)
 
     if Conductor.instance:isPaused() then
-        Conductor.instance:setPause(false)
+        Conductor.instance:resume()
     end
-
     self.persistentUpdate = true
     self.persistentDraw = true
 
@@ -200,8 +206,7 @@ function PlayScreen:enter()
     self.inst:seek(0)
 
     self.paused = false
-    self.pauseScreen = srcreq("funkin.screens.pausescreen") --- @type funkin.screens.PauseScreen
-    self.canPause = false
+    self.canPause = true
 
     self.playField = PlayField:new() --- @type funkin.gameplay.PlayField
     self.playField:prepareChart(self.currentChart, self.currentDifficulty)
@@ -240,9 +245,13 @@ function PlayScreen:resyncVocals()
 end
 
 function PlayScreen:_update(dt)
-    self.scripts:call("onUpdate", dt)
+    if self:canUpdate() then
+        self.scripts:call("onUpdate", dt)
+    end
     super._update(self, dt)
-    self.scripts:call("onUpdatePost", dt)
+    if self:canUpdate() then
+        self.scripts:call("onUpdatePost", dt)
+    end
 end
 
 function PlayScreen:update(dt)
@@ -295,7 +304,6 @@ end
 
 function PlayScreen:startSong()
     self.startingSong = false
-    self.canPause = true
     
     self.inst:play()
     Conductor.instance.music = self.inst
@@ -332,23 +340,20 @@ function PlayScreen:pauseGame()
     if canNotPause then
         return
     end
-
     self.scripts:call("onPauseGame")
 
     self.persistentUpdate = false
     self.paused = true
 
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
-    c:setPause(true)
+    c:pause()
 
     self.inst:pause()
     for i = 1, #self.vocalTracks do
         local track = self.vocalTracks[i] --- @type comet.mixer.Sound
         track:pause()
     end
-
-    self:openSubScreen(self.pauseScreen:new())
-
+    self:openSubScreen(PauseScreen:new())
     self.scripts:call("onPauseGamePost")
 end
 
@@ -361,16 +366,19 @@ function PlayScreen:resumeGame()
     self.canPause = false
 
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
-    c:setPause(false)
+    c:resume()
 
-    self.inst:play()
-    for i = 1, #self.vocalTracks do
-        local track = self.vocalTracks[i] --- @type comet.mixer.Sound
-        track:play()
+    if not self.startingSong then
+        self.inst:play()
+        for i = 1, #self.vocalTracks do
+            local track = self.vocalTracks[i] --- @type comet.mixer.Sound
+            track:seek(self.inst:tell())
+            track:play()
+        end
     end
-
-    local t = Timer.wait(0.01, function() self.canPause = true end) --- @type comet.util.Timer
-
+    Timer.wait(0.01, function(_)
+        self.canPause = true
+    end)
     self.scripts:call("onResumeGamePost")
 end
 

@@ -77,7 +77,8 @@ function FreeplayScreen:input(_)
     if self.controls.justPressed.ACCEPT then
         self.persistentUpdate = false
         self:switchTo(function()
-            return srcreq("funkin.screens.playscreen"):new({
+            PlayScreen.resetStatics()
+            return PlayScreen:new({
                 song = self.songs[self.menu.curSelected].id,
                 difficulty = "hard",
                 mix = "default",
