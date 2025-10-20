@@ -124,11 +124,12 @@ function Paths.reloadMods()
         end
         iterate(mdir)
     end
-    GlobalScript.reloadScripts()
+    if GlobalScript.scripts then
+        GlobalScript.reloadScripts()
+    end
 end
 
 function Paths.initAssetSystem()
-    GlobalScript.init()
     Paths.reloadMods()
 end
 

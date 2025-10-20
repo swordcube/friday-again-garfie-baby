@@ -408,8 +408,29 @@ function PlayScreen:measureHit(measure)
     self.scripts:call("onMeasureHit", measure)
 end
 
+function PlayScreen:getPlaybackRate()
+    return comet.settings.timeScale
+end
+
+--- @param newRate number
+function PlayScreen:setPlaybackRate(newRate)
+    comet.settings.timeScale = newRate
+    self.inst:setPitch(newRate)
+
+    for i = 1, #self.vocalTracks do
+        local track = self.vocalTracks[i] --- @type comet.mixer.Sound
+        track:setPitch(newRate)
+    end
+end
+
 function PlayScreen:exit()
     super.exit(self)
+
+    self.scripts:call("onExit")
+    self.scripts:call("onDestroy")
+    self.scripts:close()
+    self.scripts = nil
+    
     local tracks = self.vocalTracks
     for i = 1, #tracks do
         tracks[i]:destroy()
@@ -419,14 +440,9 @@ function PlayScreen:exit()
 
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     c.offset = 0
+    c:resume()
 
     self.canPause = false
-    
-    self.scripts:call("onExit")
-    self.scripts:call("onDestroy")
-    self.scripts:close()
-    self.scripts = nil
-
     PlayScreen.static.instance = nil
 end
 

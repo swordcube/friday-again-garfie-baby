@@ -39,6 +39,7 @@ function GlobalScript.init()
     comet.signals.postInput:connect(function(e)
         scripts:call("onInputPost", e)
     end)
+    GlobalScript.reloadScripts()
 end
 
 function GlobalScript.reloadScripts()

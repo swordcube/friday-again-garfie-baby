@@ -4,6 +4,9 @@ local project = require("project")
 local Options = {
     downscroll = false,
     laneUnderlay = 0,
+
+    masterVolume = 0.3,
+    masterMuted = false
 }
 -- this weird shit is done because the options class
 -- above is for vscode documentation stuff
@@ -24,6 +27,12 @@ function Options.init()
     end
     if doFlush then
         Options._save:flush()
+    end
+    comet.mixer:setMasterVolume(Options.masterVolume)
+    if Options.masterMuted then
+        comet.mixer:muteMaster()
+    else
+        comet.mixer:unmuteMaster()
     end
 end
 

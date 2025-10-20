@@ -7,6 +7,8 @@ local NoteSplash = srcreq("funkin.gameplay.notes.notesplash") --- @type funkin.g
 local Scoring = srcreq("funkin.gameplay.scoring") --- @type funkin.gameplay.Scoring
 local ScoreDisplay = srcreq("funkin.gameplay.ui.scoredisplay") --- @type funkin.gameplay.ui.ScoreDisplay
 
+local ScriptEvent = srcreq("funkin.scripting.events.scriptevent") --- @type funkin.scripting.events.ScriptEvent
+
 --- @class funkin.gameplay.PlayField : comet.gfx.Object2D
 local PlayField, super = Object2D:subclass("PlayField", ...)
 
@@ -15,6 +17,10 @@ local upperDirs = {"LEFT", "DOWN", "UP", "RIGHT"}
 
 function PlayField:__init__()
     super.__init__(self)
+
+    -- preload common events
+    ScriptEvent.get("notehit")
+    ScriptEvent.get("notemiss")
 
     self.currentChart = nil
     self.currentDifficulty = "unknown"
@@ -127,37 +133,80 @@ function PlayField:hitNote(note)
     local strum = note.strumLine:getChild(note.lane + 1) --- @type funkin.gameplay.notes.Strum
     strum:glow(note.strumLine.botplay, note.length)
 
+    local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
+    local rating = Scoring.judgeNote(note.time, note.strumLine.botplay and note.time or Conductor.instance:getCurrentTime())
+
+    --- @type funkin.scripting.events.NoteHitEvent
+    local event = ScriptEvent.get("notehit"):recycle({
+        note = note,
+        strumLine = note.strumLine,
+        playField = self,
+
+        rating = rating,
+        combo = self.stats.combo + 1,
+
+        score = Scoring.scoreNote(note.time, Conductor.instance:getCurrentTime()),
+        health = 0.0115,
+
+        showSplash = Scoring.hasNoteSplash(rating)
+    })
+    game.scripts:call("onNoteHit", event)
+
     if note.strumLine == self.playerStrumLine then
-        self.stats.combo = self.stats.combo + 1
+        game.scripts:call("onPlayerHit", event)
+        game.scripts:call("onBfHit", event)
+        game.scripts:call("onBoyfriendHit", event)
+        game.scripts:call("goodNoteHit", event)
+        
+        if event.cancelled then
+            return
+        end
+        self.stats.combo = event.combo
         self.stats.missCombo = 0
 
-        local rating = Scoring.judgeNote(note.time, Conductor.instance:getCurrentTime())
-        self.scoreDisplay:showRating(rating)
-        self.scoreDisplay:showCombo(self.stats.combo)
+        if event.showRating then
+            self.scoreDisplay:showRating(event.rating)
+        end
+        if event.showCombo then
+            self.scoreDisplay:showCombo(self.stats.combo)
+        end
+        self.stats.score = self.stats.score + event.score
+        self.stats.health = math.clamp(self.stats.health + event.health, self.stats.minHealth, self.stats.maxHealth)
 
-        self.stats.score = self.stats.score + Scoring.scoreNote(note.time, Conductor.instance:getCurrentTime())
-        self.stats.health = math.clamp(self.stats.health + 0.0115, self.stats.minHealth, self.stats.maxHealth)
-
-        if Scoring.hasNoteSplash(rating) then
+        if event.showSplash then
             self:showNoteSplash(note.lane, note.skin, note.strumLine)
         end
         if self.hud then
             self.hud:updateHealthBar(self.stats.health, self.stats.minHealth, self.stats.maxHealth)
             self.hud:updatePlayerStats(self.stats)
         end
-        local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
-        if game then
+        if game and event.playSingAnim then
             game.player:playSingAnimation(note.lane)
             game.player.holdTimer = game.player.holdTimer + note.length
         end
+        game.scripts:call("onPlayerHitPost", event)
+        game.scripts:call("onBfHitPost", event)
+        game.scripts:call("onBoyfriendHitPost", event)
+        game.scripts:call("goodNoteHitPost", event)
         
     elseif note.strumLine == self.opponentStrumLine then
+        game.scripts:call("onOpponentHit", event)
+        game.scripts:call("onDadHit", event)
+        game.scripts:call("dadNoteHit", event)
+        
+        if event.cancelled then
+            return
+        end
         local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
         if game then
             game.opponent:playSingAnimation(note.lane)
             game.opponent.holdTimer = game.opponent.holdTimer + note.length
         end
+        game.scripts:call("onOpponentHitPost", event)
+        game.scripts:call("onDadHitPost", event)
+        game.scripts:call("dadNoteHitPost", event)
     end
+    game.scripts:call("onNoteHitPost", event)
 end
 
 --- @param lane      integer
@@ -172,33 +221,76 @@ end
 
 --- @param note funkin.gameplay.notes.Note
 function PlayField:missNote(note)
-    note.wasMissed = true
-
-    note.alpha = 0.3
-    note.sustain.alpha = 0.3
+    --- @type funkin.scripting.events.NoteMissEvent
+    local event = ScriptEvent.get("notemiss"):recycle({
+        note = note,
+        strumLine = note.strumLine,
+        playField = self,
+        
+        combo = self.stats.missCombo + 1,
+    })
+    local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
+    game.scripts:call("onNoteMiss", event)
 
     if note.strumLine == self.playerStrumLine then
+        game.scripts:call("onPlayerMiss", event)
+        game.scripts:call("onBfMiss", event)
+        game.scripts:call("onBoyfriendMiss", event)
+        game.scripts:call("noteMiss", event)
+
+        if event.cancelled then
+            return
+        end
+        note.wasMissed = true
+    
+        note.alpha = 0.3
+        note.sustain.alpha = 0.3
+
         if self.stats.combo > 0 then
             self.stats.combo = 0
             self.stats.comboBreaks = self.stats.comboBreaks + 1
         end
-        self.stats.missCombo = self.stats.missCombo + 1
+        self.stats.missCombo = event.combo
 
-        self.stats.score = self.stats.score - 100
-        self.stats.health = math.clamp(self.stats.health - 0.02375, self.stats.minHealth, self.stats.maxHealth)
+        self.stats.score = self.stats.score - event.score
+        self.stats.health = math.clamp(self.stats.health - event.health, self.stats.minHealth, self.stats.maxHealth)
         
         if self.hud then
             self.hud:updateHealthBar(self.stats.health, self.stats.minHealth, self.stats.maxHealth)
             self.hud:updatePlayerStats(self.stats)
         end
-        self.scoreDisplay:showRating("miss")
-        self.scoreDisplay:showCombo(self.stats.missCombo, true)
-
-        local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
-        if game then
+        if event.showRating then
+            self.scoreDisplay:showRating("miss")
+        end
+        if event.showCombo then
+            self.scoreDisplay:showCombo(self.stats.missCombo, true)
+        end
+        if game and event.playMissAnim then
             game.player:playMissAnimation(note.lane)
         end
+        game.scripts:call("onPlayerMissPost", event)
+        game.scripts:call("onBfMissPost", event)
+        game.scripts:call("onBoyfriendMissPost", event)
+        game.scripts:call("noteMissPost", event)
+    
+    elseif note.strumLine == self.opponentStrumLine then
+        game.scripts:call("onOpponentMiss", event)
+        game.scripts:call("onDadMiss", event)
+        game.scripts:call("dadNoteMiss", event)
+
+        if event.cancelled then
+            return
+        end
+        note.wasMissed = true
+    
+        note.alpha = 0.3
+        note.sustain.alpha = 0.3
+
+        game.scripts:call("onOpponentMissPost", event)
+        game.scripts:call("onDadMissPost", event)
+        game.scripts:call("dadNoteMissPost", event)
     end
+    game.scripts:call("onNoteMissPost", event)
 end
 
 function PlayField:input(e)

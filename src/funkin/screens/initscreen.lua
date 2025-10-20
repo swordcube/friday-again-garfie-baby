@@ -17,8 +17,15 @@ function InitScreen:enter()
     AtlasText = srcreq("funkin.ui.atlastext") --- @type funkin.ui.AtlasText
     PlayScreen = srcreq("funkin.screens.playscreen") --- @type funkin.screens.PlayScreen
 
+    GlobalScript = srcreq("funkin.scripting.globalscript") --- @type funkin.scripting.GlobalScript
+    
     Paths = srcreq("funkin.backend.assets.paths") --- @type funkin.backend.assets.Paths
     Paths.initAssetSystem()
+    
+    VolumeTray = srcreq("funkin.backend.volumetray") --- @type funkin.backend.VolumeTray
+    VolumeTray.init()
+
+    GlobalScript.init()
 
     Options = srcreq("funkin.backend.options") --- @type funkin.backend.Options
     Options.init()
@@ -64,8 +71,6 @@ function InitScreen:enter()
         love.window.setIcon(icon)
         icon:release()
     end
-    comet.mixer:setMasterVolume(0.3)
-
     if table.contains(arg, "--gameplay") then
         self:forceSwitchTo(srcreq("funkin.screens.playscreen"):new({
             song = "lit-up-bf-mix",

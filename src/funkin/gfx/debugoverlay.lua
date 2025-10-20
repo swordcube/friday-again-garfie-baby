@@ -149,7 +149,7 @@ function DebugOverlay.init()
     rversion, rdevice = cleanRendererVersion(rversion), cleanGPUName(rdevice)
 
     comet.signals.postUpdate:connect(function()
-        local dt = comet.getFullDeltaTime()
+        local dt = comet.getRawFullDeltaTime()
         updateTimer = updateTimer + dt
         graphUpdateTimer = graphUpdateTimer + dt
         
@@ -186,7 +186,7 @@ function DebugOverlay.init()
         return baseWidth
     end
     comet.signals.postDraw:connect(function()
-        local drawDt = comet.getDeltaTime()
+        local drawDt = comet.getRawDeltaTime()
         fpsGraph:update(drawDt, drawDt * 1000)
         
         if DebugOverlay.overlayType == "none" then

@@ -14,9 +14,7 @@ function Controls:__init__()
         NOTE_DOWN = {"key:s", "key:down"},
         NOTE_UP = {"key:w", "key:up"},
         NOTE_RIGHT = {"key:d", "key:right"},
-
-        PAUSE = {"key:return", "key:escape"},
-
+        
         UI_LEFT = {"key:a", "key:left"},
         UI_DOWN = {"key:s", "key:down"},
         UI_UP = {"key:w", "key:up"},
@@ -24,7 +22,12 @@ function Controls:__init__()
 
         ACCEPT = {"key:return", "key:space"},
         BACK = {"key:backspace", "key:escape"},
+        PAUSE = {"key:return", "key:escape"},
         RESET = {"key:r", nil},
+
+        VOLUME_UP = {"key:=", "key:kp+"},
+        VOLUME_DOWN = {"key:-", "key:kp-"},
+        VOLUME_MUTE = {"key:0", "key:kp0"},
 
         OVERLAY = {"key:f3", nil},
         RELOAD = {"key:f5", nil},
