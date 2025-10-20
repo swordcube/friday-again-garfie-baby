@@ -11,7 +11,7 @@ function EventRunner:__init__()
     self.events = {}
     self.curEventIndex = 1
 
-    self.behaviors = {}
+    self.behaviors = {} --- @type table<string, funkin.gameplay.events.behaviors.EventBehavior>
     self.onExecute = Signal:new():type("string", "number", "table", "void") --- @type comet.util.Signal
 end
 
@@ -29,8 +29,17 @@ function EventRunner:update(_)
     end
 end
 
+--- @param eventType string
 --- @return funkin.gameplay.events.behaviors.EventBehavior
 function EventRunner:createBehavior(eventType)
+    if not EventRunner.static.eventTypeToBehavior then
+        EventRunner.static.eventTypeToBehavior = {
+            ["Camera Pan"] = srcreq("funkin.gameplay.events.behaviors.camerapanbehavior"),
+        }
+    end
+    if EventRunner.static.eventTypeToBehavior[eventType] then
+        return EventRunner.static.eventTypeToBehavior[eventType]:new(eventType)
+    end
     return EventBehavior:new(eventType)
 end
 
@@ -44,6 +53,7 @@ function EventRunner:setEvents(events)
             local behavior = self:createBehavior(event.k) --- @type funkin.gameplay.events.behaviors.EventBehavior
             self.behaviors[event.k] = behavior
         end
+        self.behaviors[event.k]:onQueue(event.t, event.p)
     end
 end
 

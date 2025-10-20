@@ -22,6 +22,26 @@ function FreeplayScreen:enter()
     self:addChild(self.menu)
 
     local assetLoaders = Paths._registeredAssetLoaders
+    local assetLoadersCopy = table.copy(Paths._registeredAssetLoaders)
+
+    -- ensure base game goes first
+    for i = 1, #assetLoadersCopy do
+        local loader = assetLoadersCopy[i] --- @type funkin.backend.assets.loaders.AssetLoader
+        if loader.id == "base-game" then
+            table.remove(assetLoaders, i)
+            table.insert(assetLoaders, 1, loader)
+            break
+        end
+    end
+    for i = 1, #assetLoadersCopy do
+        local loader = assetLoadersCopy[i] --- @type funkin.backend.assets.loaders.AssetLoader
+        if loader.id == "default" then
+            table.remove(assetLoaders, i)
+            table.insert(assetLoaders, 1, loader)
+            break
+        end
+    end
+    -- then actually list shit out
     for i = 1, #assetLoaders do
         local loader = assetLoaders[i] --- @type funkin.backend.assets.loaders.AssetLoader
 
