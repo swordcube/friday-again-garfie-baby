@@ -7,7 +7,6 @@
     "apiVersion": "0.1.0",
     "allowUnsafeScripts": true,
 
-    "levels": [],    
     "freeplayCategories": [],
     "defaultCategory": "main"
 }

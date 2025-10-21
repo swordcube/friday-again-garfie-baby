@@ -24,10 +24,6 @@ function Transition:__init__(type, finishCallback)
     end
 end
 
-function Transition:enter()
-    
-end
-
 function Transition:input(e)
     if e.type == "key" and e.pressed and (e.key == "lshift" or e.key == "rshift") then
         self:finish()

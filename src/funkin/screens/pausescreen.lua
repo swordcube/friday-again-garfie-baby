@@ -71,6 +71,7 @@ function PauseScreen:showPage(page)
     self.optionCallbacks = {}
     
     self.menu:clearItems()
+    self.subScreenScripts:call("onShowPage", page, self.options, self.optionCallbacks)
 
     if page == "main" then
         self:addOption("Resume", function()
@@ -132,6 +133,8 @@ function PauseScreen:showPage(page)
             self:showPage("main")
         end)
     end
+    self.subScreenScripts:call("onShowPagePost", page, self.options, self.optionCallbacks)
+
     for i = 1, #self.options do
         local option = self.options[i]
         self.menu:addItem(option)
@@ -139,6 +142,7 @@ function PauseScreen:showPage(page)
 end
 
 function PauseScreen:update(dt)
+    super.update(self, dt)
     if self.music:getVolume() < 0.5 then
         self.music:setVolume(math.min(self.music:getVolume() + (dt * 0.05), 0.5))
     end
@@ -149,6 +153,7 @@ function PauseScreen:update(dt)
 end
 
 function PauseScreen:input(_)
+    super.input(self, _)
     if self.controls.justPressed.ACCEPT then
         self.controls.justPressed.ACCEPT = false -- #hack, respectable tho lol -swordcube
         self.optionCallbacks[self.menu.curSelected]()

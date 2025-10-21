@@ -73,11 +73,11 @@ local modules = {
 		dump = deny("string.dump", "")
 	}),
     require = function(path)
-        path = "classes/" .. path:gsub("%.", "/")
-        if fs.getInfo(Paths.getPath(path), "directory") and fs.getInfo(Paths.getPath(path .. "/init.lua"), "file") then
-            return Script:new(Paths.script(path .. "/init.lua")).chunk()
+        path = path:gsub("%.", "/")
+        if fs.getInfo(Paths.getAsset(path), "directory") and fs.getInfo(Paths.script(path .. "/init"), "file") then
+            return Script:new(Paths.script(path .. "/init"), false).chunk()
         end
-        return Script:new(Paths.script(path)).chunk()
+        return Script:new(Paths.script(path), false).chunk()
     end,
 	Script = limitindex("Script", {
 		addToEnv = deny("Script:addToEnv()")
@@ -88,11 +88,14 @@ local mtEnv = {
 		if table.contains(blocklist, k) then
 			return deny(k)
 		end
-		return modules[k] or _G[k]
+		return modules[k] or _G[k] or GlobalScript.scripts:get(k)
 	end
 }
 
-function Script:__init__(path)
+function Script:__init__(path, autoRunChunk)
+	if autoRunChunk == nil then
+		autoRunChunk = true
+	end
     self.path = path --- @type string
     self.chunk = nil --- @type function
 
@@ -116,7 +119,9 @@ function Script:__init__(path)
 
             -- sandbox the chunk then run it
             setfenv(chunk, setmetatable(vars, mtEnv))
-            chunk()
+			if autoRunChunk then
+            	chunk()
+			end
         else
             FLog.warn(("Script not found at %s"):format(self.path))
             self:close()
@@ -134,6 +139,9 @@ function Script:preset()
 	if PlayScreen.instance then
 		self:set("game", PlayScreen.instance)
 	end
+	self:set("Path", cometreq("util.path"))
+	self:set("Paths", Paths)
+
 	self:set("ScreenManager", ScreenManager)
 	
 	self:set("MusicBeatScreen", MusicBeatScreen)
@@ -148,6 +156,9 @@ function Script:preset()
 	self:set("ScriptedSubScreen", srcreq("funkin.screens.scriptedsubscreen"))
 	self:set("ScriptedSubState", srcreq("funkin.screens.scriptedsubscreen"))
 
+	self:set("Transition", Transition)
+	self:set("RuntimeTextureAtlas", srcreq("funkin.gfx.rta"))
+
 	self:set("PlayState", PlayScreen)
 	self:set("PlayScreen", PlayScreen)
 	
@@ -159,6 +170,8 @@ function Script:preset()
 	self:set("UISkin", srcreq("funkin.gameplay.ui.uiskin"))
 end
 
+--- @param var any
+--- @return any
 function Script:get(var)
     if self.closed then return nil end
     return rawget(self.variables, var)

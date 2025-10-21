@@ -47,6 +47,24 @@ function ScriptPack:remove(script)
     table.removeItem(self.scripts, script)
 end
 
+function ScriptPack:get(var, defaultValue)
+    for i = 1, #self.scripts do
+        local script = self.scripts[i] --- @type funkin.scripting.Script
+        local val = script:get(var)
+        if val ~= defaultValue then
+            return val
+        end
+    end
+    return defaultValue
+end
+
+function ScriptPack:set(var, val)
+    for i = 1, #self.scripts do
+        local script = self.scripts[i] --- @type funkin.scripting.Script
+        script:set(var, val)
+    end
+end
+
 function ScriptPack:call(func, ...)
     for i = 1, #self.scripts do
         local script = self.scripts[i] --- @type funkin.scripting.Script
