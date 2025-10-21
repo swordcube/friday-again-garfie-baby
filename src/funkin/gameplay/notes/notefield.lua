@@ -19,6 +19,9 @@ function NoteField:__init__()
     self.notes = Object2D:new() --- @type comet.gfx.Object2D
     self:addChild(self.notes)
 
+    self.holdCovers = Object2D:new() --- @type comet.gfx.Object2D
+    self:addChild(self.holdCovers)
+
     self._createNote = function()
         local n = Note:new() --- @type funkin.gameplay.notes.Note
         self.sustains:addChild(n.sustain)

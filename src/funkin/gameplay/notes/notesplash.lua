@@ -54,6 +54,9 @@ function NoteSplash:loadSkin(skin)
         end
         self.animCount = self.animCount + 1
     end
+    if self.skinData.splash.offset then
+        self.offset:set(self.skinData.splash.offset[1], self.skinData.splash.offset[2])
+    end
     self.alpha = self.skinData.splash.alpha or 1.0
     self.scale:set(self.skinData.splash.scale, self.skinData.splash.scale)
     self.antialiasing = self.skinData.splash.antialiasing ~= nil and self.skinData.splash.antialiasing or true

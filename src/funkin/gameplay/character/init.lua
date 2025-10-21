@@ -18,7 +18,7 @@ function Character:__init__(x, y, name, isPlayer)
     self.debugMode = false
 
     self.holdTimer = 0.0
-    self.lastAnimContext = "dance" --- @type "none"|"dance"|"sing"|"lock"
+    self.curAnimContext = "dance" --- @type "none"|"dance"|"sing"|"lock"
     
     self.script = nil --- @type funkin.scripting.Script
     self.midpoint = Vec2:new() --- @type comet.math.Vec2
@@ -121,12 +121,10 @@ function Character:dance(force)
 end
 
 function Character:playSingAnimation(dir)
-    self.holdTimer = Conductor.instance:getCurrentStepLength() * self.singDuration
     self:playAnimation(self.config.singSteps[(dir % #self.config.singSteps) + 1], "sing", true)
 end
 
 function Character:playMissAnimation(dir)
-    self.holdTimer = Conductor.instance:getCurrentStepLength() * self.singDuration
     self:playAnimation(self.config.missSteps[(dir % #self.config.missSteps) + 1], "sing", true)
 end
 
@@ -134,7 +132,18 @@ end
 ---@param context "none"|"dance"|"sing"|"lock"
 ---@param force any
 function Character:playAnimation(name, context, force)
-    self.lastAnimContext = context
+    local lastAnimContext = self.curAnimContext
+    if context == "dance" then
+        if lastAnimContext == "none" and not self:isFinished() then
+            return
+        end
+    elseif context == "sing" then
+        if lastAnimContext == "none" and not self:isFinished() then
+            return
+        end
+        self.holdTimer = Conductor.instance:getCurrentStepLength() * self.singDuration
+    end
+    self.curAnimContext = context
     super.playAnimation(self, name, force)
 
     local posX, posY = self.config.position and self.config.position[1] or 0.0, self.config.position and self.config.position[2] or 0.0
@@ -177,7 +186,7 @@ function Character:update(dt)
     -- "lock" prevents the character from dancing automatically until dance() is called again
     -- lock doesn't need to do anything, so there's no code for it lol
 
-    if self.lastAnimContext == "sing" then
+    if self.curAnimContext == "sing" then
         local holdingAnyNoteInput = Controls.instance.pressed.NOTE_LEFT or Controls.instance.pressed.NOTE_DOWN or Controls.instance.pressed.NOTE_UP or Controls.instance.pressed.NOTE_RIGHT
         self.holdTimer = self.holdTimer - (dt * 1000.0)
 
@@ -185,7 +194,7 @@ function Character:update(dt)
             self.curDanceStep = 1
             self:dance()
         end
-    elseif self.lastAnimContext == "none" and not self:isPlaying() then
+    elseif self.curAnimContext == "none" and not self:isPlaying() then
         self:dance()
     end
     if self.script then
@@ -210,7 +219,7 @@ function Character:draw()
 end
 
 function Character:beatHit(beat)
-    if not self.debugMode and self.lastAnimContext == "dance" and beat % self.danceInterval == 0 then
+    if not self.debugMode and self.curAnimContext == "dance" and beat % self.danceInterval == 0 then
         self:dance()
     end
     if self.script then

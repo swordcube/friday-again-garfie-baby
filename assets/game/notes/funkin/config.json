@@ -95,6 +95,36 @@
                     "looped": false,
                     "offset": [1, -3]
                 }
+            },
+            "confirm-hold": {
+                "left": {
+                    "prefix": "left confirm",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": [1, -3]
+                },
+                "down": {
+                    "prefix": "down confirm",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": [0, 0]
+                },
+                "up": {
+                    "prefix": "up confirm",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": [0, 0]
+                },
+                "right": {
+                    "prefix": "right confirm",
+                    "indices": null,
+                    "fps": 24,
+                    "looped": false,
+                    "offset": [1, -3]
+                }
             }
         }
     },
@@ -290,28 +320,28 @@
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -10]
                 },
                 "down": {
                     "prefix": "start down",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -10]
                 },
                 "up": {
                     "prefix": "start up",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -10]
                 },
                 "right": {
                     "prefix": "start right",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -10]
                 }
             },
             "hold": {
@@ -350,32 +380,32 @@
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -30]
                 },
                 "down": {
                     "prefix": "end down",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -30]
                 },
                 "up": {
                     "prefix": "end up",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -30]
                 },
                 "right": {
                     "prefix": "end right",
                     "indices": null,
                     "fps": 24,
                     "looped": false,
-                    "offset": [0, 0]
+                    "offset": [0, -30]
                 }
             }
         },
-        "offset": [12, -45]
+        "offset": [-12, -102]
     },
     "holdGradients": {
         "atlas": {

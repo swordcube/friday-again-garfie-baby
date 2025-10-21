@@ -21,6 +21,7 @@ function Strum:__init__(x, y, keyCount, direction, skin)
         self.skinData = NoteSkin.get("funkin")
     end
     self.holdTimer = 0.0
+    self.susLength = 0.0
 
     -- TODO: more than just sparrow atlas!!
 
@@ -42,6 +43,14 @@ function Strum:__init__(x, y, keyCount, direction, skin)
 
     self.alpha = self.skinData.strum.alpha or 1.0
     self.antialiasing = self.skinData.strum.antialiasing ~= nil and self.skinData.strum.antialiasing or true
+
+    self.onComplete:connect(function(name)
+        if name == "confirm" and self.susLength > 0.0 then
+            if self:hasAnimation("confirm-hold") then
+                self:playAnimation("confirm-hold", true)
+            end
+        end
+    end)
 end
 
 function Strum:update(dt)
@@ -54,6 +63,7 @@ function Strum:update(dt)
 end
 
 function Strum:glow(bot, susLength)
+    self.susLength = susLength
     self.holdTimer = bot and math.max(susLength, 150) or math.huge
     self:playAnimation("confirm", true)
 end

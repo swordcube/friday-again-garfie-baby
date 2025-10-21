@@ -21,6 +21,8 @@ function NoteHitEvent:__init__()
     self.showCombo = self:setupVar("showCombo", true) --- @type boolean
 
     self.showSplash = self:setupVar("showSplash", true) --- @type boolean
+    self.showHoldCover = self:setupVar("showHoldCover", true) --- @type boolean
+    
     self.playSingAnim = self:setupVar("playSingAnim", true) --- @type boolean
 end
 

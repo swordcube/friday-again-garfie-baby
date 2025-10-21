@@ -3,6 +3,7 @@ local NoteField = srcreq("funkin.gameplay.notes.notefield") --- @type funkin.gam
 
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 local NoteSplash = srcreq("funkin.gameplay.notes.notesplash") --- @type funkin.gameplay.notes.NoteSplash
+local HoldCover = srcreq("funkin.gameplay.notes.holdcover") --- @type funkin.gameplay.notes.HoldCover
 
 local Scoring = srcreq("funkin.gameplay.scoring") --- @type funkin.gameplay.Scoring
 local ScoreDisplay = srcreq("funkin.gameplay.ui.scoredisplay") --- @type funkin.gameplay.ui.ScoreDisplay
@@ -145,10 +146,11 @@ function PlayField:hitNote(note)
         rating = rating,
         combo = self.stats.combo + 1,
 
-        score = Scoring.scoreNote(note.time, Conductor.instance:getCurrentTime()),
+        score = Scoring.scoreNote(note.time, note.strumLine.botplay and note.time or Conductor.instance:getCurrentTime()),
         health = 0.0115,
 
-        showSplash = Scoring.hasNoteSplash(rating)
+        showSplash = Scoring.hasNoteSplash(rating) and note.strumLine == self.playerStrumLine,
+        showHoldCover = note.length > 0
     })
     game.scripts:call("onNoteHit", event)
 
@@ -176,6 +178,9 @@ function PlayField:hitNote(note)
         if event.showSplash then
             self:showNoteSplash(note.lane, note.skin, note.strumLine)
         end
+        if event.showHoldCover then
+            self:showHoldCover(note.lane, note, note.skin, note.strumLine)
+        end
         if self.hud then
             self.hud:updateHealthBar(self.stats.health, self.stats.minHealth, self.stats.maxHealth)
             self.hud:updatePlayerStats(self.stats)
@@ -198,6 +203,12 @@ function PlayField:hitNote(note)
             return
         end
         local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
+        if event.showSplash then
+            self:showNoteSplash(note.lane, note.skin, note.strumLine)
+        end
+        if event.showHoldCover then
+            self:showHoldCover(note.lane, note, note.skin, note.strumLine)
+        end
         if game then
             game.opponent:playSingAnimation(note.lane)
             game.opponent.holdTimer = game.opponent.holdTimer + note.length
@@ -217,6 +228,17 @@ function PlayField:showNoteSplash(lane, skin, strumLine)
     splash.playField = self
     splash:setup(lane, skin, strumLine)
     self.splashes:moveChild(splash, self.splashes:getChildCount())
+end
+
+--- @param lane      integer
+--- @param note      funkin.gameplay.notes.Note
+--- @param skin      string
+--- @param strumLine funkin.gameplay.notes.StrumLine
+function PlayField:showHoldCover(lane, note, skin, strumLine)
+    local cover = self.noteField.holdCovers:recycle(HoldCover) --- @type funkin.gameplay.notes.HoldCover
+    cover.playField = self
+    cover:setup(lane, note, skin, strumLine)
+    self.noteField.holdCovers:moveChild(cover, self.noteField.holdCovers:getChildCount())
 end
 
 --- @param note funkin.gameplay.notes.Note

@@ -1,13 +1,13 @@
-local json = cometreq("lib.json") --- @type comet.lib.Json
+local json = cometreq("lib.json")                         --- @type comet.lib.Json
 
-local Sustain = srcreq("funkin.gameplay.notes.sustain") --- @type funkin.gameplay.notes.Sustain
+local Sustain = srcreq("funkin.gameplay.notes.sustain")   --- @type funkin.gameplay.notes.Sustain
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 
 --- @class funkin.gameplay.notes.Note : comet.gfx.AnimatedImage
 local Note, super = AnimatedImage:subclass("Note", ...)
 
-local dirs = {"left", "down", "up", "right"}
-local upperDirs = {"LEFT", "DOWN", "UP", "RIGHT"}
+local dirs = { "left", "down", "up", "right" }
+local upperDirs = { "LEFT", "DOWN", "UP", "RIGHT" }
 
 function Note:__init__()
     super.__init__(self)
@@ -23,12 +23,12 @@ function Note:__init__()
     self.wasHit = false
     self.wasMissed = false
 
-    self.strumLine = nil --- @type funkin.gameplay.notes.StrumLine
-    self.playField = nil --- @type funkin.gameplay.PlayField
+    self.strumLine = nil         --- @type funkin.gameplay.notes.StrumLine
+    self.playField = nil         --- @type funkin.gameplay.PlayField
 
     self.sustain = Sustain:new() --- @type funkin.gameplay.notes.Sustain
     self.sustain.note = self
-    
+
     self.offsetX, self.offsetY = 0.0, 0.0
 end
 
@@ -47,13 +47,14 @@ function Note:loadSkin(skin)
         for i = 1, #dirs do
             local dir = dirs[i]
             local animData = d[dir]
-    
+
             if animData.indices and animData.indices ~= json.null and #animData.indices > 0 then
                 self:addAnimationByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
             else
                 self:addAnimationByName(dir .. name, animData.prefix, animData.fps, animData.looped)
             end
-            self:setAnimationOffset(dir .. name, (animData and animData.offset) and animData.offset[1] or 0.0, (animData and animData.offset) and animData.offset[2] or 0.0)
+            self:setAnimationOffset(dir .. name, (animData and animData.offset) and animData.offset[1] or 0.0,
+                (animData and animData.offset) and animData.offset[2] or 0.0)
         end
     end
     self.alpha = self.skinData.note.alpha or 1.0
@@ -86,8 +87,9 @@ end
 
 function Note:updatePosition()
     local strum = self.strumLine:getChild(self.lane + 1) --- @type funkin.gameplay.notes.Strum
-    
-    local baseX, baseY = self.strumLine.position.x + strum.position.x + self.offsetX, self.strumLine.position.y + strum.position.y + self.offsetY
+
+    local baseX, baseY = self.strumLine.position.x + strum.position.x + self.offsetX,
+        self.strumLine.position.y + strum.position.y + self.offsetY
     self.position.x = baseX
 
     local speed = self.strumLine.scrollSpeed
@@ -111,7 +113,7 @@ function Note:update(dt)
         -- if note is too late to hit, miss
         self.playField:missNote(self)
     end
-    if self.wasHit and not self.wasMissed and not self.strumLine.botplay and Controls.instance.justReleased["NOTE_" .. upperDirs[self.lane + 1]] then
+    if self.wasHit and not self.wasMissed and not self.strumLine.botplay and self.time > Conductor.instance:getCurrentPlayhead() - (self.length - 100) and Controls.instance.justReleased["NOTE_" .. upperDirs[self.lane + 1]] then
         -- if you let go too early, miss
         self.playField:missNote(self)
     end
