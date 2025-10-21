@@ -443,6 +443,8 @@ function PlayScreen:exit()
     c:resume()
 
     self.canPause = false
+    Paths.forceMod = nil
+
     PlayScreen.static.instance = nil
 end
 

@@ -21,7 +21,7 @@ function FreeplayScreen:enter()
     self.menu = AtlasTextMenu:new() --- @type funkin.ui.AtlasTextMenu
     self:addChild(self.menu)
 
-    local assetLoaders = Paths._registeredAssetLoaders
+    local assetLoaders = table.copy(Paths._registeredAssetLoaders)
     local assetLoadersCopy = table.copy(Paths._registeredAssetLoaders)
 
     -- ensure base game goes first
