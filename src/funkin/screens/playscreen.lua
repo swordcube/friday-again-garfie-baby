@@ -84,7 +84,7 @@ function PlayScreen:enter()
     
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     c.music = nil
-    c.offset = 50
+    c.offset = 40
     c:reset(self.currentChart.meta.song.timingPoints[1].b, self.currentChart.meta.song.timingPoints[1].ts)
     c:setupTimingPoints(self.currentChart.meta.song.timingPoints)
     c:setCurrentRawTime(c:getCurrentBeatLength() * -5)

@@ -103,7 +103,7 @@ function table.filter(t, func)
     local filtered = {}
     for _, value in ipairs(t) do
         if func(value) then
-            _table.insert(filtered, value)
+            filtered[#filtered+1] = value
         end
     end
     return filtered

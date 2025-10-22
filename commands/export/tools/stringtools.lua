@@ -58,12 +58,12 @@ function string.split(self, delimiter)
     local result = {}
     if #delimiter == 0 then
         for i = 1, #self do
-            table.insert(result, self:sub(i, i))
+            result[#result+1] = self:sub(i, i)
         end
     else
         local regex = ("([^%s]+)"):format(delimiter)
         for each in self:gmatch(regex) do
-            table.insert(result, each)
+            result[#result+1] = each
         end
     end
     return result

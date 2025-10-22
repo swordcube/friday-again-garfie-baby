@@ -7,8 +7,7 @@ comet.init({
         fpsCap = 0,
         bgColor = {0.0, 0.0, 0.0, 1.0},
         dimensions = {1280, 720},
-        parallelUpdate = false,
-        frequentGc = false
+        parallelUpdate = false
     },
     screen = function() return srcreq("funkin.screens.initscreen"):new() end
 })
