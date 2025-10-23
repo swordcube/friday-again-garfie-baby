@@ -79,9 +79,9 @@ function MainMenuScreen:enter()
         local buttonData = self.options[i]
         local button = AnimatedImage:new() --- @type comet.gfx.AnimatedImage
         button:setFrameCollection(Paths.getSparrowAtlas("menus/main/" .. buttonData.id))
-        button:addAnimationByName("idle", ("%s idle"):format(buttonData.id), 24, true)
-        button:addAnimationByName("selected", ("%s selected"):format(buttonData.id), 24, true)
-        button:playAnimation("idle")
+        button.animation:addByName("idle", ("%s idle"):format(buttonData.id), 24, true)
+        button.animation:addByName("selected", ("%s selected"):format(buttonData.id), 24, true)
+        button.animation:play("idle")
         button.position:set(0, (i - 1) * 160)
         self.grpButtons:addChild(button)
     end
@@ -152,9 +152,9 @@ function MainMenuScreen:changeSelection(by, force)
                 self.grpButtons.position.x + button.position.x,
                 self.grpButtons.position.y + button.position.y
             )
-            button:playAnimation("selected")
+            button.animation:play("selected")
         else
-            button:playAnimation("idle")
+            button.animation:play("idle")
         end
     end
     comet.mixer:play(Paths.sound("menus/sfx/scroll"))
