@@ -61,7 +61,7 @@ function Character:loadCharacter(newCharacter)
         else
             self.animation:addByName(anim.shortcut or anim.name, anim.prefix or anim.name, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
         end
-        self:setAnimationOffset(anim.shortcut or anim.name, anim.offset[1] or 0.0, anim.offset[2] or 0.0)
+        self.animation:setOffset(anim.shortcut or anim.name, anim.offset[1] or 0.0, anim.offset[2] or 0.0)
     end
     local localIsPlayer = self.config.isPlayer
     if localIsPlayer == nil then
@@ -69,9 +69,9 @@ function Character:loadCharacter(newCharacter)
     end
     if self.isPlayer ~= localIsPlayer then
         -- swap left & right sing anims if player-intended character is used on non-player character instance
-        local old = self._animations[self.config.singSteps[1]]
-        self._animations[self.config.singSteps[1]] = self._animations[self.config.singSteps[4]]
-        self._animations[self.config.singSteps[4]] = old
+        local old = self.animation._animations[self.config.singSteps[1]]
+        self.animation._animations[self.config.singSteps[1]] = self.animation._animations[self.config.singSteps[4]]
+        self.animation._animations[self.config.singSteps[4]] = old
     end
     self.scale:set(
         self.config.scale and self.config.scale or 1.0,
@@ -194,7 +194,7 @@ function Character:update(dt)
             self.curDanceStep = 1
             self:dance()
         end
-    elseif self.curAnimContext == "none" and not self:isPlaying() then
+    elseif self.curAnimContext == "none" and not self.animation:isPlaying() then
         self:dance()
     end
     if self.script then

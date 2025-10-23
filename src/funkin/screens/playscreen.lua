@@ -335,6 +335,7 @@ function PlayScreen:endSong()
         self.scripts:call("onEndSong")
         self.scripts:call("onSongEnd")
     end
+    comet.settings.timeScale = 1
 end
 
 function PlayScreen:pauseGame()
@@ -444,7 +445,8 @@ function PlayScreen:exit()
 
     self.canPause = false
     Paths.forceMod = nil
-
+    
+    comet.settings.timeScale = 1
     PlayScreen.static.instance = nil
 end
 

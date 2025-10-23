@@ -81,9 +81,10 @@ function FreeplayScreen:enter()
 end
 
 function FreeplayScreen:addSong(id, contentPack)
-    local metadata, err = CoolUtil.parseJson(Paths.json(("songs/%s/default/metadata"):format(id), contentPack))
+    local metaPath = Paths.json(("songs/%s/default/metadata"):format(id), contentPack)
+    local metadata, err = CoolUtil.parseJson(metaPath)
     if not metadata then
-        FLog.warn(("Failed to load default song metadata for %s from %s: %s"):format(id, contentPack, err))
+        FLog.warn(("Failed to load default song metadata for %s from %s: %s"):format(id, contentPack, (not fs.isFile(metaPath)) and "metadata.json doesn't exist" or err))
     end
     self.menu:addItem(metadata and metadata.song.title or id)
 end

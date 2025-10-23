@@ -79,8 +79,6 @@ function InitScreen:enter()
     else
         self:forceSwitchTo(srcreq("funkin.screens.titlescreen"):new())
     end
-    
-    MusicBeatScreen.static.skipNextTransIn = true
 end
 
 return InitScreen

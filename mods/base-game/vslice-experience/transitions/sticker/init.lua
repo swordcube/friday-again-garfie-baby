@@ -54,8 +54,8 @@ function StickerTransition:startOut()
         local sticky = AnimatedImage:new() --- @type comet.gfx.AnimatedImage
         sticky.id = stickyID
         sticky:setFrameCollection(frames)
-        sticky:addAnimationByName("s", stickerNames[stickyID], 0, false)
-        sticky:playAnimation("s", true)
+        sticky.animation:addByName("s", stickerNames[stickyID], 0, false)
+        sticky.animation:play("s", true)
         sticky.visible = false
         
         sticky.position:set(xPos + (sticky:getOriginalWidth() / 2), yPos + (sticky:getOriginalHeight() / 2))
@@ -127,8 +127,8 @@ function StickerTransition:startIn()
 
         local sticky = AnimatedImage:new() --- @type comet.gfx.AnimatedImage
         sticky:setFrameCollection(frames)
-        sticky:addAnimationByName("s", stickerData.name, 0, false)
-        sticky:playAnimation("s", true)
+        sticky.animation:addByName("s", stickerData.name, 0, false)
+        sticky.animation:play("s", true)
         sticky.visible = true
         
         sticky.position:set(stickerData.x, stickerData.y)
