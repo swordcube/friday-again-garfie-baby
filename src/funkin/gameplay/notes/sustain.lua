@@ -85,14 +85,14 @@ function Sustain:updateVisuals()
     if speedSign == 1 then
         -- upscroll
         self.line.position.y = self.line:getHeight() * 0.5
-        self.line.flipY = false
+        self.line.flipY = true
         
         self.tail.position.y = self.line:getHeight() + (self.tail:getHeight() * 0.5)
         self.tail.flipY = false
     else
         -- downscroll
         self.line.position.y = -(self.line:getHeight() * 0.5)
-        self.line.flipY = true
+        self.line.flipY = false
 
         self.tail.position.y = -(self.line:getHeight() + (self.tail:getHeight() * 0.5))
         self.tail.flipY = true

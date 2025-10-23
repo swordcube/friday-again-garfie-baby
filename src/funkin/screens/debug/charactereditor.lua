@@ -5,9 +5,11 @@ local Character = srcreq("funkin.gameplay.character") --- @type funkin.gameplay.
 local CharacterConfig = srcreq("funkin.gameplay.character.config") --- @type funkin.gameplay.character.Config
 
 --- @class funkin.screens.debug.CharacterEditor : funkin.screens.MusicBeatScreen
-local CharacterEditor = MusicBeatScreen:subclass("CharacterEditor", ...)
+local CharacterEditor, super = MusicBeatScreen:subclass("CharacterEditor", ...)
 
 function CharacterEditor:enter()
+    super.enter(self)
+
     self.persistentUpdate = true
     CharacterConfig.clearCache()
 
@@ -93,7 +95,7 @@ function CharacterEditor:input(e)
             end
         else
             if comet.keys:wasJustPressed("space") then
-                self.character:playAnimation(self.character:getCurrentAnimation(), self.character.lastAnimContext, true)
+                self.character:playAnimation(self.character.animation:getCurrentAnimation(), self.character.lastAnimContext, true)
             end
             if comet.keys:wasJustPressed("w") then
                 self:changeSelection(-1)
@@ -148,27 +150,29 @@ function CharacterEditor:input(e)
 end
 
 function CharacterEditor:setAnimOffset(name, x, y)
-    self.character:setAnimationOffset(self.character.config.animations[self.curSelected].name, x, y)
-    self.shadowCharacter:setAnimationOffset(self.character.config.animations[self.curSelected].name, x, y)
+    self.character.animation:setOffset(name, x, y)
     self.character.config.animations[self.curSelected].offset = {x, y}
+    
+    self.shadowCharacter.animation:setOffset(name, x, y)
 
     local label = self.animLabels:getChild(self.curSelected) --- @type comet.gfx.Label
-    label.text = ("%s%s (%d, %d)"):format("> ", self.character.config.animations[self.curSelected].name, x, y)
+    label.text = ("%s%s (%d, %d)"):format("> ", name, x, y)
 end
 
 function CharacterEditor:addAnimOffset(name, x, y)
-    local curOffset = self.character:getAnimationOffset(self.character.config.animations[self.curSelected].name)
+    local curOffset = self.character.animation:getOffset(name)
     x, y = curOffset.x + x, curOffset.y + y
 
-    self.character:setAnimationOffset(self.character.config.animations[self.curSelected].name, x, y)
-    self.shadowCharacter:setAnimationOffset(self.character.config.animations[self.curSelected].name, x, y)
+    self.character.animation:setOffset(name, x, y)
+    self.shadowCharacter.animation:setOffset(name, x, y)
     self.character.config.animations[self.curSelected].offset = {x, y}
 
     local label = self.animLabels:getChild(self.curSelected) --- @type comet.gfx.Label
-    label.text = ("%s%s (%d, %d)"):format("> ", self.character.config.animations[self.curSelected].name, x, y)
+    label.text = ("%s%s (%d, %d)"):format("> ", name, x, y)
 end
 
 function CharacterEditor:update(dt)
+    super.update(self, dt)
     if comet.keys:isPressed("j") then
         self.camera.scroll.x = self.camera.scroll.x - (300 * dt)
     end
@@ -182,7 +186,7 @@ function CharacterEditor:update(dt)
         self.camera.scroll.y = self.camera.scroll.y + (300 * dt)
     end
     if comet.mouse:isPressed("left") then
-        local curOffset = self.character:getAnimationOffset(self.character.config.animations[self.curSelected].name)
+        local curOffset = self.character.animation:getOffset(self.character.config.animations[self.curSelected].name)
         self:setAnimOffset(
             self.character.config.animations[self.curSelected].name,
             curOffset.x + ((comet.mouse.position.x - self.lastMousePos.x) / self.camera.zoom.x),
@@ -197,9 +201,6 @@ function CharacterEditor:update(dt)
         )
         self.lastMousePos:set(comet.mouse.position.x, comet.mouse.position.y)
     end
-end
-
-function CharacterEditor:exit()
 end
 
 return CharacterEditor

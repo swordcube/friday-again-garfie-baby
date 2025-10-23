@@ -34,6 +34,12 @@ function EditorPicker:enter()
             callback = function()
                 self:switchTo(srcreq("funkin.screens.debug.charactereditor"):new())
             end
+        },
+        {
+            name = "UI Debug Screen",
+            callback = function()
+                self:switchTo(srcreq("funkin.screens.debug.uidebugscreen"):new())
+            end
         }
     }
     self.uiLayer = Parallax2D:new() --- @type comet.gfx.Parallax2D

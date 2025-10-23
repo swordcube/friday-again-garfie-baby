@@ -1,4 +1,5 @@
 local fs = love.filesystem
+local json = cometreq("lib.json") --- @type comet.lib.Json
 
 local Path = cometreq("util.path") --- @type comet.util.Path
 
@@ -175,7 +176,7 @@ function PlayScreen:enter()
     UISkin.get(self.currentChart.meta.game.uiSkin)
 
     local tracks = self.currentChart.meta.song.tracks
-    if tracks then
+    if tracks and tracks ~= json.null then
         local tempTracks = {}
         for i = 1, #tracks.opponent do
             local track = tracks.opponent[i]
@@ -265,15 +266,13 @@ function PlayScreen:update(dt)
         if comet.keys:wasJustPressed("h") then
             self.camHUD.visible = not self.camHUD.visible
         end
-        if comet.mouse.wheel.y ~= 0 then
+        if (comet.keys:isPressed("lctrl") or comet.keys:isPressed("rctrl")) and comet.mouse.wheel.y ~= 0 then
             self.defaultCamZoom = self.defaultCamZoom - ((comet.mouse.wheel.y * 0.1) * self.defaultCamZoom)
         end
     end
-
     if self.controls.justPressed.PAUSE then
         self:pauseGame()
     end
-
     local focusedCharacter, focusedCharacterType = self.opponent, "opponent"
     if self.curCameraTarget == 2 then
         focusedCharacter, focusedCharacterType = self.player, "player"
