@@ -57,9 +57,9 @@ function Character:loadCharacter(newCharacter)
     for i = 1, #anims do
         local anim = anims[i]
         if anim.indices and anim.indices ~= json.null and #anim.indices ~= 0 then
-            self:addAnimationByIndices(anim.shortcut or anim.name, anim.prefix or anim.name, anim.indices, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
+            self.animation:addByIndices(anim.shortcut or anim.name, anim.prefix or anim.name, anim.indices, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
         else
-            self:addAnimationByName(anim.shortcut or anim.name, anim.prefix or anim.name, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
+            self.animation:addByName(anim.shortcut or anim.name, anim.prefix or anim.name, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
         end
         self:setAnimationOffset(anim.shortcut or anim.name, anim.offset[1] or 0.0, anim.offset[2] or 0.0)
     end
@@ -134,11 +134,11 @@ end
 function Character:playAnimation(name, context, force)
     local lastAnimContext = self.curAnimContext
     if context == "dance" then
-        if lastAnimContext == "none" and not self:isFinished() then
+        if lastAnimContext == "none" and not self.animation:isFinished() then
             return
         end
     elseif context == "sing" then
-        if lastAnimContext == "none" and not self:isFinished() then
+        if lastAnimContext == "none" and not self.animation:isFinished() then
             return
         end
         self.holdTimer = Conductor.instance:getCurrentStepLength() * self.singDuration

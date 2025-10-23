@@ -30,14 +30,14 @@ function Strum:__init__(x, y, keyCount, direction, skin)
         local animData = d[dirs[self.direction + 1]]
 
         if animData.indices and animData.indices ~= json.null and #animData.indices > 0 then
-            self:addAnimationByIndices(name, animData.prefix, animData.indices, animData.fps, animData.looped)
+            self.animation:addByIndices(name, animData.prefix, animData.indices, animData.fps, animData.looped)
         else
-            self:addAnimationByName(name, animData.prefix, animData.fps, animData.looped)
+            self.animation:addByName(name, animData.prefix, animData.fps, animData.looped)
         end
         self:setAnimationOffset(name, (animData and animData.offset) and animData.offset[1] or 0.0, (animData and animData.offset) and animData.offset[2] or 0.0)
     end
     self.scale:set(self.skinData.strum.scale, self.skinData.strum.scale)
-    self:playAnimation("static")
+    self.animation:play("static")
 
     self.initialWidth, self.initialHeight = self:getWidth(), self:getHeight()
 
@@ -47,7 +47,7 @@ function Strum:__init__(x, y, keyCount, direction, skin)
     self.onComplete:connect(function(name)
         if name == "confirm" and self.susLength > 0.0 then
             if self:hasAnimation("confirm-hold") then
-                self:playAnimation("confirm-hold", true)
+                self.animation:play("confirm-hold", true)
             end
         end
     end)
@@ -56,7 +56,7 @@ end
 function Strum:update(dt)
     self.holdTimer = self.holdTimer - (dt * 1000.0)
     if self.holdTimer <= 0.0 then
-        self:playAnimation("static")
+        self.animation:play("static")
         self.holdTimer = math.huge
     end
     super.update(self, dt)
@@ -65,7 +65,7 @@ end
 function Strum:glow(bot, susLength)
     self.susLength = susLength
     self.holdTimer = bot and math.max(susLength, 150) or math.huge
-    self:playAnimation("confirm", true)
+    self.animation:play("confirm", true)
 end
 
 return Strum

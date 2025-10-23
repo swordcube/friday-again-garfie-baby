@@ -40,13 +40,13 @@ function HealthIcon:loadCharacter(character)
     end
     self:setFrameCollection(FrameCollection.fromTexture(iconPath, gridSize, gridSize))
 
-    self:addAnimation("idle", {1}, 0, true)
-    self:addAnimation("losing", {2}, 0, true)
+    self.animation:add("idle", {1}, 0, true)
+    self.animation:add("losing", {2}, 0, true)
 
     if self:getFrameCollection():getFrameCount("grid") > 2 then
-        self:addAnimation("winning", {3}, 0, true)
+        self.animation:add("winning", {3}, 0, true)
     end
-    self:playAnimation("idle")
+    self.animation:play("idle")
 end
 
 function HealthIcon:getHealth()
@@ -62,11 +62,11 @@ function HealthIcon:setHealth(newHealth)
 
     -- TODO: add support for transitional animations between states
     if newHealth <= 0.2 and self:hasAnimation("losing") then
-        self:playAnimation("losing")
+        self.animation:play("losing")
     elseif newHealth >= 0.8 and self:hasAnimation("winning") then
-        self:playAnimation("winning")
+        self.animation:play("winning")
     else
-        self:playAnimation("idle")
+        self.animation:play("idle")
     end
 end
 

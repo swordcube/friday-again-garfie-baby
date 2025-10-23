@@ -46,9 +46,9 @@ function NoteSplash:loadSkin(skin)
             local animData = d[dir]
     
             if animData.indices and animData.indices ~= json.null and #animData.indices > 0 then
-                self:addAnimationByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
+                self.animation:addByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
             else
-                self:addAnimationByName(dir .. name, animData.prefix, animData.fps, animData.looped)
+                self.animation:addByName(dir .. name, animData.prefix, animData.fps, animData.looped)
             end
             self:setAnimationOffset(dir .. name, (animData and animData.offset) and animData.offset[1] or 0.0, (animData and animData.offset) and animData.offset[2] or 0.0)
         end
@@ -70,7 +70,7 @@ function NoteSplash:setup(lane, skin, strumLine)
     self.strumLine = strumLine
 
     self:loadSkin(skin or "funkin")
-    self:playAnimation(dirs[lane + 1] .. "splash" .. tostring(math.floor(love.math.random(1, self.animCount))), true)
+    self.animation:play(dirs[lane + 1] .. "splash" .. tostring(math.floor(love.math.random(1, self.animCount))), true)
 end
 
 function NoteSplash:updatePosition()

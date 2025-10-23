@@ -169,10 +169,10 @@ function Conductor:setupTimingPoints(timingPoints)
     local lastTopNumber = timingPoints[1].ts[1]
     local lastBottomNumber = timingPoints[1].ts[2]
 
-    local lastBPM = timingPoints[1].bpm
+    local lastBPM = timingPoints[1].b
     for i = 2, #timingPoints do
         local point = timingPoints[i]
-        local beatDifference = (point.time - timeOffset) / (60000.0 / lastBPM)
+        local beatDifference = (point.t - timeOffset) / (60000.0 / lastBPM)
 
         measureOffset = measureOffset + (beatDifference / lastTopNumber)
         beatOffset = beatOffset + beatDifference

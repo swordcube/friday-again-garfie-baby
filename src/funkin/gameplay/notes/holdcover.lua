@@ -22,7 +22,7 @@ function HoldCover:__init__()
 
     self.onComplete:connect(function(name)
         if name:endsWith("start") then
-            self:playAnimation(dirs[self.lane + 1] .. "hold", true)
+            self.animation:play(dirs[self.lane + 1] .. "hold", true)
         
         elseif name:endsWith("end") then
             self:kill()
@@ -52,9 +52,9 @@ function HoldCover:loadSkin(skin)
             local animData = d[dir]
     
             if animData.indices and animData.indices ~= json.null and #animData.indices > 0 then
-                self:addAnimationByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
+                self.animation:addByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
             else
-                self:addAnimationByName(dir .. name, animData.prefix, animData.fps, animData.looped)
+                self.animation:addByName(dir .. name, animData.prefix, animData.fps, animData.looped)
             end
             self:setAnimationOffset(dir .. name, (animData and animData.offset) and animData.offset[1] or 0.0, (animData and animData.offset) and animData.offset[2] or 0.0)
         end
@@ -77,7 +77,7 @@ function HoldCover:setup(lane, note, skin, strumLine)
     self.strumLine = strumLine
 
     self:loadSkin(skin or "funkin")
-    self:playAnimation(dirs[lane + 1] .. "start", true)
+    self.animation:play(dirs[lane + 1] .. "start", true)
 end
 
 function HoldCover:updatePosition()
@@ -103,7 +103,7 @@ function HoldCover:update(dt)
             if strum:getCurrentAnimation():startsWith("confirm") then
                 strum:playAnimation("press", true)
             end
-            self:playAnimation(dirs[self.lane + 1] .. "end", true)
+            self.animation:play(dirs[self.lane + 1] .. "end", true)
         end
     end
 end

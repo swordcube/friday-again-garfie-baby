@@ -62,7 +62,7 @@ function DefaultHUD:updatePlayerStats(stats)
     if self.playField.playerStrumLine.botplay then
         self.scoreText.text = "Botplay Enabled"
     else
-        self.scoreText.text = ("Score: %s"):format(math.formatMoney(stats.score, false, true))
+        self.scoreText.text = ("Score: %s"):format(math.formatMoney(math.floor(stats.displayedScore), false, true))
     end
 end
 
@@ -94,6 +94,16 @@ function DefaultHUD:update(dt)
         self.iconP1:setGraphicSize(0, math.floor(150 * scale))
     end
     self:updateIcons()
+
+    local stats = self.playField.stats
+    local diff = math.floor(math.abs(stats.score - stats.displayedScore))
+    if diff <= 10 then
+        stats.displayedScore = stats.score
+        self:updatePlayerStats(stats)
+    else
+        stats.displayedScore = math.lerp(stats.displayedScore, stats.score, dt * Conductor.instance:getCurrentStepLength() * 0.5)
+        self:updatePlayerStats(stats)
+    end
 end
 
 function DefaultHUD:beatHit(b)

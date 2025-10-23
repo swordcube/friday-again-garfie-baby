@@ -49,6 +49,8 @@ function PlayField:__init__()
         totalNotesHit = 0,
 
         score = 0,
+        displayedScore = 0, -- optional, use if you wanna smoothly lerp to score on sustains
+
         accuracy = 0,
     }
     self.scoreDisplay = ScoreDisplay:new(comet.getDesiredWidth() * 0.55, comet.getDesiredHeight() * 0.5) --- @type funkin.gameplay.ui.ScoreDisplay
@@ -173,7 +175,10 @@ function PlayField:hitNote(note)
             self.scoreDisplay:showCombo(self.stats.combo)
         end
         self.stats.score = self.stats.score + event.score
+        self.stats.displayedScore = self.stats.displayedScore + event.score
+
         self.stats.health = math.clamp(self.stats.health + event.health, self.stats.minHealth, self.stats.maxHealth)
+        note.holdScoreBonus = math.round((event.score / 3.33333333333) * 2.33333333333)
 
         if event.showSplash then
             self:showNoteSplash(note.lane, note.skin, note.strumLine)
@@ -275,6 +280,8 @@ function PlayField:missNote(note)
         self.stats.missCombo = event.combo
 
         self.stats.score = self.stats.score - event.score
+        self.stats.displayedScore = self.stats.displayedScore - event.score
+
         self.stats.health = math.clamp(self.stats.health - event.health, self.stats.minHealth, self.stats.maxHealth)
         
         if self.hud then

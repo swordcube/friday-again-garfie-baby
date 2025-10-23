@@ -49,9 +49,9 @@ function Note:loadSkin(skin)
             local animData = d[dir]
 
             if animData.indices and animData.indices ~= json.null and #animData.indices > 0 then
-                self:addAnimationByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
+                self.animation:addByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
             else
-                self:addAnimationByName(dir .. name, animData.prefix, animData.fps, animData.looped)
+                self.animation:addByName(dir .. name, animData.prefix, animData.fps, animData.looped)
             end
             self:setAnimationOffset(dir .. name, (animData and animData.offset) and animData.offset[1] or 0.0,
                 (animData and animData.offset) and animData.offset[2] or 0.0)
@@ -78,11 +78,15 @@ function Note:setup(time, lane, length, type, strumLine)
     self.wasMissed = false
     self.alpha, self.sustain.alpha, self.visible = 1, 1, true
 
+    self.stepLength = Conductor.instance:getCurrentStepLength()
+    self.holdTime = self.time
+    self.holdScoreBonus = 145
+
     local strum = strumLine:getChild(lane + 1) --- @type funkin.gameplay.notes.Strum
     self:loadSkin(strum.skin)
 
     self.offsetX, self.offsetY = 0.0, 0.0
-    self:playAnimation(dirs[lane + 1] .. "scroll", true)
+    self.animation:play(dirs[lane + 1] .. "scroll", true)
 end
 
 function Note:updatePosition()
@@ -106,6 +110,12 @@ function Note:update(dt)
     end
     self:updatePosition()
 
+    if self.length > 0 and self.exists and self.wasHit and not self.wasMissed and self.strumLine == self.playField.playerStrumLine and self.holdTime <= Conductor.instance:getCurrentPlayhead() then
+        self.playField.stats.score = self.playField.stats.score + self.holdScoreBonus
+        self.playField.hud:updatePlayerStats(self.playField.stats)
+        
+        self.holdTime = self.holdTime + self.stepLength
+    end
     if not self.wasHit and self.strumLine.botplay and self.time <= Conductor.instance:getCurrentPlayhead() then
         self.playField:hitNote(self)
     end
