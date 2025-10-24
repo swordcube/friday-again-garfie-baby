@@ -2,7 +2,7 @@ local fs = love.filesystem
 local Path = cometreq("util.path") --- @type comet.util.Path
 
 --- @class funkin.backend.assets.loaders.AssetLoader
-local AssetLoader = Class("AssetLoader", ...)
+local AssetLoader = Class:extend("AssetLoader", ...)
 
 --- @param name string
 --- @param root string

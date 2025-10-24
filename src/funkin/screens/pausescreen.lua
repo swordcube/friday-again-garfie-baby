@@ -1,7 +1,7 @@
 local AtlasTextMenu = srcreq("funkin.ui.atlastextmenu") --- @type funkin.ui.AtlasTextMenu
 
 --- @class funkin.screens.PauseScreen : funkin.screens.MusicBeatSubScreen
-local PauseScreen, super = MusicBeatSubScreen:subclass("PauseScreen")
+local PauseScreen, super = MusicBeatSubScreen:extend("PauseScreen")
 
 function PauseScreen:enter()
     super.enter(self)
@@ -116,7 +116,7 @@ function PauseScreen:showPage(page)
         for i = 1, #diffs do
             local diff = diffs[i]
             self:addOption(diff, function()
-                local params = PlayScreen.static.lastParams
+                local params = PlayScreen.lastParams
                 params.difficulty = diff
 
                 self.persistentUpdate = false

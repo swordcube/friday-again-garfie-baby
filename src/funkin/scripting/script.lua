@@ -1,7 +1,7 @@
 local fs = love.filesystem
 
 --- @class funkin.scripting.Script : comet.util.Class
-local Script = Class("Script", ...)
+local Script = Class:extend("Script", ...)
 
 local closedEnv = setmetatable({}, {
 	__index = function() error("You cannot use a closed script!") end,

@@ -54,7 +54,7 @@ end
 
 function VolumeTray.show(up)
     local volumeChunks = math.round(comet.mixer:getMasterVolume() * 10)
-    Timer.wait(0.01, function(_)
+    Timer.wait(0, function(_)
         if up then
             comet.mixer:play(volumeChunks >= 10 and VolumeTray.sfx.max or VolumeTray.sfx.up)
         else

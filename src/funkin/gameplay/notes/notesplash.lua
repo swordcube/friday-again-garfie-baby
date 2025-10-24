@@ -2,7 +2,7 @@ local json = cometreq("lib.json") --- @type comet.lib.Json
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 
 --- @class funkin.gameplay.notes.NoteSplash : comet.gfx.AnimatedImage
-local NoteSplash, super = AnimatedImage:subclass("NoteSplash", ...)
+local NoteSplash, super = AnimatedImage:extend("NoteSplash", ...)
 
 local dirs = {"left", "down", "up", "right"}
 

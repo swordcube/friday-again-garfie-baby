@@ -4,7 +4,7 @@ local json = require(_CHARTY_PARENT .. ".lib.json") --- @type charty.lib.Json
 local fs = require(_CHARTY_PARENT .. ".lib.nativefs") --- @type charty.lib.nativefs
 
 --- @class charty.formats.FNFVSlice : charty.Format
-local FNFVSlice, super = Format:subclass("FNFVSlice", ...)
+local FNFVSlice, super = Format:extend("FNFVSlice", ...)
 
 function FNFVSlice:__init__()
     super.__init__(self)

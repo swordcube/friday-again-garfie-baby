@@ -4,7 +4,7 @@ local TiledAnimatedImage = cometreq("gfx.tiledanimatedimage") --- @type comet.gf
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 
 --- @class funkin.gameplay.notes.Sustain : comet.gfx.TiledAnimatedImage
-local Sustain, super = Object2D:subclass("Sustain", ...)
+local Sustain, super = Object2D:extend("Sustain", ...)
 
 local sign, abs = math.sign, math.abs
 local dirs = {"left", "down", "up", "right"}

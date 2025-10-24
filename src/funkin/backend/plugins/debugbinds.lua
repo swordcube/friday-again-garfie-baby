@@ -1,7 +1,7 @@
 local Plugin = cometreq("core.plugin") --- @type comet.core.Plugin
 
 --- @class funkin.backend.plugins.DebugBinds : comet.core.Plugin
-local DebugBinds = Plugin:subclass("DebugBinds", ...)
+local DebugBinds = Plugin:extend("DebugBinds", ...)
 
 function DebugBinds:input(_)
     if Controls.instance.justReleased.RELOAD then

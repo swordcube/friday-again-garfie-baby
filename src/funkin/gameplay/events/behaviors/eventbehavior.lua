@@ -2,7 +2,7 @@ local fs = love.filesystem
 local ScriptPack = srcreq("funkin.scripting.scriptpack") --- @type funkin.scripting.ScriptPack
 
 --- @class funkin.gameplay.events.behaviors.EventBehavior : comet.util.Class
-local EventBehavior = Class("EventBehavior", ...)
+local EventBehavior = Class:extend("EventBehavior", ...)
 
 function EventBehavior:__init__(name)
     self.name = name

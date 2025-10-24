@@ -2,7 +2,7 @@ local fs = love.filesystem
 local AtlasTextMenu = srcreq("funkin.ui.atlastextmenu") --- @type funkin.ui.AtlasTextMenu
 
 --- @class funkin.screens.FreeplayScreen : funkin.screens.MusicBeatScreen
-local FreeplayScreen, super = MusicBeatScreen:subclass("FreeplayScreen", ...)
+local FreeplayScreen, super = MusicBeatScreen:extend("FreeplayScreen", ...)
 
 function FreeplayScreen:enter()
     super.enter(self)

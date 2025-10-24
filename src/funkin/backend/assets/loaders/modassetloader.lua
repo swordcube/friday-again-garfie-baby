@@ -4,7 +4,7 @@ local Path = cometreq("util.path") --- @type comet.util.Path
 local AssetLoader = srcreq("funkin.backend.assets.loaders.assetloader") --- @type funkin.backend.assets.loaders.AssetLoader
 
 --- @class funkin.backend.assets.loaders.ModAssetLoader : funkin.backend.assets.loaders.AssetLoader
-local ModAssetLoader, super = AssetLoader:subclass("ModAssetLoader", ...)
+local ModAssetLoader, super = AssetLoader:extend("ModAssetLoader", ...)
 
 function ModAssetLoader:__init__(mod)
     super.__init__(self, "ModAssetLoader", "mods/" .. mod)

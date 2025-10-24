@@ -36,10 +36,10 @@ function onUpdate(dt)
         setThatShit(getPlaybackRate() - amount)
     end
     if funny then
-        setThatShit(math.abs(math.sin(Conductor.instance.curDecStep) * 0.25) + 0.75)
+        setThatShit(math.abs(math.sin(Conductor.instance.curDecStep) * 0.25) + 1)
     end
     local wheel = comet.mouse.wheel.y
     if wheel ~= 0 then
-        setThatShit(getPlaybackRate() - (wheel * 0.01))
+        setThatShit(getPlaybackRate() - (wheel * 0.05))
     end
 end

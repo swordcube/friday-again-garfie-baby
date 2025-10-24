@@ -1,5 +1,5 @@
 --- @class funkin.gameplay.scoring.ScoringSystem : comet.util.Class
-local ScoringSystem = Class("ScoringSystem", ...)
+local ScoringSystem = Class:extend("ScoringSystem", ...)
 
 function ScoringSystem:__init__() end
 

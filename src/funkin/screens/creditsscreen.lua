@@ -1,5 +1,5 @@
 --- @class funkin.screens.CreditsScreen : funkin.screens.MusicBeatScreen
-local CreditsScreen = MusicBeatScreen:subclass("CreditsScreen", ...)
+local CreditsScreen = MusicBeatScreen:extend("CreditsScreen", ...)
 
 function CreditsScreen:enter()
 end

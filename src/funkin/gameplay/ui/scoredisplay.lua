@@ -3,7 +3,7 @@ local RuntimeTextureAtlas = srcreq("funkin.gfx.rta") --- @type funkin.gfx.Runtim
 local AnimatedVelocityImage = srcreq("funkin.gfx.animatedvelocityimage") --- @type funkin.gfx.AnimatedVelocityImage
 
 --- @class funkin.gameplay.ui.ScoreDisplay : comet.gfx.Object2D
-local ScoreDisplay, super = Object2D:subclass("ScoreDisplay", ...)
+local ScoreDisplay, super = Object2D:extend("ScoreDisplay", ...)
 
 local math, lmath = math, love.math
 

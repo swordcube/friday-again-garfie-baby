@@ -2,7 +2,7 @@ local gfx = love.graphics
 
 --- @class funkin.gfx.Video : comet.gfx.Image
 --- A basic object for displaying video.
-local Video, super = Image:subclass("Video", ...)
+local Video, super = Image:extend("Video", ...)
 
 function Video:__init__(filePath, settings)
     super.__init__(self)
@@ -57,9 +57,10 @@ function Video:draw()
     gfx.setBlendMode("alpha", "alphamultiply")
     gfx.setColor(self._tint.r, self._tint.g, self._tint.b, self._tint.a * self.alpha)
 
-    local prevShader = gfx.getShader()
     if self.shader then
         gfx.setShader(self.shader)
+    else
+        gfx.setShader(comet._defaultShader)
     end
     local img = self.video.image --- @type love.Image
     if img then
@@ -67,10 +68,6 @@ function Video:draw()
         img:setFilter(filter, filter)
     end
     gfx.draw(self.video, transform:getRenderValues())
-
-    if self.shader then
-        gfx.setShader(prevShader)
-    end
     gfx.setColor(pr, pg, pb, pa)
 
     if comet.settings.debugDraw then

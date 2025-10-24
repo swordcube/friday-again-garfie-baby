@@ -1,11 +1,11 @@
-local StickerTransition, super = Transition:subclass("StickerTransition", ...)
-StickerTransition.static.stickerPack = "stickers-set-1"
+local StickerTransition, super = Transition:extend("StickerTransition", ...)
+StickerTransition.stickerPack = "stickers-set-1"
 
 local fs = love.filesystem
 
 function StickerTransition:__init__(type, finishCallback, stickerPack)
     super.__init__(self, type, finishCallback)
-    self.stickerPack = stickerPack or vse_temp.stickerPack or StickerTransition.static.stickerPack or "stickers-set-1"
+    self.stickerPack = stickerPack or vse_temp.stickerPack or StickerTransition.stickerPack or "stickers-set-1"
 end
 
 function StickerTransition:enter()

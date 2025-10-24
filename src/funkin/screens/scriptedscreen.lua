@@ -1,5 +1,5 @@
 --- @class funkin.screens.ScriptedScreen : funkin.screens.MusicBeatScreen
-local ScriptedScreen, super = MusicBeatScreen:subclass("ScriptedScreen", ...)
+local ScriptedScreen, super = MusicBeatScreen:extend("ScriptedScreen", ...)
 
 function ScriptedScreen:__init__(scriptName)
     self.scriptName = scriptName

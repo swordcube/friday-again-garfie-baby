@@ -1,14 +1,14 @@
 --- @class funkin.scripting.events.ScriptEvent : comet.util.Class
-local ScriptEvent = Class("ScriptEvent", ...)
+local ScriptEvent = Class:extend("ScriptEvent", ...)
 
-ScriptEvent.static._cache = {} --- @protected
+ScriptEvent._cache = {} --- @protected
 
 function ScriptEvent.get(type)
-    if not ScriptEvent.static._cache[type] then
+    if not ScriptEvent._cache[type] then
         local e = srcreq(("funkin.scripting.events.%s%s"):format(type, "event")):new() --- @type funkin.scripting.events.ScriptEvent
-        ScriptEvent.static._cache[type] = e
+        ScriptEvent._cache[type] = e
     end
-    return ScriptEvent.static._cache[type]
+    return ScriptEvent._cache[type]
 end
 
 function ScriptEvent:__init__()

@@ -4,7 +4,7 @@ local Sustain = srcreq("funkin.gameplay.notes.sustain")   --- @type funkin.gamep
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 
 --- @class funkin.gameplay.notes.Note : comet.gfx.AnimatedImage
-local Note, super = AnimatedImage:subclass("Note", ...)
+local Note, super = AnimatedImage:extend("Note", ...)
 
 local dirs = { "left", "down", "up", "right" }
 local upperDirs = { "LEFT", "DOWN", "UP", "RIGHT" }
@@ -110,7 +110,7 @@ function Note:update(dt)
     end
     self:updatePosition()
 
-    if self.length > 0 and self.exists and self.wasHit and not self.wasMissed and self.strumLine == self.playField.playerStrumLine and self.holdTime <= Conductor.instance:getCurrentPlayhead() then
+    while self.length > 0 and self.exists and self.wasHit and not self.wasMissed and self.strumLine == self.playField.playerStrumLine and self.holdTime <= Conductor.instance:getCurrentPlayhead() do
         self.playField.stats.score = self.playField.stats.score + self.holdScoreBonus
         self.playField.hud:updatePlayerStats(self.playField.stats)
         

@@ -6,7 +6,7 @@ local Glyph = srcreq("funkin.ui.atlastext.glyph") --- @type funkin.ui.AtlasText.
 
 --- @class funkin.ui.AtlasText : comet.gfx.Object2D
 --- A basic object for displaying text from an atlas instead of a static font.
-local AtlasText, super = Object2D:subclass("AtlasText", ...)
+local AtlasText, super = Object2D:extend("AtlasText", ...)
 
 function AtlasText:__init__(x, y, font, size, text)
     super.__init__(self, x, y)

@@ -1,7 +1,7 @@
 local EventBehavior = srcreq("funkin.gameplay.events.behaviors.eventbehavior") --- @type funkin.gameplay.events.behaviors.EventBehavior
 
 --- @class funkin.gameplay.events.behaviors.CameraPanBehavior : funkin.gameplay.events.behaviors.EventBehavior
-local CameraPanBehavior, super = EventBehavior:subclass("CameraPanBehavior", ...)
+local CameraPanBehavior, super = EventBehavior:extend("CameraPanBehavior", ...)
 
 function CameraPanBehavior:execute(time, params)
     if self.scripts then

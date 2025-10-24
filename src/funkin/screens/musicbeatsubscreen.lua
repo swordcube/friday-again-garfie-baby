@@ -4,14 +4,14 @@ local Script = srcreq("funkin.scripting.script") --- @type funkin.scripting.Scri
 local ScriptPack = srcreq("funkin.scripting.scriptpack") --- @type funkin.scripting.ScriptPack
 
 --- @class funkin.screens.MusicBeatSubScreen : comet.core.Screen
-local MusicBeatSubScreen, super = Screen:subclass("MusicBeatSubScreen", ...)
+local MusicBeatSubScreen, super = Screen:extend("MusicBeatSubScreen", ...)
 
 function MusicBeatSubScreen:__init__(scriptName)
     super.__init__(self)
     self.scriptName = scriptName
 
     --- Shortcut to global controls instance
-    self.controls = Controls.static.instance --- @type funkin.backend.Controls
+    self.controls = Controls.instance --- @type funkin.backend.Controls
 
     self.subScreenScripts = ScriptPack:new() --- @type funkin.scripting.ScriptPack
     self.subScreenScripts:linkObject(self)

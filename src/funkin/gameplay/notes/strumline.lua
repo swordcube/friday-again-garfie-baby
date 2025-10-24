@@ -1,7 +1,7 @@
 local Strum = srcreq("funkin.gameplay.notes.strum") --- @type funkin.gameplay.notes.Strum
 
 --- @class funkin.gameplay.notes.StrumLine : comet.gfx.Object2D
-local StrumLine, super = Object2D:subclass("StrumLine", ...)
+local StrumLine, super = Object2D:extend("StrumLine", ...)
 
 function StrumLine:__init__(x, y, downscroll, keyCount, skin)
     super.__init__(self, x, y)

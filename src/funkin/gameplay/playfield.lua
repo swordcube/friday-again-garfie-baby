@@ -11,7 +11,7 @@ local ScoreDisplay = srcreq("funkin.gameplay.ui.scoredisplay") --- @type funkin.
 local ScriptEvent = srcreq("funkin.scripting.events.scriptevent") --- @type funkin.scripting.events.ScriptEvent
 
 --- @class funkin.gameplay.PlayField : comet.gfx.Object2D
-local PlayField, super = Object2D:subclass("PlayField", ...)
+local PlayField, super = Object2D:extend("PlayField", ...)
 
 local math = math
 local upperDirs = {"LEFT", "DOWN", "UP", "RIGHT"}
@@ -74,6 +74,9 @@ function PlayField:__init__()
     self.noteField.playField = self
     self:addChild(self.noteField)
 
+    self.holdCovers = Object2D:new() --- @type comet.gfx.Object2D
+    self:addChild(self.holdCovers)
+
     self.splashes = Object2D:new() --- @type comet.gfx.Object2D
     self:addChild(self.splashes)
 
@@ -116,7 +119,28 @@ function PlayField:prepareChart(chart, difficulty)
             return a.d < b.d
         end)
     end
-    self.noteField.pendingNotes = chart.n[difficulty]
+    local allNotes = chart.n[difficulty]
+    local notesToCheck = {
+        table.filter(allNotes, function(n) return n.d < 4 end),
+        table.filter(allNotes, function(n) return n.d > 3 end)
+    }
+    for s = 1, #notesToCheck do
+        local strumOffset = ((s - 1) * 4) + 1
+        for i = strumOffset, 4 + strumOffset do
+            local dirSpecificNotes = table.filter(notesToCheck[s], function(n) return n.d == i - 1 end)
+            table.sort(dirSpecificNotes, function(a, b) return a.t < b.t end)
+
+            local lastNote = nil
+            for j = 1, #dirSpecificNotes do
+                local dirNote = dirSpecificNotes[j]
+                if lastNote ~= nil and math.abs(dirNote.t - lastNote.t) <= 5 then
+                    table.removeItem(allNotes, dirNote)
+                end
+                lastNote = dirNote
+            end
+        end
+    end
+    self.noteField.pendingNotes = allNotes
     self.noteField.curNoteIndex = 1
 
     for i = 1, self.strumLines:getChildCount() do
@@ -240,10 +264,10 @@ end
 --- @param skin      string
 --- @param strumLine funkin.gameplay.notes.StrumLine
 function PlayField:showHoldCover(lane, note, skin, strumLine)
-    local cover = self.noteField.holdCovers:recycle(HoldCover) --- @type funkin.gameplay.notes.HoldCover
+    local cover = self.holdCovers:recycle(HoldCover) --- @type funkin.gameplay.notes.HoldCover
     cover.playField = self
     cover:setup(lane, note, skin, strumLine)
-    self.noteField.holdCovers:moveChild(cover, self.noteField.holdCovers:getChildCount())
+    self.holdCovers:moveChild(cover, self.holdCovers:getChildCount())
 end
 
 --- @param note funkin.gameplay.notes.Note

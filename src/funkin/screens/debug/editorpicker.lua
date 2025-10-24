@@ -1,5 +1,5 @@
 --- @class funkin.screens.debug.EditorPicker : funkin.screens.MusicBeatSubScreen
-local EditorPicker = MusicBeatSubScreen:subclass("EditorPicker", ...)
+local EditorPicker = MusicBeatSubScreen:extend("EditorPicker", ...)
 
 function EditorPicker:enter()
     self.bg = Image:new() --- @type comet.gfx.Image

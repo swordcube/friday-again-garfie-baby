@@ -5,7 +5,7 @@ local Character = srcreq("funkin.gameplay.character") --- @type funkin.gameplay.
 local CharacterConfig = srcreq("funkin.gameplay.character.config") --- @type funkin.gameplay.character.Config
 
 --- @class funkin.screens.debug.CharacterEditor : funkin.screens.MusicBeatScreen
-local CharacterEditor, super = MusicBeatScreen:subclass("CharacterEditor", ...)
+local CharacterEditor, super = MusicBeatScreen:extend("CharacterEditor", ...)
 
 function CharacterEditor:enter()
     super.enter(self)

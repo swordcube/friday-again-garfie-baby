@@ -19,19 +19,19 @@ local EventRunner = srcreq("funkin.gameplay.events.eventrunner") --- @type funki
 local PauseScreen = srcreq("funkin.screens.pausescreen") --- @type funkin.screens.PauseScreen
 
 --- @class funkin.screens.PlayScreen : funkin.screens.MusicBeatScreen
-local PlayScreen, super = MusicBeatScreen:subclass("PlayScreen", ...)
+local PlayScreen, super = MusicBeatScreen:extend("PlayScreen", ...)
 
-PlayScreen.static.instance = nil --- @type funkin.screens.PlayScreen
-PlayScreen.static.lastParams = nil
-PlayScreen.static.deathCounter = 0
+PlayScreen.instance = nil --- @type funkin.screens.PlayScreen
+PlayScreen.lastParams = nil
+PlayScreen.deathCounter = 0
 
 function PlayScreen:__init__(params)
     super.__init__(self)
-    
+
     if not params then
-        params = PlayScreen.static.lastParams
+        params = PlayScreen.lastParams
     else
-        PlayScreen.static.lastParams = params
+        PlayScreen.lastParams = params
     end
     self.currentSong = params.song
     self.currentDifficulty = params.difficulty
@@ -40,12 +40,12 @@ function PlayScreen:__init__(params)
 end
 
 function PlayScreen.resetStatics()
-    PlayScreen.static.instance = nil
-    PlayScreen.static.deathCounter = 0
+    PlayScreen.instance = nil
+    PlayScreen.deathCounter = 0
 end
 
 function PlayScreen:enter()
-    PlayScreen.static.instance = self
+    PlayScreen.instance = self
     super.enter(self)
 
     if Conductor.instance:isPaused() then
@@ -74,7 +74,7 @@ function PlayScreen:enter()
         self.parentContentPack = Paths.getModFromPath(instPath)
     end
     assert(fs.isFile(instPath), ("Instrumental doesn't exist for %s [%s / %s]"):format(self.currentSong, self.currentMix, self.currentDifficulty))
-    
+
     comet.mixer.music:stop()
     comet.mixer.music:setSource(instPath)
     comet.mixer.music:setLooping(false)
@@ -82,7 +82,7 @@ function PlayScreen:enter()
 
     self.currentChart = CoolUtil.parseJson(Paths.json(("songs/%s/%s/chart"):format(self.currentSong, self.currentMix), self.parentContentPack))
     self.currentChart.meta = CoolUtil.parseJson(Paths.json(("songs/%s/%s/metadata"):format(self.currentSong, self.currentMix), self.parentContentPack))
-    
+
     local c = Conductor.instance --- @type funkin.backend.plugins.Conductor
     c.music = nil
     c.offset = 40
@@ -101,7 +101,7 @@ function PlayScreen:enter()
 
     --- Controls how many beats it will take to bop the camera
     self.camZoomingInterval = -1
-    
+
     --- How many beats it has taken to bop the camera
     self.camZoomingOffset = -1
 
@@ -167,7 +167,7 @@ function PlayScreen:enter()
     self.camGame.zoom:set(self.defaultCamZoom, self.defaultCamZoom)
 
     Scoring.resetSystem()
-    
+
     NoteSkin.clearCache()
     UISkin.clearCache()
 
@@ -305,7 +305,7 @@ end
 
 function PlayScreen:startSong()
     self.startingSong = false
-    
+
     self.inst:play()
     Conductor.instance.music = self.inst
 
@@ -361,7 +361,7 @@ end
 
 function PlayScreen:resumeGame()
     self.scripts:call("onResumeGame")
-    
+
     self.persistentUpdate = true
 
     self.paused = false
@@ -430,7 +430,7 @@ function PlayScreen:exit()
     self.scripts:call("onDestroy")
     self.scripts:close()
     self.scripts = nil
-    
+
     local tracks = self.vocalTracks
     for i = 1, #tracks do
         tracks[i]:destroy()
@@ -444,9 +444,9 @@ function PlayScreen:exit()
 
     self.canPause = false
     Paths.forceMod = nil
-    
+
     comet.settings.timeScale = 1
-    PlayScreen.static.instance = nil
+    PlayScreen.instance = nil
 end
 
 return PlayScreen

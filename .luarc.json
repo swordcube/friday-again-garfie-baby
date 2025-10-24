@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "runtime": {
+    "version": "LuaJIT",
+    "special": {
+      "love.filesystem.load": "loadfile"
+    },
+    "unicodeName": true
+  },
+  "workspace": {
+    "library": ["../love2d/library", "."]
+  },
+  "diagnostics": {
+    "globals": ["love", "comet"],
+    "disable": [
+      "lowercase-global",
+      "duplicate-set-field",
+      "need-check-nil",
+      "undefined-field",
+      "undefined-doc-param",
+      "param-type-mismatch",
+      "assign-type-mismatch",
+      "return-type-mismatch",
+      "inject-field"
+    ]
+  }
+}

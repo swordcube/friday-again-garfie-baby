@@ -5,20 +5,20 @@ function onShowPagePost(page, optionNames, optionCallbacks)
         optionCallbacks[exitIdx] = function()
             -- switch to sticker transition
             local t = require("transitions.sticker")
-            t.static.stickerPack = "stickers-set-1"
+            t.stickerPack = "stickers-set-1"
 
             local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
             if game then
                 local stickyPack = game.currentChart.meta.game.stickerPack
                 if stickyPack then
-                    t.static.stickerPack = stickyPack
+                    t.stickerPack = stickyPack
                 end
             end
-            Transition.static.currentType = t
+            Transition.currentType = t
 
             -- reset to default transition once we're done
             comet.signals.postScreenSwitch:connect(function()
-                Transition.static.currentType = Transition.defaultType
+                Transition.currentType = Transition.defaultType
             end, true)
 
             -- call previous callback (usually does as promised, ...exits to menu)

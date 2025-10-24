@@ -2,7 +2,7 @@ local fs = love.filesystem
 local CharacterConfig = srcreq("funkin.gameplay.character.config") --- @type funkin.gameplay.character.Config
 
 --- @class funkin.gameplay.ui.HealthIcon : comet.gfx.AnimatedImage
-local HealthIcon, super = AnimatedImage:subclass("HealthIcon", ...)
+local HealthIcon, super = AnimatedImage:extend("HealthIcon", ...)
 
 function HealthIcon:__init__(character, isPlayer)
     super.__init__(self)

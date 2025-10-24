@@ -2,7 +2,7 @@ local Signal = cometreq("util.signal") --- @type comet.util.Signal
 local EventBehavior = srcreq("funkin.gameplay.events.behaviors.eventbehavior") --- @type funkin.gameplay.events.behaviors.EventBehavior
 
 --- @class funkin.gameplay.events.EventRunner : comet.core.Object
-local EventRunner, super = Object:subclass("EventRunner", ...)
+local EventRunner, super = Object:extend("EventRunner", ...)
 
 function EventRunner:__init__()
     super.__init__(self)
@@ -32,13 +32,13 @@ end
 --- @param eventType string
 --- @return funkin.gameplay.events.behaviors.EventBehavior
 function EventRunner:createBehavior(eventType)
-    if not EventRunner.static.eventTypeToBehavior then
-        EventRunner.static.eventTypeToBehavior = {
+    if not EventRunner.eventTypeToBehavior then
+        EventRunner.eventTypeToBehavior = {
             ["Camera Pan"] = srcreq("funkin.gameplay.events.behaviors.camerapanbehavior"),
         }
     end
-    if EventRunner.static.eventTypeToBehavior[eventType] then
-        return EventRunner.static.eventTypeToBehavior[eventType]:new(eventType)
+    if EventRunner.eventTypeToBehavior[eventType] then
+        return EventRunner.eventTypeToBehavior[eventType]:new(eventType)
     end
     return EventBehavior:new(eventType)
 end

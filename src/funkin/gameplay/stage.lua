@@ -4,7 +4,7 @@ local json = cometreq("lib.json") --- @type comet.lib.Json
 local Character = srcreq("funkin.gameplay.character") --- @type funkin.gameplay.Character
 
 --- @class funkin.gameplay.Stage : comet.gfx.Object2D
-local Stage, super = Object2D:subclass("Stage", ...)
+local Stage, super = Object2D:extend("Stage", ...)
 
 function Stage:__init__(name)
     super.__init__(self)

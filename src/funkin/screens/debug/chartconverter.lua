@@ -2,7 +2,7 @@ local Path = cometreq("util.path") --- @type comet.util.Path
 local Charty = srcreq("charty") --- @type charty.Charty
 
 --- @class funkin.screens.debug.ChartConverter : funkin.screens.MusicBeatScreen
-local ChartConverter = MusicBeatScreen:subclass("ChartConverter", ...)
+local ChartConverter = MusicBeatScreen:extend("ChartConverter", ...)
 
 function ChartConverter:enter()
     self.persistentUpdate = true

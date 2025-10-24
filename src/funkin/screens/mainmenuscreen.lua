@@ -1,7 +1,7 @@
 local TiledAnimatedImage = cometreq("gfx.tiledanimatedimage") --- @type comet.gfx.TiledAnimatedImage
 
 --- @class funkin.screens.MainMenuScreen : funkin.screens.MusicBeatScreen
-local MainMenuScreen = MusicBeatScreen:subclass("MainMenuScreen", ...)
+local MainMenuScreen = MusicBeatScreen:extend("MainMenuScreen", ...)
 
 function MainMenuScreen:enter()
     self.persistentUpdate = true

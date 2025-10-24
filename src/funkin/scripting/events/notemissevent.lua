@@ -1,7 +1,7 @@
 local ScriptEvent = srcreq("funkin.scripting.events.scriptevent") --- @type funkin.scripting.events.ScriptEvent
 
 --- @class funkin.scripting.events.NoteMissEvent : funkin.scripting.events.ScriptEvent
-local NoteMissEvent, super = ScriptEvent:subclass("NoteMissEvent", ...)
+local NoteMissEvent, super = ScriptEvent:extend("NoteMissEvent", ...)
 
 function NoteMissEvent:__init__()
     super.__init__(self)

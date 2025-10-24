@@ -1,5 +1,5 @@
 --- @class funkin.ui.AtlasTextMenu : comet.gfx.Object2D
-local AtlasTextMenu, super = Object2D:subclass("AtlasTextMenu", ...)
+local AtlasTextMenu, super = Object2D:extend("AtlasTextMenu", ...)
 
 function AtlasTextMenu:__init__(x, y)
     super.__init__(self, x, y)

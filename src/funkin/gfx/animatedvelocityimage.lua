@@ -1,5 +1,5 @@
 --- @class funkin.gfx.AnimatedVelocityImage : comet.gfx.AnimatedImage
-local AnimatedVelocityImage, super = AnimatedImage:subclass("AnimatedVelocityImage", ...)
+local AnimatedVelocityImage, super = AnimatedImage:extend("AnimatedVelocityImage", ...)
 
 function AnimatedVelocityImage:__init__(x, y)
     super.__init__(self, x, y)

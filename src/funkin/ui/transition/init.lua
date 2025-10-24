@@ -1,15 +1,15 @@
 local Signal = cometreq("util.signal") --- @type comet.util.Signal
 
 --- @class funkin.ui.Transition : comet.core.Screen
-local Transition, super = Screen:subclass("Transition", ...)
+local Transition, super = Screen:extend("Transition", ...)
 
-Transition.static.defaultType = nil --- @type funkin.ui.Transition
-Transition.static.currentType = Transition.defaultType
+Transition.defaultType = nil --- @type funkin.ui.Transition
+Transition.currentType = Transition.defaultType
 
 function Transition.setDefaultTransition(type, setCurrent)
-    Transition.static.defaultType = type
+    Transition.defaultType = type
     if setCurrent then
-        Transition.static.currentType = type
+        Transition.currentType = type
     end
 end
 

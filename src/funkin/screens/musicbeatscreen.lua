@@ -5,16 +5,16 @@ local Script = srcreq("funkin.scripting.script") --- @type funkin.scripting.Scri
 local ScriptPack = srcreq("funkin.scripting.scriptpack") --- @type funkin.scripting.ScriptPack
 
 --- @class funkin.screens.MusicBeatScreen : comet.core.Screen
-local MusicBeatScreen, super = Screen:subclass("MusicBeatScreen", ...)
+local MusicBeatScreen, super = Screen:extend("MusicBeatScreen", ...)
 
-MusicBeatScreen.static.skipNextTransOut = false
-MusicBeatScreen.static.skipNextTransIn = false
+MusicBeatScreen.skipNextTransOut = false
+MusicBeatScreen.skipNextTransIn = false
 
 function MusicBeatScreen:__init__()
     super.__init__(self)
 
     --- Shortcut to global controls instance
-    self.controls = Controls.static.instance --- @type funkin.backend.Controls
+    self.controls = Controls.instance --- @type funkin.backend.Controls
 
     --- Whether or not to stop updating this screen when a transition occurs.
     self.persistentUpdate = false
@@ -58,11 +58,11 @@ end
 function MusicBeatScreen:startIntro()
     self.screenScripts:call("onStartIntro")
     
-    if not MusicBeatScreen.static.skipNextTransIn then
-        self.currentTransition = Transition.static.currentType:new("in") --- @type funkin.ui.Transition
+    if not MusicBeatScreen.skipNextTransIn then
+        self.currentTransition = Transition.currentType:new("in") --- @type funkin.ui.Transition
         self:openSubScreen(self.currentTransition)
     end
-    MusicBeatScreen.static.skipNextTransIn = false
+    MusicBeatScreen.skipNextTransIn = false
 
     self.screenScripts:call("onStartIntroPost")
 end
@@ -89,7 +89,7 @@ function MusicBeatScreen:startOutro(onOutroComplete)
     self.screenScripts:call("onStartOutro")
     
     if not MusicBeatScreen.skipNextTransOut then
-        self.currentTransition = Transition.static.currentType:new("out", onOutroComplete) --- @type funkin.ui.Transition
+        self.currentTransition = Transition.currentType:new("out", onOutroComplete) --- @type funkin.ui.Transition
         self:openSubScreen(self.currentTransition)
     else
         onOutroComplete()

@@ -1,9 +1,9 @@
 local fs = love.filesystem
 
 --- @class funkin.screens.TitleScreen : funkin.screens.MusicBeatScreen
-local TitleScreen, super = MusicBeatScreen:subclass("TitleScreen", ...)
+local TitleScreen, super = MusicBeatScreen:extend("TitleScreen", ...)
 
-TitleScreen.static.initialized = false
+TitleScreen.initialized = false
 
 -- TODO: the hue shader & cheat code thingie
 

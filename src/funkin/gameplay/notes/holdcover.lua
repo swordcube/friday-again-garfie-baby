@@ -2,7 +2,7 @@ local json = cometreq("lib.json") --- @type comet.lib.Json
 local NoteSkin = srcreq("funkin.gameplay.notes.noteskin") --- @type funkin.gameplay.notes.NoteSkin
 
 --- @class funkin.gameplay.notes.HoldCover : comet.gfx.AnimatedImage
-local HoldCover, super = AnimatedImage:subclass("HoldCover", ...)
+local HoldCover, super = AnimatedImage:extend("HoldCover", ...)
 
 local dirs = {"left", "down", "up", "right"}
 

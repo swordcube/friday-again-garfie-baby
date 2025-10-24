@@ -1,5 +1,5 @@
 --- @class funkin.screens.InitScreen : comet.core.Screen
-local InitScreen = Screen:subclass("InitScreen", ...)
+local InitScreen = Screen:extend("InitScreen", ...)
 
 function InitScreen:enter()
     FLog = srcreq("funkin.util.flog") --- @type funkin.util.FLog
@@ -9,7 +9,7 @@ function InitScreen:enter()
     Transition.setDefaultTransition(srcreq("funkin.ui.transition.gradientswipe"), true)
 
     MusicBeatScreen = srcreq("funkin.screens.musicbeatscreen") --- @type funkin.screens.MusicBeatScreen
-    MusicBeatScreen.static.skipNextTransIn = true
+    MusicBeatScreen.skipNextTransIn = true
 
     MusicBeatSubScreen = srcreq("funkin.screens.musicbeatsubscreen") --- @type funkin.screens.MusicBeatSubScreen
 
@@ -31,7 +31,7 @@ function InitScreen:enter()
     Options.init()
 
     Controls = srcreq("funkin.backend.controls") --- @type funkin.backend.Controls
-    Controls.static.instance = Controls:new()
+    Controls.instance = Controls:new()
 
     Conductor = srcreq("funkin.backend.plugins.conductor") --- @type funkin.backend.plugins.Conductor
     Conductor.instance = Conductor:new()

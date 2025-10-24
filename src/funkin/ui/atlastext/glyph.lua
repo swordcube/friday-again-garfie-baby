@@ -1,5 +1,5 @@
 --- @class funkin.ui.AtlasText.Glyph : comet.gfx.AnimatedImage
-local Glyph, super = AnimatedImage:subclass("AtlasText.Glyph", ...)
+local Glyph, super = AnimatedImage:extend("AtlasText.Glyph", ...)
 
 local allLetters = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 

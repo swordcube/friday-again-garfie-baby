@@ -1,5 +1,5 @@
 --- @class funkin.gameplay.huds.BaseHUD : comet.gfx.Object2D 
-local BaseHUD, super = Object2D:subclass("BaseHUD", ...)
+local BaseHUD, super = Object2D:extend("BaseHUD", ...)
 
 function BaseHUD:__init__(playField, name)
     super.__init__(self)

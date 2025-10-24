@@ -2,7 +2,7 @@ local BaseHUD = srcreq("funkin.gameplay.huds.basehud") --- @type funkin.gameplay
 local HealthIcon = srcreq("funkin.gameplay.ui.healthicon") --- @type funkin.gameplay.ui.HealthIcon
 
 --- @class funkin.gameplay.huds.DefaultHUD : funkin.gameplay.huds.BaseHUD
-local DefaultHUD, super = BaseHUD:subclass("DefaultHUD", ...)
+local DefaultHUD, super = BaseHUD:extend("DefaultHUD", ...)
 
 -- TODO: the pixel icons randomly disappear for one frame sometimes and i have no clue why
 

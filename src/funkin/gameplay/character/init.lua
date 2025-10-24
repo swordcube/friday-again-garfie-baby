@@ -4,9 +4,9 @@ local json = cometreq("lib.json") --- @type comet.lib.Json
 local CharacterConfig = srcreq("funkin.gameplay.character.config") --- @type funkin.gameplay.character.Config
 
 --- @class funkin.gameplay.Character : comet.gfx.AnimatedImage
-local Character, super = AnimatedImage:subclass("Character", ...)
+local Character, super = AnimatedImage:extend("Character", ...)
 
-Character.static.FALLBACK_CHARACTER = "bf"
+Character.FALLBACK_CHARACTER = "bf"
 
 function Character:__init__(x, y, name, isPlayer)
     super.__init__(self, x, y)

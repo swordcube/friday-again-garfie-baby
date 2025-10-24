@@ -1,7 +1,7 @@
 local fs = love.filesystem
 
 --- @class funkin.scripting.ScriptPack : comet.util.Class
-local ScriptPack = Class("ScriptPack", ...)
+local ScriptPack = Class:extend("ScriptPack", ...)
 
 function ScriptPack:__init__()
     self.scripts = {} --- @type funkin.scripting.Script[]

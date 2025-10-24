@@ -1,7 +1,7 @@
 local Note = srcreq("funkin.gameplay.notes.note") --- @type funkin.gameplay.notes.Note
 
 --- @class funkin.gameplay.notes.NoteField : comet.gfx.Object2D
-local NoteField, super = Object2D:subclass("NoteField", ...)
+local NoteField, super = Object2D:extend("NoteField", ...)
 
 local INTERVAL_30_FPS = 1.0 / 30.0
 
@@ -18,9 +18,6 @@ function NoteField:__init__()
 
     self.notes = Object2D:new() --- @type comet.gfx.Object2D
     self:addChild(self.notes)
-
-    self.holdCovers = Object2D:new() --- @type comet.gfx.Object2D
-    self:addChild(self.holdCovers)
 
     self._createNote = function()
         local n = Note:new() --- @type funkin.gameplay.notes.Note

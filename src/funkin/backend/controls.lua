@@ -1,7 +1,7 @@
 --- @class funkin.backend.Controls : comet.util.Class
-local Controls = Class("Controls", ...)
+local Controls = Class:extend("Controls", ...)
 
-Controls.static.instance = nil --- @type funkin.backend.Controls
+Controls.instance = nil --- @type funkin.backend.Controls
 
 function Controls:__init__()
     self._rawMappings = {}

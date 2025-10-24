@@ -2,7 +2,7 @@ local ScriptEvent = srcreq("funkin.scripting.events.scriptevent") --- @type funk
 local Scoring = srcreq("funkin.gameplay.scoring") --- @type funkin.gameplay.Scoring
 
 --- @class funkin.scripting.events.NoteHitEvent : funkin.scripting.events.ScriptEvent
-local NoteHitEvent, super = ScriptEvent:subclass("NoteHitEvent", ...)
+local NoteHitEvent, super = ScriptEvent:extend("NoteHitEvent", ...)
 
 function NoteHitEvent:__init__()
     super.__init__(self)
