@@ -24,4 +24,9 @@
       "inject-field"
     ]
   }
+  "workspace.library": [
+    "thirdparty/comet",
+    "thirdparty/lovevlc",
+    "src"
+  ]
 }
