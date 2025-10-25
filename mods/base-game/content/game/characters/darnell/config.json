@@ -19,7 +19,7 @@
 			"name": "singLEFT",
 			"offset": [
 				0,
-				-11
+				-1
 			],
 			"prefix": "Pose Left",
 			"texture": null
@@ -31,7 +31,7 @@
 			"name": "singDOWN",
 			"offset": [
 				-4,
-				-51
+				9
 			],
 			"prefix": "Pose Down",
 			"texture": null
@@ -42,8 +42,8 @@
 			"looped": false,
 			"name": "singUP",
 			"offset": [
-				-15,
-				79
+				-12,
+				-3
 			],
 			"prefix": "Pose Up",
 			"texture": null
@@ -55,7 +55,7 @@
 			"name": "singRIGHT",
 			"offset": [
 				-2,
-				14
+				-2
 			],
 			"prefix": "Pose Right",
 			"texture": null

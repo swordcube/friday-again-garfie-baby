@@ -67,7 +67,7 @@ function onLoadPost()
         mist.position.y + (mist:getOriginalHeight() - mist:getHeight())
     )
     insertProp("mist3", mist, {0.95, 0.95}, 7)
-    
+
     local mist = Backdrop:new(getStageImage("philly-streets-erect/images/mistMid"), "x") --- @type comet.gfx.Backdrop
     mist.position:set(-650, -100)
     mist.blend = "add"
@@ -137,12 +137,12 @@ function onLoadPost()
 
             spr.position.y = spr.position.y + ((spr:getHeight(1) * 0.98) + spr.reflectionOffY)
             spr:_draw()
-            
+
             spr.alpha = prevAlpha
             spr.flipY = not spr.flipY
             spr:setShader(prevShader)
             spr.position.y = spr.position.y - ((spr:getHeight(1) * 0.98) + spr.reflectionOffY)
-            
+
             woman.visible = not woman.visible
             spr:_draw()
         end

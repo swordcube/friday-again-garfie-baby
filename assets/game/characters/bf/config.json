@@ -18,8 +18,8 @@
 			"looped": true,
 			"name": "scared",
 			"offset": [
-				5,
-				19
+				6,
+				-1
 			],
 			"prefix": "BF idle shaking",
 			"texture": null
@@ -30,8 +30,8 @@
 			"looped": false,
 			"name": "singLEFT",
 			"offset": [
-				-15,
-				20
+				-5,
+				6
 			],
 			"prefix": "BF NOTE LEFT",
 			"texture": null
@@ -42,8 +42,8 @@
 			"looped": false,
 			"name": "singLEFTmiss",
 			"offset": [
-				-15,
-				-6
+				-3,
+				-19
 			],
 			"prefix": "BF NOTE LEFT MISS",
 			"texture": null
@@ -54,8 +54,8 @@
 			"looped": false,
 			"name": "singDOWN",
 			"offset": [
-				-2,
-				14
+				17,
+				52
 			],
 			"prefix": "BF NOTE DOWN",
 			"texture": null
@@ -66,8 +66,8 @@
 			"looped": false,
 			"name": "singDOWNmiss",
 			"offset": [
-				-4,
-				-17
+				16,
+				21
 			],
 			"prefix": "BF NOTE DOWN MISS",
 			"texture": null
@@ -78,8 +78,8 @@
 			"looped": false,
 			"name": "singUP",
 			"offset": [
-				30,
-				27
+				47,
+				-24
 			],
 			"prefix": "BF NOTE UP",
 			"texture": null
@@ -90,8 +90,8 @@
 			"looped": false,
 			"name": "singUPmiss",
 			"offset": [
-				26,
-				27
+				43,
+				-23
 			],
 			"prefix": "BF NOTE UP MISS",
 			"texture": null
@@ -103,7 +103,7 @@
 			"name": "singRIGHT",
 			"offset": [
 				48,
-				18
+				8
 			],
 			"prefix": "BF NOTE RIGHT",
 			"texture": null
@@ -115,7 +115,7 @@
 			"name": "singRIGHTmiss",
 			"offset": [
 				43,
-				-10
+				-20
 			],
 			"prefix": "BF NOTE RIGHT MISS",
 			"texture": null

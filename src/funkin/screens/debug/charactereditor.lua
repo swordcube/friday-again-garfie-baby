@@ -17,7 +17,7 @@ function CharacterEditor:enter()
     self.camera:setBackgroundColor(Color.GRAY)
     self:addChild(self.camera)
 
-    local chosenCharacter = "darnell"
+    local chosenCharacter = "bf"
     local config = CharacterConfig.get(chosenCharacter)
 
     self.shadowCharacter = Character:new(0, 0, chosenCharacter, config.isPlayer) --- @type funkin.gameplay.Character
@@ -25,7 +25,7 @@ function CharacterEditor:enter()
     self.shadowCharacter:setTint(Color.BLACK)
     self.shadowCharacter.alpha = 0.45
     self.camera:addChild(self.shadowCharacter)
-    
+
     self.character = Character:new(0, 0, chosenCharacter, config.isPlayer) --- @type funkin.gameplay.Character
     self.character.debugMode = true
     self.camera:addChild(self.character)
@@ -77,7 +77,7 @@ function CharacterEditor:input(e)
     if e.type == "key" then
         local holdinShift = comet.keys:isPressed("lshift") or comet.keys:isPressed("rshift")
         local holdinCtrl = comet.keys:isPressed("lctrl") or comet.keys:isPressed("rctrl")
-        
+
         if holdinCtrl and comet.keys:wasJustPressed("s") then
             local jsonStr = json.beautify(self.character.config, {newline = "\n", indent = "\t", depth = 0})
             local success, result = pcall(love.filesystem.openNativeFile, Paths.json("game/characters/" .. self.character.name .. "/config"), "w") --- @type love.File
@@ -118,24 +118,24 @@ function CharacterEditor:input(e)
             end
             if comet.keys:wasJustPressed("z") then
                 local anims = self.character.config.animations
-    
+
                 local anim = anims[self.curSelected]
                 table.remove(anims, self.curSelected)
-    
+
                 self.curSelected = math.wrap(self.curSelected - 1, 1, #anims + 1)
                 table.insert(anims, self.curSelected, anim)
-    
+
                 self:changeSelection(0)
             end
             if comet.keys:wasJustPressed("x") then
                 local anims = self.character.config.animations
-    
+
                 local anim = anims[self.curSelected]
                 table.remove(anims, self.curSelected)
-    
+
                 self.curSelected = math.wrap(self.curSelected + 1, 1, #anims + 1)
                 table.insert(anims, self.curSelected, anim)
-    
+
                 self:changeSelection(0)
             end
         end
@@ -152,7 +152,7 @@ end
 function CharacterEditor:setAnimOffset(name, x, y)
     self.character.animation:setOffset(name, x, y)
     self.character.config.animations[self.curSelected].offset = {x, y}
-    
+
     self.shadowCharacter.animation:setOffset(name, x, y)
 
     local label = self.animLabels:getChild(self.curSelected) --- @type comet.gfx.Label

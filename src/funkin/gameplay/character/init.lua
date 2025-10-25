@@ -102,6 +102,7 @@ function Character:loadCharacter(newCharacter)
 
     self:dance()
     self.midpoint:set(self:getWidth(1) * 0.5, self:getHeight(1) * 0.5)
+    self:updateOffset()
 
     if self.script then
         self.script:call("onLoadPost")
@@ -146,20 +147,23 @@ function Character:playAnimation(name, context, force)
     self.curAnimContext = context
     super.playAnimation(self, name, force)
 
-    local posX, posY = self.config.position and self.config.position[1] or 0.0, self.config.position and self.config.position[2] or 0.0
-    if self.centered then
-        self.offset.x = posX
-        self.offset.y = posY + (self:getHeight(1) * -0.5)
-    else
-        self.offset.x = posX + (self:getWidth(1) * -0.5)
-        self.offset.y = posY - self:getHeight(1)
-    end
-    self.offset.x = self.offset.x + (self.config.offset and self.config.position[1] or 0.0)
-    self.offset.y = self.offset.y + (self.config.offset and self.config.position[2] or 0.0)
-
+    self:updateOffset()
     if self.script then
         self.script:call("onPlayAnimation", name, context, force)
     end
+end
+
+function Character:updateOffset()
+    local posX, posY = self.config.position and self.config.position[1] or 0.0, self.config.position and self.config.position[2] or 0.0
+    if self.centered then
+        self.offset.x = posX
+        self.offset.y = posY - self.midpoint.y
+    else
+        self.offset.x = posX - self.midpoint.x
+        self.offset.y = posY - (self.midpoint.y * 2)
+    end
+    self.offset.x = self.offset.x + (self.config.offset and self.config.position[1] or 0.0)
+    self.offset.y = self.offset.y + (self.config.offset and self.config.position[2] or 0.0)
 end
 
 local defaultCamOffset = {0, 0}
