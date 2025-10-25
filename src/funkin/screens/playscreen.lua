@@ -114,6 +114,12 @@ function PlayScreen:enter()
     --- Multipler for how fast the camera should zoom back to default, `1` being instantaneously and `0` being not at all
     self.camZoomingSpeed = 0.05
 
+    --- Determines which character the camera should focus on
+    --- - `1` focuses on opponent
+    --- - `2` focuses on player
+    --- - `3` focuses on spectator
+    self.curCameraTarget = 1
+
     CharacterConfig.clearCache()
 
     self.scripts = ScriptPack:new() --- @type funkin.scripting.ScriptPack
@@ -122,6 +128,9 @@ function PlayScreen:enter()
     self.eventRunner = EventRunner:new() --- @type funkin.gameplay.events.EventRunner
     self.eventRunner.onExecute:connect(function(name, time, params)
         self.scripts:call("onEvent", name, time, params)
+    end)
+    table.sort(self.currentChart.e, function(a, b)
+        return a.t < b.t
     end)
     self.eventRunner:setEvents(self.currentChart.e)
     self:addChild(self.eventRunner)
@@ -149,12 +158,6 @@ function PlayScreen:enter()
     self.spectator = self.stage.props.spectator --- @type funkin.gameplay.Character
     self.opponent = self.stage.props.opponent --- @type funkin.gameplay.Character
     self.player = self.stage.props.player --- @type funkin.gameplay.Character
-
-    --- Determines which character the camera should focus on
-    --- - `1` focuses on opponent
-    --- - `2` focuses on player
-    --- - `3` focuses on spectator
-    self.curCameraTarget = 1
 
     self.camFollow = Object2D:new() --- @type comet.gfx.Object2D
     self.camFollow.position:set(initCamPos[1], initCamPos[2])

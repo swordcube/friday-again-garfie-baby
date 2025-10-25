@@ -24,7 +24,7 @@ function EventRunner:update(_)
         end
         self.behaviors[event.k]:execute(event.t, event.p)
         self.onExecute:emit(event.k, event.t, event.p)
-        
+
         self.curEventIndex = self.curEventIndex + 1
     end
 end

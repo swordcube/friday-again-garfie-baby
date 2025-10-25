@@ -162,8 +162,8 @@ function Character:updateOffset()
         self.offset.x = posX - self.midpoint.x
         self.offset.y = posY - (self.midpoint.y * 2)
     end
-    self.offset.x = self.offset.x + (self.config.offset and self.config.position[1] or 0.0)
-    self.offset.y = self.offset.y + (self.config.offset and self.config.position[2] or 0.0)
+    self.offset.x = self.offset.x + (self.config.position and self.config.position[1] or 0.0)
+    self.offset.y = self.offset.y + (self.config.position and self.config.position[2] or 0.0)
 end
 
 local defaultCamOffset = {0, 0}

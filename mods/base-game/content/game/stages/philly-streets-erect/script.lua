@@ -135,13 +135,13 @@ function onLoadPost()
             local woman = props.spectator.script:get("woman")
             woman.visible = not woman.visible
 
-            spr.position.y = spr.position.y + ((spr:getHeight(1) * 0.98) + spr.reflectionOffY)
+            spr.position.y = spr.position.y + ((spr.animation:getBiggestFrameHeight()) + spr.reflectionOffY)
             spr:_draw()
 
             spr.alpha = prevAlpha
             spr.flipY = not spr.flipY
             spr:setShader(prevShader)
-            spr.position.y = spr.position.y - ((spr:getHeight(1) * 0.98) + spr.reflectionOffY)
+            spr.position.y = spr.position.y - ((spr.animation:getBiggestFrameHeight()) + spr.reflectionOffY)
 
             woman.visible = not woman.visible
             spr:_draw()
@@ -153,7 +153,8 @@ function onLoadPost()
         end
         char.reflectionOffY = 0
     end
-    props.opponent.reflectionOffY = 60
+    props.opponent.reflectionOffY = -100
+    props.player.reflectionOffY = -130
 
     rainShader = Shader:new(Paths.frag("rain")) --- @type comet.gfx.Shader
     rainShader:send("distortionStrength", 0.5)

@@ -14,7 +14,7 @@ function Sustain:__init__(x, y)
 
     self.note = nil --- @type funkin.gameplay.notes.Note
 
-    self.skin = "funkin"
+    self.skin = nil
     self.skinData = nil
 
     self.line = TiledAnimatedImage:new() --- @type comet.gfx.TiledAnimatedImage
@@ -61,13 +61,23 @@ end
 --- @param note funkin.gameplay.notes.Note
 function Sustain:setup(note)
     self.note = note
+    if self.skin ~= note.skin then
+        loadSkin(self.line, note.skin)
+        for name in range(table.unpack(self.line.animation:getAnimationNames())) do
+            if name:endsWith("tail") then
+                self.line.animation:remove(name)
+            end
+        end
+        self.line.animation:play(dirs[note.lane + 1] .. "hold", true)
 
-    loadSkin(self.line, note.skin)
-    self.line.animation:play(dirs[note.lane + 1] .. "hold", true)
-
-    loadSkin(self.tail, note.skin)
-    self.tail.animation:play(dirs[note.lane + 1] .. "tail", true)
-
+        loadSkin(self.tail, note.skin)
+        for name in range(table.unpack(self.tail.animation:getAnimationNames())) do
+            if name:endsWith("hold") then
+                self.tail.animation:remove(name)
+            end
+        end
+        self.tail.animation:play(dirs[note.lane + 1] .. "tail", true)
+    end
     self.offsetX, self.offsetY = 0.0, 0.0
 end
 
