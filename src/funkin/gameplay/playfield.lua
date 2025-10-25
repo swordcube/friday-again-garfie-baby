@@ -380,11 +380,11 @@ function PlayField:input(e)
         if note then
             self:hitNote(note)
         else
-            strum:playAnimation("press", true)
+            strum.animation:play("press", true)
         end
     else
         local strum = plr:getChild(lane + 1) --- @type funkin.gameplay.notes.Strum
-        strum:playAnimation("static", true)
+        strum.animation:play("static", true)
     end
 end
 

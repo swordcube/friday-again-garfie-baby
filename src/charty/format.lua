@@ -2,7 +2,7 @@ local json = require(_CHARTY_PARENT .. ".lib.json") --- @type charty.lib.Json
 local Class = require(_CHARTY_PARENT .. ".lib.middleclass") --- @type charty.lib.MiddleClass
 
 --- @class charty.Format
-local Format = Class:extend("Format", ...)
+local Format = Class:subclass("Format", ...)
 
 function Format:__init__()
     self.chart = nil

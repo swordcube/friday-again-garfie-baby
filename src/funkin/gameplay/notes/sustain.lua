@@ -16,7 +16,7 @@ function Sustain:__init__(x, y)
 
     self.skin = "funkin"
     self.skinData = nil
-        
+
     self.line = TiledAnimatedImage:new() --- @type comet.gfx.TiledAnimatedImage
     self.line.horizontallyRepeat = false
     self.line.verticalPadding = 2
@@ -24,7 +24,7 @@ function Sustain:__init__(x, y)
 
     self.tail = AnimatedImage:new() --- @type comet.gfx.AnimatedImage
     self:addChild(self.tail)
-    
+
     self.alpha = 1.0
     self.offsetX, self.offsetY = 0.0, 0.0
 end
@@ -44,7 +44,7 @@ local function loadSkin(self, skin)
         for i = 1, #dirs do
             local dir = dirs[i]
             local animData = d[dir]
-    
+
             if animData.indices and animData.indices ~= json.null and #animData.indices > 0 then
                 self.animation:addByIndices(dir .. name, animData.prefix, animData.indices, animData.fps, animData.looped)
             else
@@ -61,12 +61,12 @@ end
 --- @param note funkin.gameplay.notes.Note
 function Sustain:setup(note)
     self.note = note
-    
+
     loadSkin(self.line, note.skin)
-    self.line:playAnimation(dirs[note.lane + 1] .. "hold", true)
-    
+    self.line.animation:play(dirs[note.lane + 1] .. "hold", true)
+
     loadSkin(self.tail, note.skin)
-    self.tail:playAnimation(dirs[note.lane + 1] .. "tail", true)
+    self.tail.animation:play(dirs[note.lane + 1] .. "tail", true)
 
     self.offsetX, self.offsetY = 0.0, 0.0
 end
@@ -86,7 +86,7 @@ function Sustain:updateVisuals()
         -- upscroll
         self.line.position.y = self.line:getHeight() * 0.5
         self.line.flipY = true
-        
+
         self.tail.position.y = self.line:getHeight() + (self.tail:getHeight() * 0.5)
         self.tail.flipY = false
     else
@@ -98,7 +98,7 @@ function Sustain:updateVisuals()
         self.tail.flipY = true
     end
     local strum = strumLine:getChild(note.lane + 1) --- @type funkin.gameplay.notes.Strum
-    
+
     local baseX, baseY = strumLine.position.x + strum.position.x + self.offsetX, strumLine.position.y + strum.position.y + self.offsetY
     self.position.x = baseX
     self.position.y = baseY + (0.45 * ((note.time + sexo) - Conductor.instance:getCurrentPlayhead()) * speed)
@@ -109,7 +109,7 @@ function Sustain:updateVisuals()
 
         local ry = baseY + (tail.position.y - (tail:getHeight() * 0.5))
         local clipRect = (tail.clipRect or Rect:new()):set(0, 0, tail:getOriginalWidth(), tail:getOriginalHeight())
-        
+
         if speedSign == 1 then
             -- upscroll
             clipRect.y = (strumCenter - ry) / tail.scale.y

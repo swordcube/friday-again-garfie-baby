@@ -101,7 +101,7 @@ function HoldCover:update(dt)
         else
             local strum = self.note.strumLine:getChild(self.lane + 1) --- @type funkin.gameplay.notes.Strum
             if strum:getCurrentAnimation():startsWith("confirm") then
-                strum:playAnimation("press", true)
+                strum.animation:play("press", true)
             end
             self.animation:play(dirs[self.lane + 1] .. "end", true)
         end

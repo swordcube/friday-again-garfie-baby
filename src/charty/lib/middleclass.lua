@@ -174,7 +174,7 @@ local DefaultMixin = {
             assert(type(self) == 'table', "Make sure that you are using 'Class:subclass' instead of 'Class.subclass'")
             assert(type(name) == "string", "You must provide a name(string) for your class")
 
-            local subclass = _createClass:extend(name, path, self)
+            local subclass = _createClass(name, path, self)
 
             for methodName, f in pairs(self.__instanceDict) do
                 if not (methodName == "__index" and type(f) == "table") then
@@ -209,11 +209,11 @@ function middleclass.isinstanceof(t, cl)
     return type(t) == "table" and t.isInstanceOf ~= nil and t:isInstanceOf(cl)
 end
 
-function middleclass.Class:extend(name, path, super)
+function middleclass:subclass(name, path, super)
     assert(type(name) == 'string', "A name (string) is needed for the new class")
-    return super and super:extend(name, path) or _includeMixin(_createClass:extend(name, path), DefaultMixin)
+    return super and super:subclass(name, path) or _includeMixin(_createClass(name, path), DefaultMixin)
 end
 
-setmetatable(middleclass, { __call = function(_, ...) return middleclass.Class:extend(...) end })
+setmetatable(middleclass, { __call = function(_, ...) return middleclass:subclass(...) end })
 
 return middleclass

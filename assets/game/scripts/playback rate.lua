@@ -35,6 +35,9 @@ function onUpdate(dt)
         local amount = (comet.keys:isPressed("lshift") or comet.keys:isPressed("rshift")) and 0.25 or 0.01
         setThatShit(getPlaybackRate() - amount)
     end
+    if comet.keys:wasJustPressed("f8") then
+        setThatShit(10)
+    end
     if funny then
         setThatShit(math.abs(math.sin(Conductor.instance.curDecStep) * 0.25) + 1)
     end

@@ -68,7 +68,7 @@ function Stage:__init__(name)
             local atlasType = propData.atlasType or "none" --- @type "none"|"sparrow"
             if atlasType == "none" then
                 prop = Image:new(Paths.image(("%s/%s"):format(self.config.directory, propData.assetPath))) --- @type comet.gfx.Image
-            
+
             elseif atlasType == "sparrow" then
                 prop = AnimatedImage:new() --- @type comet.gfx.AnimatedImage
                 prop:setFrameCollection(Paths.getSparrowAtlas(("%s/%s"):format(self.config.directory, propData.assetPath)))
@@ -77,15 +77,15 @@ function Stage:__init__(name)
                 for j = 1, #anims do
                     local anim = anims[j]
                     if anim.indices and anim.indices ~= json.null and #anim.indices ~= 0 then
-                        prop:addAnimationByIndices(anim.shortcut or anim.name, anim.prefix or anim.name, anim.indices, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
+                        prop.animation:addByIndices(anim.shortcut or anim.name, anim.prefix or anim.name, anim.indices, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
                     else
-                        prop:addAnimationByName(anim.shortcut or anim.name, anim.prefix or anim.name, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
+                        prop.animation:addByName(anim.shortcut or anim.name, anim.prefix or anim.name, anim.fps ~= nil and anim.fps or anim.frameRate, anim.loop ~= nil and anim.loop or anim.looped)
                     end
                     if anim.offset then
-                        prop:setAnimationOffset(anim.shortcut or anim.name, anim.offset[1] or 0.0, anim.offset[2] or 0.0)
+                        prop.animation:setOffset(anim.shortcut or anim.name, anim.offset[1] or 0.0, anim.offset[2] or 0.0)
                     end
                 end
-                prop:playAnimation(propData.idleAnim or (anims[1] and (anims[1].shortcut or anims[1].name) or "idle") or "idle")
+                prop.animation:play(propData.idleAnim or (anims[1] and (anims[1].shortcut or anims[1].name) or "idle") or "idle")
             end
             prop.position:set(
                 propData.position and (propData.position[1] or 0.0) or 0.0,
@@ -106,6 +106,9 @@ function Stage:__init__(name)
             prop.flipX = propData.flipX ~= nil and propData.flipX or false
             prop.flipY = propData.flipY ~= nil and propData.flipY or false
 
+            prop.blend = propData.blend or propData.blendMode or "alpha"
+            prop.blendAlpha = propData.blendAlpha or propData.blendAlphaMode or "premultiplied"
+
         elseif propType == "box" then
             -- TODO: box prop type
 
@@ -125,7 +128,7 @@ function Stage:__init__(name)
                 propData.position and (propData.position[1] or 0.0) or 0.0,
                 propData.position and (propData.position[2] or 0.0) or 0.0
             )
-            if self.script then                
+            if self.script then
                 self.script:call("onCharacterAdd", prop)
             end
             propData.name = propType
@@ -145,7 +148,7 @@ function Stage:__init__(name)
     if self.script then
         local game = PlayScreen.instance --- @type funkin.screens.PlayScreen
         self.script:call("onLoadPost")
-        
+
         if game then
             game.scripts:add(self.script)
         end
@@ -160,7 +163,7 @@ function Stage:addProp(name, prop, scroll)
     scroll = scroll or {1.0, 1.0}
     if scroll[1] ~= self.lastScrollFactor.x or scroll[2] ~= self.lastScrollFactor.y then
         self.lastScrollFactor:set(scroll[1], scroll[2])
-        
+
         self.lastLayer = Parallax2D:new() --- @type comet.gfx.Parallax2D
         self.lastLayer.scrollFactor:set(self.lastScrollFactor.x, self.lastScrollFactor.y)
         self:addChild(self.lastLayer)
@@ -175,7 +178,7 @@ function Stage:insertProp(name, prop, scroll, layerIndex)
 
     if scroll[1] ~= self.lastScrollFactor.x or scroll[2] ~= self.lastScrollFactor.y then
         self.lastScrollFactor:set(scroll[1], scroll[2])
-        
+
         self.lastLayer = Parallax2D:new() --- @type comet.gfx.Parallax2D
         self.lastLayer.scrollFactor:set(self.lastScrollFactor.x, self.lastScrollFactor.y)
         self:insertChild(layerIndex, self.lastLayer)

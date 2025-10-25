@@ -48,8 +48,8 @@ end
 function ScoreDisplay:showRating(rating)
     local spr = self:recycle(AnimatedVelocityImage) --- @type funkin.gfx.AnimatedVelocityImage
     spr:setFrameCollection(self._scoreAtlas)
-    spr:addAnimationByName("r", rating, 0, false)
-    spr:playAnimation("r", true)
+    spr.animation:addByName("r", rating, 0, false)
+    spr.animation:play("r", true)
     spr.acceleration.y = 550
     spr.velocity.x = math.floor(lmath.random(0, -10))
     spr.velocity.y = math.floor(lmath.random(-140, -175))
@@ -92,8 +92,8 @@ function ScoreDisplay:showCombo(combo, miss)
         end
         local spr = self:recycle(AnimatedVelocityImage) --- @type funkin.gfx.AnimatedVelocityImage
         spr:setFrameCollection(self._scoreAtlas)
-        spr:addAnimationByName("c", char, 0, false)
-        spr:playAnimation("c", true)
+        spr.animation:addByName("c", char, 0, false)
+        spr.animation:play("c", true)
         spr.acceleration.y = math.floor(lmath.random(200, 300))
         spr.velocity.x = lmath.random(-5, 5)
         spr.velocity.y = math.floor(lmath.random(-140, -160))

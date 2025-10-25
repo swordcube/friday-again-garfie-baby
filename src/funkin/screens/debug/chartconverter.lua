@@ -222,8 +222,8 @@ function ChartConverter:regenItems()
 
         local icon = AnimatedImage:new() --- @type comet.gfx.AnimatedImage
         icon:setFrameCollection(self.chartFormatIconAtlas)
-        icon:addAnimation("idle", {format.icon}, 0, false)
-        icon:playAnimation("idle")
+        icon.animation:add("idle", {format.icon}, 0, false)
+        icon.animation:play("idle")
         icon:setGraphicSize(50, 50)
         icon.position:set(90, (60 * (i - 1)) + 60)
         icon.centered = false

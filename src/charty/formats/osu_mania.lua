@@ -1,7 +1,7 @@
 local Format = require(_CHARTY_PARENT .. ".format")
 
 --- @class charty.formats.OsuMania : charty.Format
-local OsuMania, super = Format:extend("OsuMania", ...)
+local OsuMania, super = Format:subclass("OsuMania", ...)
 
 --! WARNING: This chart format is untested!
 

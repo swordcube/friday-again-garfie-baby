@@ -4,7 +4,7 @@ local json = require(_CHARTY_PARENT .. ".lib.json") --- @type charty.lib.Json
 local fs = require(_CHARTY_PARENT .. ".lib.nativefs") --- @type charty.lib.nativefs 
 
 --- @class charty.formats.FNFGarfieBaby : charty.Format
-local FNFGarfieBaby, super = Format:extend("FNFGarfieBaby", ...)
+local FNFGarfieBaby, super = Format:subclass("FNFGarfieBaby", ...)
 
 function FNFGarfieBaby:__init__()
     super.__init__(self)

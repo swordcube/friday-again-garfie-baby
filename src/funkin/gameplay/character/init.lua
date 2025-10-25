@@ -19,7 +19,7 @@ function Character:__init__(x, y, name, isPlayer)
 
     self.holdTimer = 0.0
     self.curAnimContext = "dance" --- @type "none"|"dance"|"sing"|"lock"
-    
+
     self.script = nil --- @type funkin.scripting.Script
     self.midpoint = Vec2:new() --- @type comet.math.Vec2
 
@@ -114,7 +114,7 @@ function Character:dance(force)
     end
     self:playAnimation(self.config.danceSteps[self.curDanceStep], "dance", force)
     self.curDanceStep = (self.curDanceStep % #self.config.danceSteps) + 1
-    
+
     if self.script then
         self.script:call("onDancePost")
     end

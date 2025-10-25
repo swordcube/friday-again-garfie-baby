@@ -210,7 +210,7 @@ function onBeatHit(b)
         paperOffset = b + math.floor(love.math.random(20, 40))
 
         props.paper.position.y = 608 + math.random(-150, 150)
-        props.paper:playAnimation("idle", true)
+        props.paper.animation:play("idle", true)
 
         props.paper:revive()
     end

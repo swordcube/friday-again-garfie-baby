@@ -39,13 +39,13 @@ function NoteField:update(dt)
             end
             local note = self.notes:recycle(Note, self._createNote) --- @type funkin.gameplay.notes.Note
             note.playField = self.playField
-    
+
             note:setup(noteData.t, noteData.d % strumLine.keyCount, math.max(noteData.l or 0.0, 0.0), noteData.k or "Default", strumLine)
             note:updatePosition()
-    
+
             note.sustain:setup(note)
             note.sustain:updateVisuals()
-    
+
             self.curNoteIndex = self.curNoteIndex + 1
         end
         self._noteSpawnTimer = self._noteSpawnTimer - INTERVAL_30_FPS

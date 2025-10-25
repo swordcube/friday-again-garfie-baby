@@ -56,24 +56,24 @@ function TitleScreen:enter()
     
     self.gf = AnimatedImage:new(comet.getDesiredWidth() * 0.4, comet.getDesiredHeight() * 0.07) --- @type comet.gfx.AnimatedImage
     self.gf:setFrameCollection(Paths.getSparrowAtlas("menus/title/gf"))
-    self.gf:addAnimationByIndices("danceLeft", "gfDance", table.numberList(1, 15), 24, false)
-    self.gf:addAnimationByIndices("danceRight", "gfDance", table.numberList(16, 31), 24, false)
-    self.gf:playAnimation("danceLeft")
+    self.gf.animation:addByIndices("danceLeft", "gfDance", table.numberList(1, 15), 24, false)
+    self.gf.animation:addByIndices("danceRight", "gfDance", table.numberList(16, 31), 24, false)
+    self.gf.animation:play("danceLeft")
     self.gf.centered = false
     self.titleGroup:addChild(self.gf)
 
     self.logo = AnimatedImage:new(-150, -100) --- @type comet.gfx.AnimatedImage
     self.logo:setFrameCollection(Paths.getSparrowAtlas("menus/title/logo"))
-    self.logo:addAnimationByName("idle", "logo bumpin", 24, false)
-    self.logo:playAnimation("idle")
+    self.logo.animation:addByName("idle", "logo bumpin", 24, false)
+    self.logo.animation:play("idle")
     self.logo.centered = false
     self.titleGroup:addChild(self.logo)
 
     self.titleText = AnimatedImage:new(100, comet.getDesiredHeight() * 0.8) --- @type comet.gfx.AnimatedImage
     self.titleText:setFrameCollection(Paths.getSparrowAtlas("menus/title/enter"))
-    self.titleText:addAnimationByName("idle", "Press Enter to Begin", 24, true)
-    self.titleText:addAnimationByName("press", "ENTER PRESSED", 24, true)
-    self.titleText:playAnimation("idle")
+    self.titleText.animation:addByName("idle", "Press Enter to Begin", 24, true)
+    self.titleText.animation:addByName("press", "ENTER PRESSED", 24, true)
+    self.titleText.animation:play("idle")
     self.titleText.centered = false
     self.titleGroup:addChild(self.titleText)
     
@@ -116,7 +116,7 @@ function TitleScreen:update(dt)
             self.camera:flash(Color.WHITE, 1)
             comet.mixer:play(Paths.sound("menus/sfx/select"))
             
-            self.titleText:playAnimation("press")
+            self.titleText.animation:play("press")
             self.pressTimer = Timer.wait(2, function()
                 self.persistentUpdate = false
                 self:switchTo(srcreq("funkin.screens.mainmenuscreen"):new())
@@ -164,11 +164,11 @@ function TitleScreen:beatHit(beat)
         end
     end
     if beat % 2 == 0 then
-        self.gf:playAnimation("danceRight")
+        self.gf.animation:play("danceRight")
     else
-        self.gf:playAnimation("danceLeft")
+        self.gf.animation:play("danceLeft")
     end
-    self.logo:playAnimation("idle", true)
+    self.logo.animation:play("idle", true)
     super.beatHit(self, beat)
 end
 

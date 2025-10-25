@@ -3,7 +3,7 @@ function onLoadPost()
     woman:setFrameCollection(Paths.getSparrowAtlas("game/characters/gf/woman"))
     woman:addAnimationByIndices("danceLeft", "GF Dancing Beat", table.numberList(1, 15), 24, false)
     woman:addAnimationByIndices("danceRight", "GF Dancing Beat", table.numberList(16, 30), 24, false)
-    woman:playAnimation("danceLeft")
+    woman.animation:play("danceLeft")
     woman.position:set(getWidth() * 0.5, -90)
     addChild(woman)
 
@@ -22,8 +22,8 @@ function onDance()
     end
     danceRight = not danceRight
     if danceRight then
-        woman:playAnimation("danceRight")
+        woman.animation:play("danceRight")
     else
-        woman:playAnimation("danceLeft")
+        woman.animation:play("danceLeft")
     end
 end
