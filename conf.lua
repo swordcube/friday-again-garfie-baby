@@ -1,7 +1,8 @@
 local project = require("project")
 
+math.randomseed(os.time())
 local function chance(c)
-    return love.math.random(0, 100) < (c or 50)
+    return math.random(0, 100) < (c or 50)
 end
 local function replace(self, from, to)
     local s, _ = self:gsub(from:gsub('([%^%$%(%)%%%.%[%]%*%+%-%q?])', '%%%1'), to)
@@ -20,11 +21,11 @@ function love.conf(t)
     t.usedpiscale = true
 
     t.window.title = project.title
-    -- if chance(5) then
+    if chance(5) then
         -- inside joke with friends became so funny that i had to
         t.window.title = replace(t.window.title, "garfie", "gargie")
         t.window.icon = "art/icons/gargicon.png"
-    -- end
+    end
 
     t.window.width = 1280
     t.window.height = 720
