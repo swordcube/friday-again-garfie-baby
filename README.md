@@ -1,3 +1,7 @@
+> [!WARNING]
+> # Migration Alert!!
+> This repo has now migrated to [git.gay](https://git.gay), the new repo can be found by [clicking on this text](https://git.gay/swordcube/friday-again-garfie-baby)
+
 # <img src="./art/icons/16x.png" alt="Friday Night Funkin'" width="24" /> friday again garfie baby
 
 yet another fnf engine, but with a twist!
