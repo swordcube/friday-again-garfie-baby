@@ -1,0 +1,52 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "mom-car",
+			"player": "bf-car",
+			"spectator": "gf-car"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"erect": 2.4,
+			"nightmare": 2.6
+		},
+		"stage": "limoRideErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"nightmare",
+			"normal",
+			"erect"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 135,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Satin Panties Erect",
+		"tracks": {
+			"opponent": [
+				"vocals-mom-car"
+			],
+			"player": [
+				"vocals-bf-car"
+			],
+			"spectator": []
+		}
+	}
+}

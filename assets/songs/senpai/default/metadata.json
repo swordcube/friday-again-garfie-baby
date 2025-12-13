@@ -1,0 +1,56 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "senpai",
+			"player": "bf-pixel",
+			"spectator": "gf-pixel"
+		},
+		"noteSkin": "pixel",
+		"scrollSpeed": {
+			"easy": 1.5,
+			"hard": 1.6,
+			"normal": 1.6
+		},
+		"stage": "school",
+		"uiSkin": "pixel"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "ninjamuffin99 + MtH",
+		"difficulties": [
+			"normal",
+			"hard",
+			"easy"
+		],
+		"mixes": [
+			"erect",
+			"pico"
+		],
+		"timingPoints": [
+			{
+				"b": 144,
+				"t": -1,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Senpai",
+		"tracks": {
+			"opponent": [
+				"vocals-senpai"
+			],
+			"player": [
+				"vocals-bf-pixel"
+			],
+			"spectator": []
+		}
+	}
+}

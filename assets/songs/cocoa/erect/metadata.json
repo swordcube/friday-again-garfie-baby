@@ -1,0 +1,51 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "parents-christmas",
+			"player": "bf-christmas",
+			"spectator": "gf-christmas"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"erect": 2.5,
+			"nightmare": 2.7
+		},
+		"stage": "mallXmasErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Saster",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"erect",
+			"nightmare"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 174,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Cocoa Erect",
+		"tracks": {
+			"opponent": [
+				"vocals-parents-christmas"
+			],
+			"player": [
+				"vocals-bf-christmas"
+			],
+			"spectator": []
+		}
+	}
+}

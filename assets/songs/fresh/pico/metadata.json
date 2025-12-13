@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "dad",
+			"player": "pico-playable",
+			"spectator": "nene"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 1.6,
+			"hard": 2.3,
+			"normal": 2
+		},
+		"stage": "mainStageErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Xploshi (ft. Saster)",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"normal",
+			"hard",
+			"easy"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 120,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Fresh (Pico Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-dad"
+			],
+			"player": [
+				"vocals-pico-playable"
+			],
+			"spectator": []
+		}
+	}
+}

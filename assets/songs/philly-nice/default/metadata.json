@@ -1,0 +1,56 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "pico",
+			"player": "bf",
+			"spectator": "gf"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 1.6,
+			"hard": 2,
+			"normal": 1.8
+		},
+		"stage": "phillyTrain",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "ninjamuffin99 + MtH + Spazkid",
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [
+			"erect",
+			"pico"
+		],
+		"timingPoints": [
+			{
+				"b": 175,
+				"t": -1,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Philly Nice",
+		"tracks": {
+			"opponent": [
+				"vocals-pico"
+			],
+			"player": [
+				"vocals-bf"
+			],
+			"spectator": []
+		}
+	}
+}

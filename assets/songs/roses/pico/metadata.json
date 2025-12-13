@@ -1,0 +1,53 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "senpai-angry",
+			"player": "pico-pixel",
+			"spectator": "nene-pixel"
+		},
+		"noteSkin": "pixel",
+		"scrollSpeed": {
+			"easy": 2.1,
+			"hard": 2.6,
+			"normal": 2.3
+		},
+		"stage": "schoolPico",
+		"uiSkin": "pixel"
+	},
+	"song": {
+		"artist": "Xploshi (ft. Saruky)",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 120,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Roses (Pico Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-senpai-angry"
+			],
+			"player": [
+				"vocals-pico-pixel"
+			],
+			"spectator": []
+		}
+	}
+}

@@ -1,0 +1,54 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "tankman-bloody",
+			"player": "pico-holding-nene",
+			"spectator": "otis-speaker"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2.5,
+			"hard": 3.2,
+			"normal": 2.9
+		},
+		"stage": "tankmanBattlefieldErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Saruky",
+		"charter": "fabs + Spazkid",
+		"difficulties": [
+			"normal",
+			"hard",
+			"easy",
+			"picospeaker"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 178,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Stress (Pico Mix)",
+		"tracks": {
+			"opponent": [
+				"vocals-tankman-bloody"
+			],
+			"player": [
+				"vocals-pico-holding-nene"
+			],
+			"spectator": []
+		}
+	}
+}

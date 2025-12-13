@@ -1,0 +1,55 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "spirit",
+			"player": "bf-pixel",
+			"spectator": "gf-pixel"
+		},
+		"noteSkin": "pixel",
+		"scrollSpeed": {
+			"easy": 1.7,
+			"hard": 2,
+			"normal": 1.8
+		},
+		"stage": "schoolEvil",
+		"uiSkin": "pixel"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "ninjamuffin99 + MtH",
+		"difficulties": [
+			"normal",
+			"easy",
+			"hard"
+		],
+		"mixes": [
+			"erect"
+		],
+		"timingPoints": [
+			{
+				"b": 190,
+				"t": -1,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Thorns",
+		"tracks": {
+			"opponent": [
+				"vocals-spirit"
+			],
+			"player": [
+				"vocals-bf-pixel"
+			],
+			"spectator": []
+		}
+	}
+}

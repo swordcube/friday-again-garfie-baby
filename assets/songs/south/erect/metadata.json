@@ -1,0 +1,51 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "spooky-dark",
+			"player": "bf-dark",
+			"spectator": "gf-dark"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"erect": 2.5,
+			"nightmare": 2.7
+		},
+		"stage": "spookyMansionErect",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Kawai Sprite (feat. Saruky)",
+		"charter": "Spazkid + fabs",
+		"difficulties": [
+			"erect",
+			"nightmare"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 177,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "South Erect",
+		"tracks": {
+			"opponent": [
+				"vocals-spooky-dark"
+			],
+			"player": [
+				"vocals-bf-dark"
+			],
+			"spectator": []
+		}
+	}
+}

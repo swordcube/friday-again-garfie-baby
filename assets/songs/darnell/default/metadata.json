@@ -1,0 +1,56 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "darnell",
+			"player": "pico-playable",
+			"spectator": "nene"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 2,
+			"hard": 2.4,
+			"normal": 2
+		},
+		"stage": "phillyStreets",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "fabs",
+		"difficulties": [
+			"normal",
+			"hard",
+			"easy"
+		],
+		"mixes": [
+			"bf",
+			"erect"
+		],
+		"timingPoints": [
+			{
+				"b": 155,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Darnell",
+		"tracks": {
+			"opponent": [
+				"vocals-darnell"
+			],
+			"player": [
+				"vocals-pico-playable"
+			],
+			"spectator": []
+		}
+	}
+}

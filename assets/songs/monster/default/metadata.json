@@ -1,0 +1,115 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "monster",
+			"player": "bf",
+			"spectator": "gf"
+		},
+		"noteSkin": "funkin",
+		"scrollSpeed": {
+			"easy": 1.4,
+			"hard": 1.5,
+			"normal": 1.4
+		},
+		"stage": "spookyMansion",
+		"uiSkin": "funkin"
+	},
+	"song": {
+		"artist": "BassetFilms",
+		"charter": "ChaoticGamerCG + MtH + Spazkid",
+		"difficulties": [
+			"easy",
+			"normal",
+			"hard"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 95,
+				"t": 0,
+				"ts": []
+			},
+			{
+				"b": 95,
+				"t": 41770,
+				"ts": []
+			},
+			{
+				"b": 105,
+				"t": 44180,
+				"ts": []
+			},
+			{
+				"b": 105,
+				"t": 80710,
+				"ts": []
+			},
+			{
+				"b": 110,
+				"t": 81860,
+				"ts": []
+			},
+			{
+				"b": 95,
+				"t": 81861,
+				"ts": []
+			},
+			{
+				"b": 132,
+				"t": 117230,
+				"ts": []
+			},
+			{
+				"b": 132,
+				"t": 131770,
+				"ts": []
+			},
+			{
+				"b": 107,
+				"t": 133310,
+				"ts": []
+			},
+			{
+				"b": 132,
+				"t": 133311,
+				"ts": []
+			},
+			{
+				"b": 120,
+				"t": 133770,
+				"ts": []
+			},
+			{
+				"b": 100,
+				"t": 42975,
+				"ts": []
+			},
+			{
+				"b": 107.5,
+				"t": 81285,
+				"ts": []
+			},
+			{
+				"b": 119.5,
+				"t": 132540,
+				"ts": []
+			}
+		],
+		"title": "Monster",
+		"tracks": {
+			"opponent": [
+				"vocals-monster"
+			],
+			"player": [
+				"vocals-bf"
+			],
+			"spectator": []
+		}
+	}
+}

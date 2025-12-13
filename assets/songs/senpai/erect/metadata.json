@@ -1,0 +1,51 @@
+{
+	"freeplay": {
+		"album": "vol1",
+		"icon": "face",
+		"ratings": []
+	},
+	"game": {
+		"allowOpponentMode": true,
+		"characters": {
+			"opponent": "senpai",
+			"player": "bf-pixel",
+			"spectator": "gf-pixel"
+		},
+		"noteSkin": "pixel",
+		"scrollSpeed": {
+			"erect": 2.2,
+			"nightmare": 2.8
+		},
+		"stage": "schoolErect",
+		"uiSkin": "pixel"
+	},
+	"song": {
+		"artist": "Kawai Sprite",
+		"charter": "Jenny Crowe + fabs",
+		"difficulties": [
+			"erect",
+			"nightmare"
+		],
+		"mixes": [],
+		"timingPoints": [
+			{
+				"b": 158,
+				"t": 0,
+				"ts": [
+					4,
+					4
+				]
+			}
+		],
+		"title": "Senpai Erect",
+		"tracks": {
+			"opponent": [
+				"vocals-senpai"
+			],
+			"player": [
+				"vocals-bf-pixel"
+			],
+			"spectator": []
+		}
+	}
+}
